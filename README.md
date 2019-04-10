@@ -28,7 +28,7 @@ Header-only flat FSM framework, made as an example to illustrate [twitter thread
 
 ```cpp
 struct Context {
-	// ...
+    // ...
 };
 ```
 
@@ -48,19 +48,19 @@ struct Second;
 
 ```cpp
 struct First
-	: M::State
+    : M::State
 {
-	virtual void update(Control& control) override {
-		control.changeTo<Second>();
-	}
+    virtual void update(Control& control) override {
+        control.changeTo<Second>();
+    }
 };
 
 struct Second
-	: M::State
+    : M::State
 {
-	virtual void update(Control& control) override {
-		control.changeTo<First>();
-	}
+    virtual void update(Control& control) override {
+        control.changeTo<First>();
+    }
 };
 
 struct Done : M::State {};
@@ -71,8 +71,8 @@ struct Done : M::State {};
 
 ```cpp
 using FSM = M::Host<First,
-					Second,
-					Done>;
+                    Second,
+                    Done>;
 ```
 
 7. Write the client code to use your new state machine:
@@ -84,18 +84,17 @@ int main() {
 8. Create context and state machine instances:
 
 ```cpp
-	Context context;
-	FSM fsm(context);
+    Context context;
+    FSM fsm(context);
 ```
 
 9. Kick off periodic updates until it's done:
 
 ```cpp
-	// more updates
-	while (!fsm.isActive<Done>())
-		fsm.update();
+    while (!fsm.isActive<Done>())
+        fsm.update();
 
-	return 0;
+    return 0;
 }
 ```
 
