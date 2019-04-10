@@ -20,17 +20,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\ffsm\machine.hpp" />
-    <ClInclude Include="..\..\tests\test_transition.hpp" />
+    <ClInclude Include="..\..\test\test_transition.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\tests\main.cpp" />
-    <ClCompile Include="..\..\tests\test_transition.cpp" />
+    <ClCompile Include="..\..\test\main.cpp" />
+    <ClCompile Include="..\..\test\test_transition.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{CCE21648-BED6-4180-A305-FF27932B9232}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" Label="Configuration">

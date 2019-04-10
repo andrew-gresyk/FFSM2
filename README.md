@@ -10,7 +10,7 @@ Header-only flat FSM framework, made as an example to illustrate [twitter thread
 ## Compiler Support
 
 - Visual Studio 14, 15, 16
-- GCC 6, 7, 8
+- GCC 7, 8
 - Clang 5, 6, 7
 
 ---

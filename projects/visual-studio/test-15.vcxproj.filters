@@ -4,7 +4,7 @@
     <Filter Include="include">
       <UniqueIdentifier>{de7dc121-d8ce-4c72-9ca3-e941332e2db9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="tests">
+    <Filter Include="test">
       <UniqueIdentifier>{39ccf084-4ca4-47ce-903f-258df80fd69d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -12,16 +12,16 @@
     <ClInclude Include="..\..\include\ffsm\machine.hpp">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\tests\test_transition.hpp">
-      <Filter>tests</Filter>
+    <ClInclude Include="..\..\test\test_transition.hpp">
+      <Filter>test</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\tests\main.cpp">
-      <Filter>tests</Filter>
+    <ClCompile Include="..\..\test\main.cpp">
+      <Filter>test</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\tests\test_transition.cpp">
-      <Filter>tests</Filter>
+    <ClCompile Include="..\..\test\test_transition.cpp">
+      <Filter>test</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
