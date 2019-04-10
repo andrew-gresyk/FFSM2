@@ -75,7 +75,7 @@ struct Machine {
 	// inheritable state base class with empty methods to override
 	class State {
 	protected:
-		using Control = Control;
+		using Control = Machine::Control;
 
 	public:
 		virtual ~State() {}

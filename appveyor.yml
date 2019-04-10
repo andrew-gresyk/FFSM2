@@ -1,7 +1,7 @@
 version: "{build}"
 
 image:
-- Visual Studio 2017
+- Visual Studio 2019
 
 configuration:
 - Debug
@@ -12,9 +12,9 @@ platform:
 - 64
 
 build:
-  project: projects\visual-studio\ffsm-15-vs.sln
+  project: projects\visual-studio\ffsm-16-vs.sln
   parallel: true
   verbosity: minimal
 
 test_script:
-- cmd: binaries-%PLATFORM%\ffsm-15-%CONFIGURATION%-%PLATFORM%.exe
+- cmd: binaries-%PLATFORM%\ffsm-16-%CONFIGURATION%-%PLATFORM%.exe
