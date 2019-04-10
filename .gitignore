@@ -1,0 +1,11 @@
+﻿.codelite
+.idea
+.vs
+build
+cmake-*
+
+*.user
+
+/binaries-*
+/hfsm_test.dir
+/projects/code-lite/test-gcc-tdm

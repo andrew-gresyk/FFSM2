@@ -1,0 +1,20 @@
+version: "{build}"
+
+image:
+- Visual Studio 2017
+
+configuration:
+- Debug
+- Release
+
+platform:
+- 32
+- 64
+
+build:
+  project: projects\visual-studio\ffsm-15-vs.sln
+  parallel: true
+  verbosity: minimal
+
+test_script:
+- cmd: binaries-%PLATFORM%\ffsm-15-%CONFIGURATION%-%PLATFORM%.exe

@@ -1,0 +1,97 @@
+#sudo: false
+
+language: cpp
+
+notifications:
+  email: true
+
+os: linux
+dist: trusty
+
+env:
+  global:
+    - TMPDIR=/tmp
+
+before_install:
+  - pip install --user cpp-coveralls
+
+matrix:
+  include:
+
+    # GCC 6
+    - env: COMPILER=g++-6 BUILD_TYPE=Debug
+      addons: &gcc6
+        apt:
+          packages: g++-6
+          sources: ubuntu-toolchain-r-test
+
+    - env: COMPILER=g++-6 BUILD_TYPE=Release
+      addons: *gcc6
+
+    # GCC 7
+    - env: COMPILER=g++-7 BUILD_TYPE=Debug
+      addons: &gcc7
+        apt:
+          packages: g++-7
+          sources: ubuntu-toolchain-r-test
+
+    - env: COMPILER=g++-7 BUILD_TYPE=Release
+      addons: *gcc7
+
+    # GCC 8
+    - env: COMPILER=g++-8 BUILD_TYPE=Debug
+      addons: &gcc8
+        apt:
+          packages: g++-8
+          sources: ubuntu-toolchain-r-test
+
+    - env: COMPILER=g++-8 BUILD_TYPE=Release
+      addons: *gcc8
+
+    # Clang 5.0
+    - env: COMPILER=clang++-5.0 BUILD_TYPE=Debug
+      addons: &clang5
+        apt:
+          packages:
+            - clang-5.0
+            - g++-7
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-5.0
+
+    - env: COMPILER=clang++-5.0 BUILD_TYPE=Release
+      addons: *clang5
+
+    # Clang 6.0
+    - env: COMPILER=clang++-6.0 BUILD_TYPE=Debug
+      addons: &clang6
+        apt:
+          packages:
+            - clang-6.0
+            - g++-7
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-6.0
+
+    - env: COMPILER=clang++-6.0 BUILD_TYPE=Release
+      addons: *clang6
+
+    # Clang 7.0
+    - env: COMPILER=clang++-7 BUILD_TYPE=Debug
+      addons: &clang7
+        apt:
+          packages:
+            - clang-7
+            - g++-7
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-7
+
+    - env: COMPILER=clang++-7 BUILD_TYPE=Release
+      addons: *clang7
+
+script:
+  - cd "${TRAVIS_BUILD_DIR}"
+  - mkdir build && cd build
+  - cmake .. -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+  - make
