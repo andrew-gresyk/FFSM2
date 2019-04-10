@@ -4,8 +4,8 @@ image:
 - Visual Studio 2017
 
 configuration:
-- Debug
-- Release
+- debug
+- release
 
 platform:
 - 32
@@ -17,4 +17,4 @@ build:
   verbosity: minimal
 
 test_script:
-- cmd: binaries-%PLATFORM%\ffsm-15-%CONFIGURATION%-%PLATFORM%.exe
+- cmd: binaries-%PLATFORM%\test-15-%CONFIGURATION%-%PLATFORM%.exe
