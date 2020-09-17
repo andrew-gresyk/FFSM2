@@ -1,7 +1,7 @@
 [![Standard](https://img.shields.io/badge/c%2B%2B-14/17/20-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Build status](https://ci.appveyor.com/api/projects/status/gy4gu98j2n3phtcx?svg=true)](https://ci.appveyor.com/project/andrew-gresyk/ffsm)
-[![Build Status](https://travis-ci.org/andrew-gresyk/FFSM.svg?branch=master)](https://travis-ci.org/andrew-gresyk/FFSM)
+[![Build Status](https://travis-ci.org/andrew-gresyk/FFSM.svg?branch=master)](https://travis-ci.org/andrew-gresyk/FFSM) [![Join the chat at https://gitter.im/andrew-gresyk/FFSM2](https://badges.gitter.im/andrew-gresyk/FFSM2.svg)](https://gitter.im/andrew-gresyk/FFSM2?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 # FFSM: Flat Finite State Machine Framework
 
