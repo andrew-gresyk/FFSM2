@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- https://docs.microsoft.com/en-us/visualstudio/debugger/format-specifiers-in-cpp -->
+
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+	<Type Name="std::type_index">
+		<DisplayString Condition="_Tptr->_Data._UndecoratedName">{_Tptr->_Data._UndecoratedName,sb}</DisplayString>
+		<DisplayString Condition="_Tptr->_Data._DecoratedName[5]=='$'">
+			{&amp;_Tptr->_Data._DecoratedName[6],[strchr(_Tptr->_Data._DecoratedName,'@') - _Tptr->_Data._DecoratedName - 6]sb}
+			&lt;
+			{strstr(_Tptr->_Data._DecoratedName,"@V") + 2,[strstr(_Tptr->_Data._DecoratedName,"@?") - strstr(_Tptr->_Data._DecoratedName,"@V") - 2]sb}
+			&gt;
+		</DisplayString>
+		<DisplayString>{&amp;_Tptr->_Data._DecoratedName[4],[strchr(_Tptr->_Data._DecoratedName,'@') - _Tptr->_Data._DecoratedName - 4]sb}</DisplayString>
+		<Expand HideRawView="true" />
+	</Type>
+
+	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+	<Type Name="ffsm2::detail::Array&lt;*&gt;">
+		<DisplayString>&lt;{_count}&gt;</DisplayString>
+		<Expand HideRawView="true">
+			<ArrayItems>
+				<Size>_count</Size>
+				<ValuePointer>_items</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+
+	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+	<Type Name="ffsm2::detail::TransitionBase">
+		<DisplayString Condition="origin == 0xFFFF">{type, en} (► {destination})</DisplayString>
+		<DisplayString>{type, en} ({origin} ► {destination})</DisplayString>
+		<Expand HideRawView="true" />
+	</Type>
+
+	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+	<Type Name="ffsm2::detail::ControlT&lt;*&gt;">
+		<DisplayString>{_context}</DisplayString>
+	</Type>
+
+	<!-- ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ -->
+
+	<Type Name="ffsm2::detail::PlanControlT&lt;*&gt;">
+		<DisplayString>({_status})</DisplayString>
+	</Type>
+
+	<!-- ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ -->
+
+	<Type Name="ffsm2::detail::FullControlT&lt;*&gt;">
+		<DisplayString>[{_status}]</DisplayString>
+	</Type>
+
+	<!-- ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ -->
+
+	<Type Name="ffsm2::detail::GuardControlT&lt;*,*&gt;">
+		<DisplayString>[{_status}] ({_pending})</DisplayString>
+	</Type>
+
+	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+	<Type Name="ffsm2::detail::Status">
+		<DisplayString>{result}</DisplayString>
+		<Expand HideRawView="true" />
+	</Type>
+
+	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+	<Type Name="ffsm2::detail::DBox&lt;*&gt;">
+		<DisplayString>{TYPE}</DisplayString>
+		<Expand HideRawView="true" />
+	</Type>
+
+	<Type Name="ffsm2::detail::SBox&lt;*&gt;">
+		<DisplayString>{TYPE}</DisplayString>
+		<Expand HideRawView="true" />
+	</Type>
+
+	<!-- ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ -->
+
+	<Type Name="ffsm2::detail::S_&lt;*&gt;">
+		<DisplayString>{_headBox}</DisplayString>
+		<Expand HideRawView="true" />
+	</Type>
+
+	<!-- ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ -->
+
+	<Type Name="ffsm2::detail::C_&lt;*&gt;">
+		<DisplayString>({_headState})</DisplayString>
+	</Type>
+
+	<Type Name="ffsm2::detail::CS_&lt;*&gt;">
+		<DisplayString Optional="true">{{ {lHalf} {rHalf} }}</DisplayString>
+		<DisplayString Optional="true">{{{state}}}</DisplayString>
+	</Type>
+
+	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+	<Type Name="ffsm2::Iterator&lt;*&gt;">
+		<DisplayString>[{_cursor}] = {_t[_cursor]}</DisplayString>
+		<Expand>
+			<ExpandedItem>_container</ExpandedItem>
+		</Expand>
+	</Type>
+
+	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+	<Type Name="Event">
+		<DisplayString Condition="target == ffsm2::INVALID_STATE_ID"		   >{type, en} [{(unsigned)origin}]</DisplayString>
+		<DisplayString Condition="origin == ffsm2::INVALID_STATE_ID">(external) {type, en} [{(unsigned)target}]</DisplayString>
+		<DisplayString									  >[{(unsigned)origin}] {type, en} [{(unsigned)target}]</DisplayString>
+		<Expand HideRawView="true" />
+	</Type>
+
+	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+</AutoVisualizer>

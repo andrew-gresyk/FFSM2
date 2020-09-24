@@ -1,106 +1,56 @@
-[![Standard](https://img.shields.io/badge/c%2B%2B-14/17/20-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![Build status](https://ci.appveyor.com/api/projects/status/gy4gu98j2n3phtcx?svg=true)](https://ci.appveyor.com/project/andrew-gresyk/ffsm)
-[![Build Status](https://travis-ci.org/andrew-gresyk/FFSM.svg?branch=master)](https://travis-ci.org/andrew-gresyk/FFSM) [![Join the chat at https://gitter.im/andrew-gresyk/FFSM2](https://badges.gitter.im/andrew-gresyk/FFSM2.svg)](https://gitter.im/andrew-gresyk/FFSM2?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build status](https://ci.appveyor.com/api/projects/status/gy4gu98j2n3phtcx?svg=true)](https://ci.appveyor.com/project/andrew-gresyk/FFSM2)
+[![Build Status](https://travis-ci.org/andrew-gresyk/FFSM.svg?branch=master)](https://travis-ci.org/andrew-gresyk/FFSM2)
+[![Gitter](https://badges.gitter.im/andrew-gresyk/FFSM2.svg)](https://gitter.im/andrew-gresyk/FFSM2)
 
-# FFSM: Flat Finite State Machine Framework
+# FFSM2: High-Performance Flat Finite State Machine Framework
 
-Header-only flat FSM framework, made as an example to illustrate [twitter thread on #cpp #state_machine #software_design](https://threadreaderapp.com/thread/1108411688079015936.html).
+Header-only flat FSM framework in C++11, with fully statically-defined structure (no dynamic allocations), built with variadic templates.
 
 ## Compiler Support
 
 - Visual Studio 14, 15, 16
-- GCC 7, 8
-- Clang 5, 6, 7
+- GCC 5, 6, 7, 8, 9
+- Clang 3.7, 3.8, 3.9, 4, 5, 6, 7, 8, 9, 10
 
 ---
 
-## Basic Usage
+## See Also
 
-1. Include FFSM header:
+- [Hierarchical FSM Framework](https://hfsm.dev)
 
-```cpp
-#include <ffsm/machine.hpp>
-```
+---
 
-2. Define interface class between the state machine and its host
-(also ok to use the host object itself):
+## Feature Highlights
 
-```cpp
-struct Context {
-    // ...
-};
-```
+- Permissive [MIT License](https://github.com/andrew-gresyk/HFSM2/blob/master/LICENSE)
+- Written in widely-supported modern(ish) C++11
+- Header-only
+- Convenient, minimal boilerplate
+- Fully static, no dynamic allocations
+- Uses inline-friendly compile-time pylymorphism, no virtual methods are used
+- Type-safe transitions: `FSM.changeTo<TargetState>()` with optional payloads
+- Gamedev-friendly, supports explicit `State::update()`
+- Also supports traditional event-based workflow with `State::react()`
+- Inspect anything: previous and current transitions, state activation status, and more!
+- Scaleable, supports robust state re-use via state injections
 
-3. (Optional, recommended) Typedef `ffsm::Machine` for convenience:
+---
 
-```cpp
-using M = ffsm::Machine<Context>;
-```
+## 3rd Party Libraries
 
-4. (Optional) Forward declare transition target states:
+- [Catch2](https://github.com/catchorg/Catch2) unit testing framework
 
-```cpp
-struct Second;
-```
-
-5. Define states inheriting them from `M::State`:
-
-```cpp
-struct First
-    : M::State
-{
-    virtual void update(Control& control) override {
-        control.changeTo<Second>();
-    }
-};
-
-struct Second
-    : M::State
-{
-    virtual void update(Control& control) override {
-        control.changeTo<First>();
-    }
-};
-
-struct Done : M::State {};
-
-```
-
-6. Declare state machine structure:
-
-```cpp
-using FSM = M::Host<First,
-                    Second,
-                    Done>;
-```
-
-7. Write the client code to use your new state machine:
-
-```cpp
-int main() {
-```
-
-8. Create context and state machine instances:
-
-```cpp
-    Context context;
-    FSM fsm(context);
-```
-
-9. Kick off periodic updates until it's done:
-
-```cpp
-    while (!fsm.isActive<Done>())
-        fsm.update();
-
-    return 0;
-}
-```
+---
 
 ## Get Updates
 
-- [Original twitter thread on #cpp #state_machine #software_design](https://threadreaderapp.com/thread/1108411688079015936.html)
-- [FFSM's "Older sibling" - Hierarchical FSM framework](https://hfsm.dev)
 - [Blog](https://gresyk.dev)
+- [Twitter](https://www.twitter.com/andrew_gresyk)
+
+---
+
+## Get In Touch
+
+- [Gitter](https://gitter.im/andrew-gresyk/FFSM2)
 - [Twitter](https://www.twitter.com/andrew_gresyk)

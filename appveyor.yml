@@ -4,12 +4,12 @@ image:
 - Visual Studio 2017
 
 configuration:
-- debug
-- release
+- Debug
+- Release
 
 platform:
-- 32
-- 64
+- x86
+- x64
 
 build:
   project: projects\visual-studio\ffsm-15-vs.sln
