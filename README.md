@@ -1,6 +1,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![Build status](https://ci.appveyor.com/api/projects/status/gy4gu98j2n3phtcx?svg=true)](https://ci.appveyor.com/project/andrew-gresyk/FFSM2)
-[![Build Status](https://travis-ci.org/andrew-gresyk/FFSM.svg?branch=master)](https://travis-ci.org/andrew-gresyk/FFSM2)
+[![Build status](https://ci.appveyor.com/api/projects/status/io1x70fd52l04wad?svg=true)](https://ci.appveyor.com/project/andrew-gresyk/FFSM2)
+[![Build Status](https://travis-ci.org/andrew-gresyk/FFSM2.svg?branch=master)](https://travis-ci.org/andrew-gresyk/FFSM2)
 [![Gitter](https://badges.gitter.im/andrew-gresyk/FFSM2.svg)](https://gitter.im/andrew-gresyk/FFSM2)
 
 # FFSM2: High-Performance Flat Finite State Machine Framework
