@@ -1,0 +1,13 @@
+#ifdef FFSM2_ENABLE_PLANS
+
+namespace ffsm2 {
+namespace detail {
+
+////////////////////////////////////////////////////////////////////////////////
+
+}
+}
+
+#include "plan_data.inl"
+
+#endif

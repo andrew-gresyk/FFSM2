@@ -1,6 +1,7 @@
 ﻿.codelite
 .idea
 .vs
+.vscode
 build
 cmake-*
 
@@ -8,4 +9,8 @@ cmake-*
 
 /binaries-*
 /hfsm_test.dir
-/projects/code-lite/test-gcc-tdm
+/projects/code-lite/compile_commands.json
+/projects/code-lite/*/CMakeLists.txt
+/projects/code-lite/*/compile_flags.txt
+/projects/visual-studio/.opencppcov
+/projects/visual-studio/*.log

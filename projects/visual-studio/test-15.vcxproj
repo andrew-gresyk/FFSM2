@@ -1,58 +1,93 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="debug|Win32">
-      <Configuration>debug</Configuration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="release|Win32">
-      <Configuration>release</Configuration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="debug|x64">
-      <Configuration>debug</Configuration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="release|x64">
-      <Configuration>release</Configuration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\include\ffsm\machine.hpp" />
-    <ClInclude Include="..\..\test\test_transition.hpp" />
+    <ClInclude Include="..\..\include\ffsm2\detail\features\common.hpp" />
+    <ClInclude Include="..\..\include\ffsm2\detail\features\logger_interface.hpp" />
+    <ClInclude Include="..\..\include\ffsm2\detail\root.hpp" />
+    <ClInclude Include="..\..\include\ffsm2\detail\root\control.hpp" />
+    <ClInclude Include="..\..\include\ffsm2\detail\root\plan.hpp" />
+    <ClInclude Include="..\..\include\ffsm2\detail\root\plan_data.hpp" />
+    <ClInclude Include="..\..\include\ffsm2\detail\root\registry.hpp" />
+    <ClInclude Include="..\..\include\ffsm2\detail\root\state_access.hpp" />
+    <ClInclude Include="..\..\include\ffsm2\detail\shared\array.hpp" />
+    <ClInclude Include="..\..\include\ffsm2\detail\shared\iterator.hpp" />
+    <ClInclude Include="..\..\include\ffsm2\detail\shared\macros_off.hpp" />
+    <ClInclude Include="..\..\include\ffsm2\detail\shared\macros_on.hpp" />
+    <ClInclude Include="..\..\include\ffsm2\detail\shared\type_list.hpp" />
+    <ClInclude Include="..\..\include\ffsm2\detail\shared\utility.hpp" />
+    <ClInclude Include="..\..\include\ffsm2\detail\structure\composite.hpp" />
+    <ClInclude Include="..\..\include\ffsm2\detail\structure\composite_sub.hpp" />
+    <ClInclude Include="..\..\include\ffsm2\detail\structure\forward.hpp" />
+    <ClInclude Include="..\..\include\ffsm2\detail\structure\injections.hpp" />
+    <ClInclude Include="..\..\include\ffsm2\detail\structure\state.hpp" />
+    <ClInclude Include="..\..\include\ffsm2\detail\structure\state_box.hpp" />
+    <ClInclude Include="..\..\include\ffsm2\machine_dev.hpp" />
+    <ClInclude Include="..\..\test\tools.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\test\main.cpp" />
-    <ClCompile Include="..\..\test\test_transition.cpp" />
+    <ClCompile Include="..\..\test\test_transitions.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\include\ffsm2\detail\root.inl" />
+    <None Include="..\..\include\ffsm2\detail\root\control.inl" />
+    <None Include="..\..\include\ffsm2\detail\root\plan.inl" />
+    <None Include="..\..\include\ffsm2\detail\root\plan_data.inl" />
+    <None Include="..\..\include\ffsm2\detail\shared\array.inl" />
+    <None Include="..\..\include\ffsm2\detail\shared\iterator.inl" />
+    <None Include="..\..\include\ffsm2\detail\structure\composite.inl" />
+    <None Include="..\..\include\ffsm2\detail\structure\composite_sub_1.inl" />
+    <None Include="..\..\include\ffsm2\detail\structure\composite_sub_2.inl" />
+    <None Include="..\..\include\ffsm2\detail\structure\injections.inl" />
+    <None Include="..\..\include\ffsm2\detail\structure\state.inl" />
+    <None Include="..\..\include\ffsm2\detail\structure\state_box.inl" />
+    <None Include="..\..\test\tools.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{CCE21648-BED6-4180-A305-FF27932B9232}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion Condition="'$(WindowsTargetPlatformVersion)' == ''">$([Microsoft.Build.Utilities.ToolLocationHelper]::GetLatestSDKTargetPlatformVersion('Windows', '10.0'))</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
@@ -64,40 +99,40 @@
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="shared-15.props" />
     <Import Project="catch2.props" />
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="shared-15.props" />
     <Import Project="catch2.props" />
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="shared-15.props" />
     <Import Project="catch2.props" />
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='release|x64'">
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="shared-15.props" />
     <Import Project="catch2.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -106,7 +141,7 @@
     </ClCompile>
     <Link />
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -120,7 +155,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -129,7 +164,7 @@
     </ClCompile>
     <Link />
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>

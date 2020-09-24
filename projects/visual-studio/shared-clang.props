@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ImportGroup Label="PropertySheets">
-    <Import Project="shared.props" />
-  </ImportGroup>
+  <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <OutDir>$(SolutionDir)..\..\binaries-$(PlatformArchitecture)\</OutDir>
-    <IntDir>$(BUILD_ROOT)\$(SolutionName)-$(PlatformArchitecture)\$(ProjectName)-$(Configuration)\</IntDir>
-    <TargetName>$(ProjectName)-$(Configuration)-$(PlatformArchitecture)</TargetName>
+    <OutDir>$(SolutionDir)..\..\binaries-$(PlatformTarget)\</OutDir>
+    <IntDir>$(BUILD_ROOT)\$(SolutionName)-$(PlatformTarget)\$(ProjectName)-$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)-$(Configuration)-$(PlatformTarget)</TargetName>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup>
@@ -16,8 +14,9 @@
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <PreprocessorDefinitions>_UNICODE;UNICODE;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>-m$(PlatformArchitecture) -fmsc-version=1900 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-Wpedantic %(AdditionalOptions)</AdditionalOptions>
       <SupportJustMyCode>false</SupportJustMyCode>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

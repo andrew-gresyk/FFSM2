@@ -1,27 +1,143 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="ffsm">
-      <UniqueIdentifier>{8b3c44cd-9e3f-425f-991d-10f0f4ba6402}</UniqueIdentifier>
+    <Filter Include="ffsm2">
+      <UniqueIdentifier>{26b683c5-e03f-4fb4-b635-2692fd8b6cdd}</UniqueIdentifier>
     </Filter>
     <Filter Include="test">
-      <UniqueIdentifier>{1dd961d0-5877-45af-b04b-d761b7821626}</UniqueIdentifier>
+      <UniqueIdentifier>{3a9661ac-4bd8-407d-b08b-56a27fae1d6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ffsm2\detail">
+      <UniqueIdentifier>{aa0efce0-b404-44c7-97cf-5d4cfebf935c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ffsm2\detail\root">
+      <UniqueIdentifier>{b1e85ed1-4a9f-43ef-bd5f-49262ce6f451}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ffsm2\detail\shared">
+      <UniqueIdentifier>{625fcf45-bf79-4d3f-ad98-9e10c4e2995c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ffsm2\detail\structure">
+      <UniqueIdentifier>{b5b55fb3-81b2-4ae4-803c-f72fe5a59b0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ffsm2\detail\features">
+      <UniqueIdentifier>{46255f99-09a1-46d9-bd29-d84ef1b2eed0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\include\ffsm\machine.hpp">
-      <Filter>ffsm</Filter>
+    <ClInclude Include="..\..\include\ffsm2\machine_dev.hpp">
+      <Filter>ffsm2</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\test\test_transition.hpp">
+    <ClInclude Include="..\..\include\ffsm2\detail\root.hpp">
+      <Filter>ffsm2\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ffsm2\detail\root\control.hpp">
+      <Filter>ffsm2\detail\root</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ffsm2\detail\root\plan.hpp">
+      <Filter>ffsm2\detail\root</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ffsm2\detail\root\plan_data.hpp">
+      <Filter>ffsm2\detail\root</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ffsm2\detail\root\state_access.hpp">
+      <Filter>ffsm2\detail\root</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ffsm2\detail\shared\macros_off.hpp">
+      <Filter>ffsm2\detail\shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ffsm2\detail\shared\macros_on.hpp">
+      <Filter>ffsm2\detail\shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ffsm2\detail\shared\type_list.hpp">
+      <Filter>ffsm2\detail\shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ffsm2\detail\shared\utility.hpp">
+      <Filter>ffsm2\detail\shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ffsm2\detail\structure\forward.hpp">
+      <Filter>ffsm2\detail\structure</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ffsm2\detail\structure\injections.hpp">
+      <Filter>ffsm2\detail\structure</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ffsm2\detail\structure\state.hpp">
+      <Filter>ffsm2\detail\structure</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ffsm2\detail\structure\state_box.hpp">
+      <Filter>ffsm2\detail\structure</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ffsm2\detail\features\common.hpp">
+      <Filter>ffsm2\detail\features</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\test\tools.hpp">
       <Filter>test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ffsm2\detail\features\logger_interface.hpp">
+      <Filter>ffsm2\detail\features</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ffsm2\detail\structure\composite.hpp">
+      <Filter>ffsm2\detail\structure</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ffsm2\detail\root\registry.hpp">
+      <Filter>ffsm2\detail\root</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ffsm2\detail\shared\array.hpp">
+      <Filter>ffsm2\detail\shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ffsm2\detail\shared\iterator.hpp">
+      <Filter>ffsm2\detail\shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ffsm2\detail\structure\composite_sub.hpp">
+      <Filter>ffsm2\detail\structure</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\test\main.cpp">
       <Filter>test</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\test\test_transition.cpp">
+    <ClCompile Include="..\..\test\test_transitions.cpp">
       <Filter>test</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\include\ffsm2\detail\root.inl">
+      <Filter>ffsm2\detail</Filter>
+    </None>
+    <None Include="..\..\include\ffsm2\detail\root\control.inl">
+      <Filter>ffsm2\detail\root</Filter>
+    </None>
+    <None Include="..\..\include\ffsm2\detail\root\plan.inl">
+      <Filter>ffsm2\detail\root</Filter>
+    </None>
+    <None Include="..\..\include\ffsm2\detail\root\plan_data.inl">
+      <Filter>ffsm2\detail\root</Filter>
+    </None>
+    <None Include="..\..\include\ffsm2\detail\structure\injections.inl">
+      <Filter>ffsm2\detail\structure</Filter>
+    </None>
+    <None Include="..\..\include\ffsm2\detail\structure\state.inl">
+      <Filter>ffsm2\detail\structure</Filter>
+    </None>
+    <None Include="..\..\include\ffsm2\detail\structure\state_box.inl">
+      <Filter>ffsm2\detail\structure</Filter>
+    </None>
+    <None Include="..\..\test\tools.inl">
+      <Filter>test</Filter>
+    </None>
+    <None Include="..\..\include\ffsm2\detail\structure\composite.inl">
+      <Filter>ffsm2\detail\structure</Filter>
+    </None>
+    <None Include="..\..\include\ffsm2\detail\shared\array.inl">
+      <Filter>ffsm2\detail\shared</Filter>
+    </None>
+    <None Include="..\..\include\ffsm2\detail\shared\iterator.inl">
+      <Filter>ffsm2\detail\shared</Filter>
+    </None>
+    <None Include="..\..\include\ffsm2\detail\structure\composite_sub_1.inl">
+      <Filter>ffsm2\detail\structure</Filter>
+    </None>
+    <None Include="..\..\include\ffsm2\detail\structure\composite_sub_2.inl">
+      <Filter>ffsm2\detail\structure</Filter>
+    </None>
   </ItemGroup>
 </Project>
