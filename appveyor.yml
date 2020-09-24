@@ -12,7 +12,7 @@ platform:
 - x64
 
 build:
-  project: projects\visual-studio\ffsm-15-vs.sln
+  project: projects\visual-studio\ffsm2-15-vs.sln
   parallel: true
   verbosity: minimal
 

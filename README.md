@@ -17,7 +17,7 @@ Header-only flat FSM framework in C++11, with fully statically-defined structure
 
 ## See Also
 
-- [Hierarchical FSM Framework](https://hfsm.dev)
+- [HFSM2: High-Performance Hierarchical Finite State Machine Framework](https://hfsm.dev)
 
 ---
 
