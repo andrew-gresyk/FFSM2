@@ -3,15 +3,14 @@ namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename TIndices,
+template <StateID NStateId,
 		  typename TArgs,
 		  Short NIndex,
 		  typename... TStates>
 struct CS_ final {
 	static_assert(sizeof...(TStates) >= 2, "");
 
-	using Indices		= TIndices;
-	static constexpr StateID  INITIAL_ID  = Indices::STATE_ID;
+	static constexpr StateID  INITIAL_ID  = NStateId;
 
 	static constexpr Short	  PRONG_INDEX = NIndex;
 
@@ -33,7 +32,7 @@ struct CS_ final {
 	static constexpr Short	  L_PRONG	  = PRONG_INDEX;
 
 	using LStates		= SplitL<TStates...>;
-	using LHalf			= CSubMaterial<I_<INITIAL_ID>,
+	using LHalf			= CSubMaterial<INITIAL_ID,
 									   Args,
 									   L_PRONG,
 									   LStates>;
@@ -42,7 +41,7 @@ struct CS_ final {
 	static constexpr Short	  R_PRONG	  = PRONG_INDEX + LStates::SIZE;
 
 	using RStates		= SplitR<TStates...>;
-	using RHalf			= CSubMaterial<I_<INITIAL_ID  + LHalfInfo::STATE_COUNT>,
+	using RHalf			= CSubMaterial<INITIAL_ID  + LHalfInfo::STATE_COUNT,
 									   Args,
 									   R_PRONG,
 									   RStates>;
@@ -79,13 +78,12 @@ struct CS_ final {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename TIndices,
+template <StateID NStateId,
 		  typename TArgs,
 		  Short NIndex,
 		  typename TState>
-struct CS_<TIndices, TArgs, NIndex, TState> final {
-	using Indices		= TIndices;
-	static constexpr StateID INITIAL_ID	= Indices::STATE_ID;
+struct CS_<NStateId, TArgs, NIndex, TState> final {
+	static constexpr StateID INITIAL_ID	= NStateId;
 
 	static constexpr Short PRONG_INDEX	= NIndex;
 
@@ -98,9 +96,7 @@ struct CS_<TIndices, TArgs, NIndex, TState> final {
 	using FullControl	= FullControlT <Args>;
 	using GuardControl	= GuardControlT<Args>;
 
-	using State			= Material<I_<INITIAL_ID>,
-								   Args,
-								   TState>;
+	using State			= Material<INITIAL_ID, Args, TState>;
 
 	//----------------------------------------------------------------------
 

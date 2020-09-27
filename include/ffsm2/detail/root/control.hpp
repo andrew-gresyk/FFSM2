@@ -5,7 +5,7 @@ namespace detail {
 
 template <typename TArgs>
 class ControlT {
-	template <typename, typename, typename>
+	template <StateID, typename, typename>
 	friend struct S_;
 
 	template <typename, typename, typename...>
@@ -104,7 +104,7 @@ template <typename TArgs>
 class PlanControlT
 	: public ControlT<TArgs>
 {
-	template <typename, typename, typename>
+	template <StateID, typename, typename>
 	friend struct S_;
 
 	template <typename, typename, typename...>
@@ -132,7 +132,7 @@ template <typename TArgs>
 class FullControlBaseT
 	: public PlanControlT<TArgs>
 {
-	template <typename, typename, typename>
+	template <StateID, typename, typename>
 	friend struct S_;
 
 	template <typename, typename, typename...>
@@ -211,7 +211,7 @@ class FullControlT<ArgsT<TContext
 								  , NSubstitutionLimit
 								  , TPayload>>
 {
-	template <typename, typename, typename>
+	template <StateID, typename, typename>
 	friend struct S_;
 
 	template <typename, typename, typename...>
@@ -297,7 +297,7 @@ class FullControlT<ArgsT<TContext
 								  , NSubstitutionLimit
 								  , void>>
 {
-	template <typename, typename, typename>
+	template <StateID, typename, typename>
 	friend struct S_;
 
 	template <typename, typename, typename...>
@@ -333,7 +333,7 @@ template <typename TArgs>
 class GuardControlT final
 	: public FullControlT<TArgs>
 {
-	template <typename, typename, typename>
+	template <StateID, typename, typename>
 	friend struct S_;
 
 	template <typename, typename, typename...>

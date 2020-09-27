@@ -1,6 +1,7 @@
+#define FFSM2_ENABLE_VERBOSE_DEBUG_LOG
 #include "tools.hpp"
 
-namespace test_transitions {
+namespace test_transitions_verbose {
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -85,7 +86,7 @@ struct D
 
 ////////////////////////////////////////////////////////////////////////////////
 
-TEST_CASE("FSM.Transitions", "[machine]") {
+TEST_CASE("FSM.Transitions Verbose", "[machine]") {
 	float _ = 0.0f;
 	LoggerT<Config> logger;
 
@@ -95,7 +96,13 @@ TEST_CASE("FSM.Transitions", "[machine]") {
 		FSM::Instance machine{_, &logger};
 		{
 			logger.assertSequence({
+				{ ffsm2::INVALID_STATE_ID,	Event::ENTRY_GUARD },
+				{ FSM::stateId<A>(),		Event::ENTRY_GUARD },
+
+				{ ffsm2::INVALID_STATE_ID,	Event::CONSTRUCT },
 				{ FSM::stateId<A>(),		Event::CONSTRUCT },
+
+				{ ffsm2::INVALID_STATE_ID,	Event::ENTER },
 				{ FSM::stateId<A>(),		Event::ENTER },
 			});
 
@@ -110,12 +117,17 @@ TEST_CASE("FSM.Transitions", "[machine]") {
 			logger.assertSequence({
 				{							Event::CHANGE, FSM::stateId<B>() },
 
+				{ ffsm2::INVALID_STATE_ID,	Event::UPDATE },
 				{ FSM::stateId<A>(),		Event::UPDATE },
+
+				{ FSM::stateId<A>(),		Event::EXIT_GUARD },
+				{ FSM::stateId<B>(),		Event::ENTRY_GUARD },
 
 				{ FSM::stateId<A>(),		Event::EXIT },
 				{ FSM::stateId<A>(),		Event::DESTRUCT },
 
-				//{ FSM::stateId<B>(),		Event::CONSTRUCT },
+				{ FSM::stateId<B>(),		Event::CONSTRUCT },
+				{ FSM::stateId<B>(),		Event::ENTER },
 			});
 
 			REQUIRE(machine.activeStateId() == FSM::stateId<B>());
@@ -125,7 +137,11 @@ TEST_CASE("FSM.Transitions", "[machine]") {
 	}
 
 	logger.assertSequence({
-		//{ FSM::stateId<B>(),		Event::DESTRUCT },
+		{ FSM::stateId<B>(),		Event::EXIT },
+		{ ffsm2::INVALID_STATE_ID,	Event::EXIT },
+
+		{ FSM::stateId<B>(),		Event::DESTRUCT },
+		{ ffsm2::INVALID_STATE_ID,	Event::DESTRUCT },
 	});
 }
 

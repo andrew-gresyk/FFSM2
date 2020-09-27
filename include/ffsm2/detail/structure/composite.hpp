@@ -22,13 +22,9 @@ struct C_ final {
 	using GuardControl	= GuardControlT<Args>;
 
 	using Head			= THead;
+	using HeadState		= S_<INVALID_STATE_ID, Args, Head>;
 
-	using HeadState		= S_<I_<INVALID_STATE_ID>, Args, Head>;
-
-	using SubStates		= CS_<I_<0>,
-							  Args,
-							  0,
-							  TSubStates...>;
+	using SubStates		= CS_<0, Args, 0, TSubStates...>;
 
 	//----------------------------------------------------------------------
 

@@ -45,6 +45,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\test\main.cpp" />
     <ClCompile Include="..\..\test\test_transitions.cpp" />
+    <ClCompile Include="..\..\test\test_transitions_verbose.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\include\ffsm2\detail\root.inl" />

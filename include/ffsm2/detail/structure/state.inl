@@ -3,11 +3,10 @@ namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename TN_, typename TA, typename TH>
+template <StateID N, typename TA, typename TH>
 bool
-S_<TN_, TA, TH>::deepEntryGuard(GuardControl& control) {
+S_<N, TA, TH>::deepEntryGuard(GuardControl& control) {
 	FFSM2_LOG_STATE_METHOD(&Head::entryGuard,
-						   control.context(),
 						   Method::ENTRY_GUARD);
 
 	ScopedOrigin origin{control, STATE_ID};
@@ -21,11 +20,10 @@ S_<TN_, TA, TH>::deepEntryGuard(GuardControl& control) {
 
 //------------------------------------------------------------------------------
 
-template <typename TN_, typename TA, typename TH>
+template <StateID N, typename TA, typename TH>
 void
-S_<TN_, TA, TH>::deepConstruct(PlanControl& FFSM2_IF_LOG_INTERFACE(control)) {
+S_<N, TA, TH>::deepConstruct(PlanControl& FFSM2_IF_LOG_INTERFACE(control)) {
 	FFSM2_LOG_STATE_METHOD(&Head::enter,
-						   control.context(),
 						   Method::CONSTRUCT);
 
 	_headBox.construct();
@@ -33,11 +31,10 @@ S_<TN_, TA, TH>::deepConstruct(PlanControl& FFSM2_IF_LOG_INTERFACE(control)) {
 
 //------------------------------------------------------------------------------
 
-template <typename TN_, typename TA, typename TH>
+template <StateID N, typename TA, typename TH>
 void
-S_<TN_, TA, TH>::deepEnter(PlanControl& control) {
+S_<N, TA, TH>::deepEnter(PlanControl& control) {
 	FFSM2_LOG_STATE_METHOD(&Head::enter,
-						   control.context(),
 						   Method::ENTER);
 
 	ScopedOrigin origin{control, STATE_ID};
@@ -48,11 +45,10 @@ S_<TN_, TA, TH>::deepEnter(PlanControl& control) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename TN_, typename TA, typename TH>
+template <StateID N, typename TA, typename TH>
 void
-S_<TN_, TA, TH>::deepReenter(PlanControl& control) {
+S_<N, TA, TH>::deepReenter(PlanControl& control) {
 	FFSM2_LOG_STATE_METHOD(&Head::reenter,
-						   control.context(),
 						   Method::REENTER);
 
 	ScopedOrigin origin{control, STATE_ID};
@@ -66,11 +62,10 @@ S_<TN_, TA, TH>::deepReenter(PlanControl& control) {
 
 //------------------------------------------------------------------------------
 
-template <typename TN_, typename TA, typename TH>
+template <StateID N, typename TA, typename TH>
 Status
-S_<TN_, TA, TH>::deepUpdate(FullControl& control) {
+S_<N, TA, TH>::deepUpdate(FullControl& control) {
 	FFSM2_LOG_STATE_METHOD(&Head::update,
-						   control.context(),
 						   Method::UPDATE);
 
 	ScopedOrigin origin{control, STATE_ID};
@@ -83,15 +78,14 @@ S_<TN_, TA, TH>::deepUpdate(FullControl& control) {
 
 //------------------------------------------------------------------------------
 
-template <typename TN_, typename TA, typename TH>
+template <StateID N, typename TA, typename TH>
 template <typename TEvent>
 Status
-S_<TN_, TA, TH>::deepReact(FullControl& control,
-						   const TEvent& event)
+S_<N, TA, TH>::deepReact(FullControl& control,
+						 const TEvent& event)
 {
 	auto reaction = static_cast<void(Head::*)(const TEvent&, FullControl&)>(&Head::react);
 	FFSM2_LOG_STATE_METHOD(reaction,
-						   control.context(),
 						   Method::REACT);
 
 	ScopedOrigin origin{control, STATE_ID};
@@ -104,11 +98,10 @@ S_<TN_, TA, TH>::deepReact(FullControl& control,
 
 //------------------------------------------------------------------------------
 
-template <typename TN_, typename TA, typename TH>
+template <StateID N, typename TA, typename TH>
 bool
-S_<TN_, TA, TH>::deepExitGuard(GuardControl& control) {
+S_<N, TA, TH>::deepExitGuard(GuardControl& control) {
 	FFSM2_LOG_STATE_METHOD(&Head::exitGuard,
-						   control.context(),
 						   Method::EXIT_GUARD);
 
 	ScopedOrigin origin{control, STATE_ID};
@@ -123,11 +116,10 @@ S_<TN_, TA, TH>::deepExitGuard(GuardControl& control) {
 
 //------------------------------------------------------------------------------
 
-template <typename TN_, typename TA, typename TH>
+template <StateID N, typename TA, typename TH>
 void
-S_<TN_, TA, TH>::deepExit(PlanControl& control) {
+S_<N, TA, TH>::deepExit(PlanControl& control) {
 	FFSM2_LOG_STATE_METHOD(&Head::exit,
-						   control.context(),
 						   Method::EXIT);
 
 	ScopedOrigin origin{control, STATE_ID};
@@ -143,16 +135,10 @@ S_<TN_, TA, TH>::deepExit(PlanControl& control) {
 
 //------------------------------------------------------------------------------
 
-template <typename TN_, typename TA, typename TH>
+template <StateID N, typename TA, typename TH>
 void
-S_<TN_, TA, TH>::deepDestruct(PlanControl&
-						  #if defined FFSM2_ENABLE_LOG_INTERFACE || defined FFSM2_ENABLE_PLANS
-							  control
-						  #endif
-							  )
-{
+S_<N, TA, TH>::deepDestruct(PlanControl& FFSM2_IF_LOG_INTERFACE(control)) {
 	FFSM2_LOG_STATE_METHOD(&Head::exit,
-						   control.context(),
 						   Method::DESTRUCT);
 
 	_headBox.destruct();

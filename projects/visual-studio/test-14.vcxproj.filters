@@ -98,6 +98,9 @@
     <ClCompile Include="..\..\test\test_transitions.cpp">
       <Filter>test</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\test\test_transitions_verbose.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\include\ffsm2\detail\root.inl">

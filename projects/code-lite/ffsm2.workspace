@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Workspace Name="ffsm2" Database="" Version="10.0.0">
-  <VirtualDirectory Name="examples"/>
-  <VirtualDirectory Name="tests">
+  <VirtualDirectory Name="test">
     <Project Name="test-gcc-tdm" Path="test-gcc-tdm/test-gcc-tdm.project" Active="Yes"/>
   </VirtualDirectory>
   <BuildMatrix>
