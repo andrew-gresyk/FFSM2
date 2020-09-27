@@ -103,6 +103,9 @@
 
 #ifdef FFSM2_ENABLE_VERBOSE_DEBUG_LOG
 	#define FFSM2_ENABLE_LOG_INTERFACE
+	#define FFSM2_VERBOSE_DEBUG_LOG_MASK								 (1 << 4)
+#else
+	#define FFSM2_VERBOSE_DEBUG_LOG_MASK								 (0 << 4)
 #endif
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -110,7 +113,7 @@
 #ifdef FFSM2_ENABLE_LOG_INTERFACE
 
 	#define FFSM2_IF_LOG_INTERFACE(...)								  __VA_ARGS__
-	#define FFSM2_LOG_INTERFACE_MASK									 (1 << 4)
+	#define FFSM2_LOG_INTERFACE_MASK									 (1 << 5)
 
 	#define FFSM2_LOG_TRANSITION(CONTEXT, ORIGIN, DESTINATION)					\
 		if (_logger)															\
@@ -135,7 +138,7 @@
 #else
 
 	#define FFSM2_IF_LOG_INTERFACE(...)
-	#define FFSM2_LOG_INTERFACE_MASK									 (0 << 4)
+	#define FFSM2_LOG_INTERFACE_MASK									 (0 << 5)
 
 	#define FFSM2_LOG_TRANSITION(CONTEXT, ORIGIN, DESTINATION)
 
@@ -152,19 +155,19 @@
 
 #ifdef FFSM2_ENABLE_VERBOSE_DEBUG_LOG
 
-	#define FFSM2_LOG_STATE_METHOD(METHOD, CONTEXT, METHOD_ID)					\
+	#define FFSM2_LOG_STATE_METHOD(METHOD, METHOD_ID)							\
 		if (auto* const logger = control.logger())								\
-			logger->recordMethod(CONTEXT, STATE_ID, METHOD_ID)
+			logger->recordMethod(control.context(), STATE_ID, METHOD_ID)
 
 #elif defined FFSM2_ENABLE_LOG_INTERFACE
 
-	#define FFSM2_LOG_STATE_METHOD(METHOD, CONTEXT, METHOD_ID)					\
+	#define FFSM2_LOG_STATE_METHOD(METHOD, METHOD_ID)							\
 		if (auto* const logger = control.logger())								\
-			log<decltype(METHOD)>(*logger, CONTEXT, METHOD_ID)
+			log(METHOD, *logger, control.context(), METHOD_ID)
 
 #else
 
-	#define FFSM2_LOG_STATE_METHOD(METHOD, CONTEXT, METHOD_ID)
+	#define FFSM2_LOG_STATE_METHOD(METHOD, METHOD_ID)
 
 #endif
 
@@ -178,6 +181,7 @@ constexpr FeatureTag FFSM2_FEATURE_TAG = FFSM2_PLANS_MASK						|
 										 FFSM2_SERIALIZATION_MASK				|
 										 FFSM2_TRANSITION_HISTORY_MASK			|
 										 FFSM2_STRUCTURE_REPORT_MASK			|
+										 FFSM2_VERBOSE_DEBUG_LOG_MASK			|
 										 FFSM2_LOG_INTERFACE_MASK;
 
 }
@@ -188,18 +192,19 @@ constexpr FeatureTag FFSM2_FEATURE_TAG = FFSM2_PLANS_MASK						|
 #undef FFSM2_SERIALIZATION_MASK
 #undef FFSM2_TRANSITION_HISTORY_MASK
 #undef FFSM2_STRUCTURE_REPORT_MASK
+#undef FFSM2_VERBOSE_DEBUG_LOG_MASK
 #undef FFSM2_LOG_INTERFACE_MASK
 
 ////////////////////////////////////////////////////////////////////////////////
 
 #ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wextra-semi" // error : extra ';' inside a class
+	#pragma clang diagnostic push
+	#pragma clang diagnostic ignored "-Wextra-semi" // error : extra ';' inside a class
 #endif
 
 #if defined(__GNUC__) || defined(__GNUG__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpedantic" // error : extra ';'
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wpedantic" // error : extra ';'
 #endif
 
 //------------------------------------------------------------------------------

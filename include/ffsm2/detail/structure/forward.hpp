@@ -105,20 +105,13 @@ struct ArgsT final {
 
 //------------------------------------------------------------------------------
 
-template <StateID NStateID>
-struct I_ {
-	static constexpr StateID STATE_ID	 = NStateID;
-};
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-template <typename, typename, typename>
+template <StateID, typename, typename>
 struct S_;
 
 template <typename, typename, typename...>
 struct C_;
 
-template <typename, typename, Short, typename...>
+template <StateID, typename, Short, typename...>
 struct CS_;
 
 template <typename, typename>
@@ -126,26 +119,26 @@ class RW_;
 
 //------------------------------------------------------------------------------
 
-template <typename, typename...>
+template <StateID, typename...>
 struct MaterialT;
 
-template <typename TN, typename TA, typename TH>
-struct MaterialT   <TN, TA, TH> {
-	using Type = S_<TN, TA, TH>;
+template <StateID N, typename TA, typename TH>
+struct MaterialT   <N, TA, TH> {
+	using Type = S_<N, TA, TH>;
 };
 
-template <typename TN, typename TA, 			 typename... TS>
-struct MaterialT   <TN, TA, CI_<void,         TS...>> {
-	using Type = C_<	TA, StaticEmptyT<TA>, TS...>;
+template <StateID N, typename TA, 			 typename... TS>
+struct MaterialT   <N, TA, CI_<void,         TS...>> {
+	using Type = C_<   TA, StaticEmptyT<TA>, TS...>;
 };
 
-template <typename TN, typename TA, typename TH, typename... TS>
-struct MaterialT   <TN, TA, CI_<TH,			  TS...>> {
-	using Type = C_<	TA, TH,				  TS...>;
+template <StateID N, typename TA, typename TH, typename... TS>
+struct MaterialT   <N, TA, CI_<TH,			  TS...>> {
+	using Type = C_<   TA, TH,				  TS...>;
 };
 
-template <typename TN, typename... TS>
-using Material = typename MaterialT<TN, TS...>::Type;
+template <StateID N, typename... TS>
+using Material = typename MaterialT<N, TS...>::Type;
 
 //------------------------------------------------------------------------------
 
@@ -159,7 +152,7 @@ struct RF_ final {
 
 	static constexpr Long  SUBSTITUTION_LIMIT	= TConfig::SUBSTITUTION_LIMIT;
 
-	using Payload	= typename TConfig::Payload;
+	using Payload		= typename TConfig::Payload;
 
 	using StateList		= typename Apex::StateList;
 
@@ -219,35 +212,35 @@ struct RF_ final {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename TN, typename TA, Short NI, typename T>
+template <StateID, typename, Short, typename>
 struct CSubMaterialT;
 
-template <typename TN, typename TA, Short NI, typename... TS>
-struct CSubMaterialT<TN, TA, NI, ITL_<TS...>> {
-	using Type = CS_<TN, TA, NI,	  TS...>;
+template <StateID N, typename TA, Short NI, typename... TS>
+struct CSubMaterialT<N, TA, NI, ITL_<TS...>> {
+	using Type = CS_<N, TA, NI,	     TS...>;
 };
 
-template <typename TN, typename TA, Short NI, typename... TS>
-using CSubMaterial = typename CSubMaterialT<TN, TA, NI, TS...>::Type;
+template <StateID N, typename TA, Short NI, typename... TS>
+using CSubMaterial = typename CSubMaterialT<N, TA, NI, TS...>::Type;
 
 //------------------------------------------------------------------------------
 
-template <typename...>
+template <typename>
 struct InfoT;
 
-template <typename TN, typename TA, typename TH>
-struct InfoT<S_<TN, TA, TH>> {
-	using Type = SI_<	TH>;
+template <StateID N, typename TA, typename TH>
+struct InfoT<S_<N, TA, TH>> {
+	using Type = SI_<  TH>;
 };
 
-template <typename TN, typename TA, typename TH, typename... TS>
-struct InfoT<C_<TN, TA, TH, TS...>> {
-	using Type = CI_<	TH, TS...>;
+template <typename TA, typename TH, typename... TS>
+struct InfoT<C_< TA, TH, TS...>> {
+	using Type = CI_<TH, TS...>;
 };
 
-template <typename TN, typename TA, Short NI, typename... TS>
-struct InfoT<CS_<TN, TA, NI, TS...>> {
-	using Type = CSI_<		 TS...>;
+template <StateID N, typename TA, Short NI	 , typename... TS>
+struct InfoT<CS_<N, TA, NI, TS...>> {
+	using Type = CSI_<		TS...>;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

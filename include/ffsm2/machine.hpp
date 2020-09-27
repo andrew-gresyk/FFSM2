@@ -147,6 +147,9 @@
 
 #ifdef FFSM2_ENABLE_VERBOSE_DEBUG_LOG
 	#define FFSM2_ENABLE_LOG_INTERFACE
+	#define FFSM2_VERBOSE_DEBUG_LOG_MASK								 (1 << 4)
+#else
+	#define FFSM2_VERBOSE_DEBUG_LOG_MASK								 (0 << 4)
 #endif
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -154,7 +157,7 @@
 #ifdef FFSM2_ENABLE_LOG_INTERFACE
 
 	#define FFSM2_IF_LOG_INTERFACE(...)								  __VA_ARGS__
-	#define FFSM2_LOG_INTERFACE_MASK									 (1 << 4)
+	#define FFSM2_LOG_INTERFACE_MASK									 (1 << 5)
 
 	#define FFSM2_LOG_TRANSITION(CONTEXT, ORIGIN, DESTINATION)					\
 		if (_logger)															\
@@ -179,7 +182,7 @@
 #else
 
 	#define FFSM2_IF_LOG_INTERFACE(...)
-	#define FFSM2_LOG_INTERFACE_MASK									 (0 << 4)
+	#define FFSM2_LOG_INTERFACE_MASK									 (0 << 5)
 
 	#define FFSM2_LOG_TRANSITION(CONTEXT, ORIGIN, DESTINATION)
 
@@ -196,19 +199,19 @@
 
 #ifdef FFSM2_ENABLE_VERBOSE_DEBUG_LOG
 
-	#define FFSM2_LOG_STATE_METHOD(METHOD, CONTEXT, METHOD_ID)					\
+	#define FFSM2_LOG_STATE_METHOD(METHOD, METHOD_ID)							\
 		if (auto* const logger = control.logger())								\
-			logger->recordMethod(CONTEXT, STATE_ID, METHOD_ID)
+			logger->recordMethod(control.context(), STATE_ID, METHOD_ID)
 
 #elif defined FFSM2_ENABLE_LOG_INTERFACE
 
-	#define FFSM2_LOG_STATE_METHOD(METHOD, CONTEXT, METHOD_ID)					\
+	#define FFSM2_LOG_STATE_METHOD(METHOD, METHOD_ID)							\
 		if (auto* const logger = control.logger())								\
-			log<decltype(METHOD)>(*logger, CONTEXT, METHOD_ID)
+			log(METHOD, *logger, control.context(), METHOD_ID)
 
 #else
 
-	#define FFSM2_LOG_STATE_METHOD(METHOD, CONTEXT, METHOD_ID)
+	#define FFSM2_LOG_STATE_METHOD(METHOD, METHOD_ID)
 
 #endif
 
@@ -222,6 +225,7 @@ constexpr FeatureTag FFSM2_FEATURE_TAG = FFSM2_PLANS_MASK						|
 										 FFSM2_SERIALIZATION_MASK				|
 										 FFSM2_TRANSITION_HISTORY_MASK			|
 										 FFSM2_STRUCTURE_REPORT_MASK			|
+										 FFSM2_VERBOSE_DEBUG_LOG_MASK			|
 										 FFSM2_LOG_INTERFACE_MASK;
 
 }
@@ -232,18 +236,19 @@ constexpr FeatureTag FFSM2_FEATURE_TAG = FFSM2_PLANS_MASK						|
 #undef FFSM2_SERIALIZATION_MASK
 #undef FFSM2_TRANSITION_HISTORY_MASK
 #undef FFSM2_STRUCTURE_REPORT_MASK
+#undef FFSM2_VERBOSE_DEBUG_LOG_MASK
 #undef FFSM2_LOG_INTERFACE_MASK
 
 ////////////////////////////////////////////////////////////////////////////////
 
 #ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wextra-semi" // error : extra ';' inside a class
+	#pragma clang diagnostic push
+	#pragma clang diagnostic ignored "-Wextra-semi" // error : extra ';' inside a class
 #endif
 
 #if defined(__GNUC__) || defined(__GNUG__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpedantic" // error : extra ';'
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wpedantic" // error : extra ';'
 #endif
 
 //------------------------------------------------------------------------------
@@ -1169,11 +1174,11 @@ struct Status {
 
 	Result result = Result::NONE;
 
-	FFSM2_INLINE Status(const Result result_ = Result::NONE);
+	inline Status(const Result result_ = Result::NONE);
 
-	FFSM2_INLINE explicit operator bool() const	{ return result != Result::NONE; }
+	inline explicit operator bool() const	{ return result != Result::NONE; }
 
-	FFSM2_INLINE void clear();
+	inline void clear();
 };
 
 #pragma pack(pop)
@@ -1248,7 +1253,7 @@ namespace detail {
 
 template <typename TArgs>
 class ControlT {
-	template <typename, typename, typename>
+	template <StateID, typename, typename>
 	friend struct S_;
 
 	template <typename, typename, typename...>
@@ -1347,7 +1352,7 @@ template <typename TArgs>
 class PlanControlT
 	: public ControlT<TArgs>
 {
-	template <typename, typename, typename>
+	template <StateID, typename, typename>
 	friend struct S_;
 
 	template <typename, typename, typename...>
@@ -1375,7 +1380,7 @@ template <typename TArgs>
 class FullControlBaseT
 	: public PlanControlT<TArgs>
 {
-	template <typename, typename, typename>
+	template <StateID, typename, typename>
 	friend struct S_;
 
 	template <typename, typename, typename...>
@@ -1454,7 +1459,7 @@ class FullControlT<ArgsT<TContext
 								  , NSubstitutionLimit
 								  , TPayload>>
 {
-	template <typename, typename, typename>
+	template <StateID, typename, typename>
 	friend struct S_;
 
 	template <typename, typename, typename...>
@@ -1540,7 +1545,7 @@ class FullControlT<ArgsT<TContext
 								  , NSubstitutionLimit
 								  , void>>
 {
-	template <typename, typename, typename>
+	template <StateID, typename, typename>
 	friend struct S_;
 
 	template <typename, typename, typename...>
@@ -1576,7 +1581,7 @@ template <typename TArgs>
 class GuardControlT final
 	: public FullControlT<TArgs>
 {
-	template <typename, typename, typename>
+	template <StateID, typename, typename>
 	friend struct S_;
 
 	template <typename, typename, typename...>
@@ -2175,11 +2180,11 @@ namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename TIndices,
+template <StateID NStateId,
 		  typename TArgs,
 		  typename THead>
 struct S_ final {
-	static constexpr auto STATE_ID	 = TIndices::STATE_ID;
+	static constexpr auto STATE_ID	 = NStateId;
 
 	using Context		= typename TArgs::Context;
 
@@ -2230,20 +2235,9 @@ struct S_ final {
 
 #endif
 
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	//----------------------------------------------------------------------
 
 #ifdef FFSM2_ENABLE_LOG_INTERFACE
-
-	template <typename>
-	struct Traits_;
-
-	template <typename TR_, typename TH_, typename... TAs_>
-	struct Traits_<TR_(TH_::*)(TAs_...)> {
-		using Host = TH_;
-	};
-
-	template <typename TM_>
-	using Host_			= typename Traits_<TM_>::Host;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -2251,33 +2245,23 @@ struct S_ final {
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	template <typename TMethodType>
-	typename std::enable_if<
-				 std::is_same<
-					 Host_<TMethodType>,
-					 Empty
-				 >::value
-			 >::type
-	log(Logger&,
-		Context&,
-		const Method) const
-	{}
-
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	template <typename TMethodType>
-	typename std::enable_if<
-				 !std::is_same<
-					 Host_<TMethodType>,
-					 Empty
-				 >::value
-			 >::type
-	log(Logger& logger,
-		Context& context,
-		const Method method) const
+	template <typename TReturn, typename THost, typename... TParams>
+	void log(TReturn(THost::*)(TParams...),
+			 Logger& logger,
+			 Context& context,
+			 const Method method) const
 	{
 		logger.recordMethod(context, STATE_ID, method);
 	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	template <typename TReturn, typename... TParams>
+	void log(TReturn(Empty::*)(TParams...),
+			 Logger&,
+			 Context&,
+			 const Method) const
+	{}
 
 #endif
 
@@ -2303,11 +2287,10 @@ namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename TN_, typename TA, typename TH>
+template <StateID N, typename TA, typename TH>
 bool
-S_<TN_, TA, TH>::deepEntryGuard(GuardControl& control) {
+S_<N, TA, TH>::deepEntryGuard(GuardControl& control) {
 	FFSM2_LOG_STATE_METHOD(&Head::entryGuard,
-						   control.context(),
 						   Method::ENTRY_GUARD);
 
 	ScopedOrigin origin{control, STATE_ID};
@@ -2321,11 +2304,10 @@ S_<TN_, TA, TH>::deepEntryGuard(GuardControl& control) {
 
 //------------------------------------------------------------------------------
 
-template <typename TN_, typename TA, typename TH>
+template <StateID N, typename TA, typename TH>
 void
-S_<TN_, TA, TH>::deepConstruct(PlanControl& FFSM2_IF_LOG_INTERFACE(control)) {
+S_<N, TA, TH>::deepConstruct(PlanControl& FFSM2_IF_LOG_INTERFACE(control)) {
 	FFSM2_LOG_STATE_METHOD(&Head::enter,
-						   control.context(),
 						   Method::CONSTRUCT);
 
 	_headBox.construct();
@@ -2333,11 +2315,10 @@ S_<TN_, TA, TH>::deepConstruct(PlanControl& FFSM2_IF_LOG_INTERFACE(control)) {
 
 //------------------------------------------------------------------------------
 
-template <typename TN_, typename TA, typename TH>
+template <StateID N, typename TA, typename TH>
 void
-S_<TN_, TA, TH>::deepEnter(PlanControl& control) {
+S_<N, TA, TH>::deepEnter(PlanControl& control) {
 	FFSM2_LOG_STATE_METHOD(&Head::enter,
-						   control.context(),
 						   Method::ENTER);
 
 	ScopedOrigin origin{control, STATE_ID};
@@ -2348,11 +2329,10 @@ S_<TN_, TA, TH>::deepEnter(PlanControl& control) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename TN_, typename TA, typename TH>
+template <StateID N, typename TA, typename TH>
 void
-S_<TN_, TA, TH>::deepReenter(PlanControl& control) {
+S_<N, TA, TH>::deepReenter(PlanControl& control) {
 	FFSM2_LOG_STATE_METHOD(&Head::reenter,
-						   control.context(),
 						   Method::REENTER);
 
 	ScopedOrigin origin{control, STATE_ID};
@@ -2366,11 +2346,10 @@ S_<TN_, TA, TH>::deepReenter(PlanControl& control) {
 
 //------------------------------------------------------------------------------
 
-template <typename TN_, typename TA, typename TH>
+template <StateID N, typename TA, typename TH>
 Status
-S_<TN_, TA, TH>::deepUpdate(FullControl& control) {
+S_<N, TA, TH>::deepUpdate(FullControl& control) {
 	FFSM2_LOG_STATE_METHOD(&Head::update,
-						   control.context(),
 						   Method::UPDATE);
 
 	ScopedOrigin origin{control, STATE_ID};
@@ -2383,15 +2362,14 @@ S_<TN_, TA, TH>::deepUpdate(FullControl& control) {
 
 //------------------------------------------------------------------------------
 
-template <typename TN_, typename TA, typename TH>
+template <StateID N, typename TA, typename TH>
 template <typename TEvent>
 Status
-S_<TN_, TA, TH>::deepReact(FullControl& control,
-						   const TEvent& event)
+S_<N, TA, TH>::deepReact(FullControl& control,
+						 const TEvent& event)
 {
 	auto reaction = static_cast<void(Head::*)(const TEvent&, FullControl&)>(&Head::react);
 	FFSM2_LOG_STATE_METHOD(reaction,
-						   control.context(),
 						   Method::REACT);
 
 	ScopedOrigin origin{control, STATE_ID};
@@ -2404,11 +2382,10 @@ S_<TN_, TA, TH>::deepReact(FullControl& control,
 
 //------------------------------------------------------------------------------
 
-template <typename TN_, typename TA, typename TH>
+template <StateID N, typename TA, typename TH>
 bool
-S_<TN_, TA, TH>::deepExitGuard(GuardControl& control) {
+S_<N, TA, TH>::deepExitGuard(GuardControl& control) {
 	FFSM2_LOG_STATE_METHOD(&Head::exitGuard,
-						   control.context(),
 						   Method::EXIT_GUARD);
 
 	ScopedOrigin origin{control, STATE_ID};
@@ -2423,11 +2400,10 @@ S_<TN_, TA, TH>::deepExitGuard(GuardControl& control) {
 
 //------------------------------------------------------------------------------
 
-template <typename TN_, typename TA, typename TH>
+template <StateID N, typename TA, typename TH>
 void
-S_<TN_, TA, TH>::deepExit(PlanControl& control) {
+S_<N, TA, TH>::deepExit(PlanControl& control) {
 	FFSM2_LOG_STATE_METHOD(&Head::exit,
-						   control.context(),
 						   Method::EXIT);
 
 	ScopedOrigin origin{control, STATE_ID};
@@ -2443,16 +2419,10 @@ S_<TN_, TA, TH>::deepExit(PlanControl& control) {
 
 //------------------------------------------------------------------------------
 
-template <typename TN_, typename TA, typename TH>
+template <StateID N, typename TA, typename TH>
 void
-S_<TN_, TA, TH>::deepDestruct(PlanControl&
-						  #if defined FFSM2_ENABLE_LOG_INTERFACE || defined FFSM2_ENABLE_PLANS
-							  control
-						  #endif
-							  )
-{
+S_<N, TA, TH>::deepDestruct(PlanControl& FFSM2_IF_LOG_INTERFACE(control)) {
 	FFSM2_LOG_STATE_METHOD(&Head::exit,
-						   control.context(),
 						   Method::DESTRUCT);
 
 	_headBox.destruct();
@@ -2569,20 +2539,13 @@ struct ArgsT final {
 
 //------------------------------------------------------------------------------
 
-template <StateID NStateID>
-struct I_ {
-	static constexpr StateID STATE_ID	 = NStateID;
-};
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-template <typename, typename, typename>
+template <StateID, typename, typename>
 struct S_;
 
 template <typename, typename, typename...>
 struct C_;
 
-template <typename, typename, Short, typename...>
+template <StateID, typename, Short, typename...>
 struct CS_;
 
 template <typename, typename>
@@ -2590,26 +2553,26 @@ class RW_;
 
 //------------------------------------------------------------------------------
 
-template <typename, typename...>
+template <StateID, typename...>
 struct MaterialT;
 
-template <typename TN, typename TA, typename TH>
-struct MaterialT   <TN, TA, TH> {
-	using Type = S_<TN, TA, TH>;
+template <StateID N, typename TA, typename TH>
+struct MaterialT   <N, TA, TH> {
+	using Type = S_<N, TA, TH>;
 };
 
-template <typename TN, typename TA, 			 typename... TS>
-struct MaterialT   <TN, TA, CI_<void,         TS...>> {
-	using Type = C_<	TA, StaticEmptyT<TA>, TS...>;
+template <StateID N, typename TA, 			 typename... TS>
+struct MaterialT   <N, TA, CI_<void,         TS...>> {
+	using Type = C_<   TA, StaticEmptyT<TA>, TS...>;
 };
 
-template <typename TN, typename TA, typename TH, typename... TS>
-struct MaterialT   <TN, TA, CI_<TH,			  TS...>> {
-	using Type = C_<	TA, TH,				  TS...>;
+template <StateID N, typename TA, typename TH, typename... TS>
+struct MaterialT   <N, TA, CI_<TH,			  TS...>> {
+	using Type = C_<   TA, TH,				  TS...>;
 };
 
-template <typename TN, typename... TS>
-using Material = typename MaterialT<TN, TS...>::Type;
+template <StateID N, typename... TS>
+using Material = typename MaterialT<N, TS...>::Type;
 
 //------------------------------------------------------------------------------
 
@@ -2623,7 +2586,7 @@ struct RF_ final {
 
 	static constexpr Long  SUBSTITUTION_LIMIT	= TConfig::SUBSTITUTION_LIMIT;
 
-	using Payload	= typename TConfig::Payload;
+	using Payload		= typename TConfig::Payload;
 
 	using StateList		= typename Apex::StateList;
 
@@ -2683,35 +2646,35 @@ struct RF_ final {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename TN, typename TA, Short NI, typename T>
+template <StateID, typename, Short, typename>
 struct CSubMaterialT;
 
-template <typename TN, typename TA, Short NI, typename... TS>
-struct CSubMaterialT<TN, TA, NI, ITL_<TS...>> {
-	using Type = CS_<TN, TA, NI,	  TS...>;
+template <StateID N, typename TA, Short NI, typename... TS>
+struct CSubMaterialT<N, TA, NI, ITL_<TS...>> {
+	using Type = CS_<N, TA, NI,	     TS...>;
 };
 
-template <typename TN, typename TA, Short NI, typename... TS>
-using CSubMaterial = typename CSubMaterialT<TN, TA, NI, TS...>::Type;
+template <StateID N, typename TA, Short NI, typename... TS>
+using CSubMaterial = typename CSubMaterialT<N, TA, NI, TS...>::Type;
 
 //------------------------------------------------------------------------------
 
-template <typename...>
+template <typename>
 struct InfoT;
 
-template <typename TN, typename TA, typename TH>
-struct InfoT<S_<TN, TA, TH>> {
-	using Type = SI_<	TH>;
+template <StateID N, typename TA, typename TH>
+struct InfoT<S_<N, TA, TH>> {
+	using Type = SI_<  TH>;
 };
 
-template <typename TN, typename TA, typename TH, typename... TS>
-struct InfoT<C_<TN, TA, TH, TS...>> {
-	using Type = CI_<	TH, TS...>;
+template <typename TA, typename TH, typename... TS>
+struct InfoT<C_< TA, TH, TS...>> {
+	using Type = CI_<TH, TS...>;
 };
 
-template <typename TN, typename TA, Short NI, typename... TS>
-struct InfoT<CS_<TN, TA, NI, TS...>> {
-	using Type = CSI_<		 TS...>;
+template <StateID N, typename TA, Short NI	 , typename... TS>
+struct InfoT<CS_<N, TA, NI, TS...>> {
+	using Type = CSI_<		TS...>;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2723,15 +2686,14 @@ namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename TIndices,
+template <StateID NStateId,
 		  typename TArgs,
 		  Short NIndex,
 		  typename... TStates>
 struct CS_ final {
 	static_assert(sizeof...(TStates) >= 2, "");
 
-	using Indices		= TIndices;
-	static constexpr StateID  INITIAL_ID  = Indices::STATE_ID;
+	static constexpr StateID  INITIAL_ID  = NStateId;
 
 	static constexpr Short	  PRONG_INDEX = NIndex;
 
@@ -2753,7 +2715,7 @@ struct CS_ final {
 	static constexpr Short	  L_PRONG	  = PRONG_INDEX;
 
 	using LStates		= SplitL<TStates...>;
-	using LHalf			= CSubMaterial<I_<INITIAL_ID>,
+	using LHalf			= CSubMaterial<INITIAL_ID,
 									   Args,
 									   L_PRONG,
 									   LStates>;
@@ -2762,7 +2724,7 @@ struct CS_ final {
 	static constexpr Short	  R_PRONG	  = PRONG_INDEX + LStates::SIZE;
 
 	using RStates		= SplitR<TStates...>;
-	using RHalf			= CSubMaterial<I_<INITIAL_ID  + LHalfInfo::STATE_COUNT>,
+	using RHalf			= CSubMaterial<INITIAL_ID  + LHalfInfo::STATE_COUNT,
 									   Args,
 									   R_PRONG,
 									   RStates>;
@@ -2799,13 +2761,12 @@ struct CS_ final {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename TIndices,
+template <StateID NStateId,
 		  typename TArgs,
 		  Short NIndex,
 		  typename TState>
-struct CS_<TIndices, TArgs, NIndex, TState> final {
-	using Indices		= TIndices;
-	static constexpr StateID INITIAL_ID	= Indices::STATE_ID;
+struct CS_<NStateId, TArgs, NIndex, TState> final {
+	static constexpr StateID INITIAL_ID	= NStateId;
 
 	static constexpr Short PRONG_INDEX	= NIndex;
 
@@ -2818,9 +2779,7 @@ struct CS_<TIndices, TArgs, NIndex, TState> final {
 	using FullControl	= FullControlT <Args>;
 	using GuardControl	= GuardControlT<Args>;
 
-	using State			= Material<I_<INITIAL_ID>,
-								   Args,
-								   TState>;
+	using State			= Material<INITIAL_ID, Args, TState>;
 
 	//----------------------------------------------------------------------
 
@@ -2861,10 +2820,10 @@ namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename TN, typename TA, Short NI, typename... TS>
+template <StateID N, typename TA, Short NI, typename... TS>
 bool
-CS_<TN, TA, NI, TS...>::wideEntryGuard(GuardControl& control,
-									   const Short prong)
+CS_<N, TA, NI, TS...>::wideEntryGuard(GuardControl& control,
+									  const Short prong)
 {
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
@@ -2876,10 +2835,10 @@ CS_<TN, TA, NI, TS...>::wideEntryGuard(GuardControl& control,
 
 //------------------------------------------------------------------------------
 
-template <typename TN, typename TA, Short NI, typename... TS>
+template <StateID N, typename TA, Short NI, typename... TS>
 void
-CS_<TN, TA, NI, TS...>::wideConstruct(PlanControl& control,
-									  const Short prong)
+CS_<N, TA, NI, TS...>::wideConstruct(PlanControl& control,
+									 const Short prong)
 {
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
@@ -2891,10 +2850,10 @@ CS_<TN, TA, NI, TS...>::wideConstruct(PlanControl& control,
 
 //------------------------------------------------------------------------------
 
-template <typename TN, typename TA, Short NI, typename... TS>
+template <StateID N, typename TA, Short NI, typename... TS>
 void
-CS_<TN, TA, NI, TS...>::wideEnter(PlanControl& control,
-								  const Short prong)
+CS_<N, TA, NI, TS...>::wideEnter(PlanControl& control,
+								 const Short prong)
 {
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
@@ -2906,10 +2865,10 @@ CS_<TN, TA, NI, TS...>::wideEnter(PlanControl& control,
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename TN, typename TA, Short NI, typename... TS>
+template <StateID N, typename TA, Short NI, typename... TS>
 void
-CS_<TN, TA, NI, TS...>::wideReenter(PlanControl& control,
-									const Short prong)
+CS_<N, TA, NI, TS...>::wideReenter(PlanControl& control,
+								   const Short prong)
 {
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
@@ -2921,10 +2880,10 @@ CS_<TN, TA, NI, TS...>::wideReenter(PlanControl& control,
 
 //------------------------------------------------------------------------------
 
-template <typename TN, typename TA, Short NI, typename... TS>
+template <StateID N, typename TA, Short NI, typename... TS>
 Status
-CS_<TN, TA, NI, TS...>::wideUpdate(FullControl& control,
-								   const Short prong)
+CS_<N, TA, NI, TS...>::wideUpdate(FullControl& control,
+								  const Short prong)
 {
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
@@ -2935,12 +2894,12 @@ CS_<TN, TA, NI, TS...>::wideUpdate(FullControl& control,
 
 //------------------------------------------------------------------------------
 
-template <typename TN, typename TA, Short NI, typename... TS>
+template <StateID N, typename TA, Short NI, typename... TS>
 template <typename TEvent>
 Status
-CS_<TN, TA, NI, TS...>::wideReact(FullControl& control,
-								  const TEvent& event,
-								  const Short prong)
+CS_<N, TA, NI, TS...>::wideReact(FullControl& control,
+								 const TEvent& event,
+								 const Short prong)
 {
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
@@ -2951,10 +2910,10 @@ CS_<TN, TA, NI, TS...>::wideReact(FullControl& control,
 
 //------------------------------------------------------------------------------
 
-template <typename TN, typename TA, Short NI, typename... TS>
+template <StateID N, typename TA, Short NI, typename... TS>
 bool
-CS_<TN, TA, NI, TS...>::wideExitGuard(GuardControl& control,
-									  const Short prong)
+CS_<N, TA, NI, TS...>::wideExitGuard(GuardControl& control,
+									 const Short prong)
 {
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
@@ -2966,10 +2925,10 @@ CS_<TN, TA, NI, TS...>::wideExitGuard(GuardControl& control,
 
 //------------------------------------------------------------------------------
 
-template <typename TN, typename TA, Short NI, typename... TS>
+template <StateID N, typename TA, Short NI, typename... TS>
 void
-CS_<TN, TA, NI, TS...>::wideExit(PlanControl& control,
-								 const Short prong)
+CS_<N, TA, NI, TS...>::wideExit(PlanControl& control,
+								const Short prong)
 {
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
@@ -2981,10 +2940,10 @@ CS_<TN, TA, NI, TS...>::wideExit(PlanControl& control,
 
 //------------------------------------------------------------------------------
 
-template <typename TN, typename TA, Short NI, typename... TS>
+template <StateID N, typename TA, Short NI, typename... TS>
 void
-CS_<TN, TA, NI, TS...>::wideDestruct(PlanControl& control,
-									 const Short prong)
+CS_<N, TA, NI, TS...>::wideDestruct(PlanControl& control,
+									const Short prong)
 {
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
@@ -2996,10 +2955,10 @@ CS_<TN, TA, NI, TS...>::wideDestruct(PlanControl& control,
 
 //------------------------------------------------------------------------------
 
-template <typename TN, typename TA, Short NI, typename... TS>
+template <StateID N, typename TA, Short NI, typename... TS>
 void
-CS_<TN, TA, NI, TS...>::wideChangeToRequested(PlanControl& control,
-											  const Short prong)
+CS_<N, TA, NI, TS...>::wideChangeToRequested(PlanControl& control,
+											 const Short prong)
 {
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
@@ -3018,10 +2977,10 @@ namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename TN, typename TA, Short NI, typename T>
+template <StateID N, typename TA, Short NI, typename T>
 bool
-CS_<TN, TA, NI, T>::wideEntryGuard(GuardControl& control,
-								   const Short FFSM2_IF_ASSERT(prong))
+CS_<N, TA, NI, T>::wideEntryGuard(GuardControl& control,
+								  const Short FFSM2_IF_ASSERT(prong))
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
@@ -3030,10 +2989,10 @@ CS_<TN, TA, NI, T>::wideEntryGuard(GuardControl& control,
 
 //------------------------------------------------------------------------------
 
-template <typename TN, typename TA, Short NI, typename T>
+template <StateID N, typename TA, Short NI, typename T>
 void
-CS_<TN, TA, NI, T>::wideConstruct(PlanControl& control,
-								  const Short FFSM2_IF_ASSERT(prong))
+CS_<N, TA, NI, T>::wideConstruct(PlanControl& control,
+								 const Short FFSM2_IF_ASSERT(prong))
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
@@ -3042,10 +3001,10 @@ CS_<TN, TA, NI, T>::wideConstruct(PlanControl& control,
 
 //------------------------------------------------------------------------------
 
-template <typename TN, typename TA, Short NI, typename T>
+template <StateID N, typename TA, Short NI, typename T>
 void
-CS_<TN, TA, NI, T>::wideEnter(PlanControl& control,
-							  const Short FFSM2_IF_ASSERT(prong))
+CS_<N, TA, NI, T>::wideEnter(PlanControl& control,
+							 const Short FFSM2_IF_ASSERT(prong))
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
@@ -3054,10 +3013,10 @@ CS_<TN, TA, NI, T>::wideEnter(PlanControl& control,
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename TN, typename TA, Short NI, typename T>
+template <StateID N, typename TA, Short NI, typename T>
 void
-CS_<TN, TA, NI, T>::wideReenter(PlanControl& control,
-								const Short FFSM2_IF_ASSERT(prong))
+CS_<N, TA, NI, T>::wideReenter(PlanControl& control,
+							   const Short FFSM2_IF_ASSERT(prong))
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
@@ -3066,10 +3025,10 @@ CS_<TN, TA, NI, T>::wideReenter(PlanControl& control,
 
 //------------------------------------------------------------------------------
 
-template <typename TN, typename TA, Short NI, typename T>
+template <StateID N, typename TA, Short NI, typename T>
 Status
-CS_<TN, TA, NI, T>::wideUpdate(FullControl& control,
-							   const Short FFSM2_IF_ASSERT(prong))
+CS_<N, TA, NI, T>::wideUpdate(FullControl& control,
+							  const Short FFSM2_IF_ASSERT(prong))
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
@@ -3078,12 +3037,12 @@ CS_<TN, TA, NI, T>::wideUpdate(FullControl& control,
 
 //------------------------------------------------------------------------------
 
-template <typename TN, typename TA, Short NI, typename T>
+template <StateID N, typename TA, Short NI, typename T>
 template <typename TEvent>
 Status
-CS_<TN, TA, NI, T>::wideReact(FullControl& control,
-							  const TEvent& event,
-							  const Short FFSM2_IF_ASSERT(prong))
+CS_<N, TA, NI, T>::wideReact(FullControl& control,
+							 const TEvent& event,
+							 const Short FFSM2_IF_ASSERT(prong))
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
@@ -3092,10 +3051,10 @@ CS_<TN, TA, NI, T>::wideReact(FullControl& control,
 
 //------------------------------------------------------------------------------
 
-template <typename TN, typename TA, Short NI, typename T>
+template <StateID N, typename TA, Short NI, typename T>
 bool
-CS_<TN, TA, NI, T>::wideExitGuard(GuardControl& control,
-								  const Short FFSM2_IF_ASSERT(prong))
+CS_<N, TA, NI, T>::wideExitGuard(GuardControl& control,
+								 const Short FFSM2_IF_ASSERT(prong))
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
@@ -3104,10 +3063,10 @@ CS_<TN, TA, NI, T>::wideExitGuard(GuardControl& control,
 
 //------------------------------------------------------------------------------
 
-template <typename TN, typename TA, Short NI, typename T>
+template <StateID N, typename TA, Short NI, typename T>
 void
-CS_<TN, TA, NI, T>::wideExit(PlanControl& control,
-							 const Short FFSM2_IF_ASSERT(prong))
+CS_<N, TA, NI, T>::wideExit(PlanControl& control,
+							const Short FFSM2_IF_ASSERT(prong))
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
@@ -3116,10 +3075,10 @@ CS_<TN, TA, NI, T>::wideExit(PlanControl& control,
 
 //------------------------------------------------------------------------------
 
-template <typename TN, typename TA, Short NI, typename T>
+template <StateID N, typename TA, Short NI, typename T>
 void
-CS_<TN, TA, NI, T>::wideDestruct(PlanControl& control,
-								 const Short FFSM2_IF_ASSERT(prong))
+CS_<N, TA, NI, T>::wideDestruct(PlanControl& control,
+								const Short FFSM2_IF_ASSERT(prong))
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
@@ -3154,13 +3113,9 @@ struct C_ final {
 	using GuardControl	= GuardControlT<Args>;
 
 	using Head			= THead;
+	using HeadState		= S_<INVALID_STATE_ID, Args, Head>;
 
-	using HeadState		= S_<I_<INVALID_STATE_ID>, Args, Head>;
-
-	using SubStates		= CS_<I_<0>,
-							  Args,
-							  0,
-							  TSubStates...>;
+	using SubStates		= CS_<0, Args, 0, TSubStates...>;
 
 	//----------------------------------------------------------------------
 
@@ -3530,6 +3485,8 @@ namespace detail {
 template <typename TConfig,
 		  typename TApex>
 class R_ {
+	static constexpr FeatureTag FEATURE_TAG = TConfig::FEATURE_TAG;
+
 	using Context				= typename TConfig::Context;
 
 	using Payload				= typename TConfig::Payload;
@@ -3540,7 +3497,7 @@ class R_ {
 	using StateList				= typename Forward::StateList;
 	using Args					= typename Forward::Args;
 
-	using MaterialApex			= Material<I_<0>, Args, Apex>;
+	using MaterialApex			= Material<0, Args, Apex>;
 
 	using Control				= ControlT	   <Args>;
 	using PlanControl			= PlanControlT <Args>;

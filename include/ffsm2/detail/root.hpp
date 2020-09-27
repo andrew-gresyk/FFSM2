@@ -9,6 +9,8 @@ namespace detail {
 template <typename TConfig,
 		  typename TApex>
 class R_ {
+	static constexpr FeatureTag FEATURE_TAG = TConfig::FEATURE_TAG;
+
 	using Context				= typename TConfig::Context;
 
 	using Payload				= typename TConfig::Payload;
@@ -19,7 +21,7 @@ class R_ {
 	using StateList				= typename Forward::StateList;
 	using Args					= typename Forward::Args;
 
-	using MaterialApex			= Material<I_<0>, Args, Apex>;
+	using MaterialApex			= Material<0, Args, Apex>;
 
 	using Control				= ControlT	   <Args>;
 	using PlanControl			= PlanControlT <Args>;

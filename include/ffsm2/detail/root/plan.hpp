@@ -14,11 +14,11 @@ struct Status {
 
 	Result result = Result::NONE;
 
-	FFSM2_INLINE Status(const Result result_ = Result::NONE);
+	inline Status(const Result result_ = Result::NONE);
 
-	FFSM2_INLINE explicit operator bool() const	{ return result != Result::NONE; }
+	inline explicit operator bool() const	{ return result != Result::NONE; }
 
-	FFSM2_INLINE void clear();
+	inline void clear();
 };
 
 #pragma pack(pop)

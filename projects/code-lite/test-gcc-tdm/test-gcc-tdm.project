@@ -47,6 +47,7 @@
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="test">
+    <File Name="../../../test/test_transitions_verbose.cpp"/>
     <File Name="../../../test/tools.inl"/>
     <File Name="../../../test/test_transitions.cpp"/>
     <File Name="../../../test/tools.hpp"/>
@@ -81,7 +82,7 @@
       </Linker>
       <ResourceCompiler Options=""/>
     </GlobalSettings>
-    <Configuration Name="Debug" CompilerType="MinGW ( gcc.exe (tdm64-1) 5.1.0 )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+    <Configuration Name="Debug" CompilerType="MinGW ( C:\GCC\TDM-GCC-64\bin\ )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-g;-O0" C_Options="-g;-O0" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <Preprocessor Value="_DEBUG"/>
       </Compiler>
