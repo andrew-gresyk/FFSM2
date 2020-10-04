@@ -51,6 +51,7 @@ void
 R_<TG, TA>::react(const TEvent& event) {
 	FullControl control{_context
 					  , _registry
+					  , _request
 					  FFSM2_IF_LOG_INTERFACE(, _logger)};
 
 	_apex.deepReact(control, event);
@@ -144,11 +145,10 @@ R_<TG, TA>::processTransitions(TransitionSets& currentTransitions) {
 		pendingTransition.clear();
 	}
 
-	if (currentTransitions.count()) {
+	if (currentTransitions.count())
 		_apex.deepChangeToRequested(control);
 
-		_registry.clearRequests();
-	}
+	_registry.clearRequests();
 }
 
 //------------------------------------------------------------------------------

@@ -33,7 +33,7 @@
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 	<Type Name="ffsm2::detail::TransitionBase">
-		<DisplayString Condition="origin == 0xFFFF">{type, en} (► {destination})</DisplayString>
+		<DisplayString Condition="origin == ffsm2::INVALID_STATE_ID">{type, en} (► {destination})</DisplayString>
 		<DisplayString>{type, en} ({origin} ► {destination})</DisplayString>
 		<Expand HideRawView="true" />
 	</Type>

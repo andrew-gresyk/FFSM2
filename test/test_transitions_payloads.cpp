@@ -1,14 +1,15 @@
-#define FFSM2_ENABLE_VERBOSE_DEBUG_LOG
 #include "tools.hpp"
 
-namespace test_transitions_verbose {
+namespace test_transitions_payloads {
 
 ////////////////////////////////////////////////////////////////////////////////
 
 struct Context {};
+struct Payload {};
 
 using Config = ffsm2::Config
-					::ContextT<Context>;
+					::ContextT<Context>
+					::PayloadT<Payload>;
 
 using M = ffsm2::MachineT<Config>;
 
@@ -85,11 +86,11 @@ struct B
 	//void enter(PlanControl&)													{}
 
 	void update(FullControl& control) {
-		control.changeTo<C>();
+		control.changeWith<C>(Payload{});
 	}
 
 	void react(const Action&, FullControl& control) {
-		control.changeTo<C>();
+		control.changeWith<C>(Payload{});
 	}
 
 	using FSM::State::react;
@@ -138,13 +139,7 @@ struct D
 
 void step1(FSM::Instance& machine, Logger& logger) {
 	logger.assertSequence({
-		{ ffsm2::INVALID_STATE_ID,	Event::Type::ENTRY_GUARD },
-		{ FSM::stateId<A>(),		Event::Type::ENTRY_GUARD },
-
-		{ ffsm2::INVALID_STATE_ID,	Event::Type::CONSTRUCT },
 		{ FSM::stateId<A>(),		Event::Type::CONSTRUCT },
-
-		{ ffsm2::INVALID_STATE_ID,	Event::Type::ENTER },
 		{ FSM::stateId<A>(),		Event::Type::ENTER },
 	});
 
@@ -154,23 +149,16 @@ void step1(FSM::Instance& machine, Logger& logger) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 void step2(FSM::Instance& machine, Logger& logger) {
-	machine.changeTo<B>();
+	machine.changeWith<B>(Payload{});
 	machine.update();
 
 	logger.assertSequence({
 		{							Event::Type::CHANGE, FSM::stateId<B>() },
 
-		{ ffsm2::INVALID_STATE_ID,	Event::Type::UPDATE },
 		{ FSM::stateId<A>(),		Event::Type::UPDATE },
-
-		{ FSM::stateId<A>(),		Event::Type::EXIT_GUARD },
-		{ FSM::stateId<B>(),		Event::Type::ENTRY_GUARD },
 
 		{ FSM::stateId<A>(),		Event::Type::EXIT },
 		{ FSM::stateId<A>(),		Event::Type::DESTRUCT },
-
-		{ FSM::stateId<B>(),		Event::Type::CONSTRUCT },
-		{ FSM::stateId<B>(),		Event::Type::ENTER },
 	});
 
 	REQUIRE(machine.activeStateId() == FSM::stateId<B>());
@@ -182,12 +170,9 @@ void step3(FSM::Instance& machine, Logger& logger) {
 	machine.update();
 
 	logger.assertSequence({
-		{ ffsm2::INVALID_STATE_ID,	Event::Type::UPDATE },
 		{ FSM::stateId<B>(),		Event::Type::UPDATE },
 
 		{ FSM::stateId<B>(),		Event::Type::CHANGE, FSM::stateId<C>() },
-
-		{ FSM::stateId<B>(),		Event::Type::EXIT_GUARD },
 
 		{ FSM::stateId<C>(),		Event::Type::ENTRY_GUARD },
 		{ FSM::stateId<C>(),		Event::Type::CANCEL_PENDING },
@@ -207,11 +192,7 @@ void step4(FSM::Instance& machine, Logger& logger) {
 
 		{ FSM::stateId<B>(),		Event::Type::CHANGE, FSM::stateId<C>() },
 
-		{ FSM::stateId<B>(),		Event::Type::EXIT_GUARD },
 		{ FSM::stateId<C>(),		Event::Type::ENTRY_GUARD },
-
-		{ FSM::stateId<B>(),		Event::Type::EXIT },
-		{ FSM::stateId<B>(),		Event::Type::DESTRUCT },
 
 		{ FSM::stateId<C>(),		Event::Type::CONSTRUCT },
 		{ FSM::stateId<C>(),		Event::Type::ENTER },
@@ -222,7 +203,7 @@ void step4(FSM::Instance& machine, Logger& logger) {
 
 //------------------------------------------------------------------------------
 
-TEST_CASE("FSM.Transitions Verbose", "[machine]") {
+TEST_CASE("FSM.Transition Payloads", "[machine]") {
 	Context _;
 	LoggerT<Config> logger;
 
@@ -237,10 +218,7 @@ TEST_CASE("FSM.Transitions Verbose", "[machine]") {
 
 	logger.assertSequence({
 		{ FSM::stateId<C>(),		Event::Type::EXIT },
-		{ ffsm2::INVALID_STATE_ID,	Event::Type::EXIT },
-
 		{ FSM::stateId<C>(),		Event::Type::DESTRUCT },
-		{ ffsm2::INVALID_STATE_ID,	Event::Type::DESTRUCT },
 	});
 }
 

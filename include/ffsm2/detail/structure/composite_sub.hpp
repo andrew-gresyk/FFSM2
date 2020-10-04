@@ -31,20 +31,19 @@ struct CS_ final {
 
 	static constexpr Short	  L_PRONG	  = PRONG_INDEX;
 
-	using LStates		= SplitL<TStates...>;
-	using LHalf			= CSubMaterial<INITIAL_ID,
+	using LStateList	= LHalf<TStates...>;
+	using LMaterial		= CSubMaterial<INITIAL_ID,
 									   Args,
 									   L_PRONG,
-									   LStates>;
-	using LHalfInfo		= typename InfoT<LHalf>::Type;
+									   LStateList>;
 
-	static constexpr Short	  R_PRONG	  = PRONG_INDEX + LStates::SIZE;
+	static constexpr Short	  R_PRONG	  = PRONG_INDEX + LStateList::SIZE;
 
-	using RStates		= SplitR<TStates...>;
-	using RHalf			= CSubMaterial<INITIAL_ID  + LHalfInfo::STATE_COUNT,
+	using RStateList	= RHalf<TStates...>;
+	using RMaterial		= CSubMaterial<INITIAL_ID + LStateList::SIZE,
 									   Args,
 									   R_PRONG,
-									   RStates>;
+									   RStateList>;
 
 	//----------------------------------------------------------------------
 
@@ -72,8 +71,8 @@ struct CS_ final {
 
 	//----------------------------------------------------------------------
 
-	LHalf lHalf;
-	RHalf rHalf;
+	LMaterial lHalf;
+	RMaterial rHalf;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
