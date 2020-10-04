@@ -11,39 +11,39 @@ LoggerT<TConfig>::recordMethod(Context& /*context*/,
 	switch (method) {
 
 		case Method::ENTRY_GUARD:
-			history.emplace_back(origin, Event::ENTRY_GUARD);
+			history.emplace_back(origin, Event::Type::ENTRY_GUARD);
 			break;
 
 		case Method::CONSTRUCT:
-			history.emplace_back(origin, Event::CONSTRUCT);
+			history.emplace_back(origin, Event::Type::CONSTRUCT);
 			break;
 
 		case Method::ENTER:
-			history.emplace_back(origin, Event::ENTER);
+			history.emplace_back(origin, Event::Type::ENTER);
 			break;
 
 		case Method::REENTER:
-			history.emplace_back(origin, Event::REENTER);
+			history.emplace_back(origin, Event::Type::REENTER);
 			break;
 
 		case Method::UPDATE:
-			history.emplace_back(origin, Event::UPDATE);
+			history.emplace_back(origin, Event::Type::UPDATE);
 			break;
 
 		case Method::REACT:
-			history.emplace_back(origin, Event::REACT);
+			history.emplace_back(origin, Event::Type::REACT);
 			break;
 
 		case Method::EXIT_GUARD:
-			history.emplace_back(origin, Event::EXIT_GUARD);
+			history.emplace_back(origin, Event::Type::EXIT_GUARD);
 			break;
 
 		case Method::EXIT:
-			history.emplace_back(origin, Event::EXIT);
+			history.emplace_back(origin, Event::Type::EXIT);
 			break;
 
 		case Method::DESTRUCT:
-			history.emplace_back(origin, Event::DESTRUCT);
+			history.emplace_back(origin, Event::Type::DESTRUCT);
 			break;
 
 		default:
@@ -59,7 +59,7 @@ LoggerT<TConfig>::recordTransition(Context& /*context*/,
 								   const StateID origin,
 								   const StateID target)
 {
-	history.emplace_back(origin, Event::CHANGE, target);
+	history.emplace_back(origin, Event::Type::CHANGE, target);
 }
 
 //------------------------------------------------------------------------------
@@ -69,7 +69,7 @@ void
 LoggerT<TConfig>::recordCancelledPending(Context& /*context*/,
 										 const StateID origin)
 {
-	history.emplace_back(origin, Event::CANCEL_PENDING);
+	history.emplace_back(origin, Event::Type::CANCEL_PENDING);
 }
 
 //------------------------------------------------------------------------------

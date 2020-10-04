@@ -715,9 +715,12 @@ Array<T, NC>::operator += (const Array<T, N>& other) {
 }
 }
 namespace ffsm2 {
-namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
+
+#if 0
+
+namespace detail {
 
 template<Long N>
 struct IndexConstant {};
@@ -781,103 +784,284 @@ struct ITL_Impl<IndexSequence<Ns...>, Ts...>
 	static constexpr Long select(ITL_EntryN<T, N>) { return (Long) N; }
 };
 
+}
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename... Ts>
-struct ITL_
-	: private ITL_Impl<IndexSequenceFor<Ts...>, Ts...>
+struct TypeList
+	: private	 detail::ITL_Impl<detail::IndexSequenceFor<Ts...>, Ts...>
 {
-	using Base = ITL_Impl<IndexSequenceFor<Ts...>, Ts...>;
+	using Base = detail::ITL_Impl<detail::IndexSequenceFor<Ts...>, Ts...>;
 
 	static constexpr Long SIZE = sizeof...(Ts);
 
 	template <typename T>
-	static constexpr bool contains() { return std::is_base_of<ITL_EntryT<T>, ITL_>::value; }
-
-	template <typename T>
-	static constexpr
-	typename std::enable_if< std::is_base_of<ITL_EntryT<T>, ITL_>::value, Long>::type
-	index() {
-		return Base::template select<T>(ITL_{});
-	}
-
-	template <typename T>
-	static constexpr
-	typename std::enable_if<!std::is_base_of<ITL_EntryT<T>, ITL_>::value, Long>::type
-	index() {
-		return INVALID_LONG;
+	static constexpr Long index() {
+		return Base::template select<T>(TypeList{});
 	}
 };
 
+template <typename TList, typename T>
+constexpr Long index   () { return TList::template index   <T>(); }
+
+template <typename TList, typename T>
+constexpr bool contains() { return std::is_base_of<detail::ITL_EntryT<T>, TList>::value; }
+
 ////////////////////////////////////////////////////////////////////////////////
+
+namespace detail {
 
 template <typename...>
 struct PrependT;
 
 template <typename T, typename... Ts>
-struct PrependT<T, ITL_<Ts...>> {
-	using Type = ITL_<T, Ts...>;
+struct PrependT<T, TypeList<Ts...>> {
+	using Type = TypeList<T, Ts...>;
 };
 
+}
+
 template <typename... Ts>
-using Prepend = typename PrependT<Ts...>::Type;
+using Prepend = typename detail::PrependT<Ts...>::Type;
 
 //------------------------------------------------------------------------------
+
+namespace detail {
 
 template <typename...>
 struct MergeT;
 
 template <typename... Ts1, typename... Ts2>
-struct MergeT<ITL_<Ts1...>, ITL_<Ts2...>> {
-	using Type = ITL_<Ts1..., Ts2...>;
+struct MergeT<TypeList<Ts1...>, TypeList<Ts2...>> {
+	using Type = TypeList<Ts1..., Ts2...>;
 };
 
+}
+
 template <typename... Ts>
-using Merge = typename MergeT<Ts...>::Type;
+using Merge = typename detail::MergeT<Ts...>::Type;
 
 //------------------------------------------------------------------------------
 
+namespace detail {
+
 template <Long, Long, typename...>
-struct LesserT;
+struct LowerT;
+
+template <Long H, Long I, typename... Ts>
+using Lower = typename LowerT<H, I, Ts...>::Type;
 
 template <Long H, Long I, typename TFirst, typename... TRest>
-struct LesserT<H, I, TFirst, TRest...> {
-	using Type = typename std::conditional<(I < H),
-										   Prepend<TFirst, typename LesserT<H, I + 1, TRest...>::Type>,
-										   typename LesserT<H, I + 1, TRest...>::Type>::type;
+struct LowerT<H, I, TFirst, TRest...> {
+	using Type = typename std::conditional<
+					 (I < H),
+					 Prepend<TFirst, Lower<H, I + 1, TRest...>>,
+					 Lower<H, I + 1, TRest...>
+				 >::type;
 };
 
 template <Long H, Long I>
-struct LesserT<H, I> {
-	using Type = ITL_<>;
+struct LowerT<H, I> {
+	using Type = TypeList<>;
 };
 
+}
+
 template <typename... Ts>
-using SplitL = typename LesserT<sizeof...(Ts) / 2, 0, Ts...>::Type;
+using LHalf = detail::Lower<sizeof...(Ts) / 2, 0, Ts...>;
 
 //------------------------------------------------------------------------------
 
+namespace detail {
+
 template <Long, Long, typename...>
-struct GreaterT;
+struct UpperT;
+
+template <Long H, Long I, typename... Ts>
+using Upper = typename UpperT<H, I, Ts...>::Type;
 
 template <Long H, Long I, typename TFirst, typename... TRest>
-struct GreaterT<H, I, TFirst, TRest...> {
-	using Type = typename std::conditional<(I < H),
-										   typename GreaterT<H, I + 1, TRest...>::Type,
-										   ITL_<TFirst, TRest...>>::type;
+struct UpperT<H, I, TFirst, TRest...> {
+	using Type = typename std::conditional<
+					 (I < H),
+					 UpperT<H, I + 1, TRest...>,
+					 TypeList<TFirst, TRest...>
+				 >::type;
 };
 
 template <Long H, Long I>
-struct GreaterT<H, I> {
-	using Type = ITL_<>;
+struct UpperT<H, I> {
+	using Type = TypeList<>;
 };
 
+}
+
 template <typename... Ts>
-using SplitR = typename GreaterT<sizeof...(Ts) / 2, 0, Ts...>::Type;
+using RHalf = detail::Upper<sizeof...(Ts) / 2, 0, Ts...>;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+#else
+
+namespace detail {
+
+template <typename>
+struct Type {};
+
 }
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <typename... Ts>
+struct TypeList
+	: detail::Type<Ts>...
+{
+	static constexpr Long SIZE = sizeof...(Ts);
+};
+
+//------------------------------------------------------------------------------
+
+namespace detail {
+
+template <Long N>
+struct Const {
+	static constexpr Long Value = N;
+};
+
+//------------------------------------------------------------------------------
+
+template <typename...>
+struct PrependT;
+
+template <typename T, typename... Ts>
+struct PrependT<T, TypeList<Ts...>> {
+	using Type = TypeList<T, Ts...>;
+};
+
+}
+
+template <typename... Ts>
+using Prepend = typename detail::PrependT<Ts...>::Type;
+
+//------------------------------------------------------------------------------
+
+namespace detail {
+
+template <typename...>
+struct MergeT;
+
+template <typename... Ts1, typename... Ts2>
+struct MergeT<TypeList<Ts1...>, TypeList<Ts2...>> {
+	using Type = TypeList<Ts1..., Ts2...>;
+};
+
+}
+
+template <typename... Ts>
+using Merge = typename detail::MergeT<Ts...>::Type;
+
+//------------------------------------------------------------------------------
+
+namespace detail {
+
+template <Long, Long, typename...>
+struct LowerT;
+
+template <Long H, Long I, typename... Ts>
+using Lower = typename LowerT<H, I, Ts...>::Type;
+
+template <Long H, Long I, typename TFirst, typename... TRest>
+struct LowerT<H, I, TFirst, TRest...> {
+	using Type = typename std::conditional<
+					 (I < H),
+					 Prepend<TFirst, Lower<H, I + 1, TRest...>>,
+					 Lower<H, I + 1, TRest...>
+				 >::type;
+};
+
+template <Long H, Long I>
+struct LowerT<H, I> {
+	using Type = TypeList<>;
+};
+
+}
+
+template <typename... Ts>
+using LHalf = detail::Lower<sizeof...(Ts) / 2, 0, Ts...>;
+
+//------------------------------------------------------------------------------
+
+namespace detail {
+
+template <Long, Long, typename...>
+struct UpperT;
+
+template <Long H, Long I, typename... Ts>
+using Upper = typename UpperT<H, I, Ts...>::Type;
+
+template <Long H, Long I, typename TFirst, typename... TRest>
+struct UpperT<H, I, TFirst, TRest...> {
+	using Type = typename std::conditional<
+					 (I < H),
+					 Upper<H, I + 1, TRest...>,
+					 TypeList<TFirst, TRest...>
+				 >::type;
+};
+
+template <Long H, Long I>
+struct UpperT<H, I> {
+	using Type = TypeList<>;
+};
+
+}
+
+template <typename... Ts>
+using RHalf = detail::Upper<sizeof...(Ts) / 2, 0, Ts...>;
+
+//------------------------------------------------------------------------------
+
+namespace detail {
+
+template<Long, typename...>
+struct FindImpl
+	: Const<INVALID_LONG>
+{};
+
+template<Long N, typename T, typename TFirst, typename... TRest>
+struct FindImpl<N, T, TFirst, TRest...>
+	: FindImpl<N + 1, T, TRest...>
+{};
+
+template<Long N, typename T, typename... Ts>
+struct FindImpl<N, T, T, Ts...>
+	: Const<N>
+{};
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <typename, typename>
+struct Find;
+
+template <typename T, typename... Ts>
+struct Find<T, TypeList<Ts...>>
+	: FindImpl<0, T, Ts...>
+{};
+
+}
+
+//------------------------------------------------------------------------------
+
+template <typename TList, typename T>
+constexpr Long index   () { return detail::Find<T, TList>::Value;					}
+
+template <typename TList, typename T>
+constexpr bool contains() { return std::is_base_of<detail::Type<T>, TList>::value;	}
+
+#endif
+
+////////////////////////////////////////////////////////////////////////////////
+
 }
 
 namespace ffsm2 {
@@ -1303,7 +1487,7 @@ protected:
 	/// @tparam TState State type
 	/// @return Numeric state identifier
 	template <typename TState>
-	static constexpr StateID stateId()				{ return			StateList ::template index<TState>();	}
+	static constexpr StateID stateId()								{ return index<StateList, TState>();		}
 
 	/// @brief Access FSM context (data shared between states and/or data interface between FSM and external code)
 	/// @return context
@@ -1795,7 +1979,7 @@ public:
 	FFSM2_INLINE void postExit	   (Context&)		{}
 
 	template <typename T>
-	static constexpr StateID  stateId()		{ return			StateList ::template index<T>();	}
+	static constexpr StateID  stateId()		{ return index<StateList, T>();	}
 };
 
 //------------------------------------------------------------------------------
@@ -2072,46 +2256,50 @@ FFSM2_IF_DEBUG(struct None {});
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename T, typename TArgs>
-struct DBox final {
-	static constexpr bool isBare()								{ return false;					}
+struct DynamicBox final {
+	using Type = T;
+
+	static constexpr bool isBare()							{ return false;						}
 
 	union {
-		T t_;
+		Type t_;
 	};
 
-	FFSM2_INLINE  DBox() {}
-	FFSM2_INLINE ~DBox() {}
+	FFSM2_INLINE  DynamicBox() {}
+	FFSM2_INLINE ~DynamicBox() {}
 
-	FFSM2_INLINE void guard(GuardControlT<TArgs>& control)		{ Guard<T>::execute(control);	}
+	FFSM2_INLINE void guard(GuardControlT<TArgs>& control)	{ Guard<Type>::execute(control);	}
 
 	FFSM2_INLINE void construct();
 	FFSM2_INLINE void destruct();
 
-	FFSM2_INLINE	   T& get()						{ FFSM2_ASSERT(initialized_); return t_;	}
-	FFSM2_INLINE const T& get() const				{ FFSM2_ASSERT(initialized_); return t_;	}
+	FFSM2_INLINE	   Type& get()					{ FFSM2_ASSERT(initialized_); return t_;	}
+	FFSM2_INLINE const Type& get() const			{ FFSM2_ASSERT(initialized_); return t_;	}
 
 	FFSM2_IF_ASSERT(bool initialized_ = false);
 
-	FFSM2_IF_DEBUG(const std::type_index TYPE = typeid(T));
+	FFSM2_IF_DEBUG(const std::type_index TYPE = typeid(Type));
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename T, typename TArgs>
-struct SBox final {
-	static constexpr bool isBare()	{ return std::is_base_of<T, StaticEmptyT<TArgs>>::value;	}
+struct StaticBox final {
+	using Type = T;
 
-	T t_;
+	static constexpr bool isBare()	{ return std::is_base_of<Type, StaticEmptyT<TArgs>>::value;	}
+
+	Type t_;
 
 	FFSM2_INLINE void guard(GuardControlT<TArgs>& control);
 
 	FFSM2_INLINE void construct()																{}
 	FFSM2_INLINE void destruct()																{}
 
-	FFSM2_INLINE	   T& get()									{ return t_;					}
-	FFSM2_INLINE const T& get() const							{ return t_;					}
+	FFSM2_INLINE	   Type& get()							{ return t_;						}
+	FFSM2_INLINE const Type& get() const					{ return t_;						}
 
-	FFSM2_IF_DEBUG(const std::type_index TYPE = isBare() ? typeid(None) : typeid(T));
+	FFSM2_IF_DEBUG(const std::type_index TYPE = isBare() ? typeid(None) : typeid(Type));
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2120,8 +2308,8 @@ template <typename T, typename TArgs>
 struct BoxifyT final {
 	using Type = typename std::conditional<
 					 std::is_base_of<Dynamic_, T>::value,
-					 DBox<T, TArgs>,
-					 SBox<T, TArgs>
+					 DynamicBox<T, TArgs>,
+					 StaticBox<T, TArgs>
 				 >::type;
 };
 
@@ -2142,7 +2330,7 @@ namespace detail {
 
 template <typename T, typename TA>
 void
-DBox<T, TA>::construct() {
+DynamicBox<T, TA>::construct() {
 	FFSM2_ASSERT(!initialized_);
 
 	new(&t_) T{};
@@ -2154,7 +2342,7 @@ DBox<T, TA>::construct() {
 
 template <typename T, typename TA>
 void
-DBox<T, TA>::destruct() {
+DynamicBox<T, TA>::destruct() {
 	FFSM2_ASSERT(initialized_);
 
 	t_.~T();
@@ -2166,7 +2354,7 @@ DBox<T, TA>::destruct() {
 
 template <typename T, typename TA>
 void
-SBox<T, TA>::guard(GuardControlT<TA>& control) {
+StaticBox<T, TA>::guard(GuardControlT<TA>& control) {
 	t_.widePreEntryGuard(control.context());
 	t_.		  entryGuard(control);
 }
@@ -2368,7 +2556,8 @@ Status
 S_<N, TA, TH>::deepReact(FullControl& control,
 						 const TEvent& event)
 {
-	auto reaction = static_cast<void(Head::*)(const TEvent&, FullControl&)>(&Head::react);
+	auto reaction = static_cast<void (Head::*)(const TEvent&, FullControl&)>(&Head::react);
+
 	FFSM2_LOG_STATE_METHOD(reaction,
 						   Method::REACT);
 
@@ -2477,7 +2666,7 @@ using WrapInfo = typename WrapInfoT<TS...>::Type;
 template <typename THead>
 struct SI_ final {
 	using Head				= THead;
-	using StateList			= ITL_<Head>;
+	using StateList			= TypeList<Head>;
 
 	static constexpr Short WIDTH		  = 1;
 
@@ -2604,7 +2793,7 @@ struct RF_ final {
 	using FullControl	= FullControlT <Args>;
 	using GuardControl	= GuardControlT<Args>;
 
-	//using Injection		= InjectionT<Args>;
+	using Injection		= InjectionT<Args>;
 
 	//----------------------------------------------------------------------
 
@@ -2636,12 +2825,10 @@ struct RF_ final {
 	//----------------------------------------------------------------------
 
 	template <typename T>
-	static constexpr bool contains() {
-		return StateList::template index<T>() != INVALID_LONG;
-	}
+	static constexpr bool	 contains()		{ return contains<StateList, T>();	}
 
 	template <typename T>
-	static constexpr StateID  stateId()		{ return			StateList ::template index<T>();	}
+	static constexpr StateID  stateId()		{ return index	 <StateList, T>();	}
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2650,12 +2837,12 @@ template <StateID, typename, Short, typename>
 struct CSubMaterialT;
 
 template <StateID N, typename TA, Short NI, typename... TS>
-struct CSubMaterialT<N, TA, NI, ITL_<TS...>> {
-	using Type = CS_<N, TA, NI,	     TS...>;
+struct CSubMaterialT<N, TA, NI, TypeList<TS...>> {
+	using Type = CS_<N, TA, NI,			 TS...>;
 };
 
-template <StateID N, typename TA, Short NI, typename... TS>
-using CSubMaterial = typename CSubMaterialT<N, TA, NI, TS...>::Type;
+template <StateID N, typename TA, Short NI, typename TList>
+using CSubMaterial = typename CSubMaterialT<N, TA, NI, TList>::Type;
 
 //------------------------------------------------------------------------------
 
@@ -2672,10 +2859,13 @@ struct InfoT<C_< TA, TH, TS...>> {
 	using Type = CI_<TH, TS...>;
 };
 
-template <StateID N, typename TA, Short NI	 , typename... TS>
+template <StateID N, typename TA, Short NI, typename... TS>
 struct InfoT<CS_<N, TA, NI, TS...>> {
 	using Type = CSI_<		TS...>;
 };
+
+template <typename T>
+using Info = typename InfoT<T>::Type;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -2714,20 +2904,19 @@ struct CS_ final {
 
 	static constexpr Short	  L_PRONG	  = PRONG_INDEX;
 
-	using LStates		= SplitL<TStates...>;
-	using LHalf			= CSubMaterial<INITIAL_ID,
+	using LStateList	= LHalf<TStates...>;
+	using LMaterial		= CSubMaterial<INITIAL_ID,
 									   Args,
 									   L_PRONG,
-									   LStates>;
-	using LHalfInfo		= typename InfoT<LHalf>::Type;
+									   LStateList>;
 
-	static constexpr Short	  R_PRONG	  = PRONG_INDEX + LStates::SIZE;
+	static constexpr Short	  R_PRONG	  = PRONG_INDEX + LStateList::SIZE;
 
-	using RStates		= SplitR<TStates...>;
-	using RHalf			= CSubMaterial<INITIAL_ID  + LHalfInfo::STATE_COUNT,
+	using RStateList	= RHalf<TStates...>;
+	using RMaterial		= CSubMaterial<INITIAL_ID + LStateList::SIZE,
 									   Args,
 									   R_PRONG,
-									   RStates>;
+									   RStateList>;
 
 	//----------------------------------------------------------------------
 
@@ -2755,8 +2944,8 @@ struct CS_ final {
 
 	//----------------------------------------------------------------------
 
-	LHalf lHalf;
-	RHalf rHalf;
+	LMaterial lSubs;
+	RMaterial rSubs;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2828,9 +3017,9 @@ CS_<N, TA, NI, TS...>::wideEntryGuard(GuardControl& control,
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
 	if (prong < R_PRONG)
-		return lHalf.wideEntryGuard(control, prong);
+		return lSubs.wideEntryGuard(control, prong);
 	else
-		return rHalf.wideEntryGuard(control, prong);
+		return rSubs.wideEntryGuard(control, prong);
 }
 
 //------------------------------------------------------------------------------
@@ -2843,9 +3032,9 @@ CS_<N, TA, NI, TS...>::wideConstruct(PlanControl& control,
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
 	if (prong < R_PRONG)
-		lHalf.wideConstruct(control, prong);
+		lSubs.wideConstruct(control, prong);
 	else
-		rHalf.wideConstruct(control, prong);
+		rSubs.wideConstruct(control, prong);
 }
 
 //------------------------------------------------------------------------------
@@ -2858,9 +3047,9 @@ CS_<N, TA, NI, TS...>::wideEnter(PlanControl& control,
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
 	if (prong < R_PRONG)
-		lHalf.wideEnter(control, prong);
+		lSubs.wideEnter(control, prong);
 	else
-		rHalf.wideEnter(control, prong);
+		rSubs.wideEnter(control, prong);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -2873,9 +3062,9 @@ CS_<N, TA, NI, TS...>::wideReenter(PlanControl& control,
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
 	if (prong < R_PRONG)
-		lHalf.wideReenter(control, prong);
+		lSubs.wideReenter(control, prong);
 	else
-		rHalf.wideReenter(control, prong);
+		rSubs.wideReenter(control, prong);
 }
 
 //------------------------------------------------------------------------------
@@ -2888,8 +3077,8 @@ CS_<N, TA, NI, TS...>::wideUpdate(FullControl& control,
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
 	return prong < R_PRONG ?
-		lHalf.wideUpdate(control, prong) :
-		rHalf.wideUpdate(control, prong);
+		lSubs.wideUpdate(control, prong) :
+		rSubs.wideUpdate(control, prong);
 }
 
 //------------------------------------------------------------------------------
@@ -2904,8 +3093,8 @@ CS_<N, TA, NI, TS...>::wideReact(FullControl& control,
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
 	return prong < R_PRONG ?
-		lHalf.wideReact(control, event, prong) :
-		rHalf.wideReact(control, event, prong);
+		lSubs.wideReact(control, event, prong) :
+		rSubs.wideReact(control, event, prong);
 }
 
 //------------------------------------------------------------------------------
@@ -2918,9 +3107,9 @@ CS_<N, TA, NI, TS...>::wideExitGuard(GuardControl& control,
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
 	if (prong < R_PRONG)
-		return lHalf.wideExitGuard(control, prong);
+		return lSubs.wideExitGuard(control, prong);
 	else
-		return rHalf.wideExitGuard(control, prong);
+		return rSubs.wideExitGuard(control, prong);
 }
 
 //------------------------------------------------------------------------------
@@ -2933,9 +3122,9 @@ CS_<N, TA, NI, TS...>::wideExit(PlanControl& control,
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
 	if (prong < R_PRONG)
-		lHalf.wideExit(control, prong);
+		lSubs.wideExit(control, prong);
 	else
-		rHalf.wideExit(control, prong);
+		rSubs.wideExit(control, prong);
 }
 
 //------------------------------------------------------------------------------
@@ -2948,9 +3137,9 @@ CS_<N, TA, NI, TS...>::wideDestruct(PlanControl& control,
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
 	if (prong < R_PRONG)
-		lHalf.wideDestruct(control, prong);
+		lSubs.wideDestruct(control, prong);
 	else
-		rHalf.wideDestruct(control, prong);
+		rSubs.wideDestruct(control, prong);
 }
 
 //------------------------------------------------------------------------------
@@ -2963,9 +3152,9 @@ CS_<N, TA, NI, TS...>::wideChangeToRequested(PlanControl& control,
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
 	if (prong < R_PRONG)
-		lHalf.wideChangeToRequested(control, prong);
+		lSubs.wideChangeToRequested(control, prong);
 	else
-		rHalf.wideChangeToRequested(control, prong);
+		rSubs.wideChangeToRequested(control, prong);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -3522,18 +3711,20 @@ public:
 
 public:
 
+	//----------------------------------------------------------------------
+
 	explicit R_(Context& context
 				FFSM2_IF_LOG_INTERFACE(, Logger* const logger = nullptr));
 
 	~R_();
 
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	//----------------------------------------------------------------------
 
 	/// @brief Get state identifier for a state type
 	/// @tparam TState State type
 	/// @return Numeric state identifier
 	template <typename TState>
-	static constexpr StateID  stateId()					{ return			StateList ::template index<TState>();	}
+	static constexpr StateID  stateId()								{ return index<StateList, TState>();			}
 
 	//----------------------------------------------------------------------
 
@@ -3647,13 +3838,13 @@ public:
 	/// @tparam TState Destination state type
 	/// @param payload Payload
 	template <typename TState>
-	FFSM2_INLINE void changeWith   (const Payload& payload)	{ changeWith   (stateId<TState>(		  payload ));	}
+	FFSM2_INLINE void changeWith   (const Payload& payload)	{ changeWith   (stateId<TState>(),			 payload );	}
 
 	/// @brief Transition into a state (if transitioning into a region, acts depending on the region type)
 	/// @tparam TState Destination state type
 	/// @param payload Payload
 	template <typename TState>
-	FFSM2_INLINE void changeWith   (	 Payload&& payload)	{ changeWith   (stateId<TState>(std::move(payload)));	}
+	FFSM2_INLINE void changeWith   (	 Payload&& payload)	{ changeWith   (stateId<TState>(), std::move(payload));	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -3780,6 +3971,7 @@ void
 R_<TG, TA>::react(const TEvent& event) {
 	FullControl control{_context
 					  , _registry
+					  , _request
 					  FFSM2_IF_LOG_INTERFACE(, _logger)};
 
 	_apex.deepReact(control, event);
@@ -3873,11 +4065,10 @@ R_<TG, TA>::processTransitions(TransitionSets& currentTransitions) {
 		pendingTransition.clear();
 	}
 
-	if (currentTransitions.count()) {
+	if (currentTransitions.count())
 		_apex.deepChangeToRequested(control);
 
-		_registry.clearRequests();
-	}
+	_registry.clearRequests();
 }
 
 //------------------------------------------------------------------------------

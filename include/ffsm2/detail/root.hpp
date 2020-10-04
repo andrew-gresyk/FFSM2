@@ -46,18 +46,20 @@ public:
 
 public:
 
+	//----------------------------------------------------------------------
+
 	explicit R_(Context& context
 				FFSM2_IF_LOG_INTERFACE(, Logger* const logger = nullptr));
 
 	~R_();
 
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	//----------------------------------------------------------------------
 
 	/// @brief Get state identifier for a state type
 	/// @tparam TState State type
 	/// @return Numeric state identifier
 	template <typename TState>
-	static constexpr StateID  stateId()					{ return			StateList ::template index<TState>();	}
+	static constexpr StateID  stateId()								{ return index<StateList, TState>();			}
 
 	//----------------------------------------------------------------------
 
@@ -171,13 +173,13 @@ public:
 	/// @tparam TState Destination state type
 	/// @param payload Payload
 	template <typename TState>
-	FFSM2_INLINE void changeWith   (const Payload& payload)	{ changeWith   (stateId<TState>(		  payload ));	}
+	FFSM2_INLINE void changeWith   (const Payload& payload)	{ changeWith   (stateId<TState>(),			 payload );	}
 
 	/// @brief Transition into a state (if transitioning into a region, acts depending on the region type)
 	/// @tparam TState Destination state type
 	/// @param payload Payload
 	template <typename TState>
-	FFSM2_INLINE void changeWith   (	 Payload&& payload)	{ changeWith   (stateId<TState>(std::move(payload)));	}
+	FFSM2_INLINE void changeWith   (	 Payload&& payload)	{ changeWith   (stateId<TState>(), std::move(payload));	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
