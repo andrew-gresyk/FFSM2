@@ -84,7 +84,8 @@ Status
 S_<N, TA, TH>::deepReact(FullControl& control,
 						 const TEvent& event)
 {
-	auto reaction = static_cast<void(Head::*)(const TEvent&, FullControl&)>(&Head::react);
+	auto reaction = static_cast<void (Head::*)(const TEvent&, FullControl&)>(&Head::react);
+
 	FFSM2_LOG_STATE_METHOD(reaction,
 						   Method::REACT);
 

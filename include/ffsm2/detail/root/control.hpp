@@ -55,7 +55,7 @@ protected:
 	/// @tparam TState State type
 	/// @return Numeric state identifier
 	template <typename TState>
-	static constexpr StateID stateId()				{ return			StateList ::template index<TState>();	}
+	static constexpr StateID stateId()								{ return index<StateList, TState>();		}
 
 	/// @brief Access FSM context (data shared between states and/or data interface between FSM and external code)
 	/// @return context

@@ -30,10 +30,11 @@ Header-only flat FSM framework in C++11, with fully statically-defined structure
 - Fully static, no dynamic allocations
 - Uses inline-friendly compile-time pylymorphism, no virtual methods are used
 - Type-safe transitions: `FSM.changeTo<TargetState>()` with optional payloads
+- Scaleable, supports robust state re-use via state injections
 - Gamedev-friendly, supports explicit `State::update()`
 - Also supports traditional event-based workflow with `State::react()`
 - Inspect anything: previous and current transitions, state activation status, and more!
-- Scaleable, supports robust state re-use via state injections
+- Built-in logging support
 
 ---
 

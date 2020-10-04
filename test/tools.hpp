@@ -11,7 +11,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 struct Event {
-	enum Enum {
+	enum class Type {
 		ENTRY_GUARD,
 		CONSTRUCT,
 		ENTER,
@@ -33,14 +33,14 @@ struct Event {
 	};
 
 	Event(const ffsm2::StateID origin_,
-		  const Enum type_,
+		  const Type type_,
 		  const ffsm2::StateID target_ = ffsm2::INVALID_STATE_ID)
 		: origin{origin_}
 		, type{type_}
 		, target{target_}
 	{}
 
-	Event(const Enum type_,
+	Event(const Type type_,
 		  const ffsm2::StateID target_)
 		: origin{ffsm2::INVALID_STATE_ID}
 		, type{type_}
@@ -48,7 +48,7 @@ struct Event {
 	{}
 
 	ffsm2::StateID origin;
-	Enum type;
+	Type type;
 	ffsm2::StateID target;
 };
 using Events = std::vector<Event>;

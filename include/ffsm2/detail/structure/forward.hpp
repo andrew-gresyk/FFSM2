@@ -43,7 +43,7 @@ using WrapInfo = typename WrapInfoT<TS...>::Type;
 template <typename THead>
 struct SI_ final {
 	using Head				= THead;
-	using StateList			= ITL_<Head>;
+	using StateList			= TypeList<Head>;
 
 	static constexpr Short WIDTH		  = 1;
 
@@ -170,7 +170,7 @@ struct RF_ final {
 	using FullControl	= FullControlT <Args>;
 	using GuardControl	= GuardControlT<Args>;
 
-	//using Injection		= InjectionT<Args>;
+	using Injection		= InjectionT<Args>;
 
 	//----------------------------------------------------------------------
 
@@ -202,12 +202,10 @@ struct RF_ final {
 	//----------------------------------------------------------------------
 
 	template <typename T>
-	static constexpr bool contains() {
-		return StateList::template index<T>() != INVALID_LONG;
-	}
+	static constexpr bool	 contains()		{ return contains<StateList, T>();	}
 
 	template <typename T>
-	static constexpr StateID  stateId()		{ return			StateList ::template index<T>();	}
+	static constexpr StateID  stateId()		{ return index	 <StateList, T>();	}
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -216,32 +214,12 @@ template <StateID, typename, Short, typename>
 struct CSubMaterialT;
 
 template <StateID N, typename TA, Short NI, typename... TS>
-struct CSubMaterialT<N, TA, NI, ITL_<TS...>> {
-	using Type = CS_<N, TA, NI,	     TS...>;
+struct CSubMaterialT<N, TA, NI, TypeList<TS...>> {
+	using Type = CS_<N, TA, NI,			 TS...>;
 };
 
-template <StateID N, typename TA, Short NI, typename... TS>
-using CSubMaterial = typename CSubMaterialT<N, TA, NI, TS...>::Type;
-
-//------------------------------------------------------------------------------
-
-template <typename>
-struct InfoT;
-
-template <StateID N, typename TA, typename TH>
-struct InfoT<S_<N, TA, TH>> {
-	using Type = SI_<  TH>;
-};
-
-template <typename TA, typename TH, typename... TS>
-struct InfoT<C_< TA, TH, TS...>> {
-	using Type = CI_<TH, TS...>;
-};
-
-template <StateID N, typename TA, Short NI	 , typename... TS>
-struct InfoT<CS_<N, TA, NI, TS...>> {
-	using Type = CSI_<		TS...>;
-};
+template <StateID N, typename TA, Short NI, typename TList>
+using CSubMaterial = typename CSubMaterialT<N, TA, NI, TList>::Type;
 
 ////////////////////////////////////////////////////////////////////////////////
 

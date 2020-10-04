@@ -36,7 +36,7 @@ public:
 	FFSM2_INLINE void postExit	   (Context&)		{}
 
 	template <typename T>
-	static constexpr StateID  stateId()		{ return			StateList ::template index<T>();	}
+	static constexpr StateID  stateId()		{ return index<StateList, T>();	}
 };
 
 //------------------------------------------------------------------------------
