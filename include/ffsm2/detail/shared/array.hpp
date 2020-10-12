@@ -4,6 +4,54 @@ namespace detail {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename T, Long NCapacity>
+class StaticArray {
+public:
+	static constexpr Long CAPACITY = NCapacity;
+	static constexpr Long DUMMY	   = INVALID_LONG;
+
+	using Item  = T;
+	using Index = UnsignedCapacity<CAPACITY>;
+
+public:
+	FFSM2_INLINE StaticArray() = default;
+	FFSM2_INLINE StaticArray(const Item filler);
+
+	template <typename N>
+	FFSM2_INLINE	   Item& operator[] (const N i);
+
+	template <typename N>
+	FFSM2_INLINE const Item& operator[] (const N i) const;
+
+	FFSM2_INLINE Long count() const							{ return CAPACITY;									}
+
+	FFSM2_INLINE void fill(const Item filler);
+	FFSM2_INLINE void clear()								{ fill(INVALID_SHORT);								}
+
+	FFSM2_INLINE Iterator<      StaticArray>  begin()		{ return Iterator<      StaticArray>(*this,     0); }
+	FFSM2_INLINE Iterator<const	StaticArray>  begin() const	{ return Iterator<const StaticArray>(*this,     0); }
+	FFSM2_INLINE Iterator<const	StaticArray> cbegin() const	{ return Iterator<const StaticArray>(*this,     0); }
+
+	FFSM2_INLINE Iterator<      StaticArray>    end()		{ return Iterator<      StaticArray>(*this, DUMMY);	}
+	FFSM2_INLINE Iterator<const	StaticArray>    end() const	{ return Iterator<const StaticArray>(*this, DUMMY);	}
+	FFSM2_INLINE Iterator<const	StaticArray>   cend() const	{ return Iterator<const StaticArray>(*this, DUMMY);	}
+
+private:
+	Item _items[CAPACITY];
+};
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <typename T>
+struct StaticArray<T, 0> {
+	using Item  = T;
+
+	FFSM2_INLINE StaticArray() = default;
+	FFSM2_INLINE StaticArray(const Item)											{}
+};
+
+//------------------------------------------------------------------------------
+
+template <typename T, Long NCapacity>
 class Array {
 	template <typename>
 	friend class Iterator;

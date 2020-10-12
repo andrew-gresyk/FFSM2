@@ -23,6 +23,11 @@ protected:
 	using Transition		= TransitionT<Payload>;
 	using TransitionSets	= Array<Transition, TArgs::SUBSTITUTION_LIMIT>;
 
+#ifdef FFSM2_ENABLE_PLANS
+	using PlanData			= PlanDataT<TArgs>;
+	using ConstPlan			= ConstPlanT<TArgs>;
+#endif
+
 #ifdef FFSM2_ENABLE_LOG_INTERFACE
 	using Logger			= typename TArgs::Logger;
 #endif
@@ -44,12 +49,19 @@ protected:
 	FFSM2_INLINE ControlT(Context& context
 						, Registry& registry
 						, Transition& request
+						FFSM2_IF_PLANS(, PlanData& planData)
 						FFSM2_IF_LOG_INTERFACE(, Logger* const logger))
 		: _context{context}
 		, _registry{registry}
 		, _request{request}
+		FFSM2_IF_PLANS(, _planData{planData})
 		FFSM2_IF_LOG_INTERFACE(, _logger{logger})
 	{}
+
+	FFSM2_INLINE void setOrigin  (const StateID stateId);
+	FFSM2_INLINE void resetOrigin(const StateID stateId);
+
+public:
 
 	/// @brief Get state identifier for a state type
 	/// @tparam TState State type
@@ -85,6 +97,16 @@ protected:
 
 	//----------------------------------------------------------------------
 
+#ifdef FFSM2_ENABLE_PLANS
+
+	/// @brief Access read-only plan
+	/// @return Plan
+	FFSM2_INLINE ConstPlan plan() const								{ return ConstPlan{_planData};				}
+
+#endif
+
+	//----------------------------------------------------------------------
+
 protected:
 #ifdef FFSM2_ENABLE_LOG_INTERFACE
 	FFSM2_INLINE Logger* logger()									{ return _logger;							}
@@ -95,6 +117,7 @@ protected:
 	Registry& _registry;
 	Transition& _request;
 	StateID _originId = INVALID_STATE_ID;
+	FFSM2_IF_PLANS(PlanData& _planData);
 	FFSM2_IF_LOG_INTERFACE(Logger* _logger);
 };
 
@@ -118,9 +141,34 @@ protected:
 
 	using typename Control::StateList;
 
+#ifdef FFSM2_ENABLE_PLANS
+	using typename Control::PlanData;
+	using typename Control::ConstPlan;
+
+	using Plan			= PlanT<TArgs>;
+#endif
+
 	using Control::Control;
 
+public:
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+#ifdef FFSM2_ENABLE_PLANS
+
+	/// @brief Access plan
+	/// @return Plan
+	FFSM2_INLINE	  Plan plan()									{ return	  Plan{_planData};				}
+
+	/// @brief Access read-only plan
+	/// @return Read-only plan
+	FFSM2_INLINE ConstPlan plan() const								{ return ConstPlan{_planData};				}
+
+#endif
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 protected:
+	FFSM2_IF_PLANS(using Control::_planData);
 	FFSM2_IF_LOG_INTERFACE(using Control::_logger);
 
 	Status _status;
@@ -148,6 +196,10 @@ protected:
 
 	using typename PlanControl::Transition;
 
+#ifdef FFSM2_ENABLE_PLANS
+	using TasksBits		= BitArray<StateID, StateList::SIZE>;
+#endif
+
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	struct Lock {
@@ -167,19 +219,32 @@ public:
 	//----------------------------------------------------------------------
 	// Clang trips over 'stateId<>()', so give it a hint it comes from PlanControl
 
-	/// @brief Transition into a state (if transitioning into a region, acts depending on the region type)
+	/// @brief Transition into a state
 	/// @param stateId State identifier
 	FFSM2_INLINE void changeTo (const StateID stateId);
 
-	/// @brief Transition into a state (if transitioning into a region, acts depending on the region type)
+	/// @brief Transition into a state
 	/// @tparam TState State type
 	template <typename TState>
-	FFSM2_INLINE void changeTo ()							{ changeTo (PlanControl::template stateId<TState>());	}
+	FFSM2_INLINE void changeTo ()						{ changeTo (PlanControl::template stateId<TState>());	}
+
+	//----------------------------------------------------------------------
+
+#ifdef FFSM2_ENABLE_PLANS
+
+	/// @brief Succeed a plan task for the current state
+	FFSM2_INLINE void succeed();
+
+	/// @brief Fail a plan task for the current state
+	FFSM2_INLINE void fail();
+
+#endif
 
 	//----------------------------------------------------------------------
 
 protected:
 	using PlanControl::_request;
+	FFSM2_IF_PLANS(using PlanControl::_planData);
 	FFSM2_IF_LOG_INTERFACE(using PlanControl::_logger);
 
 	using PlanControl::_originId;
@@ -199,16 +264,19 @@ template <typename TContext
 		, typename TConfig
 		, typename TStateList
 		, Long NSubstitutionLimit
+		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload>
 class FullControlT<ArgsT<TContext
 					   , TConfig
 					   , TStateList
 					   , NSubstitutionLimit
+					   FFSM2_IF_PLANS(, NTaskCapacity)
 					   , TPayload>>
 	: public FullControlBaseT<ArgsT<TContext
 								  , TConfig
 								  , TStateList
 								  , NSubstitutionLimit
+								  FFSM2_IF_PLANS(, NTaskCapacity)
 								  , TPayload>>
 {
 	template <StateID, typename, typename>
@@ -224,6 +292,7 @@ class FullControlT<ArgsT<TContext
 					 , TConfig
 					 , TStateList
 					 , NSubstitutionLimit
+					 FFSM2_IF_PLANS(, NTaskCapacity)
 					 , TPayload>;
 
 protected:
@@ -234,44 +303,61 @@ protected:
 
 	using typename FullControlBase::Origin;
 
+#ifdef FFSM2_ENABLE_PLANS
+	using typename FullControlBase::Plan;
+	using typename FullControlBase::TasksBits;
+#endif
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 	using FullControlBase::FullControlBase;
+
+#ifdef FFSM2_ENABLE_PLANS
+
+	template <typename TState>
+	void updatePlan(TState& headState, const Status subStatus);
+
+#endif
 
 public:
 	using FullControlBase::context;
 
 	using FullControlBase::changeTo;
 
+	FFSM2_IF_PLANS(using FullControlBase::plan);
+
 	//------------------------------------------------------------------------------
 
-	/// @brief Transition into a state (if transitioning into a region, acts depending on the region type)
+	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
 	FFSM2_INLINE void changeWith   (const StateID  stateId,
 									const Payload& payload);
 
-	/// @brief Transition into a state (if transitioning into a region, acts depending on the region type)
+	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
 	FFSM2_INLINE void changeWith   (const StateID  stateId,
 										 Payload&& payload);
 
-	/// @brief Transition into a state (if transitioning into a region, acts depending on the region type)
+	/// @brief Transition into a state
 	/// @tparam TState Destination state type
 	/// @param payload Payload
 	template <typename TState>
 	FFSM2_INLINE void changeWith   (const Payload& payload)	{ changeWith   (FullControlBase::template stateId<TState>(),		   payload );	}
 
-	/// @brief Transition into a state (if transitioning into a region, acts depending on the region type)
+	/// @brief Transition into a state
 	/// @tparam TState Destination state type
 	/// @param payload Payload
 	template <typename TState>
 	FFSM2_INLINE void changeWith   (	 Payload&& payload)	{ changeWith   (FullControlBase::template stateId<TState>(), std::move(payload));	}
 
-
 	//------------------------------------------------------------------------------
 
 protected:
 	using FullControlBase::_request;
+	FFSM2_IF_PLANS(using FullControlBase::_planData);
+	FFSM2_IF_PLANS(using FullControlBase::_registry);
 	FFSM2_IF_LOG_INTERFACE(using FullControlBase::_logger);
 
 	using FullControlBase::_originId;
@@ -285,16 +371,19 @@ protected:
 template <typename TContext
 		, typename TConfig
 		, typename TStateList
-		, Long NSubstitutionLimit>
+		, Long NSubstitutionLimit
+		FFSM2_IF_PLANS(, Long NTaskCapacity)>
 class FullControlT<ArgsT<TContext
 					   , TConfig
 					   , TStateList
 					   , NSubstitutionLimit
+					   FFSM2_IF_PLANS(, NTaskCapacity)
 					   , void>>
 	: public FullControlBaseT<ArgsT<TContext
 								  , TConfig
 								  , TStateList
 								  , NSubstitutionLimit
+								  FFSM2_IF_PLANS(, NTaskCapacity)
 								  , void>>
 {
 	template <StateID, typename, typename>
@@ -310,6 +399,7 @@ class FullControlT<ArgsT<TContext
 					 , TConfig
 					 , TStateList
 					 , NSubstitutionLimit
+					 FFSM2_IF_PLANS(, NTaskCapacity)
 					 , void>;
 
 protected:
@@ -317,12 +407,30 @@ protected:
 
 	using typename FullControlBase::Origin;
 
+#ifdef FFSM2_ENABLE_PLANS
+	using typename FullControlBase::Plan;
+	using typename FullControlBase::TasksBits;
+#endif
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 	using FullControlBase::FullControlBase;
+
+#ifdef FFSM2_ENABLE_PLANS
+
+	template <typename TState>
+	void updatePlan(TState& headState, const Status subStatus);
+
+#endif
 
 public:
 	using FullControlBase::changeTo;
 
+	FFSM2_IF_PLANS(using FullControlBase::plan);
+
 protected:
+	FFSM2_IF_PLANS(using FullControlBase::_registry);
+	FFSM2_IF_PLANS(using FullControlBase::_planData);
 
 	using FullControlBase::_status;
 };
@@ -349,6 +457,10 @@ class GuardControlT final
 	using typename FullControl::Transition;
 	using typename FullControl::TransitionSets;
 
+#ifdef FFSM2_ENABLE_PLANS
+	using typename FullControl::PlanData;
+#endif
+
 #ifdef FFSM2_ENABLE_LOG_INTERFACE
 	using typename FullControl::Logger;
 #endif
@@ -360,10 +472,12 @@ class GuardControlT final
 							 , Transition& request
 							 , const TransitionSets& currentTransitions
 							 , const Transition& pendingTransition
+							 FFSM2_IF_PLANS(, PlanData& planData)
 							 FFSM2_IF_LOG_INTERFACE(, Logger* const logger))
 		: FullControl{context
 					, registry
 					, request
+					FFSM2_IF_PLANS(, planData)
 					FFSM2_IF_LOG_INTERFACE(, logger)}
 		, _currentTransitions{currentTransitions}
 		, _pendingTransition{pendingTransition}
@@ -373,19 +487,6 @@ class GuardControlT final
 
 public:
 	using FullControl::context;
-
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	/// @brief Check if a state is going to be activated or deactivated
-	/// @param stateId State identifier
-	/// @return State pending activation/deactivation status
-	FFSM2_INLINE bool isPendingChange(const StateID stateId) const	{ return _registry.isPendingChange(stateId);	}
-
-	/// @brief Check if a state is going to be activated or deactivated
-	/// @tparam TState State type
-	/// @return State pending activation/deactivation status
-	template <typename TState>
-	FFSM2_INLINE bool isPendingChange()			{ return isPendingChange(FullControl::template stateId<TState>());	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

@@ -87,6 +87,7 @@ template <typename TContext
 		, typename TConfig
 		, typename TStateList
 		, Long NSubstitutionLimit
+		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload>
 struct ArgsT final {
 	using Context		= TContext;
@@ -99,6 +100,10 @@ struct ArgsT final {
 
 	static constexpr Long  STATE_COUNT		  = StateList::SIZE;
 	static constexpr Short SUBSTITUTION_LIMIT = NSubstitutionLimit;
+
+#ifdef FFSM2_ENABLE_PLANS
+	static constexpr Long  TASK_CAPACITY	  = NTaskCapacity;
+#endif
 
 	using Payload	= TPayload;
 };
@@ -152,7 +157,16 @@ struct RF_ final {
 
 	static constexpr Long  SUBSTITUTION_LIMIT	= TConfig::SUBSTITUTION_LIMIT;
 
+#ifdef FFSM2_ENABLE_PLANS
+	static constexpr Long  TASK_CAPACITY		= TConfig::TASK_CAPACITY != INVALID_LONG ?
+													  TConfig::TASK_CAPACITY : Apex::STATE_COUNT;
+#endif
+
 	using Payload		= typename TConfig::Payload;
+
+#ifdef FFSM2_ENABLE_PLANS
+	using Task			= typename TConfig::Task;
+#endif
 
 	using StateList		= typename Apex::StateList;
 
@@ -160,6 +174,7 @@ struct RF_ final {
 							  , TConfig
 							  , StateList
 							  , SUBSTITUTION_LIMIT
+							  FFSM2_IF_PLANS(, TASK_CAPACITY)
 							  , Payload>;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

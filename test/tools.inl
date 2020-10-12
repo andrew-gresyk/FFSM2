@@ -46,6 +46,18 @@ LoggerT<TConfig>::recordMethod(Context& /*context*/,
 			history.emplace_back(origin, Event::Type::DESTRUCT);
 			break;
 
+	#ifdef FFSM2_ENABLE_PLANS
+
+		case Method::PLAN_SUCCEEDED:
+			history.emplace_back(origin, Event::Type::PLAN_SUCCEEDED);
+			break;
+
+		case Method::PLAN_FAILED:
+			history.emplace_back(origin, Event::Type::PLAN_FAILED);
+			break;
+
+	#endif
+
 		default:
 			FFSM2_BREAK();
 	}
@@ -61,6 +73,54 @@ LoggerT<TConfig>::recordTransition(Context& /*context*/,
 {
 	history.emplace_back(origin, Event::Type::CHANGE, target);
 }
+
+//------------------------------------------------------------------------------
+
+#ifdef FFSM2_ENABLE_PLANS
+
+template <typename TConfig>
+void
+LoggerT<TConfig>::recordTaskStatus(Context& /*context*/,
+								   const StateID origin,
+								   const StatusEvent event)
+{
+	switch (event) {
+		case StatusEvent::SUCCEEDED:
+			history.emplace_back(origin, Event::Type::TASK_SUCCESS);
+			break;
+
+		case StatusEvent::FAILED:
+			history.emplace_back(origin, Event::Type::TASK_FAILURE);
+			break;
+
+		default:
+			FFSM2_BREAK();
+	}
+}
+
+//------------------------------------------------------------------------------
+
+template <typename TConfig>
+void
+LoggerT<TConfig>::recordPlanStatus(Context& /*context*/,
+								   const StatusEvent event)
+{
+	switch (event) {
+		case StatusEvent::SUCCEEDED:
+			history.emplace_back(Event::Type::PLAN_SUCCESS, ffsm2::INVALID_STATE_ID);
+			break;
+
+		case StatusEvent::FAILED:
+			history.emplace_back(Event::Type::PLAN_FAILURE, ffsm2::INVALID_STATE_ID);
+			break;
+
+		default:
+			FFSM2_BREAK();
+	}
+}
+
+#endif
+
 
 //------------------------------------------------------------------------------
 

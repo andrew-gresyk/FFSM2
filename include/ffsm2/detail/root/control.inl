@@ -49,12 +49,84 @@ FullControlBaseT<TArgs>::changeTo(const StateID stateId) {
 	}
 }
 
+//------------------------------------------------------------------------------
+
+#ifdef FFSM2_ENABLE_PLANS
+
+template <typename TArgs>
+void
+FullControlBaseT<TArgs>::succeed() {
+	_status.result = Status::Result::SUCCESS;
+
+	_planData.tasksSuccesses.set(_originId);
+
+	FFSM2_LOG_TASK_STATUS(context(), _originId, StatusEvent::SUCCEEDED);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <typename TArgs>
+void
+FullControlBaseT<TArgs>::fail() {
+	_status.result = Status::Result::FAILURE;
+
+	_planData.tasksFailures.set(_originId);
+
+	FFSM2_LOG_TASK_STATUS(context(), _originId, StatusEvent::FAILED);
+}
+
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename TC, typename TG, typename TSL, Long NSL, typename TTP>
+#ifdef FFSM2_ENABLE_PLANS
+
+template <typename TC, typename TG, typename TSL, Long NSL, Long NTC, typename TTP>
+template <typename TState>
 void
-FullControlT<ArgsT<TC, TG, TSL, NSL, TTP>>::changeWith(const StateID stateId,
-													   const Payload& payload)
+FullControlT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::updatePlan(TState& headState,
+															const Status subStatus)
+{
+	FFSM2_ASSERT(subStatus);
+
+	if (subStatus.result == Status::Result::FAILURE) {
+		_status.result = Status::Result::FAILURE;
+		headState.wrapPlanFailed(*this);
+
+		if (Plan p = plan())
+			p.clear();
+	} else if (subStatus.result == Status::Result::SUCCESS) {
+		if (Plan p = plan()) {
+			TasksBits processed;
+
+			for (auto it = p.first(); it; ++it) {
+				if (_registry.active == it->origin &&
+					_planData.tasksSuccesses.get(it->origin) &&
+					!processed.get(it->origin))
+				{
+					Origin origin{*this, it->origin};
+					changeTo(it->destination);
+
+					_planData.tasksSuccesses.clear(it->origin);
+					processed.set(it->origin);
+					it.remove();
+				}
+			}
+		} else {
+			_status.result = Status::Result::SUCCESS;
+			headState.wrapPlanSucceeded(*this);
+		}
+	}
+}
+
+#endif
+
+//------------------------------------------------------------------------------
+
+template <typename TC, typename TG, typename TSL, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TTP>
+void
+FullControlT<ArgsT<TC, TG, TSL, NSL FFSM2_IF_PLANS(, NTC), TTP>>::changeWith(const StateID stateId,
+																			 const Payload& payload)
 {
 	if (!_locked) {
 		_request = Transition{_originId, stateId, payload};
@@ -65,10 +137,10 @@ FullControlT<ArgsT<TC, TG, TSL, NSL, TTP>>::changeWith(const StateID stateId,
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename TC, typename TG, typename TSL, Long NSL, typename TTP>
+template <typename TC, typename TG, typename TSL, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TTP>
 void
-FullControlT<ArgsT<TC, TG, TSL, NSL, TTP>>::changeWith(const StateID stateId,
-													   Payload&& payload)
+FullControlT<ArgsT<TC, TG, TSL, NSL FFSM2_IF_PLANS(, NTC), TTP>>::changeWith(const StateID stateId,
+																				  Payload&& payload)
 {
 	if (!_locked) {
 		_request = Transition{_originId, stateId, std::move(payload)};
@@ -76,6 +148,50 @@ FullControlT<ArgsT<TC, TG, TSL, NSL, TTP>>::changeWith(const StateID stateId,
 		FFSM2_LOG_TRANSITION(context(), _originId, stateId);
 	}
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+#ifdef FFSM2_ENABLE_PLANS
+
+template <typename TC, typename TG, typename TSL, Long NSL, Long NTC>
+template <typename TState>
+void
+FullControlT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::updatePlan(TState& headState,
+															 const Status subStatus)
+{
+	FFSM2_ASSERT(subStatus);
+
+	if (subStatus.result == Status::Result::FAILURE) {
+		_status.result = Status::Result::FAILURE;
+		headState.wrapPlanFailed(*this);
+
+		if (Plan p = plan())
+			p.clear();
+	} else if (subStatus.result == Status::Result::SUCCESS) {
+		if (Plan p = plan()) {
+			TasksBits processed;
+
+			for (auto it = p.first(); it; ++it) {
+				if (_registry.active == it->origin &&
+					_planData.tasksSuccesses.get(it->origin) &&
+					!processed.get(it->origin))
+				{
+					Origin origin{*this, it->origin};
+					changeTo(it->destination);
+
+					_planData.tasksSuccesses.clear(it->origin);
+					processed.set(it->origin);
+					it.remove();
+				}
+			}
+		} else {
+			_status.result = Status::Result::SUCCESS;
+			headState.wrapPlanSucceeded(*this);
+		}
+	}
+}
+
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 
