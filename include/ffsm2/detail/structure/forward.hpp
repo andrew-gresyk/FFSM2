@@ -26,8 +26,8 @@ template <typename...>
 struct WrapInfoT;
 
 template <typename TH>
-struct WrapInfoT<	  TH> {
-	using Type =  SI_<TH>;
+struct WrapInfoT<	 TH> {
+	using Type = SI_<TH>;
 };
 
 template <typename TH, typename... TS>

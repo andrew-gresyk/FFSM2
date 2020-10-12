@@ -30,7 +30,7 @@ Header-only flat FSM framework in C++11, with fully statically-defined structure
 
 ## Feature Highlights
 
-- Permissive [MIT License](https://github.com/andrew-gresyk/HFSM2/blob/master/LICENSE)
+- Permissive [MIT License](https://github.com/andrew-gresyk/FFSM2/blob/master/LICENSE)
 - Written in widely-supported modern(ish) C++11
 - Header-only
 - Convenient, minimal boilerplate
@@ -41,7 +41,7 @@ Header-only flat FSM framework in C++11, with fully statically-defined structure
 - Gamedev-friendly, supports explicit `State::update()`
 - Also supports traditional event-based workflow with `State::react()`
 - Inspect anything: previous and current transitions, state activation status, and more!
-- Game AI-friendly with [Dynamic planning](https://github.com/andrew-gresyk/HFSM2/wiki/Plans) support
+- Game AI-friendly with dynamic planning support
 - Built-in logging support
 
 ---

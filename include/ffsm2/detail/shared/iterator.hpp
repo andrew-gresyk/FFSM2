@@ -24,11 +24,11 @@ public:
 
 	FFSM2_INLINE Iterator& operator ++();
 
-	FFSM2_INLINE	   Item& operator *()		{ return  _container[_cursor]; }
-	FFSM2_INLINE const Item& operator *() const { return  _container[_cursor]; }
+	FFSM2_INLINE	   Item& operator *()		{ return  _container[_cursor];	}
+	FFSM2_INLINE const Item& operator *() const { return  _container[_cursor];	}
 
-	FFSM2_INLINE	   Item* operator->()		{ return &_container[_cursor]; }
-	FFSM2_INLINE const Item* operator->() const { return &_container[_cursor]; }
+	FFSM2_INLINE	   Item* operator->()		{ return &_container[_cursor];	}
+	FFSM2_INLINE const Item* operator->() const { return &_container[_cursor];	}
 
 private:
 	Container& _container;
@@ -59,9 +59,9 @@ public:
 
 	FFSM2_INLINE Iterator& operator ++();
 
-	FFSM2_INLINE const Item& operator *() const { return _container[_cursor]; }
+	FFSM2_INLINE const Item& operator *() const { return _container[_cursor];	}
 
-	FFSM2_INLINE const Item* operator->() const { return &operator *();		 }
+	FFSM2_INLINE const Item* operator->() const { return &operator *();			}
 
 private:
 	const Container& _container;

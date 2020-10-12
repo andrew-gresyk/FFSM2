@@ -164,7 +164,7 @@ public:
 	template <typename TState>
 	static constexpr StateID  stateId()								{ return Base::template stateId<TState>();		}
 
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	//------------------------------------------------------------------------------
 
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
@@ -219,7 +219,7 @@ public:
 
 /// @brief FSM Root
 /// @tparam Cfg Type configuration
-/// @tparam TApex Root  type
+/// @tparam TApex Root region type
 template <typename TConfig,
 		  typename TApex>
 class RW_ final

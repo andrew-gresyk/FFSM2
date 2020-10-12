@@ -445,11 +445,11 @@ public:
 
 	FFSM2_INLINE Iterator& operator ++();
 
-	FFSM2_INLINE	   Item& operator *()		{ return  _container[_cursor]; }
-	FFSM2_INLINE const Item& operator *() const { return  _container[_cursor]; }
+	FFSM2_INLINE	   Item& operator *()		{ return  _container[_cursor];	}
+	FFSM2_INLINE const Item& operator *() const { return  _container[_cursor];	}
 
-	FFSM2_INLINE	   Item* operator->()		{ return &_container[_cursor]; }
-	FFSM2_INLINE const Item* operator->() const { return &_container[_cursor]; }
+	FFSM2_INLINE	   Item* operator->()		{ return &_container[_cursor];	}
+	FFSM2_INLINE const Item* operator->() const { return &_container[_cursor];	}
 
 private:
 	Container& _container;
@@ -480,9 +480,9 @@ public:
 
 	FFSM2_INLINE Iterator& operator ++();
 
-	FFSM2_INLINE const Item& operator *() const { return _container[_cursor]; }
+	FFSM2_INLINE const Item& operator *() const { return _container[_cursor];	}
 
-	FFSM2_INLINE const Item* operator->() const { return &operator *();		 }
+	FFSM2_INLINE const Item* operator->() const { return &operator *();			}
 
 private:
 	const Container& _container;
@@ -4638,8 +4638,8 @@ template <typename...>
 struct WrapInfoT;
 
 template <typename TH>
-struct WrapInfoT<	  TH> {
-	using Type =  SI_<TH>;
+struct WrapInfoT<	 TH> {
+	using Type = SI_<TH>;
 };
 
 template <typename TH, typename... TS>
@@ -5620,26 +5620,26 @@ struct M_	   <G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTas
 
 	//----------------------------------------------------------------------
 
-	/// @brief Composite  ('changeTo<>()' into the  acts as 'restart<>()')
+	/// @brief Composite region
 	/// @tparam THead Head state
 	/// @tparam TSubStates Sub-states
 	template <typename THead, typename... TSubStates>
 	using Composite		 = CI_<THead, TSubStates...>;
 
-	/// @brief Headless composite  ('changeTo<>()' into the  acts as 'restart<>()')
+	/// @brief Headless composite region
 	/// @tparam TSubStates Sub-states
 	template <				  typename... TSubStates>
 	using CompositePeers = CI_<void,  TSubStates...>;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	/// @brief Root ('changeTo<>()' into the root  acts as 'restart<>()')
+	/// @brief Root
 	/// @tparam THead Head state
 	/// @tparam TSubStates Sub-states
 	template <typename THead, typename... TSubStates>
 	using Root			 = RF_<Cfg, Composite  <THead, TSubStates...>>;
 
-	/// @brief Headless root ('changeTo<>()' into the root  acts as 'restart<>()')
+	/// @brief Headless root
 	/// @tparam TSubStates Sub-states
 	template <				  typename... TSubStates>
 	using PeerRoot		 = RF_<Cfg, CompositePeers  <  TSubStates...>>;
@@ -5653,11 +5653,9 @@ struct M_	   <G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTas
 
 /// @brief Type configuration for MachineT<>
 /// @tparam TContext Context type for data shared between states and/or data interface between FSM and external code
-/// @tparam TRank Rank type for 'TRank State::rank() const' method
-/// @tparam TUtility Utility type for 'TUtility State::utility() const' method
-/// @tparam TRNG RNG type used in 'Random' s
 /// @tparam NSubstitutionLimit Maximum number times 'guard()' methods can substitute their states for others
 /// @tparam NTaskCapacity Maximum number of tasks across all plans
+/// @tparam TPayload Payload type
 template <typename TContext = EmptyContext
 		, Long NSubstitutionLimit = 4
 		FFSM2_IF_PLANS(, Long NTaskCapacity = INVALID_LONG)
@@ -5846,7 +5844,7 @@ public:
 	template <typename TState>
 	static constexpr StateID  stateId()								{ return Base::template stateId<TState>();		}
 
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	//------------------------------------------------------------------------------
 
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
@@ -5901,7 +5899,7 @@ public:
 
 /// @brief FSM Root
 /// @tparam Cfg Type configuration
-/// @tparam TApex Root  type
+/// @tparam TApex Root region type
 template <typename TConfig,
 		  typename TApex>
 class RW_ final
