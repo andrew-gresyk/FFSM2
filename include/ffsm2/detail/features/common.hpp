@@ -15,8 +15,24 @@ enum class Method : uint8_t {
 	EXIT,
 	DESTRUCT,
 
+#ifdef FFSM2_ENABLE_PLANS
+	PLAN_SUCCEEDED,
+	PLAN_FAILED,
+#endif
+
 	COUNT
 };
+
+#ifdef FFSM2_ENABLE_PLANS
+
+enum class StatusEvent : uint8_t {
+	SUCCEEDED,
+	FAILED,
+
+	COUNT
+};
+
+#endif
 
 //------------------------------------------------------------------------------
 
@@ -60,6 +76,11 @@ methodName(const Method method) {
 	case Method::EXIT:			 return "exit";
 	case Method::DESTRUCT:		 return "destruct";
 
+#ifdef FFSM2_ENABLE_PLANS
+	case Method::PLAN_SUCCEEDED: return "planSucceeded";
+	case Method::PLAN_FAILED:	 return "planFailed";
+#endif
+
 	default:
 		FFSM2_BREAK();
 		return nullptr;
@@ -90,7 +111,7 @@ struct alignas(4) TransitionBase {
 
 	FFSM2_INLINE TransitionBase(const StateID origin_,
 								const StateID destination_)
-		: origin{origin_}
+		: origin	 {origin_}
 		, destination{destination_}
 	{}
 

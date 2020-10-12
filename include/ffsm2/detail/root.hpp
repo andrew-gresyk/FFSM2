@@ -21,6 +21,9 @@ class R_ {
 	using StateList				= typename Forward::StateList;
 	using Args					= typename Forward::Args;
 
+	static_assert(Args::STATE_COUNT <  (unsigned) -1, "Too many states in the FSM. Change 'Short' type.");
+	static_assert(Args::STATE_COUNT == (unsigned) StateList::SIZE, "STATE_COUNT != StateList::SIZE");
+
 	using MaterialApex			= Material<0, Args, Apex>;
 
 	using Control				= ControlT	   <Args>;
@@ -30,10 +33,13 @@ class R_ {
 
 	static constexpr Long	SUBSTITUTION_LIMIT	= Forward::SUBSTITUTION_LIMIT;
 
-public:
-	static_assert(Args::STATE_COUNT <  (unsigned) -1, "Too many states in the hierarchy. Change 'Short' type.");
-	static_assert(Args::STATE_COUNT == (unsigned) StateList::SIZE, "STATE_COUNT != StateList::SIZE");
+#ifdef FFSM2_ENABLE_PLANS
+	using PlanData				= PlanDataT<Args>;
 
+	static constexpr Long TASK_CAPACITY = Forward::TASK_CAPACITY;
+#endif
+
+public:
 	/// @brief Transition
 	using Transition			= typename Control::Transition;
 
@@ -80,11 +86,11 @@ public:
 
 	//------------------------------------------------------------------------------
 
-	/// @brief Transition into a state (if transitioning into a region, acts depending on the region type)
+	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
 	FFSM2_INLINE void changeTo(const StateID stateId);
 
-	/// @brief Transition into a state (if transitioning into a region, acts depending on the region type)
+	/// @brief Transition into a state
 	/// @tparam TState Destination state type
 	template <typename TState>
 	FFSM2_INLINE void changeTo()									{ changeTo (stateId<TState>());					}
@@ -116,6 +122,8 @@ protected:
 	Context& _context;
 
 	Registry _registry;
+	FFSM2_IF_PLANS(PlanData _planData);
+
 	Transition _request;
 
 	MaterialApex _apex;
@@ -134,12 +142,13 @@ class RP_;
 template <FeatureTag NFeatureTag
 		, typename TContext
 		, Long NSubstitutionLimit
+		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload
 		, typename TApex>
-class RP_		   <G_<NFeatureTag, TContext, NSubstitutionLimit, TPayload>, TApex>
-	: public	 R_<G_<NFeatureTag, TContext, NSubstitutionLimit, TPayload>, TApex>
+class RP_		   <G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
+	: public	 R_<G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
 {
-	using Base = R_<G_<NFeatureTag, TContext, NSubstitutionLimit, TPayload>, TApex>;
+	using Base = R_<G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
 
 	using Payload				= TPayload;
 	using Transition			= TransitionT<Payload>;
@@ -157,25 +166,25 @@ public:
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	/// @brief Transition into a state (if transitioning into a region, acts depending on the region type)
+	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
 	FFSM2_INLINE void changeWith   (const StateID  stateId,
 									const Payload& payload);
 
-	/// @brief Transition into a state (if transitioning into a region, acts depending on the region type)
+	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
 	FFSM2_INLINE void changeWith   (const StateID  stateId,
 										 Payload&& payload);
 
-	/// @brief Transition into a state (if transitioning into a region, acts depending on the region type)
+	/// @brief Transition into a state
 	/// @tparam TState Destination state type
 	/// @param payload Payload
 	template <typename TState>
 	FFSM2_INLINE void changeWith   (const Payload& payload)	{ changeWith   (stateId<TState>(),			 payload );	}
 
-	/// @brief Transition into a state (if transitioning into a region, acts depending on the region type)
+	/// @brief Transition into a state
 	/// @tparam TState Destination state type
 	/// @param payload Payload
 	template <typename TState>
@@ -195,11 +204,12 @@ private:
 template <FeatureTag NFeatureTag
 		, typename TContext
 		, Long NSubstitutionLimit
+		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TApex>
-class RP_		   <G_<NFeatureTag, TContext, NSubstitutionLimit, void>, TApex>
-	: public	 R_<G_<NFeatureTag, TContext, NSubstitutionLimit, void>, TApex>
+class RP_		   <G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), void>, TApex>
+	: public	 R_<G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), void>, TApex>
 {
-	using Base = R_<G_<NFeatureTag, TContext, NSubstitutionLimit, void>, TApex>;
+	using Base = R_<G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), void>, TApex>;
 
 public:
 	using Base::Base;
@@ -209,7 +219,7 @@ public:
 
 /// @brief FSM Root
 /// @tparam Cfg Type configuration
-/// @tparam TApex Root region type
+/// @tparam TApex Root  type
 template <typename TConfig,
 		  typename TApex>
 class RW_ final
@@ -226,13 +236,14 @@ public:
 
 template <
 		  Long NSubstitutionLimit,
+		  FFSM2_IF_PLANS(Long NTaskCapacity,)
 		  typename TPayload,
 		  typename TApex>
-class RW_		<::ffsm2::ConfigT<::ffsm2::EmptyContext, NSubstitutionLimit, TPayload>, TApex> final
-	: public RP_<::ffsm2::ConfigT<::ffsm2::EmptyContext, NSubstitutionLimit, TPayload>, TApex>
+class RW_		<::ffsm2::ConfigT<::ffsm2::EmptyContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
+	: public RP_<::ffsm2::ConfigT<::ffsm2::EmptyContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
 	, ::ffsm2::EmptyContext
 {
-	using Cfg =  ::ffsm2::ConfigT<::ffsm2::EmptyContext, NSubstitutionLimit, TPayload>;
+	using Cfg =  ::ffsm2::ConfigT<::ffsm2::EmptyContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>;
 
 	using Context	= typename Cfg::Context;
 	using Base		= RP_<Cfg, TApex>;

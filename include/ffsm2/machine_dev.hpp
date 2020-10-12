@@ -1,4 +1,4 @@
-// HFSM2 (hierarchical state machine for games and interactive applications)
+// FFSM2 (flat state machine for games and interactive applications)
 // Created by Andrew Gresyk
 //
 // Licensed under the MIT License;
@@ -47,6 +47,8 @@
 #include "detail/shared/utility.hpp"
 #include "detail/shared/iterator.hpp"
 #include "detail/shared/array.hpp"
+#include "detail/shared/bit_array.hpp"
+#include "detail/shared/list.hpp"
 #include "detail/shared/type_list.hpp"
 
 #include "detail/features/common.hpp"
@@ -73,6 +75,7 @@ namespace detail {
 template <FeatureTag NFeatureTag
 		, typename TContext
 		, Long NSubstitutionLimit
+		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload>
 struct G_ {
 	static constexpr FeatureTag FEATURE_TAG = NFeatureTag;
@@ -85,23 +88,40 @@ struct G_ {
 
 	static constexpr Long SUBSTITUTION_LIMIT = NSubstitutionLimit;
 
+#ifdef FFSM2_ENABLE_PLANS
+	static constexpr Long TASK_CAPACITY	  = NTaskCapacity;
+#endif
+
 	using Payload			 = TPayload;
 	using Transition		 = TransitionT<Payload>;
+
+#ifdef FFSM2_ENABLE_PLANS
+	using Task				 = TaskT<Payload>;
+#endif
 
 	/// @brief Set Context type
 	/// @tparam T Context type for data shared between states and/or data interface between FSM and external code
 	template <typename T>
-	using ContextT			 = G_<FEATURE_TAG, T	  , SUBSTITUTION_LIMIT, Payload>;
+	using ContextT			 = G_<FEATURE_TAG, T	  , SUBSTITUTION_LIMIT FFSM2_IF_PLANS(, TASK_CAPACITY), Payload>;
 
 	/// @brief Set Substitution limit
 	/// @tparam N Maximum number times 'guard()' methods can substitute their states for others
 	template <Long N>
-	using SubstitutionLimitN = G_<FEATURE_TAG, Context, N                 , Payload>;
+	using SubstitutionLimitN = G_<FEATURE_TAG, Context, N				   FFSM2_IF_PLANS(, TASK_CAPACITY), Payload>;
+
+#ifdef FFSM2_ENABLE_PLANS
+
+	/// @brief Set Task capacity
+	/// @tparam N Maximum number of tasks across all plans
+	template <Long N>
+	using TaskCapacityN		 = G_<FEATURE_TAG, Context, SUBSTITUTION_LIMIT				  , N             , Payload>;
+
+#endif
 
 	/// @brief Set Transition Payload type
 	/// @tparam T Utility type for 'TUtility State::utility() const' method
 	template <typename T>
-	using PayloadT			 = G_<FEATURE_TAG, Context, SUBSTITUTION_LIMIT, T      >;
+	using PayloadT			 = G_<FEATURE_TAG, Context, SUBSTITUTION_LIMIT FFSM2_IF_PLANS(, TASK_CAPACITY), T      >;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -112,9 +132,10 @@ struct M_;
 template <FeatureTag NFeatureTag
 		, typename TContext
 		, Long NSubstitutionLimit
+		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload>
-struct M_	   <G_<NFeatureTag, TContext, NSubstitutionLimit, TPayload>> {
-	using Cfg = G_<NFeatureTag, TContext, NSubstitutionLimit, TPayload>;
+struct M_	   <G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>> {
+	using Cfg = G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>;
 
 	static constexpr FeatureTag FEATURE_TAG = NFeatureTag;
 
@@ -129,26 +150,26 @@ struct M_	   <G_<NFeatureTag, TContext, NSubstitutionLimit, TPayload>> {
 
 	//----------------------------------------------------------------------
 
-	/// @brief Composite region ('changeTo<>()' into the region acts as 'restart<>()')
+	/// @brief Composite  ('changeTo<>()' into the  acts as 'restart<>()')
 	/// @tparam THead Head state
 	/// @tparam TSubStates Sub-states
 	template <typename THead, typename... TSubStates>
 	using Composite		 = CI_<THead, TSubStates...>;
 
-	/// @brief Headless composite region ('changeTo<>()' into the region acts as 'restart<>()')
+	/// @brief Headless composite  ('changeTo<>()' into the  acts as 'restart<>()')
 	/// @tparam TSubStates Sub-states
 	template <				  typename... TSubStates>
 	using CompositePeers = CI_<void,  TSubStates...>;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	/// @brief Root ('changeTo<>()' into the root region acts as 'restart<>()')
+	/// @brief Root ('changeTo<>()' into the root  acts as 'restart<>()')
 	/// @tparam THead Head state
 	/// @tparam TSubStates Sub-states
 	template <typename THead, typename... TSubStates>
 	using Root			 = RF_<Cfg, Composite  <THead, TSubStates...>>;
 
-	/// @brief Headless root ('changeTo<>()' into the root region acts as 'restart<>()')
+	/// @brief Headless root ('changeTo<>()' into the root  acts as 'restart<>()')
 	/// @tparam TSubStates Sub-states
 	template <				  typename... TSubStates>
 	using PeerRoot		 = RF_<Cfg, CompositePeers  <  TSubStates...>>;
@@ -164,13 +185,14 @@ struct M_	   <G_<NFeatureTag, TContext, NSubstitutionLimit, TPayload>> {
 /// @tparam TContext Context type for data shared between states and/or data interface between FSM and external code
 /// @tparam TRank Rank type for 'TRank State::rank() const' method
 /// @tparam TUtility Utility type for 'TUtility State::utility() const' method
-/// @tparam TRNG RNG type used in 'Random' regions
+/// @tparam TRNG RNG type used in 'Random' s
 /// @tparam NSubstitutionLimit Maximum number times 'guard()' methods can substitute their states for others
 /// @tparam NTaskCapacity Maximum number of tasks across all plans
 template <typename TContext = EmptyContext
 		, Long NSubstitutionLimit = 4
+		FFSM2_IF_PLANS(, Long NTaskCapacity = INVALID_LONG)
 		, typename TPayload = void>
-using ConfigT = detail::G_<FFSM2_FEATURE_TAG, TContext, NSubstitutionLimit, TPayload>;
+using ConfigT = detail::G_<FFSM2_FEATURE_TAG, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>;
 
 /// @brief Type configuration for MachineT<>
 using Config = ConfigT<>;

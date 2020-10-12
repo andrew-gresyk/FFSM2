@@ -28,23 +28,30 @@ struct S_ final {
 
 	//----------------------------------------------------------------------
 
-	FFSM2_INLINE bool	 deepEntryGuard		  (GuardControl& control);
+	FFSM2_INLINE bool	deepEntryGuard		  (GuardControl& control);
 
-	FFSM2_INLINE void	 deepConstruct		  (PlanControl&  control);
+	FFSM2_INLINE void	deepConstruct		  (PlanControl&  control);
 
-	FFSM2_INLINE void	 deepEnter			  (PlanControl&  control);
-	FFSM2_INLINE void	 deepReenter		  (PlanControl&  control);
+	FFSM2_INLINE void	deepEnter			  (PlanControl&  control);
+	FFSM2_INLINE void	deepReenter			  (PlanControl&  control);
 
-	FFSM2_INLINE Status	 deepUpdate			  (FullControl&  control);
+	FFSM2_INLINE Status	deepUpdate			  (FullControl&  control);
 
 	template <typename TEvent>
-	FFSM2_INLINE Status	 deepReact			  (FullControl&	 control, const TEvent& event);
+	FFSM2_INLINE Status	deepReact			  (FullControl&	 control, const TEvent& event);
 
-	FFSM2_INLINE bool	 deepExitGuard		  (GuardControl& control);
+	FFSM2_INLINE bool	deepExitGuard		  (GuardControl& control);
 
-	FFSM2_INLINE void	 deepExit			  (PlanControl&	 control);
+	FFSM2_INLINE void	deepExit			  (PlanControl&	 control);
 
-	FFSM2_INLINE void	 deepDestruct		  (PlanControl&  control);
+	FFSM2_INLINE void	deepDestruct		  (PlanControl&  control);
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+#ifdef FFSM2_ENABLE_PLANS
+	FFSM2_INLINE void	wrapPlanSucceeded	  (FullControl&	 control);
+	FFSM2_INLINE void	wrapPlanFailed		  (FullControl&	 control);
+#endif
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

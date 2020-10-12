@@ -2,7 +2,7 @@
 
 #define FFSM2_ENABLE_LOG_INTERFACE
 #define FFSM2_ENABLE_ASSERT
-#include <ffsm2/machine.hpp>
+#include <ffsm2/machine_dev.hpp>
 
 #include <catch2/catch.hpp>
 
@@ -21,6 +21,16 @@ struct Event {
 		EXIT_GUARD,
 		EXIT,
 		DESTRUCT,
+
+	//#ifdef FFSM2_ENABLE_PLANS
+		PLAN_SUCCEEDED,
+		PLAN_FAILED,
+
+		TASK_SUCCESS,
+		TASK_FAILURE,
+		PLAN_SUCCESS,
+		PLAN_FAILURE,
+	//#endif
 
 		CHANGE,
 		RESTART,
@@ -66,6 +76,10 @@ struct LoggerT
 	using typename Interface::Method;
 	using typename Interface::StateID;
 
+#ifdef FFSM2_ENABLE_PLANS
+	using StatusEvent	  = typename Interface::StatusEvent;
+#endif
+
 	void recordMethod(Context& context,
 					  const StateID origin,
 					  const Method method) override;
@@ -73,6 +87,17 @@ struct LoggerT
 	void recordTransition(Context& context,
 						  const StateID origin,
 						  const StateID target) override;
+
+#ifdef FFSM2_ENABLE_PLANS
+
+	void recordTaskStatus(Context& context,
+						  const StateID origin,
+						  const StatusEvent event) override;
+
+	void recordPlanStatus(Context& context,
+						  const StatusEvent event) override;
+
+#endif
 
 	void recordCancelledPending(Context& context,
 								const StateID origin) override;

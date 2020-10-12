@@ -26,7 +26,8 @@ using FSM = M::PeerRoot<
 				S(A),
 				S(B),
 				S(C),
-				S(D)
+				S(D),
+				S(E)
 			>;
 
 #undef S
@@ -37,6 +38,7 @@ static_assert(FSM::stateId<A>() == 0, "");
 static_assert(FSM::stateId<B>() == 1, "");
 static_assert(FSM::stateId<C>() == 2, "");
 static_assert(FSM::stateId<D>() == 3, "");
+static_assert(FSM::stateId<E>() == 4, "");
 
 //------------------------------------------------------------------------------
 
@@ -69,12 +71,9 @@ private:
 struct A
 	: FSM::State
 {
-	//void entryGuard(GuardControl&)											{}
 	void enter(PlanControl&)													{}
 	void update(FullControl&)													{}
-	//void react(const Action&, FullControl&)									{}
 	void exit(PlanControl&)														{}
-	//void exitGuard(GuardControl&)												{}
 };
 
 //------------------------------------------------------------------------------
@@ -82,9 +81,6 @@ struct A
 struct B
 	: FSM::State
 {
-	//void entryGuard(GuardControl&)											{}
-	//void enter(PlanControl&)													{}
-
 	void update(FullControl& control) {
 		control.changeWith<C>(Payload{});
 	}
@@ -94,9 +90,6 @@ struct B
 	}
 
 	using FSM::State::react;
-
-	//void exit(PlanControl&)													{}
-	//void exitGuard(GuardControl&)												{}
 };
 
 //------------------------------------------------------------------------------
@@ -107,19 +100,27 @@ struct C
 	using Base = FSM::StateT<Tracked>;
 
 	void entryGuard(GuardControl& control) {
-		if (entryAttemptCount() == 1)
+		switch (entryAttemptCount()) {
+		case 1:
 			control.cancelPendingTransition();
-	}
+			break;
 
-	//void enter(PlanControl&)													{}
-	//void update(FullControl&)													{}
+		case 2:
+			control.cancelPendingTransition();
+			control.changeWith<D>(Payload{});
+			break;
+
+		case 3:
+			break;
+
+		default:
+			FFSM2_BREAK();
+		}
+	}
 
 	void react(const Reaction&, FullControl&)									{}
 
 	using Base::react;
-
-	//void exit(PlanControl&)													{}
-	void exitGuard(GuardControl&)												{}
 };
 
 //------------------------------------------------------------------------------
@@ -127,11 +128,17 @@ struct C
 struct D
 	: FSM::State
 {
-	//void entryGuard(GuardControl&)											{}
-	void enter(PlanControl&)													{}
-	void update(FullControl&)													{}
-	//void react(const Action&, FullControl&)									{}
-	//void exit(PlanControl&)													{}
+	void exitGuard(GuardControl& control) {
+		control.cancelPendingTransition();
+		control.changeWith<C>(Payload{});
+	}
+};
+
+//------------------------------------------------------------------------------
+
+struct E
+	: FSM::State
+{
 	//void exitGuard(GuardControl&)												{}
 };
 
@@ -153,7 +160,7 @@ void step2(FSM::Instance& machine, Logger& logger) {
 	machine.update();
 
 	logger.assertSequence({
-		{							Event::Type::CHANGE, FSM::stateId<B>() },
+		{							Event::Type::CHANGE,	FSM::stateId<B>() },
 
 		{ FSM::stateId<A>(),		Event::Type::UPDATE },
 
@@ -172,7 +179,7 @@ void step3(FSM::Instance& machine, Logger& logger) {
 	logger.assertSequence({
 		{ FSM::stateId<B>(),		Event::Type::UPDATE },
 
-		{ FSM::stateId<B>(),		Event::Type::CHANGE, FSM::stateId<C>() },
+		{ FSM::stateId<B>(),		Event::Type::CHANGE,	FSM::stateId<C>() },
 
 		{ FSM::stateId<C>(),		Event::Type::ENTRY_GUARD },
 		{ FSM::stateId<C>(),		Event::Type::CANCEL_PENDING },
@@ -190,15 +197,15 @@ void step4(FSM::Instance& machine, Logger& logger) {
 		{ ffsm2::INVALID_STATE_ID,	Event::Type::REACT },
 		{ FSM::stateId<B>(),		Event::Type::REACT },
 
-		{ FSM::stateId<B>(),		Event::Type::CHANGE, FSM::stateId<C>() },
+		{ FSM::stateId<B>(),		Event::Type::CHANGE,	FSM::stateId<C>() },
 
 		{ FSM::stateId<C>(),		Event::Type::ENTRY_GUARD },
 
-		{ FSM::stateId<C>(),		Event::Type::CONSTRUCT },
-		{ FSM::stateId<C>(),		Event::Type::ENTER },
+		{ FSM::stateId<C>(),		Event::Type::CANCEL_PENDING },
+		{ FSM::stateId<C>(),		Event::Type::CHANGE,	FSM::stateId<D>() },
 	});
 
-	REQUIRE(machine.activeStateId() == FSM::stateId<C>());
+	REQUIRE(machine.activeStateId() == FSM::stateId<D>());
 }
 
 //------------------------------------------------------------------------------
@@ -216,10 +223,7 @@ TEST_CASE("FSM.Transition Payloads", "[machine]") {
 		step4(machine, logger);
 	}
 
-	logger.assertSequence({
-		{ FSM::stateId<C>(),		Event::Type::EXIT },
-		{ FSM::stateId<C>(),		Event::Type::DESTRUCT },
-	});
+	logger.assertSequence({});
 }
 
 ////////////////////////////////////////////////////////////////////////////////

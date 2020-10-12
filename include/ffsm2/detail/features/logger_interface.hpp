@@ -12,6 +12,10 @@ struct LoggerInterfaceT {
 	using Method		 = ::ffsm2::Method;
 	using StateID		 = ::ffsm2::StateID;
 
+#ifdef FFSM2_ENABLE_PLANS
+	using StatusEvent	 = ::ffsm2::StatusEvent;
+#endif
+
 	virtual void recordMethod(Context& /*context*/,
 							  const StateID /*origin*/,
 							  const Method /*method*/)
@@ -21,6 +25,19 @@ struct LoggerInterfaceT {
 								  const StateID /*origin*/,
 								  const StateID /*target*/)
 	{}
+
+#ifdef FFSM2_ENABLE_PLANS
+
+	virtual void recordTaskStatus(Context& /*context*/,
+								  const StateID /*origin*/,
+								  const StatusEvent /*event*/)
+	{}
+
+	virtual void recordPlanStatus(Context& /*context*/,
+								  const StatusEvent /*event*/)
+	{}
+
+#endif
 
 	virtual void recordCancelledPending(Context& /*context*/,
 										const StateID /*origin*/)

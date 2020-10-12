@@ -90,6 +90,12 @@
     <ClInclude Include="..\..\include\ffsm2\detail\structure\composite_sub.hpp">
       <Filter>ffsm2\detail\structure</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\ffsm2\detail\shared\bit_array.hpp">
+      <Filter>ffsm2\detail\shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ffsm2\detail\shared\list.hpp">
+      <Filter>ffsm2\detail\shared</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\test\main.cpp">
@@ -102,6 +108,15 @@
       <Filter>test</Filter>
     </ClCompile>
     <ClCompile Include="..\..\test\test_transitions_payloads.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\test_plans.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\test_plans_payloads.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\test_plans_verbose.cpp">
       <Filter>test</Filter>
     </ClCompile>
   </ItemGroup>
@@ -144,6 +159,12 @@
     </None>
     <None Include="..\..\include\ffsm2\detail\structure\composite_sub_2.inl">
       <Filter>ffsm2\detail\structure</Filter>
+    </None>
+    <None Include="..\..\include\ffsm2\detail\shared\bit_array.inl">
+      <Filter>ffsm2\detail\shared</Filter>
+    </None>
+    <None Include="..\..\include\ffsm2\detail\shared\list.inl">
+      <Filter>ffsm2\detail\shared</Filter>
     </None>
   </ItemGroup>
 </Project>

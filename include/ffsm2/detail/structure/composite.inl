@@ -62,7 +62,7 @@ C_<TA, TH, TS...>::deepEnter(PlanControl& control) {
 //------------------------------------------------------------------------------
 
 template <typename TA, typename TH, typename... TS>
-Status
+void
 C_<TA, TH, TS...>::deepUpdate(FullControl& control) {
 	const Short active = control._registry.active;
 	FFSM2_ASSERT(active != INVALID_SHORT);
@@ -71,19 +71,24 @@ C_<TA, TH, TS...>::deepUpdate(FullControl& control) {
 
 	if (const Status headStatus = _headState.deepUpdate(control)) {
 		ControlLock lock{control};
-		_subStates		 .wideUpdate(control, active);
 
-		return headStatus;
-	} else
-		return _subStates.wideUpdate(control, active);
+		_subStates.wideUpdate(control, active);
+	} else {
+		FFSM2_IF_PLANS(const Status subStatus =)
+		_subStates.wideUpdate(control, active);
 
+	#ifdef FFSM2_ENABLE_PLANS
+		if (subStatus && control._planData.planExists)
+			control.updatePlan(_headState, subStatus);
+	#endif
+	}
 }
 
 //------------------------------------------------------------------------------
 
 template <typename TA, typename TH, typename... TS>
 template <typename TEvent>
-Status
+void
 C_<TA, TH, TS...>::deepReact(FullControl& control,
 							 const TEvent& event)
 {
@@ -94,11 +99,17 @@ C_<TA, TH, TS...>::deepReact(FullControl& control,
 
 	if (const Status headStatus = _headState.deepReact(control, event)) {
 		ControlLock lock{control};
-		_subStates		 .wideReact(control, event, active);
 
-		return headStatus;
-	} else
-		return _subStates.wideReact(control, event, active);
+		_subStates.wideReact(control, event, active);
+	} else {
+		FFSM2_IF_PLANS(const Status subStatus =)
+		_subStates.wideReact(control, event, active);
+
+	#ifdef FFSM2_ENABLE_PLANS
+		if (subStatus && control._planData.planExists)
+			control.updatePlan(_headState, subStatus);
+	#endif
+	}
 }
 
 //------------------------------------------------------------------------------
@@ -154,6 +165,11 @@ C_<TA, TH, TS...>::deepDestruct(PlanControl& control) {
 	_headState.deepDestruct(control);
 
 	active = INVALID_SHORT;
+
+#ifdef FFSM2_ENABLE_PLANS
+	auto plan = control.plan();
+	plan.clear();
+#endif
 }
 
 //------------------------------------------------------------------------------

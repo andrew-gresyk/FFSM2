@@ -34,6 +34,7 @@ Header-only flat FSM framework in C++11, with fully statically-defined structure
 - Gamedev-friendly, supports explicit `State::update()`
 - Also supports traditional event-based workflow with `State::react()`
 - Inspect anything: previous and current transitions, state activation status, and more!
+- Game AI-friendly with [Dynamic planning](https://github.com/andrew-gresyk/HFSM2/wiki/Plans) support
 - Built-in logging support
 
 ---

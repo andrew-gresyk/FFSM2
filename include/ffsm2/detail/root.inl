@@ -19,10 +19,13 @@ R_<TG, TA>::~R_() {
 	PlanControl control{_context
 					  , _registry
 					  , _request
+					  FFSM2_IF_PLANS(, _planData)
 					  FFSM2_IF_LOG_INTERFACE(, _logger)};
 
 	_apex.deepExit	  (control);
 	_apex.deepDestruct(control);
+
+	FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
 }
 
 //------------------------------------------------------------------------------
@@ -33,9 +36,12 @@ R_<TG, TA>::update() {
 	FullControl control{_context
 					  , _registry
 					  , _request
+					  FFSM2_IF_PLANS(, _planData)
 					  FFSM2_IF_LOG_INTERFACE(, _logger)};
 
 	_apex.deepUpdate(control);
+
+	FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
 
 	TransitionSets currentTransitions;
 
@@ -52,6 +58,7 @@ R_<TG, TA>::react(const TEvent& event) {
 	FullControl control{_context
 					  , _registry
 					  , _request
+					  FFSM2_IF_PLANS(, _planData)
 					  FFSM2_IF_LOG_INTERFACE(, _logger)};
 
 	_apex.deepReact(control, event);
@@ -82,6 +89,7 @@ R_<TG, TA>::initialEnter() {
 	PlanControl control{_context
 					  , _registry
 					  , _request
+					  FFSM2_IF_PLANS(, _planData)
 					  FFSM2_IF_LOG_INTERFACE(, _logger)};
 
 	_registry.requested = 0;
@@ -113,6 +121,8 @@ R_<TG, TA>::initialEnter() {
 	_apex.deepEnter	   (control);
 
 	_registry.clearRequests();
+
+	FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -125,6 +135,7 @@ R_<TG, TA>::processTransitions(TransitionSets& currentTransitions) {
 	PlanControl control{_context
 					  , _registry
 					  , _request
+					  FFSM2_IF_PLANS(, _planData)
 					  FFSM2_IF_LOG_INTERFACE(, _logger)};
 
 	Transition pendingTransition;
@@ -149,6 +160,8 @@ R_<TG, TA>::processTransitions(TransitionSets& currentTransitions) {
 		_apex.deepChangeToRequested(control);
 
 	_registry.clearRequests();
+
+	FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
 }
 
 //------------------------------------------------------------------------------
@@ -163,6 +176,7 @@ R_<TG, TA>::cancelledByEntryGuards(const TransitionSets& currentTransitions,
 							, _request
 							, currentTransitions
 							, pendingTransition
+							FFSM2_IF_PLANS(, _planData)
 							FFSM2_IF_LOG_INTERFACE(, _logger)};
 
 	return _apex.deepEntryGuard(guardControl);
@@ -180,6 +194,7 @@ R_<TG, TA>::cancelledByGuards(const TransitionSets& currentTransitions,
 							, _request
 							, currentTransitions
 							, pendingTransition
+							FFSM2_IF_PLANS(, _planData)
 							FFSM2_IF_LOG_INTERFACE(, _logger)};
 
 	return _apex.deepForwardExitGuard(guardControl) ||
@@ -188,20 +203,20 @@ R_<TG, TA>::cancelledByGuards(const TransitionSets& currentTransitions,
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <FeatureTag NFT, typename TC, Long NSL, typename TP, typename TA>
+template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
 void
-RP_<G_<NFT, TC, NSL, TP>, TA>::changeWith(const StateID  stateId,
-										  const Payload& payload)
+RP_<G_<NFT, TC, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  stateId,
+																const Payload& payload)
 {
 	_request = Transition{stateId, payload};
 
 	FFSM2_LOG_TRANSITION(_context, INVALID_STATE_ID, stateId);
 }
 
-template <FeatureTag NFT, typename TC, Long NSL, typename TP, typename TA>
+template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
 void
-RP_<G_<NFT, TC, NSL, TP>, TA>::changeWith(const StateID  stateId,
-										  Payload&& payload)
+RP_<G_<NFT, TC, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  stateId,
+																	 Payload&& payload)
 {
 	_request = Transition{stateId, std::move(payload)};
 

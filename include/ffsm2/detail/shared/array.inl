@@ -4,6 +4,44 @@ namespace detail {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename T, Long NC>
+StaticArray<T, NC>::StaticArray(const Item filler) {
+	fill(filler);
+}
+
+//------------------------------------------------------------------------------
+
+template <typename T, Long NC>
+template <typename N>
+T&
+StaticArray<T, NC>::operator[] (const N i) {
+	FFSM2_ASSERT(0 <= i && i < CAPACITY);
+
+	return _items[(Index) i];
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <typename T, Long NC>
+template <typename N>
+const T&
+StaticArray<T, NC>::operator[] (const N i) const {
+	FFSM2_ASSERT(0 <= i && i < CAPACITY);
+
+	return _items[(Index) i];
+}
+
+//------------------------------------------------------------------------------
+
+template <typename T, Long NC>
+void
+StaticArray<T, NC>::fill(const Item filler) {
+	for (Long i = 0; i < CAPACITY; ++i)
+		_items[i] = filler;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+template <typename T, Long NC>
 template <typename TValue>
 Long
 Array<T, NC>::append(const TValue& value) {
