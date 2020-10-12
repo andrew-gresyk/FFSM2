@@ -5394,7 +5394,7 @@ C_<TA, TH, TS...>::deepUpdate(FullControl& control) {
 
 	FFSM2_ASSERT(control._registry.requested == INVALID_SHORT);
 
-	if (const Status headStatus = _headState.deepUpdate(control)) {
+	if (_headState.deepUpdate(control)) {
 		ControlLock lock{control};
 
 		_subStates.wideUpdate(control, active);
@@ -5422,7 +5422,7 @@ C_<TA, TH, TS...>::deepReact(FullControl& control,
 
 	FFSM2_ASSERT(control._registry.requested == INVALID_SHORT);
 
-	if (const Status headStatus = _headState.deepReact(control, event)) {
+	if (_headState.deepReact(control, event)) {
 		ControlLock lock{control};
 
 		_subStates.wideReact(control, event, active);
