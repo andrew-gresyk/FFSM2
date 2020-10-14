@@ -3,6 +3,8 @@
 [![Build Status](https://travis-ci.org/andrew-gresyk/FFSM2.svg?branch=master)](https://travis-ci.org/andrew-gresyk/FFSM2)
 [![Gitter](https://badges.gitter.im/andrew-gresyk/FFSM2.svg)](https://gitter.im/andrew-gresyk/FFSM2)
 
+---
+
 ![FFSM2](assets/logos/ffsm2-logo-large.png)
 
 # [FFSM2](https://flat.hfsm.dev): High-Performance Flat Finite State Machine Framework
@@ -19,20 +21,20 @@ Header-only flat FSM framework in C++11, with fully statically-defined structure
 
 ## See Also
 
-- [HFSM2](https://hfsm.dev): High-Performance **Hierarchical** Finite State Machine Framework
+- **[HFSM2](https://hfsm.dev)**: High-Performance **Hierarchical** Finite State Machine Framework
 
 ---
 
 ## Documentation
 
-- [GitBook](https://flatdoc.hfsm.dev/)
+- GitBook: **[flatdoc.hfsm.dev](https://flatdoc.hfsm.dev/)**
 - In-line comments
 
 ---
 
 ## Feature Highlights
 
-- Permissive [MIT License](https://github.com/andrew-gresyk/FFSM2/blob/master/LICENSE)
+- Permissive **[MIT License](https://github.com/andrew-gresyk/FFSM2/blob/master/LICENSE)**
 - Written in widely-supported modern(ish) C++11
 - Header-only
 - Convenient, minimal boilerplate
@@ -50,18 +52,18 @@ Header-only flat FSM framework in C++11, with fully statically-defined structure
 
 ## 3rd Party Libraries
 
-- [Catch2](https://github.com/catchorg/Catch2) unit testing framework
+- **[Catch2](https://github.com/catchorg/Catch2)** unit testing framework
 
 ---
 
-## Get Updates
+## Receive Updates
 
-- Blog: [gresyk.dev](https://gresyk.dev)
-- Twitter: [@andrew_gresyk](https://www.twitter.com/andrew_gresyk)
+- Blog: **[gresyk.dev](https://gresyk.dev)**
+- Twitter: **[@andrew_gresyk](https://www.twitter.com/andrew_gresyk)**
 
 ---
 
 ## Get In Touch
 
-- [Gitter](https://gitter.im/andrew-gresyk/FFSM2)
-- [Twitter](https://www.twitter.com/andrew_gresyk)
+- Discord: **[HFSM.dev](https://discord.gg/v4t3tzh)**
+- Gitter: **[andrew-gresyk/FFSM2](https://gitter.im/andrew-gresyk/FFSM2)**
