@@ -1,2 +1,4 @@
 theme: jekyll-theme-minimal
-logo: logo/ffsm2-logo-jekyll.png
+title: FFSM2
+description: High-Performance Flat Finite State Machine Framework
+logo: assets/logos/ffsm2-logo-jekyll.png
