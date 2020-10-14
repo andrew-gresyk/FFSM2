@@ -1,0 +1,14 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+a:link, a:visited {
+    color: #0057b7;
+    text-decoration: none;
+}
+a:hover, a:active {
+    background-color: #ffd700;
+    color: #0057b7;
+    text-decoration: none;
+}

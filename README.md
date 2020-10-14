@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/andrew-gresyk/FFSM2.svg?branch=master)](https://travis-ci.org/andrew-gresyk/FFSM2)
 [![Gitter](https://badges.gitter.im/andrew-gresyk/FFSM2.svg)](https://gitter.im/andrew-gresyk/FFSM2)
 
-![FFSM2](logo/ffsm2-logo-large.png)
+![FFSM2](assets/logos/ffsm2-logo-large.png)
 
 # [FFSM2](https://flat.hfsm.dev): High-Performance Flat Finite State Machine Framework
 
