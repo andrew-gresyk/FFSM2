@@ -65,5 +65,5 @@ Header-only flat FSM framework in C++11, with fully statically-defined structure
 
 ## Get In Touch
 
-- Discord: **[HFSM.dev](https://discord.gg/v4t3tzh)**
+- Discord: **[HFSM.dev](https://discord.gg/ZfWjhFj)**
 - Gitter: **[andrew-gresyk/FFSM2](https://gitter.im/andrew-gresyk/FFSM2)**
