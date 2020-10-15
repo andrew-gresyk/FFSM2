@@ -7,7 +7,7 @@
 
 ![FFSM2](assets/logos/ffsm2-logo-large.png)
 
-# [FFSM2](https://flat.hfsm.dev): High-Performance Flat Finite State Machine Framework
+# High-Performance Flat Finite State Machine
 
 Header-only flat FSM framework in C++11, with fully statically-defined structure (no dynamic allocations), built with variadic templates.
 
@@ -27,7 +27,7 @@ Header-only flat FSM framework in C++11, with fully statically-defined structure
 
 ## Documentation
 
-- GitBook: **[flatdoc.hfsm.dev](https://flatdoc.hfsm.dev/)**
+- GitBook: **[flatdoc.hfsm.dev](https://flatdoc.hfsm.dev/)** (WIP)
 - In-line comments
 
 ---
