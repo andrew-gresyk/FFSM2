@@ -2971,9 +2971,12 @@ bool
 PlanBaseT<TArgs>::append(const StateID origin,
 						 const StateID destination)
 {
-	_planData.planExists = true;
+	if (_planData.tasks.count() < TASK_CAPACITY) {
+		_planData.planExists = true;
 
-	return linkTask(_planData.tasks.emplace(origin, destination));
+		return linkTask(_planData.tasks.emplace(origin, destination));
+	} else
+		return false;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -2999,7 +3002,7 @@ PlanBaseT<TArgs>::linkTask(const Long index) {
 			lastLink.next  = index;
 
 			auto& currLink = _planData.taskLinks[index];
-			FFSM2_ASSERT(lastLink.prev == INVALID_LONG);
+			FFSM2_ASSERT(currLink.prev == INVALID_LONG);
 
 			currLink.prev  = _bounds.last;
 
@@ -5342,7 +5345,6 @@ C_<TA, TH, TS...>::deepForwardEntryGuard(GuardControl& control) {
 	FFSM2_ASSERT(control._registry.active != INVALID_SHORT);
 
 	const Short  requested  = control._registry.requested;
-	FFSM2_ASSERT(requested != control._registry.active);
 	FFSM2_ASSERT(requested != INVALID_SHORT);
 
 	return _subStates.wideEntryGuard(control, requested);
@@ -5453,7 +5455,6 @@ C_<TA, TH, TS...>::deepForwardExitGuard(GuardControl& control) {
 	FFSM2_ASSERT(control._registry.requested != INVALID_SHORT);
 
 	const Short  active  = control._registry.active;
-	FFSM2_ASSERT(active != control._registry.requested);
 	FFSM2_ASSERT(active != INVALID_SHORT);
 
 	return _subStates.wideExitGuard(control, active);

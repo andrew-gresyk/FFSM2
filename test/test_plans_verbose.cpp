@@ -130,7 +130,8 @@ struct B
 		if (!plan) {
 			control.cancelPendingTransition();
 
-			plan.change<B>(stateId<C>());
+			plan.change<B, C>();
+			plan.change<C>(stateId<C>());
 			plan.change(stateId<C>(), stateId<D>());
 		}
 	}
@@ -250,6 +251,27 @@ void step5(FSM::Instance& machine, Logger& logger) {
 		{ FSM::stateId<C>(),		Event::Type::UPDATE },
 
 		{ FSM::stateId<C>(),		Event::Type::TASK_SUCCESS },
+		{ FSM::stateId<C>(),		Event::Type::CHANGE,	FSM::stateId<C>() },
+
+		{ FSM::stateId<C>(),		Event::Type::EXIT_GUARD },
+		{ FSM::stateId<C>(),		Event::Type::ENTRY_GUARD },
+
+		{ FSM::stateId<C>(),		Event::Type::REENTER },
+	});
+
+	REQUIRE(machine.activeStateId() == FSM::stateId<C>());
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+void step6(FSM::Instance& machine, Logger& logger) {
+	machine.update();
+
+	logger.assertSequence({
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::UPDATE },
+		{ FSM::stateId<C>(),		Event::Type::UPDATE },
+
+		{ FSM::stateId<C>(),		Event::Type::TASK_SUCCESS },
 		{ FSM::stateId<C>(),		Event::Type::CHANGE,	FSM::stateId<D>() },
 
 		{ FSM::stateId<C>(),		Event::Type::EXIT_GUARD },
@@ -279,6 +301,7 @@ TEST_CASE("FSM.Plans Verbose", "[machine]") {
 		step3(machine, logger);
 		step4(machine, logger);
 		step5(machine, logger);
+		step6(machine, logger);
 	}
 
 	logger.assertSequence({
