@@ -13,9 +13,8 @@ struct ArgsT;
 
 //------------------------------------------------------------------------------
 
-struct Registry
-{
-	void clearRequests() {
+struct Registry {
+	constexpr void clearRequests() noexcept {
 		requested = INVALID_SHORT;
 	}
 

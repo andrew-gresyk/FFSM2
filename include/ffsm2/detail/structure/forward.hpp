@@ -217,10 +217,10 @@ struct RF_ final {
 	//----------------------------------------------------------------------
 
 	template <typename T>
-	static constexpr bool	 contains()		{ return contains<StateList, T>();	}
+	static constexpr bool	 contains() noexcept	{ return contains<StateList, T>();	}
 
 	template <typename T>
-	static constexpr StateID  stateId()		{ return index	 <StateList, T>();	}
+	static constexpr StateID  stateId() noexcept	{ return index	 <StateList, T>();	}
 };
 
 ////////////////////////////////////////////////////////////////////////////////

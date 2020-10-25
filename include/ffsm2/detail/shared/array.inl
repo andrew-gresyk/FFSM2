@@ -4,7 +4,8 @@ namespace detail {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename T, Long NC>
-StaticArray<T, NC>::StaticArray(const Item filler) {
+constexpr
+StaticArray<T, NC>::StaticArray(const Item filler) noexcept {
 	fill(filler);
 }
 
@@ -12,8 +13,8 @@ StaticArray<T, NC>::StaticArray(const Item filler) {
 
 template <typename T, Long NC>
 template <typename N>
-T&
-StaticArray<T, NC>::operator[] (const N i) {
+constexpr T&
+StaticArray<T, NC>::operator[] (const N i) noexcept {
 	FFSM2_ASSERT(0 <= i && i < CAPACITY);
 
 	return _items[(Index) i];
@@ -23,8 +24,8 @@ StaticArray<T, NC>::operator[] (const N i) {
 
 template <typename T, Long NC>
 template <typename N>
-const T&
-StaticArray<T, NC>::operator[] (const N i) const {
+constexpr const T&
+StaticArray<T, NC>::operator[] (const N i) const noexcept {
 	FFSM2_ASSERT(0 <= i && i < CAPACITY);
 
 	return _items[(Index) i];
@@ -33,8 +34,8 @@ StaticArray<T, NC>::operator[] (const N i) const {
 //------------------------------------------------------------------------------
 
 template <typename T, Long NC>
-void
-StaticArray<T, NC>::fill(const Item filler) {
+constexpr void
+StaticArray<T, NC>::fill(const Item filler) noexcept {
 	for (Long i = 0; i < CAPACITY; ++i)
 		_items[i] = filler;
 }
@@ -43,8 +44,8 @@ StaticArray<T, NC>::fill(const Item filler) {
 
 template <typename T, Long NC>
 template <typename TValue>
-Long
-Array<T, NC>::append(const TValue& value) {
+constexpr Long
+Array<T, NC>::append(const TValue& value) noexcept {
 	FFSM2_ASSERT(_count < CAPACITY);
 
 	new (&_items[_count]) Item{value};
@@ -56,8 +57,8 @@ Array<T, NC>::append(const TValue& value) {
 
 template <typename T, Long NC>
 template <typename TValue>
-Long
-Array<T, NC>::append(TValue&& value) {
+constexpr Long
+Array<T, NC>::append(TValue&& value) noexcept {
 	FFSM2_ASSERT(_count < CAPACITY);
 
 	new (&_items[_count]) Item{std::move(value)};
@@ -69,8 +70,8 @@ Array<T, NC>::append(TValue&& value) {
 
 template <typename T, Long NC>
 template <typename N>
-T&
-Array<T, NC>::operator[] (const N i) {
+constexpr T&
+Array<T, NC>::operator[] (const N i) noexcept {
 	FFSM2_ASSERT(0 <= i && i < CAPACITY);
 
 	return _items[(Index) i];
@@ -80,8 +81,8 @@ Array<T, NC>::operator[] (const N i) {
 
 template <typename T, Long NC>
 template <typename N>
-const T&
-Array<T, NC>::operator[] (const N i) const {
+constexpr const T&
+Array<T, NC>::operator[] (const N i) const noexcept {
 	FFSM2_ASSERT(0 <= i && i < CAPACITY);
 
 	return _items[(Index) i];
@@ -90,8 +91,8 @@ Array<T, NC>::operator[] (const N i) const {
 //------------------------------------------------------------------------------
 
 template <typename T, Long NC>
-Array<T, NC>&
-Array<T, NC>::operator += (const Item& item) {
+constexpr Array<T, NC>&
+Array<T, NC>::operator += (const Item& item) noexcept {
 	append(item);
 
 	return *this;
@@ -100,8 +101,8 @@ Array<T, NC>::operator += (const Item& item) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename T, Long NC>
-Array<T, NC>&
-Array<T, NC>::operator += (Item&& item) {
+constexpr Array<T, NC>&
+Array<T, NC>::operator += (Item&& item) noexcept {
 	append(std::move(item));
 
 	return *this;
@@ -111,8 +112,8 @@ Array<T, NC>::operator += (Item&& item) {
 
 template <typename T, Long NC>
 template <Long N>
-Array<T, NC>&
-Array<T, NC>::operator += (const Array<T, N>& other) {
+constexpr Array<T, NC>&
+Array<T, NC>::operator += (const Array<T, N>& other) noexcept {
 	for (const auto& item : other)
 		append(item);
 

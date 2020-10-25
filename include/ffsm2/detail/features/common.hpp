@@ -38,7 +38,7 @@ enum class StatusEvent : uint8_t {
 
 static inline
 const char*
-stateName(const std::type_index stateType) {
+stateName(const std::type_index stateType) noexcept {
 	const char* const raw = stateType.name();
 
 	#if defined(_MSC_VER)
@@ -62,9 +62,9 @@ stateName(const std::type_index stateType) {
 
 //------------------------------------------------------------------------------
 
-static inline
+static constexpr
 const char*
-methodName(const Method method) {
+methodName(const Method method) noexcept {
 	switch (method) {
 	case Method::ENTRY_GUARD:	 return "entryGuard";
 	case Method::ENTER:			 return "enter";
@@ -99,25 +99,25 @@ namespace detail {
 #endif
 
 struct alignas(4) TransitionBase {
-	FFSM2_INLINE TransitionBase() = default;
+	constexpr TransitionBase() noexcept = default;
 
 	//----------------------------------------------------------------------
 
-	FFSM2_INLINE TransitionBase(const StateID destination_)
+	constexpr TransitionBase(const StateID destination_) noexcept
 		: destination{destination_}
 	{}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_INLINE TransitionBase(const StateID origin_,
-								const StateID destination_)
+	constexpr TransitionBase(const StateID origin_,
+							 const StateID destination_) noexcept
 		: origin	 {origin_}
 		, destination{destination_}
 	{}
 
 	//----------------------------------------------------------------------
 
-	FFSM2_INLINE bool operator == (const TransitionBase& other) const {
+	constexpr bool operator == (const TransitionBase& other) const noexcept {
 		return origin	   == other.origin &&
 			   destination == other.destination &&
 			   method	   == other.method;
@@ -125,7 +125,7 @@ struct alignas(4) TransitionBase {
 
 	//----------------------------------------------------------------------
 
-	FFSM2_INLINE void clear() {
+	constexpr void clear() noexcept {
 		destination	= INVALID_STATE_ID;
 	}
 
@@ -149,14 +149,18 @@ struct alignas(4) TransitionT
 	using Payload = TPayload;
 	using Storage = typename std::aligned_storage<sizeof(Payload), 4>::type;
 
-	FFSM2_INLINE TransitionT() = default;
-
 	using TransitionBase::TransitionBase;
 
 	//----------------------------------------------------------------------
 
-	FFSM2_INLINE TransitionT(const StateID destination,
-							 const Payload& payload)
+	constexpr TransitionT() noexcept {
+		new (&storage) Payload{};
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	constexpr TransitionT(const StateID destination,
+						  const Payload& payload) noexcept
 		: TransitionBase{destination}
 		, payloadSet{true}
 	{
@@ -165,8 +169,8 @@ struct alignas(4) TransitionT
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_INLINE TransitionT(const StateID destination,
-							 Payload&& payload)
+	constexpr TransitionT(const StateID destination,
+						  Payload&& payload) noexcept
 		: TransitionBase{destination}
 		, payloadSet{true}
 	{
@@ -175,9 +179,9 @@ struct alignas(4) TransitionT
 
 	//----------------------------------------------------------------------
 
-	FFSM2_INLINE TransitionT(const StateID origin,
-							 const StateID destination,
-							 const Payload& payload)
+	constexpr TransitionT(const StateID origin,
+						  const StateID destination,
+						  const Payload& payload) noexcept
 		: TransitionBase{origin, destination}
 		, payloadSet{true}
 	{
@@ -186,9 +190,9 @@ struct alignas(4) TransitionT
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_INLINE TransitionT(const StateID origin,
-							 const StateID destination,
-							 Payload&& payload)
+	constexpr TransitionT(const StateID origin,
+						  const StateID destination,
+						  Payload&& payload) noexcept
 		: TransitionBase{origin, destination}
 		, payloadSet{true}
 	{
@@ -197,7 +201,7 @@ struct alignas(4) TransitionT
 
 	//----------------------------------------------------------------------
 
-	FFSM2_INLINE bool operator == (const TransitionT& other) const {
+	constexpr bool operator == (const TransitionT& other) const noexcept {
 		return TransitionBase::operator == (other) &&
 			   (payloadSet ==  other.payloadSet);
 		//	  (!payloadSet && !other.payloadSet || payload ==  other.payload);

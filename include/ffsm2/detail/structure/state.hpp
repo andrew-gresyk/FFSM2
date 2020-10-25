@@ -28,34 +28,35 @@ struct S_ final {
 
 	//----------------------------------------------------------------------
 
-	FFSM2_INLINE bool	deepEntryGuard		  (GuardControl& control);
+	constexpr bool	 deepEntryGuard		  (GuardControl& control) noexcept;
 
-	FFSM2_INLINE void	deepConstruct		  (PlanControl&  control);
+	constexpr void	 deepConstruct		  (PlanControl&  control) noexcept;
 
-	FFSM2_INLINE void	deepEnter			  (PlanControl&  control);
-	FFSM2_INLINE void	deepReenter			  (PlanControl&  control);
+	constexpr void	 deepEnter			  (PlanControl&  control) noexcept;
+	constexpr void	 deepReenter		  (PlanControl&  control) noexcept;
 
-	FFSM2_INLINE Status	deepUpdate			  (FullControl&  control);
+	constexpr Status deepUpdate			  (FullControl&  control) noexcept;
 
 	template <typename TEvent>
-	FFSM2_INLINE Status	deepReact			  (FullControl&	 control, const TEvent& event);
+	constexpr Status deepReact			  (FullControl&	 control,
+										   const TEvent& event)	  noexcept;
 
-	FFSM2_INLINE bool	deepExitGuard		  (GuardControl& control);
+	constexpr bool	 deepExitGuard		  (GuardControl& control) noexcept;
 
-	FFSM2_INLINE void	deepExit			  (PlanControl&	 control);
+	constexpr void	 deepExit			  (PlanControl&	 control) noexcept;
 
-	FFSM2_INLINE void	deepDestruct		  (PlanControl&  control);
+	constexpr void	 deepDestruct		  (PlanControl&  control) noexcept;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #ifdef FFSM2_ENABLE_PLANS
-	FFSM2_INLINE void	wrapPlanSucceeded	  (FullControl&	 control);
-	FFSM2_INLINE void	wrapPlanFailed		  (FullControl&	 control);
+	constexpr void	 wrapPlanSucceeded	  (FullControl&	 control) noexcept;
+	constexpr void	 wrapPlanFailed		  (FullControl&	 control) noexcept;
 #endif
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_INLINE void	deepChangeToRequested(Control&)																		{}
+	constexpr void	 deepChangeToRequested(Control&)			  noexcept {}
 
 	//----------------------------------------------------------------------
 
@@ -76,10 +77,10 @@ struct S_ final {
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	template <typename TReturn, typename THost, typename... TParams>
-	void log(TReturn(THost::*)(TParams...),
-			 Logger& logger,
-			 Context& context,
-			 const Method method) const
+	constexpr void log(TReturn(THost::*)(TParams...),
+					   Logger& logger,
+					   Context& context,
+					   const Method method) const noexcept
 	{
 		logger.recordMethod(context, STATE_ID, method);
 	}
@@ -87,10 +88,10 @@ struct S_ final {
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	template <typename TReturn, typename... TParams>
-	void log(TReturn(Empty::*)(TParams...),
-			 Logger&,
-			 Context&,
-			 const Method) const
+	constexpr void log(TReturn(Empty::*)(TParams...),
+					   Logger&,
+					   Context&,
+					   const Method) const noexcept
 	{}
 
 #endif

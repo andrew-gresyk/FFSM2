@@ -24,23 +24,23 @@ protected:
 	using GuardControl	= GuardControlT<TArgs>;
 
 public:
-	FFSM2_INLINE void preEntryGuard(Context&)		{}
+	constexpr void preEntryGuard(Context&) noexcept {}
 
-	FFSM2_INLINE void preEnter	   (Context&)		{}
-	FFSM2_INLINE void preReenter   (Context&)		{}
+	constexpr void preEnter		(Context&) noexcept {}
+	constexpr void preReenter	(Context&) noexcept {}
 
-	FFSM2_INLINE void preUpdate	   (Context&)		{}
+	constexpr void preUpdate	(Context&) noexcept {}
 
 	template <typename TEvent>
-	FFSM2_INLINE void preReact	   (const TEvent&,
-									Context&)		{}
+	constexpr void preReact		(const TEvent&,
+								 Context&) noexcept {}
 
-	FFSM2_INLINE void preExitGuard (Context&)		{}
+	constexpr void preExitGuard	(Context&) noexcept {}
 
-	FFSM2_INLINE void postExit	   (Context&)		{}
+	constexpr void postExit		(Context&) noexcept {}
 
 	template <typename T>
-	static constexpr StateID  stateId()		{ return index<StateList, T>();	}
+	static constexpr StateID  stateId()	   noexcept { return index<StateList, T>();	}
 };
 
 //------------------------------------------------------------------------------
@@ -71,20 +71,20 @@ struct B_<TFirst, TRest...>
 
 	using TFirst::stateId;
 
-	FFSM2_INLINE void widePreEntryGuard(Context& context);
+	constexpr void widePreEntryGuard(Context& context) noexcept;
 
-	FFSM2_INLINE void widePreEnter	   (Context& context);
-	FFSM2_INLINE void widePreReenter   (Context& context);
+	constexpr void widePreEnter		(Context& context) noexcept;
+	constexpr void widePreReenter	(Context& context) noexcept;
 
-	FFSM2_INLINE void widePreUpdate	   (Context& context);
+	constexpr void widePreUpdate	(Context& context) noexcept;
 
 	template <typename TEvent>
-	FFSM2_INLINE void widePreReact	   (const TEvent& event,
-										Context& context);
+	constexpr void widePreReact		(const TEvent& event,
+									 Context& context) noexcept;
 
-	FFSM2_INLINE void widePreExitGuard (Context& context);
+	constexpr void widePreExitGuard	(Context& context) noexcept;
 
-	FFSM2_INLINE void widePostExit	   (Context& context);
+	constexpr void widePostExit		(Context& context) noexcept;
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -109,40 +109,40 @@ struct B_<TFirst>
 
 	using TFirst::stateId;
 
-	FFSM2_INLINE void entryGuard	   (GuardControl&)			{}
+	constexpr void entryGuard		(GuardControl&)	noexcept {}
 
-	FFSM2_INLINE void enter			   (PlanControl&)			{}
-	FFSM2_INLINE void reenter		   (PlanControl&)			{}
+	constexpr void enter			(PlanControl& )	noexcept {}
+	constexpr void reenter			(PlanControl& )	noexcept {}
 
-	FFSM2_INLINE void update		   (FullControl&)			{}
+	constexpr void update			(FullControl& )	noexcept {}
 
 	template <typename TEvent>
-	FFSM2_INLINE void react			   (const TEvent&,
-					 				    FullControl&)			{}
+	constexpr void react			(const TEvent&,
+									 FullControl& )	noexcept {}
 
-	FFSM2_INLINE void exitGuard		   (GuardControl&)			{}
+	constexpr void exitGuard		(GuardControl&)	noexcept {}
 
-	FFSM2_INLINE void exit			   (PlanControl&)			{}
+	constexpr void exit				(PlanControl& )	noexcept {}
 
 #ifdef FFSM2_ENABLE_PLANS
-	FFSM2_INLINE void planSucceeded	   (FullControl& control)	{ control.succeed();	}
-	FFSM2_INLINE void planFailed	   (FullControl& control)	{ control.fail();		}
+	constexpr void planSucceeded	(FullControl& control) noexcept { control.succeed();	}
+	constexpr void planFailed		(FullControl& control) noexcept { control.fail();		}
 #endif
 
-	FFSM2_INLINE void widePreEntryGuard(Context& context);
+	constexpr void widePreEntryGuard(Context& context) noexcept;
 
-	FFSM2_INLINE void widePreEnter	   (Context& context);
-	FFSM2_INLINE void widePreReenter   (Context& context);
+	constexpr void widePreEnter		(Context& context) noexcept;
+	constexpr void widePreReenter	(Context& context) noexcept;
 
-	FFSM2_INLINE void widePreUpdate	   (Context& context);
+	constexpr void widePreUpdate	(Context& context) noexcept;
 
 	template <typename TEvent>
-	FFSM2_INLINE void widePreReact	   (const TEvent& event,
-					  				    Context& context);
+	constexpr void widePreReact		(const TEvent& event,
+									 Context& context) noexcept;
 
-	FFSM2_INLINE void widePreExitGuard (Context& context);
+	constexpr void widePreExitGuard	(Context& context) noexcept;
 
-	FFSM2_INLINE void widePostExit	   (Context& context);
+	constexpr void widePostExit		(Context& context) noexcept;
 };
 
 //------------------------------------------------------------------------------

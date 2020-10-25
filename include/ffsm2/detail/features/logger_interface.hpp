@@ -18,29 +18,29 @@ struct LoggerInterfaceT {
 
 	virtual void recordMethod(Context& /*context*/,
 							  const StateID /*origin*/,
-							  const Method /*method*/)
+							  const Method /*method*/) noexcept
 	{}
 
 	virtual void recordTransition(Context& /*context*/,
 								  const StateID /*origin*/,
-								  const StateID /*target*/)
+								  const StateID /*target*/) noexcept
 	{}
 
 #ifdef FFSM2_ENABLE_PLANS
 
 	virtual void recordTaskStatus(Context& /*context*/,
 								  const StateID /*origin*/,
-								  const StatusEvent /*event*/)
+								  const StatusEvent /*event*/) noexcept
 	{}
 
 	virtual void recordPlanStatus(Context& /*context*/,
-								  const StatusEvent /*event*/)
+								  const StatusEvent /*event*/) noexcept
 	{}
 
 #endif
 
 	virtual void recordCancelledPending(Context& /*context*/,
-										const StateID /*origin*/)
+										const StateID /*origin*/) noexcept
 	{}
 
 };

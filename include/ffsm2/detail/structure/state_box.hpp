@@ -5,7 +5,7 @@ namespace ffsm2 {
 template <typename>
 struct Guard {
 	template <typename TArgs>
-	static void execute(ffsm2::detail::GuardControlT<TArgs>&) {}
+	static constexpr void execute(ffsm2::detail::GuardControlT<TArgs>&) noexcept {}
 };
 
 namespace detail {
@@ -20,22 +20,22 @@ template <typename T, typename TArgs>
 struct DynamicBox final {
 	using Type = T;
 
-	static constexpr bool isBare()							{ return false;						}
+	static constexpr bool isBare() noexcept							{ return false;						}
 
 	union {
 		Type t_;
 	};
 
-	FFSM2_INLINE  DynamicBox() {}
-	FFSM2_INLINE ~DynamicBox() {}
+	constexpr DynamicBox() noexcept {}
+	~DynamicBox()		   noexcept {}
 
-	FFSM2_INLINE void guard(GuardControlT<TArgs>& control)	{ Guard<Type>::execute(control);	}
+	constexpr void guard(GuardControlT<TArgs>& control) noexcept	{ Guard<Type>::execute(control);	}
 
-	FFSM2_INLINE void construct();
-	FFSM2_INLINE void destruct();
+	constexpr void construct() noexcept;
+	constexpr void destruct()  noexcept;
 
-	FFSM2_INLINE	   Type& get()					{ FFSM2_ASSERT(initialized_); return t_;	}
-	FFSM2_INLINE const Type& get() const			{ FFSM2_ASSERT(initialized_); return t_;	}
+	constexpr		Type& get()		  noexcept				{ FFSM2_ASSERT(initialized_); return t_;	}
+	constexpr const Type& get() const noexcept				{ FFSM2_ASSERT(initialized_); return t_;	}
 
 	FFSM2_IF_ASSERT(bool initialized_ = false);
 
@@ -48,17 +48,17 @@ template <typename T, typename TArgs>
 struct StaticBox final {
 	using Type = T;
 
-	static constexpr bool isBare()	{ return std::is_base_of<Type, StaticEmptyT<TArgs>>::value;	}
+	static constexpr bool isBare() noexcept	{ return std::is_base_of<Type, StaticEmptyT<TArgs>>::value;	}
 
 	Type t_;
 
-	FFSM2_INLINE void guard(GuardControlT<TArgs>& control);
+	constexpr void guard(GuardControlT<TArgs>& control) noexcept;
 
-	FFSM2_INLINE void construct()																{}
-	FFSM2_INLINE void destruct()																{}
+	constexpr void construct() noexcept 																{}
+	constexpr void destruct()  noexcept 																{}
 
-	FFSM2_INLINE	   Type& get()							{ return t_;						}
-	FFSM2_INLINE const Type& get() const					{ return t_;						}
+	constexpr		Type& get()		  noexcept						{ return t_;						}
+	constexpr const Type& get() const noexcept						{ return t_;						}
 
 	FFSM2_IF_DEBUG(const std::type_index TYPE = isBare() ? typeid(None) : typeid(Type));
 };

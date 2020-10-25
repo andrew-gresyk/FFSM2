@@ -13,22 +13,22 @@ public:
 	friend class Array;
 
 private:
-	FFSM2_INLINE Iterator(Container& container,
-						  const Long cursor)
+	constexpr Iterator(Container& container,
+					   const Long cursor) noexcept
 		: _container{container}
 		, _cursor{cursor}
 	{}
 
 public:
-	FFSM2_INLINE bool operator != (const Iterator<Container>& dummy) const;
+	constexpr bool operator != (const Iterator<Container>& dummy) const noexcept;
 
-	FFSM2_INLINE Iterator& operator ++();
+	constexpr Iterator& operator ++() noexcept;
 
-	FFSM2_INLINE	   Item& operator *()		{ return  _container[_cursor];	}
-	FFSM2_INLINE const Item& operator *() const { return  _container[_cursor];	}
+	constexpr		Item& operator *()		 noexcept	{ return  _container[_cursor];	}
+	constexpr const Item& operator *() const noexcept	{ return  _container[_cursor];	}
 
-	FFSM2_INLINE	   Item* operator->()		{ return &_container[_cursor];	}
-	FFSM2_INLINE const Item* operator->() const { return &_container[_cursor];	}
+	constexpr		Item* operator->()		 noexcept	{ return &_container[_cursor];	}
+	constexpr const Item* operator->() const noexcept	{ return &_container[_cursor];	}
 
 private:
 	Container& _container;
@@ -48,20 +48,20 @@ public:
 	friend class Array;
 
 private:
-	FFSM2_INLINE Iterator(const Container& container,
-						  const Long cursor)
+	constexpr Iterator(const Container& container,
+					   const Long cursor) noexcept
 		: _container{container}
 		, _cursor{cursor}
 	{}
 
 public:
-	FFSM2_INLINE bool operator != (const Iterator<const Container>& dummy) const;
+	constexpr bool operator != (const Iterator<const Container>& dummy) const noexcept;
 
-	FFSM2_INLINE Iterator& operator ++();
+	constexpr Iterator& operator ++() noexcept;
 
-	FFSM2_INLINE const Item& operator *() const { return _container[_cursor];	}
+	constexpr const Item& operator *() const noexcept	{ return _container[_cursor];	}
 
-	FFSM2_INLINE const Item* operator->() const { return &operator *();			}
+	constexpr const Item* operator->() const noexcept	{ return &operator *();			}
 
 private:
 	const Container& _container;

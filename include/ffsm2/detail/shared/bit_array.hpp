@@ -4,8 +4,8 @@ namespace detail {
 ////////////////////////////////////////////////////////////////////////////////
 
 struct Units {
-	inline Units(Short unit_  = INVALID_SHORT,
-				 Short width_ = INVALID_SHORT)
+	constexpr Units(Short unit_  = INVALID_SHORT,
+					Short width_ = INVALID_SHORT) noexcept
 		: unit {unit_ }
 		, width{width_}
 	{}
@@ -31,20 +31,20 @@ public:
 		friend class BitArray;
 
 	private:
-		FFSM2_INLINE explicit Bits(Unit* const storage,
-								   const Index width)
+		constexpr explicit Bits(Unit* const storage,
+								const Index width) noexcept
 			: _storage{storage}
 			, _width{width}
 		{}
 
 	public:
-		FFSM2_INLINE explicit operator bool() const;
+		constexpr explicit operator bool() const noexcept;
 
-		FFSM2_INLINE void clear();
+		constexpr void clear() noexcept;
 
-		FFSM2_INLINE bool get  (const Index index) const;
-		FFSM2_INLINE void set  (const Index index);
-		FFSM2_INLINE void clear(const Index index);
+		constexpr bool get  (const Index index) const noexcept;
+		constexpr void set  (const Index index)		  noexcept;
+		constexpr void clear(const Index index)		  noexcept;
 
 	private:
 		Unit* const _storage;
@@ -53,21 +53,21 @@ public:
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	class ConstBits {
+	class CBits {
 		template <typename, Short>
 		friend class BitArray;
 
 	private:
-		FFSM2_INLINE explicit ConstBits(const Unit* const storage,
-										const Index width)
+		constexpr explicit CBits(const Unit* const storage,
+								 const Index width) noexcept
 			: _storage{storage}
 			, _width{width}
 		{}
 
 	public:
-		FFSM2_INLINE explicit operator bool() const;
+		constexpr explicit operator bool() const noexcept;
 
-		FFSM2_INLINE bool get(const Index index) const;
+		constexpr bool get(const Index index) const noexcept;
 
 	private:
 		const Unit* const _storage;
@@ -81,21 +81,20 @@ public:
 		clear();
 	}
 
-	FFSM2_INLINE void clear();
+	constexpr void clear() noexcept;
 
-	FFSM2_INLINE bool get  (const Index index) const;
-	FFSM2_INLINE void set  (const Index index);
-	FFSM2_INLINE void clear(const Index index);
-
-	template <Short NUnit, Short NWidth>
-	FFSM2_INLINE	  Bits bits();
+	constexpr bool get  (const Index index) const noexcept;
+	constexpr void set  (const Index index)		  noexcept;
+	constexpr void clear(const Index index)		  noexcept;
 
 	template <Short NUnit, Short NWidth>
-	FFSM2_INLINE ConstBits bits() const;
+	constexpr  Bits bits()		 noexcept;
 
+	template <Short NUnit, Short NWidth>
+	constexpr CBits bits() const noexcept;
 
-	FFSM2_INLINE	  Bits bits(const Units& units);
-	FFSM2_INLINE ConstBits bits(const Units& units) const;
+	constexpr  Bits bits(const Units& units)	   noexcept;
+	constexpr CBits bits(const Units& units) const noexcept;
 
 private:
 	Unit _storage[CAPACITY];
@@ -106,7 +105,7 @@ private:
 template <typename TIndex>
 class BitArray<TIndex, 0> final {
 public:
-	FFSM2_INLINE void clear() {}
+	constexpr void clear() noexcept {}
 };
 
 ////////////////////////////////////////////////////////////////////////////////

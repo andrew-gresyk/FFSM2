@@ -54,10 +54,10 @@ public:
 
 	//----------------------------------------------------------------------
 
-	explicit R_(Context& context
-				FFSM2_IF_LOG_INTERFACE(, Logger* const logger = nullptr));
+	constexpr explicit R_(Context& context
+						  FFSM2_IF_LOG_INTERFACE(, Logger* const logger = nullptr)) noexcept;
 
-	~R_();
+	~R_() noexcept;
 
 	//----------------------------------------------------------------------
 
@@ -65,35 +65,35 @@ public:
 	/// @tparam TState State type
 	/// @return Numeric state identifier
 	template <typename TState>
-	static constexpr StateID  stateId()								{ return index<StateList, TState>();			}
+	static constexpr StateID stateId() noexcept						{ return index<StateList, TState>();	}
 
 	//----------------------------------------------------------------------
 
 	/// @brief Trigger FSM update cycle (recursively call 'update()' on all active states, then process requested transitions)
-	void update();
+	constexpr void update() noexcept;
 
 	/// @brief Have FSM react to an event (recursively call matching 'react<>()' on all active states, then process requested transitions)
 	/// @tparam TEvent Event type
 	/// @param event Event to react to
 	template <typename TEvent>
-	FFSM2_INLINE void react(const TEvent& event);
+	constexpr void react(const TEvent& event) noexcept;
 
 	//----------------------------------------------------------------------
 
 	/// @brief Get current active state ID
 	/// @return Current active state ID
-	FFSM2_INLINE StateID activeStateId() const						{ return _registry.active;						}
+	constexpr StateID activeStateId() const noexcept				{ return _registry.active;				}
 
 	//------------------------------------------------------------------------------
 
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
-	FFSM2_INLINE void changeTo(const StateID stateId);
+	constexpr void changeTo(const StateID stateId) noexcept;
 
 	/// @brief Transition into a state
 	/// @tparam TState Destination state type
 	template <typename TState>
-	FFSM2_INLINE void changeTo()									{ changeTo (stateId<TState>());					}
+	constexpr void changeTo() noexcept								{ changeTo (stateId<TState>());			}
 
 	//------------------------------------------------------------------------------
 
@@ -102,21 +102,21 @@ public:
 	/// @brief Attach logger
 	/// @param logger A logger implementing 'ffsm2::LoggerInterfaceT<>' interface
 	/// @see FFSM2_ENABLE_LOG_INTERFACE
-	void attachLogger(Logger* const logger)							{ _logger = logger;								}
+	constexpr void attachLogger(Logger* const logger) noexcept		{ _logger = logger;						}
 
 #endif
 
 	//----------------------------------------------------------------------
 
 private:
-	void initialEnter();
-	void processTransitions(TransitionSets& currentTransitions);
+	constexpr void initialEnter() noexcept;
+	constexpr void processTransitions(TransitionSets& currentTransitions) noexcept;
 
-	bool cancelledByEntryGuards(const TransitionSets& currentTransitions,
-								const Transition& pendingTransition);
+	constexpr bool cancelledByEntryGuards(const TransitionSets& currentTransitions,
+										  const Transition& pendingTransition) noexcept;
 
-	bool cancelledByGuards(const TransitionSets& currentTransitions,
-						   const Transition& pendingTransition);
+	constexpr bool cancelledByGuards(const TransitionSets& currentTransitions,
+									 const Transition& pendingTransition) noexcept;
 
 protected:
 	Context& _context;
@@ -162,33 +162,33 @@ public:
 	/// @tparam TState State type
 	/// @return Numeric state identifier
 	template <typename TState>
-	static constexpr StateID  stateId()								{ return Base::template stateId<TState>();		}
+	static constexpr StateID  stateId() noexcept							{ return Base::template stateId<TState>();		}
 
 	//------------------------------------------------------------------------------
 
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
-	FFSM2_INLINE void changeWith   (const StateID  stateId,
-									const Payload& payload);
+	constexpr void changeWith   (const StateID  stateId,
+								 const Payload& payload) noexcept;
 
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
-	FFSM2_INLINE void changeWith   (const StateID  stateId,
-										 Payload&& payload);
+	constexpr void changeWith   (const StateID  stateId,
+									  Payload&& payload) noexcept;
 
 	/// @brief Transition into a state
 	/// @tparam TState Destination state type
 	/// @param payload Payload
 	template <typename TState>
-	FFSM2_INLINE void changeWith   (const Payload& payload)	{ changeWith   (stateId<TState>(),			 payload );	}
+	constexpr void changeWith   (const Payload& payload) noexcept	{ changeWith   (stateId<TState>(),			 payload );	}
 
 	/// @brief Transition into a state
 	/// @tparam TState Destination state type
 	/// @param payload Payload
 	template <typename TState>
-	FFSM2_INLINE void changeWith   (	 Payload&& payload)	{ changeWith   (stateId<TState>(), std::move(payload));	}
+	constexpr void changeWith   (	  Payload&& payload) noexcept	{ changeWith   (stateId<TState>(), std::move(payload));	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -253,7 +253,7 @@ class RW_		<::ffsm2::ConfigT<::ffsm2::EmptyContext, NSubstitutionLimit FFSM2_IF_
 #endif
 
 public:
-	explicit FFSM2_INLINE RW_(FFSM2_IF_LOG_INTERFACE(  Logger* const logger = nullptr))
+	explicit constexpr RW_(FFSM2_IF_LOG_INTERFACE(Logger* const logger = nullptr)) noexcept
 		: Base{static_cast<Context&>(*this)
 			 FFSM2_IF_LOG_INTERFACE(, logger)}
 	{}

@@ -5,8 +5,8 @@ namespace detail {
 
 template <typename T, Long NC>
 template <typename... TA>
-Long
-List<T, NC>::emplace(TA... args) {
+constexpr Long
+List<T, NC>::emplace(TA... args) noexcept {
 	if (_count < CAPACITY) {
 		FFSM2_ASSERT(_vacantHead < CAPACITY);
 		FFSM2_ASSERT(_vacantTail < CAPACITY);
@@ -60,8 +60,8 @@ List<T, NC>::emplace(TA... args) {
 //------------------------------------------------------------------------------
 
 template <typename T, Long NC>
-void
-List<T, NC>::remove(const Index i) {
+constexpr void
+List<T, NC>::remove(const Index i) noexcept {
 	FFSM2_ASSERT(i < CAPACITY && _count);
 
 	auto& fresh = _cells[i];
@@ -98,8 +98,8 @@ List<T, NC>::remove(const Index i) {
 //------------------------------------------------------------------------------
 
 template <typename T, Long NC>
-T&
-List<T, NC>::operator[] (const Index i) {
+constexpr T&
+List<T, NC>::operator[] (const Index i) noexcept {
 	FFSM2_IF_ASSERT(verifyStructure());
 
 	return _cells[i].item;
@@ -108,8 +108,8 @@ List<T, NC>::operator[] (const Index i) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename T, Long NC>
-const T&
-List<T, NC>::operator[] (const Index i) const {
+constexpr const T&
+List<T, NC>::operator[] (const Index i) const noexcept {
 	FFSM2_IF_ASSERT(verifyStructure());
 
 	return _cells[i].item;
@@ -120,8 +120,8 @@ List<T, NC>::operator[] (const Index i) const {
 #ifdef FFSM2_ENABLE_ASSERT
 
 template <typename T, Long NC>
-void
-List<T, NC>::verifyStructure(const Index occupied) const {
+constexpr void
+List<T, NC>::verifyStructure(const Index occupied) const noexcept {
 	if (_count < CAPACITY) {
 		FFSM2_ASSERT(_vacantHead < CAPACITY);
 		FFSM2_ASSERT(_vacantTail < CAPACITY);
