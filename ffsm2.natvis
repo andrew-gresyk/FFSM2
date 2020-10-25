@@ -145,11 +145,11 @@
 	<!-- ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ -->
 
 	<Type Name="ffsm2::detail::Task">
-		<DisplayString>{origin} ► {destination}</DisplayString>
+		<DisplayString>{(unsigned)origin} ► {(unsigned)destination}</DisplayString>
 	</Type>
 
 	<Type Name="ffsm2::detail::TaskLink">
-		<DisplayString>{prev} ◄► {next}</DisplayString>
+		<DisplayString>{(unsigned)prev} ◄► {(unsigned)next}</DisplayString>
 	</Type>
 
 	<!-- ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ -->

@@ -112,10 +112,6 @@ struct C
 			FFSM2_BREAK();
 		}
 	}
-
-	//void react(const Reaction&, FullControl&)									{}
-
-	//using Base::react;
 };
 
 //------------------------------------------------------------------------------
@@ -157,6 +153,27 @@ void step1(FSM::Instance& machine, Logger& logger) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 void step2(FSM::Instance& machine, Logger& logger) {
+	machine.changeTo<A>();
+	machine.update();
+
+	logger.assertSequence({
+		{							Event::Type::CHANGE,	FSM::stateId<A>() },
+
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::UPDATE },
+		{ FSM::stateId<A>(),		Event::Type::UPDATE },
+
+		{ FSM::stateId<A>(),		Event::Type::EXIT_GUARD },
+		{ FSM::stateId<A>(),		Event::Type::ENTRY_GUARD },
+
+		{ FSM::stateId<A>(),		Event::Type::REENTER },
+	});
+
+	REQUIRE(machine.activeStateId() == FSM::stateId<A>());
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+void step3(FSM::Instance& machine, Logger& logger) {
 	machine.changeTo<B>();
 	machine.update();
 
@@ -181,7 +198,7 @@ void step2(FSM::Instance& machine, Logger& logger) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-void step3(FSM::Instance& machine, Logger& logger) {
+void step4(FSM::Instance& machine, Logger& logger) {
 	machine.update();
 
 	logger.assertSequence({
@@ -201,7 +218,7 @@ void step3(FSM::Instance& machine, Logger& logger) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-void step4(FSM::Instance& machine, Logger& logger) {
+void step5(FSM::Instance& machine, Logger& logger) {
 	machine.react(Action{});
 
 	logger.assertSequence({
@@ -242,6 +259,7 @@ TEST_CASE("FSM.Transitions Verbose", "[machine]") {
 		step2(machine, logger);
 		step3(machine, logger);
 		step4(machine, logger);
+		step5(machine, logger);
 	}
 
 	logger.assertSequence({

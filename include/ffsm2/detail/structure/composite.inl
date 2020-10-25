@@ -9,7 +9,6 @@ C_<TA, TH, TS...>::deepForwardEntryGuard(GuardControl& control) {
 	FFSM2_ASSERT(control._registry.active != INVALID_SHORT);
 
 	const Short  requested  = control._registry.requested;
-	FFSM2_ASSERT(requested != control._registry.active);
 	FFSM2_ASSERT(requested != INVALID_SHORT);
 
 	return _subStates.wideEntryGuard(control, requested);
@@ -120,7 +119,6 @@ C_<TA, TH, TS...>::deepForwardExitGuard(GuardControl& control) {
 	FFSM2_ASSERT(control._registry.requested != INVALID_SHORT);
 
 	const Short  active  = control._registry.active;
-	FFSM2_ASSERT(active != control._registry.requested);
 	FFSM2_ASSERT(active != INVALID_SHORT);
 
 	return _subStates.wideExitGuard(control, active);
