@@ -31,12 +31,18 @@ Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "tools", "tools.pyproj", "{2
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		ASan|x64 = ASan|x64
+		ASan|x86 = ASan|x86
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0E3EA848-3FFE-4784-8D44-1DF036990C22}.ASan|x64.ActiveCfg = ASan|x64
+		{0E3EA848-3FFE-4784-8D44-1DF036990C22}.ASan|x64.Build.0 = ASan|x64
+		{0E3EA848-3FFE-4784-8D44-1DF036990C22}.ASan|x86.ActiveCfg = ASan|Win32
+		{0E3EA848-3FFE-4784-8D44-1DF036990C22}.ASan|x86.Build.0 = ASan|Win32
 		{0E3EA848-3FFE-4784-8D44-1DF036990C22}.Debug|x64.ActiveCfg = Debug|x64
 		{0E3EA848-3FFE-4784-8D44-1DF036990C22}.Debug|x64.Build.0 = Debug|x64
 		{0E3EA848-3FFE-4784-8D44-1DF036990C22}.Debug|x86.ActiveCfg = Debug|Win32
@@ -45,6 +51,8 @@ Global
 		{0E3EA848-3FFE-4784-8D44-1DF036990C22}.Release|x64.Build.0 = Release|x64
 		{0E3EA848-3FFE-4784-8D44-1DF036990C22}.Release|x86.ActiveCfg = Release|Win32
 		{0E3EA848-3FFE-4784-8D44-1DF036990C22}.Release|x86.Build.0 = Release|Win32
+		{CCE21648-BED6-4180-A305-FF27932B9232}.ASan|x64.ActiveCfg = Release|x64
+		{CCE21648-BED6-4180-A305-FF27932B9232}.ASan|x86.ActiveCfg = Release|Win32
 		{CCE21648-BED6-4180-A305-FF27932B9232}.Debug|x64.ActiveCfg = Debug|x64
 		{CCE21648-BED6-4180-A305-FF27932B9232}.Debug|x64.Build.0 = Debug|x64
 		{CCE21648-BED6-4180-A305-FF27932B9232}.Debug|x86.ActiveCfg = Debug|Win32
@@ -53,6 +61,8 @@ Global
 		{CCE21648-BED6-4180-A305-FF27932B9232}.Release|x64.Build.0 = Release|x64
 		{CCE21648-BED6-4180-A305-FF27932B9232}.Release|x86.ActiveCfg = Release|Win32
 		{CCE21648-BED6-4180-A305-FF27932B9232}.Release|x86.Build.0 = Release|Win32
+		{0895F78B-D3D4-4BEF-8E12-DAABE32686E5}.ASan|x64.ActiveCfg = Release|x64
+		{0895F78B-D3D4-4BEF-8E12-DAABE32686E5}.ASan|x86.ActiveCfg = Release|Win32
 		{0895F78B-D3D4-4BEF-8E12-DAABE32686E5}.Debug|x64.ActiveCfg = Debug|x64
 		{0895F78B-D3D4-4BEF-8E12-DAABE32686E5}.Debug|x64.Build.0 = Debug|x64
 		{0895F78B-D3D4-4BEF-8E12-DAABE32686E5}.Debug|x86.ActiveCfg = Debug|Win32
@@ -61,6 +71,8 @@ Global
 		{0895F78B-D3D4-4BEF-8E12-DAABE32686E5}.Release|x64.Build.0 = Release|x64
 		{0895F78B-D3D4-4BEF-8E12-DAABE32686E5}.Release|x86.ActiveCfg = Release|Win32
 		{0895F78B-D3D4-4BEF-8E12-DAABE32686E5}.Release|x86.Build.0 = Release|Win32
+		{2347027E-E5DE-43C4-8EF9-5F1411ADE33B}.ASan|x64.ActiveCfg = Release|Any CPU
+		{2347027E-E5DE-43C4-8EF9-5F1411ADE33B}.ASan|x86.ActiveCfg = Release|Any CPU
 		{2347027E-E5DE-43C4-8EF9-5F1411ADE33B}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{2347027E-E5DE-43C4-8EF9-5F1411ADE33B}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{2347027E-E5DE-43C4-8EF9-5F1411ADE33B}.Release|x64.ActiveCfg = Release|Any CPU

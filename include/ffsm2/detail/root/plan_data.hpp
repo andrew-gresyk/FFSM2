@@ -8,6 +8,8 @@ namespace detail {
 #pragma pack(push, 2)
 
 struct TaskBase {
+	FFSM2_INLINE TaskBase() {}
+
 	FFSM2_INLINE TaskBase(const StateID origin_,
 						  const StateID destination_)
 		: origin{origin_}
@@ -33,6 +35,12 @@ struct TaskT
 	using Storage = typename std::aligned_storage<sizeof(Payload), 2>::type;
 
 	using TaskBase::TaskBase;
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	FFSM2_INLINE TaskT() {
+		new (&storage) Payload{};
+	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
