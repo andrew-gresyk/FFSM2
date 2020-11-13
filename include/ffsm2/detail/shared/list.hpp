@@ -28,7 +28,7 @@ private:
 		Item item;
 		Links links;
 
-		constexpr Cell() noexcept
+		FFSM2_INLINE Cell() noexcept
 			: links{}
 		{}
 	};
@@ -37,23 +37,23 @@ private:
 
 public:
 	template <typename... TArgs>
-	constexpr Index emplace(TArgs... args) noexcept;
+	Index emplace(TArgs... args) noexcept;
 
-	constexpr void remove(const Index i) noexcept;
+	void remove(const Index i) noexcept;
 
-	constexpr		Item& operator[] (const Index i)	   noexcept;
-	constexpr const Item& operator[] (const Index i) const noexcept;
+	FFSM2_INLINE	   Item& operator[] (const Index i)		  noexcept;
+	FFSM2_INLINE const Item& operator[] (const Index i) const noexcept;
 
-	constexpr Index count() const noexcept						{ return _count;	}
+	FFSM2_INLINE Index count() const noexcept						{ return _count;	}
 
 private:
-	FFSM2_IF_ASSERT(constexpr void verifyStructure(const Index occupied = INVALID) const noexcept);
+	FFSM2_IF_ASSERT(void verifyStructure(const Index occupied = INVALID) const noexcept);
 
 private:
 	Cell _cells[CAPACITY];
 	Index _vacantHead = 0;
 	Index _vacantTail = 0;
-	Index _last = 0;
+	Index _last  = 0;
 	Index _count = 0;
 };
 

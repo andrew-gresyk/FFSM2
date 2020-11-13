@@ -45,9 +45,9 @@ struct SI_ final {
 	using Head				= THead;
 	using StateList			= TypeList<Head>;
 
-	static constexpr Short WIDTH		  = 1;
+	static constexpr Short WIDTH			  = 1;
 
-	static constexpr Long  STATE_COUNT	  = StateList::SIZE;
+	static constexpr Long  STATE_COUNT	 	  = StateList::SIZE;
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -58,7 +58,7 @@ struct CSI_<TInitial, TRemaining...> {
 	using Remaining			= CSI_<TRemaining...>;
 	using StateList			= Merge<typename Initial::StateList,  typename Remaining::StateList>;
 
-	static constexpr Long  STATE_COUNT	  = StateList::SIZE;
+	static constexpr Long  STATE_COUNT		  = StateList::SIZE;
 };
 
 template <typename TInitial>
@@ -66,7 +66,7 @@ struct CSI_<TInitial> {
 	using Initial			= WrapInfo<TInitial>;
 	using StateList			= typename Initial::StateList;
 
-	static constexpr Long  STATE_COUNT	  = StateList::SIZE;
+	static constexpr Long  STATE_COUNT		  = StateList::SIZE;
 };
 
 template <typename THead, typename... TSubStates>
@@ -76,9 +76,9 @@ struct CI_ final {
 	using SubStates			= CSI_<TSubStates...>;
 	using StateList			= typename SubStates::StateList;
 
-	static constexpr Short WIDTH		  = sizeof...(TSubStates);
+	static constexpr Short WIDTH			  = sizeof...(TSubStates);
 
-	static constexpr Long  STATE_COUNT	  = StateList::SIZE;
+	static constexpr Long  STATE_COUNT		  = StateList::SIZE;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -155,10 +155,10 @@ struct RF_ final {
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static constexpr Long  SUBSTITUTION_LIMIT	= TConfig::SUBSTITUTION_LIMIT;
+	static constexpr Long  SUBSTITUTION_LIMIT = TConfig::SUBSTITUTION_LIMIT;
 
 #ifdef FFSM2_ENABLE_PLANS
-	static constexpr Long  TASK_CAPACITY		= TConfig::TASK_CAPACITY != INVALID_LONG ?
+	static constexpr Long  TASK_CAPACITY	  = TConfig::TASK_CAPACITY != INVALID_LONG ?
 													  TConfig::TASK_CAPACITY : Apex::STATE_COUNT;
 #endif
 

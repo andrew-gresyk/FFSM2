@@ -47,28 +47,28 @@ struct CS_ final {
 
 	//----------------------------------------------------------------------
 
-	constexpr bool	 wideEntryGuard		  (GuardControl& control, const Short prong) noexcept;
+	FFSM2_INLINE bool	wideEntryGuard		 (GuardControl& control, const Short prong) noexcept;
 
-	constexpr void	 wideConstruct		  (PlanControl&  control, const Short prong) noexcept;
+	FFSM2_INLINE void	wideConstruct		 (PlanControl&  control, const Short prong) noexcept;
 
-	constexpr void	 wideEnter			  (PlanControl&  control, const Short prong) noexcept;
-	constexpr void	 wideReenter		  (PlanControl&  control, const Short prong) noexcept;
+	FFSM2_INLINE void	wideEnter			 (PlanControl&  control, const Short prong) noexcept;
+	FFSM2_INLINE void	wideReenter			 (PlanControl&  control, const Short prong) noexcept;
 
-	constexpr Status wideUpdate			  (FullControl&  control, const Short prong) noexcept;
+	FFSM2_INLINE Status wideUpdate			 (FullControl&  control, const Short prong) noexcept;
 
 	template <typename TEvent>
-	constexpr Status wideReact			  (FullControl&  control,
-										   const TEvent& event,	  const Short prong) noexcept;
+	FFSM2_INLINE Status wideReact			 (FullControl&  control,
+											  const TEvent& event,	 const Short prong) noexcept;
 
-	constexpr bool	 wideExitGuard		  (GuardControl& control, const Short prong) noexcept;
+	FFSM2_INLINE bool	wideExitGuard		 (GuardControl& control, const Short prong) noexcept;
 
-	constexpr void	 wideExit			  (PlanControl&  control, const Short prong) noexcept;
+	FFSM2_INLINE void	wideExit			 (PlanControl&  control, const Short prong) noexcept;
 
-	constexpr void	 wideDestruct		  (PlanControl&  control, const Short prong) noexcept;
+	FFSM2_INLINE void	wideDestruct		 (PlanControl&  control, const Short prong) noexcept;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	constexpr void	 wideChangeToRequested(PlanControl&  control, const Short prong) noexcept;
+	FFSM2_INLINE void	wideChangeToRequested(PlanControl&  control, const Short prong) noexcept;
 
 	//----------------------------------------------------------------------
 
@@ -100,28 +100,28 @@ struct CS_<NStateId, TArgs, NIndex, TState> final {
 
 	//----------------------------------------------------------------------
 
-	constexpr bool	 wideEntryGuard		  (GuardControl& control, const Short prong) noexcept;
+	FFSM2_INLINE bool	wideEntryGuard		 (GuardControl& control, const Short prong) noexcept;
 
-	constexpr void	 wideConstruct		  (PlanControl&  control, const Short prong) noexcept;
+	FFSM2_INLINE void	wideConstruct		 (PlanControl&  control, const Short prong) noexcept;
 
-	constexpr void	 wideEnter			  (PlanControl&  control, const Short prong) noexcept;
-	constexpr void	 wideReenter		  (PlanControl&  control, const Short prong) noexcept;
+	FFSM2_INLINE void	wideEnter			 (PlanControl&  control, const Short prong) noexcept;
+	FFSM2_INLINE void	wideReenter			 (PlanControl&  control, const Short prong) noexcept;
 
-	constexpr Status wideUpdate			  (FullControl&  control, const Short prong) noexcept;
+	FFSM2_INLINE Status wideUpdate			 (FullControl&  control, const Short prong) noexcept;
 
 	template <typename TEvent>
-	constexpr Status wideReact			  (FullControl&  control,
-										   const TEvent& event,	  const Short prong) noexcept;
+	FFSM2_INLINE Status wideReact			 (FullControl&  control,
+											  const TEvent& event,	 const Short prong) noexcept;
 
-	constexpr bool	 wideExitGuard		  (GuardControl& control, const Short prong) noexcept;
+	FFSM2_INLINE bool	wideExitGuard		 (GuardControl& control, const Short prong) noexcept;
 
-	constexpr void	 wideExit			  (PlanControl&  control, const Short prong) noexcept;
+	FFSM2_INLINE void	wideExit			 (PlanControl&  control, const Short prong) noexcept;
 
-	constexpr void	 wideDestruct		  (PlanControl&  control, const Short prong) noexcept;
+	FFSM2_INLINE void	wideDestruct		 (PlanControl&  control, const Short prong) noexcept;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	constexpr void	 wideChangeToRequested(PlanControl&  control, const Short prong) noexcept;
+	FFSM2_INLINE void	wideChangeToRequested(PlanControl&  control, const Short prong) noexcept;
 
 	//----------------------------------------------------------------------
 

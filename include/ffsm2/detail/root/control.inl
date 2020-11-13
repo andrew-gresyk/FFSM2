@@ -4,7 +4,6 @@ namespace detail {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TArgs>
-constexpr
 ControlT<TArgs>::Origin::Origin(ControlT& control_,
 								const StateID stateId) noexcept
 	: control{control_}
@@ -23,7 +22,6 @@ ControlT<TArgs>::Origin::~Origin() noexcept {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TArgs>
-constexpr
 FullControlBaseT<TArgs>::Lock::Lock(FullControlBaseT& control_) noexcept
 	: control{!control_._locked ? &control_ : nullptr}
 {
@@ -42,7 +40,7 @@ FullControlBaseT<TArgs>::Lock::~Lock() noexcept {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TArgs>
-constexpr void
+void
 FullControlBaseT<TArgs>::changeTo(const StateID stateId) noexcept {
 	if (!_locked) {
 		_request = Transition{_originId, stateId};
@@ -56,7 +54,7 @@ FullControlBaseT<TArgs>::changeTo(const StateID stateId) noexcept {
 #ifdef FFSM2_ENABLE_PLANS
 
 template <typename TArgs>
-constexpr void
+void
 FullControlBaseT<TArgs>::succeed() noexcept {
 	_status.result = Status::Result::SUCCESS;
 
@@ -68,7 +66,7 @@ FullControlBaseT<TArgs>::succeed() noexcept {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename TArgs>
-constexpr void
+void
 FullControlBaseT<TArgs>::fail() noexcept {
 	_status.result = Status::Result::FAILURE;
 
@@ -85,7 +83,7 @@ FullControlBaseT<TArgs>::fail() noexcept {
 
 template <typename TC, typename TG, typename TSL, Long NSL, Long NTC, typename TTP>
 template <typename TState>
-constexpr void
+void
 FullControlT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::updatePlan(TState& headState,
 															const Status subStatus) noexcept
 {
@@ -126,8 +124,8 @@ FullControlT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::updatePlan(TState& headState,
 //------------------------------------------------------------------------------
 
 template <typename TC, typename TG, typename TSL, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TTP>
-constexpr void
-FullControlT<ArgsT<TC, TG, TSL, NSL FFSM2_IF_PLANS(, NTC), TTP>>::changeWith(const StateID stateId,
+void
+FullControlT<ArgsT<TC, TG, TSL, NSL FFSM2_IF_PLANS(, NTC), TTP>>::changeWith(const StateID  stateId,
 																			 const Payload& payload) noexcept
 {
 	if (!_locked) {
@@ -140,8 +138,8 @@ FullControlT<ArgsT<TC, TG, TSL, NSL FFSM2_IF_PLANS(, NTC), TTP>>::changeWith(con
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename TC, typename TG, typename TSL, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TTP>
-constexpr void
-FullControlT<ArgsT<TC, TG, TSL, NSL FFSM2_IF_PLANS(, NTC), TTP>>::changeWith(const StateID stateId,
+void
+FullControlT<ArgsT<TC, TG, TSL, NSL FFSM2_IF_PLANS(, NTC), TTP>>::changeWith(const StateID  stateId,
 																				  Payload&& payload) noexcept
 {
 	if (!_locked) {
@@ -157,7 +155,7 @@ FullControlT<ArgsT<TC, TG, TSL, NSL FFSM2_IF_PLANS(, NTC), TTP>>::changeWith(con
 
 template <typename TC, typename TG, typename TSL, Long NSL, Long NTC>
 template <typename TState>
-constexpr void
+void
 FullControlT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::updatePlan(TState& headState,
 															 const Status subStatus) noexcept
 {
@@ -198,7 +196,7 @@ FullControlT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::updatePlan(TState& headState,
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TArgs>
-constexpr void
+void
 GuardControlT<TArgs>::cancelPendingTransition() noexcept {
 	_cancelled = true;
 

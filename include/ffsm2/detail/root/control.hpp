@@ -25,7 +25,7 @@ protected:
 
 #ifdef FFSM2_ENABLE_PLANS
 	using PlanData			= PlanDataT<TArgs>;
-	using ConstPlan			= ConstPlanT<TArgs>;
+	using CPlan				= CPlanT<TArgs>;
 #endif
 
 #ifdef FFSM2_ENABLE_LOG_INTERFACE
@@ -35,10 +35,10 @@ protected:
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	struct Origin {
-		constexpr Origin(ControlT& control_,
-						 const StateID stateId) noexcept;
+		FFSM2_INLINE Origin(ControlT& control_,
+							const StateID stateId) noexcept;
 
-		~Origin() noexcept;
+		FFSM2_INLINE ~Origin() noexcept;
 
 		ControlT& control;
 		const StateID prevId;
@@ -46,11 +46,11 @@ protected:
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	constexpr ControlT(Context& context
-					 , Registry& registry
-					 , Transition& request
-					 FFSM2_IF_PLANS(, PlanData& planData)
-					 FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
+	FFSM2_INLINE ControlT(Context& context
+						, Registry& registry
+						, Transition& request
+						FFSM2_IF_PLANS(, PlanData& planData)
+						FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
 		: _context{context}
 		, _registry{registry}
 		, _request{request}
@@ -64,33 +64,33 @@ public:
 	/// @tparam TState State type
 	/// @return Numeric state identifier
 	template <typename TState>
-	static constexpr StateID stateId()			noexcept	{ return index<StateList, TState>();		}
+	static constexpr StateID stateId()				noexcept	{ return index<StateList, TState>();	}
 
 	/// @brief Access FSM context (data shared between states and/or data interface between FSM and external code)
 	/// @return context
 	/// @see Control::context()
-	constexpr		Context& _()				noexcept	{ return _context;							}
+	FFSM2_INLINE	   Context& _()					noexcept	{ return _context;						}
 
 	/// @brief Access FSM context (data shared between states and/or data interface between FSM and external code)
 	/// @return context
 	/// @see Control::context()
-	constexpr const Context& _() const			noexcept	{ return _context;							}
+	FFSM2_INLINE const Context& _() const			noexcept	{ return _context;						}
 
 	/// @brief Access FSM context (data shared between states and/or data interface between FSM and external code)
 	/// @return context
 	/// @see Control::_()
-	constexpr		Context& context()			noexcept	{ return _context;							}
+	FFSM2_INLINE	   Context& context()			noexcept	{ return _context;						}
 
 	/// @brief Access FSM context (data shared between states and/or data interface between FSM and external code)
 	/// @return context
 	/// @see Control::_()
-	constexpr const Context& context() const	noexcept	{ return _context;							}
+	FFSM2_INLINE const Context& context() const		noexcept	{ return _context;						}
 
 	//----------------------------------------------------------------------
 
 	/// @brief Inspect current transition requests
 	/// @return Array of transition requests
-	constexpr const Transition& request() const	noexcept	{ return _request;							}
+	FFSM2_INLINE const Transition& request() const	noexcept	{ return _request;						}
 
 	//----------------------------------------------------------------------
 
@@ -98,7 +98,7 @@ public:
 
 	/// @brief Access read-only plan
 	/// @return Plan
-	constexpr ConstPlan plan() const			noexcept	{ return ConstPlan{_planData};				}
+	FFSM2_INLINE CPlan plan() const					noexcept	{ return CPlan{_planData};				}
 
 #endif
 
@@ -106,7 +106,7 @@ public:
 
 protected:
 #ifdef FFSM2_ENABLE_LOG_INTERFACE
-	constexpr Logger* logger()					noexcept	{ return _logger;							}
+	FFSM2_INLINE Logger* logger()					noexcept	{ return _logger;						}
 #endif
 
 protected:
@@ -140,7 +140,7 @@ protected:
 
 #ifdef FFSM2_ENABLE_PLANS
 	using typename Control::PlanData;
-	using typename Control::ConstPlan;
+	using typename Control::CPlan;
 
 	using Plan			= PlanT<TArgs>;
 #endif
@@ -154,11 +154,11 @@ public:
 
 	/// @brief Access plan
 	/// @return Plan
-	constexpr	   Plan plan()					noexcept	{ return	  Plan{_planData};				}
+	FFSM2_INLINE  Plan plan()						noexcept	{ return  Plan{_planData};				}
 
 	/// @brief Access read-only plan
 	/// @return Read-only plan
-	constexpr ConstPlan plan() const			noexcept	{ return ConstPlan{_planData};				}
+	FFSM2_INLINE CPlan plan() const					noexcept	{ return CPlan{_planData};				}
 
 #endif
 
@@ -200,8 +200,8 @@ protected:
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	struct Lock {
-		constexpr Lock(FullControlBaseT& control_) noexcept;
-		~Lock() noexcept;
+		FFSM2_INLINE Lock(FullControlBaseT& control_) noexcept;
+		FFSM2_INLINE ~Lock() noexcept;
 
 		FullControlBaseT* const control;
 	};
@@ -218,22 +218,22 @@ public:
 
 	/// @brief Transition into a state
 	/// @param stateId State identifier
-	constexpr void changeTo (const StateID stateId) noexcept;
+	FFSM2_INLINE void changeTo(const StateID stateId) noexcept;
 
 	/// @brief Transition into a state
 	/// @tparam TState State type
 	template <typename TState>
-	constexpr void changeTo () noexcept		{ changeTo (PlanControl::template stateId<TState>());	}
+	FFSM2_INLINE void changeTo() noexcept		{ changeTo (PlanControl::template stateId<TState>());	}
 
 	//----------------------------------------------------------------------
 
 #ifdef FFSM2_ENABLE_PLANS
 
 	/// @brief Succeed a plan task for the current state
-	constexpr void succeed() noexcept;
+	FFSM2_INLINE void succeed() noexcept;
 
 	/// @brief Fail a plan task for the current state
-	constexpr void fail()	 noexcept;
+	FFSM2_INLINE void fail()	noexcept;
 
 #endif
 
@@ -312,7 +312,7 @@ protected:
 #ifdef FFSM2_ENABLE_PLANS
 
 	template <typename TState>
-	constexpr void updatePlan(TState& headState, const Status subStatus) noexcept;
+	void updatePlan(TState& headState, const Status subStatus) noexcept;
 
 #endif
 
@@ -328,26 +328,26 @@ public:
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
-	constexpr void changeWith   (const StateID  stateId,
+	FFSM2_INLINE void changeWith(const StateID  stateId,
 								 const Payload& payload) noexcept;
 
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
-	constexpr void changeWith   (const StateID  stateId,
+	FFSM2_INLINE void changeWith(const StateID  stateId,
 									  Payload&& payload) noexcept;
 
 	/// @brief Transition into a state
 	/// @tparam TState Destination state type
 	/// @param payload Payload
 	template <typename TState>
-	constexpr void changeWith   (const Payload& payload) noexcept	{ changeWith   (FullControlBase::template stateId<TState>(),		   payload );	}
+	FFSM2_INLINE void changeWith(const Payload& payload) noexcept	{ changeWith(FullControlBase::template stateId<TState>(),		   payload );	}
 
 	/// @brief Transition into a state
 	/// @tparam TState Destination state type
 	/// @param payload Payload
 	template <typename TState>
-	constexpr void changeWith   (	  Payload&& payload) noexcept	{ changeWith   (FullControlBase::template stateId<TState>(), std::move(payload));	}
+	FFSM2_INLINE void changeWith(	  Payload&& payload) noexcept	{ changeWith(FullControlBase::template stateId<TState>(), std::move(payload));	}
 
 	//------------------------------------------------------------------------------
 
@@ -416,7 +416,7 @@ protected:
 #ifdef FFSM2_ENABLE_PLANS
 
 	template <typename TState>
-	constexpr void updatePlan(TState& headState, const Status subStatus) noexcept;
+	void updatePlan(TState& headState, const Status subStatus) noexcept;
 
 #endif
 
@@ -464,7 +464,7 @@ class GuardControlT final
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	constexpr GuardControlT(Context& context
+	FFSM2_INLINE GuardControlT(Context& context
 						  , Registry& registry
 						  , Transition& request
 						  , const TransitionSets& currentTransitions
@@ -487,15 +487,15 @@ public:
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	constexpr const TransitionSets& currentTransitions() const	noexcept	{ return _currentTransitions;	}
+	FFSM2_INLINE const TransitionSets& currentTransitions() const	noexcept	{ return _currentTransitions;	}
 
 	/// @brief Get pending transition requests
 	/// @return Array of pending transition requests
-	constexpr Transition& pendingTransition() const				noexcept	{ return _pendingTransition;	}
+	FFSM2_INLINE Transition& pendingTransition() const				noexcept	{ return _pendingTransition;	}
 
 	/// @brief Cancel pending transition requests
 	///		(can be used to substitute a transition into the current state with a different one)
-	constexpr void cancelPendingTransition()					noexcept;
+	FFSM2_INLINE void cancelPendingTransition()						noexcept;
 
 private:
 	using FullControl::_registry;

@@ -4,7 +4,7 @@ namespace detail {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <StateID N, typename TA, typename TH>
-constexpr bool
+bool
 S_<N, TA, TH>::deepEntryGuard(GuardControl& control) noexcept {
 	FFSM2_LOG_STATE_METHOD(&Head::entryGuard,
 						   Method::ENTRY_GUARD);
@@ -21,7 +21,7 @@ S_<N, TA, TH>::deepEntryGuard(GuardControl& control) noexcept {
 //------------------------------------------------------------------------------
 
 template <StateID N, typename TA, typename TH>
-constexpr void
+void
 S_<N, TA, TH>::deepConstruct(PlanControl& FFSM2_IF_LOG_INTERFACE(control)) noexcept {
 	FFSM2_IF_PLANS(control._planData.verifyEmptyStatus(STATE_ID));
 
@@ -34,7 +34,7 @@ S_<N, TA, TH>::deepConstruct(PlanControl& FFSM2_IF_LOG_INTERFACE(control)) noexc
 //------------------------------------------------------------------------------
 
 template <StateID N, typename TA, typename TH>
-constexpr void
+void
 S_<N, TA, TH>::deepEnter(PlanControl& control) noexcept {
 	FFSM2_LOG_STATE_METHOD(&Head::enter,
 						   Method::ENTER);
@@ -48,7 +48,7 @@ S_<N, TA, TH>::deepEnter(PlanControl& control) noexcept {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <StateID N, typename TA, typename TH>
-constexpr void
+void
 S_<N, TA, TH>::deepReenter(PlanControl& control) noexcept {
 	FFSM2_IF_PLANS(control._planData.verifyEmptyStatus(STATE_ID));
 
@@ -67,7 +67,7 @@ S_<N, TA, TH>::deepReenter(PlanControl& control) noexcept {
 //------------------------------------------------------------------------------
 
 template <StateID N, typename TA, typename TH>
-constexpr Status
+Status
 S_<N, TA, TH>::deepUpdate(FullControl& control) noexcept {
 	FFSM2_LOG_STATE_METHOD(&Head::update,
 						   Method::UPDATE);
@@ -84,7 +84,7 @@ S_<N, TA, TH>::deepUpdate(FullControl& control) noexcept {
 
 template <StateID N, typename TA, typename TH>
 template <typename TEvent>
-constexpr Status
+Status
 S_<N, TA, TH>::deepReact(FullControl& control,
 						 const TEvent& event) noexcept
 {
@@ -104,7 +104,7 @@ S_<N, TA, TH>::deepReact(FullControl& control,
 //------------------------------------------------------------------------------
 
 template <StateID N, typename TA, typename TH>
-constexpr bool
+bool
 S_<N, TA, TH>::deepExitGuard(GuardControl& control) noexcept {
 	FFSM2_LOG_STATE_METHOD(&Head::exitGuard,
 						   Method::EXIT_GUARD);
@@ -122,7 +122,7 @@ S_<N, TA, TH>::deepExitGuard(GuardControl& control) noexcept {
 //------------------------------------------------------------------------------
 
 template <StateID N, typename TA, typename TH>
-constexpr void
+void
 S_<N, TA, TH>::deepExit(PlanControl& control) noexcept {
 	FFSM2_LOG_STATE_METHOD(&Head::exit,
 						   Method::EXIT);
@@ -141,7 +141,7 @@ S_<N, TA, TH>::deepExit(PlanControl& control) noexcept {
 //------------------------------------------------------------------------------
 
 template <StateID N, typename TA, typename TH>
-constexpr void
+void
 S_<N, TA, TH>::deepDestruct(PlanControl&
 						#if defined FFSM2_ENABLE_LOG_INTERFACE || defined FFSM2_ENABLE_PLANS
 							control
@@ -163,7 +163,7 @@ S_<N, TA, TH>::deepDestruct(PlanControl&
 #ifdef FFSM2_ENABLE_PLANS
 
 template <StateID N, typename TA, typename TH>
-constexpr void
+void
 S_<N, TA, TH>::wrapPlanSucceeded(FullControl& control) noexcept {
 	FFSM2_LOG_STATE_METHOD(&Head::planSucceeded,
 						   Method::PLAN_SUCCEEDED);
@@ -176,7 +176,7 @@ S_<N, TA, TH>::wrapPlanSucceeded(FullControl& control) noexcept {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <StateID N, typename TA, typename TH>
-constexpr void
+void
 S_<N, TA, TH>::wrapPlanFailed(FullControl& control) noexcept {
 	FFSM2_LOG_STATE_METHOD(&Head::planFailed,
 						   Method::PLAN_FAILED);

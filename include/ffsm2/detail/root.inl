@@ -4,7 +4,6 @@ namespace detail {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TG, typename TA>
-constexpr
 R_<TG, TA>::R_(Context& context
 			   FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
 	: _context{context}
@@ -32,7 +31,7 @@ R_<TG, TA>::~R_() noexcept {
 //------------------------------------------------------------------------------
 
 template <typename TG, typename TA>
-constexpr void
+void
 R_<TG, TA>::update() noexcept {
 	FullControl control{_context
 					  , _registry
@@ -54,7 +53,7 @@ R_<TG, TA>::update() noexcept {
 
 template <typename TG, typename TA>
 template <typename TEvent>
-constexpr void
+void
 R_<TG, TA>::react(const TEvent& event) noexcept {
 	FullControl control{_context
 					  , _registry
@@ -73,7 +72,7 @@ R_<TG, TA>::react(const TEvent& event) noexcept {
 //------------------------------------------------------------------------------
 
 template <typename TG, typename TA>
-constexpr void
+void
 R_<TG, TA>::changeTo(const StateID stateId) noexcept {
 	_request = Transition{stateId};
 
@@ -83,7 +82,7 @@ R_<TG, TA>::changeTo(const StateID stateId) noexcept {
 //------------------------------------------------------------------------------
 
 template <typename TG, typename TA>
-constexpr void
+void
 R_<TG, TA>::initialEnter() noexcept {
 	FFSM2_ASSERT(_request.destination == INVALID_SHORT);
 
@@ -129,7 +128,7 @@ R_<TG, TA>::initialEnter() noexcept {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename TG, typename TA>
-constexpr void
+void
 R_<TG, TA>::processTransitions(TransitionSets& currentTransitions) noexcept {
 	FFSM2_ASSERT(_request.destination != INVALID_SHORT);
 
@@ -168,7 +167,7 @@ R_<TG, TA>::processTransitions(TransitionSets& currentTransitions) noexcept {
 //------------------------------------------------------------------------------
 
 template <typename TG, typename TA>
-constexpr bool
+bool
 R_<TG, TA>::cancelledByEntryGuards(const TransitionSets& currentTransitions,
 								   const Transition& pendingTransition) noexcept
 {
@@ -186,7 +185,7 @@ R_<TG, TA>::cancelledByEntryGuards(const TransitionSets& currentTransitions,
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename TG, typename TA>
-constexpr bool
+bool
 R_<TG, TA>::cancelledByGuards(const TransitionSets& currentTransitions,
 							  const Transition& pendingTransition) noexcept
 {
@@ -205,7 +204,7 @@ R_<TG, TA>::cancelledByGuards(const TransitionSets& currentTransitions,
 ////////////////////////////////////////////////////////////////////////////////
 
 template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
-constexpr void
+void
 RP_<G_<NFT, TC, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  stateId,
 																const Payload& payload) noexcept
 {
@@ -215,7 +214,7 @@ RP_<G_<NFT, TC, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  s
 }
 
 template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
-constexpr void
+void
 RP_<G_<NFT, TC, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  stateId,
 																	 Payload&& payload) noexcept
 {

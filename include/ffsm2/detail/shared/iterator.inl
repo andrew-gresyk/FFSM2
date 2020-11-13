@@ -4,7 +4,7 @@ namespace detail {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-constexpr bool
+bool
 Iterator<T>::operator != (const Iterator<T>& FFSM2_IF_ASSERT(dummy)) const noexcept {
 	FFSM2_ASSERT(&_container == &dummy._container);
 
@@ -14,7 +14,7 @@ Iterator<T>::operator != (const Iterator<T>& FFSM2_IF_ASSERT(dummy)) const noexc
 //------------------------------------------------------------------------------
 
 template <typename T>
-constexpr Iterator<T>&
+Iterator<T>&
 Iterator<T>::operator ++() noexcept {
 	_cursor = _container.next(_cursor);
 
@@ -24,7 +24,7 @@ Iterator<T>::operator ++() noexcept {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-constexpr bool
+bool
 Iterator<const T>::operator != (const Iterator<const T>& FFSM2_IF_ASSERT(dummy)) const noexcept {
 	FFSM2_ASSERT(&_container == &dummy._container);
 
@@ -34,7 +34,7 @@ Iterator<const T>::operator != (const Iterator<const T>& FFSM2_IF_ASSERT(dummy))
 //------------------------------------------------------------------------------
 
 template <typename T>
-constexpr Iterator<const T>&
+Iterator<const T>&
 Iterator<const T>::operator ++() noexcept {
 	_cursor = _container.next(_cursor);
 

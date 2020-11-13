@@ -28,29 +28,29 @@ struct C_ final {
 
 	//----------------------------------------------------------------------
 
-	constexpr bool deepForwardEntryGuard(GuardControl& control) noexcept;
-	constexpr bool deepEntryGuard		(GuardControl& control) noexcept;
+	FFSM2_INLINE bool deepForwardEntryGuard(GuardControl& control) noexcept;
+	FFSM2_INLINE bool deepEntryGuard	   (GuardControl& control) noexcept;
 
-	constexpr void deepConstruct		(PlanControl&  control) noexcept;
+	FFSM2_INLINE void deepConstruct		   (PlanControl&  control) noexcept;
 
-	constexpr void deepEnter			(PlanControl&  control) noexcept;
+	FFSM2_INLINE void deepEnter			   (PlanControl&  control) noexcept;
 
-	constexpr void deepUpdate			(FullControl&  control) noexcept;
+	FFSM2_INLINE void deepUpdate		   (FullControl&  control) noexcept;
 
 	template <typename TEvent>
-	constexpr void deepReact			(FullControl&  control,
-										 const TEvent& event)	noexcept;
+	FFSM2_INLINE void deepReact			   (FullControl&  control,
+											const TEvent& event)   noexcept;
 
-	constexpr bool deepForwardExitGuard	(GuardControl& control) noexcept;
-	constexpr bool deepExitGuard		(GuardControl& control) noexcept;
+	FFSM2_INLINE bool deepForwardExitGuard (GuardControl& control) noexcept;
+	FFSM2_INLINE bool deepExitGuard		   (GuardControl& control) noexcept;
 
-	constexpr void deepExit				(PlanControl&  control) noexcept;
+	FFSM2_INLINE void deepExit			   (PlanControl&  control) noexcept;
 
-	constexpr void deepDestruct			(PlanControl&  control) noexcept;
+	FFSM2_INLINE void deepDestruct		   (PlanControl&  control) noexcept;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	constexpr void deepChangeToRequested(PlanControl&  control) noexcept;
+	FFSM2_INLINE void deepChangeToRequested(PlanControl&  control) noexcept;
 
 	//----------------------------------------------------------------------
 

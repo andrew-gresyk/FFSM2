@@ -8,10 +8,10 @@ namespace detail {
 #pragma pack(push, 2)
 
 struct TaskBase {
-	constexpr TaskBase() noexcept {}
+	FFSM2_INLINE TaskBase() noexcept {}
 
-	constexpr TaskBase(const StateID origin_,
-					   const StateID destination_) noexcept
+	FFSM2_INLINE TaskBase(const StateID origin_,
+						  const StateID destination_) noexcept
 		: origin{origin_}
 		, destination{destination_}
 	{}
@@ -20,7 +20,7 @@ struct TaskBase {
 	StateID destination	= INVALID_STATE_ID;
 };
 
-constexpr bool operator == (const TaskBase& lhs, const TaskBase& rhs) noexcept {
+inline bool operator == (const TaskBase& lhs, const TaskBase& rhs) noexcept {
 	return lhs.origin	   == rhs.origin &&
 		   lhs.destination == rhs.destination;
 }
@@ -38,15 +38,15 @@ struct TaskT
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	constexpr TaskT() noexcept {
+	FFSM2_INLINE TaskT() noexcept {
 		new (&storage) Payload{};
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	constexpr TaskT(const StateID origin,
-					const StateID destination,
-					const Payload& payload) noexcept
+	FFSM2_INLINE TaskT(const StateID origin,
+					   const StateID destination,
+					   const Payload& payload) noexcept
 		: TaskBase{origin, destination}
 		, payloadSet{true}
 	{
@@ -55,9 +55,9 @@ struct TaskT
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	constexpr TaskT(const StateID origin,
-					const StateID destination,
-					Payload&& payload) noexcept
+	FFSM2_INLINE TaskT(const StateID origin,
+					   const StateID destination,
+					   Payload&& payload) noexcept
 		: TaskBase{origin, destination}
 		, payloadSet{true}
 	{
@@ -145,13 +145,13 @@ struct PlanDataT<ArgsT<TContext
 	TasksBits tasksFailures;
 	bool planExists;
 
-	constexpr void clearTaskStatus(const StateID stateId) noexcept;
+	void clearTaskStatus(const StateID stateId) noexcept;
 
 #ifdef FFSM2_ENABLE_ASSERT
-	constexpr void verifyEmptyStatus(const StateID stateId) const noexcept;
+	void verifyEmptyStatus(const StateID stateId) const noexcept;
 
-	constexpr void verifyPlans() const noexcept;
-	constexpr Long verifyPlan()  const noexcept;
+	void verifyPlans() const noexcept;
+	Long verifyPlan()  const noexcept;
 #endif
 };
 
@@ -187,13 +187,13 @@ struct PlanDataT<ArgsT<TContext
 	TasksBits tasksFailures;
 	bool planExists;
 
-	constexpr void clearTaskStatus(const StateID stateId) noexcept;
+	void clearTaskStatus(const StateID stateId) noexcept;
 
 #ifdef FFSM2_ENABLE_ASSERT
-	constexpr void verifyEmptyStatus(const StateID stateId) const noexcept;
+	void verifyEmptyStatus(const StateID stateId) const noexcept;
 
-	constexpr void verifyPlans() const noexcept;
-	constexpr Long verifyPlan()  const noexcept;
+	void verifyPlans() const noexcept;
+	Long verifyPlan()  const noexcept;
 #endif
 };
 

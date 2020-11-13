@@ -4,7 +4,6 @@ namespace detail {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename T, Long NC>
-constexpr
 StaticArray<T, NC>::StaticArray(const Item filler) noexcept {
 	fill(filler);
 }
@@ -13,7 +12,7 @@ StaticArray<T, NC>::StaticArray(const Item filler) noexcept {
 
 template <typename T, Long NC>
 template <typename N>
-constexpr T&
+T&
 StaticArray<T, NC>::operator[] (const N i) noexcept {
 	FFSM2_ASSERT(0 <= i && i < CAPACITY);
 
@@ -24,7 +23,7 @@ StaticArray<T, NC>::operator[] (const N i) noexcept {
 
 template <typename T, Long NC>
 template <typename N>
-constexpr const T&
+const T&
 StaticArray<T, NC>::operator[] (const N i) const noexcept {
 	FFSM2_ASSERT(0 <= i && i < CAPACITY);
 
@@ -34,7 +33,7 @@ StaticArray<T, NC>::operator[] (const N i) const noexcept {
 //------------------------------------------------------------------------------
 
 template <typename T, Long NC>
-constexpr void
+void
 StaticArray<T, NC>::fill(const Item filler) noexcept {
 	for (Long i = 0; i < CAPACITY; ++i)
 		_items[i] = filler;
@@ -44,7 +43,7 @@ StaticArray<T, NC>::fill(const Item filler) noexcept {
 
 template <typename T, Long NC>
 template <typename TValue>
-constexpr Long
+Long
 Array<T, NC>::append(const TValue& value) noexcept {
 	FFSM2_ASSERT(_count < CAPACITY);
 
@@ -57,7 +56,7 @@ Array<T, NC>::append(const TValue& value) noexcept {
 
 template <typename T, Long NC>
 template <typename TValue>
-constexpr Long
+Long
 Array<T, NC>::append(TValue&& value) noexcept {
 	FFSM2_ASSERT(_count < CAPACITY);
 
@@ -70,7 +69,7 @@ Array<T, NC>::append(TValue&& value) noexcept {
 
 template <typename T, Long NC>
 template <typename N>
-constexpr T&
+T&
 Array<T, NC>::operator[] (const N i) noexcept {
 	FFSM2_ASSERT(0 <= i && i < CAPACITY);
 
@@ -81,7 +80,7 @@ Array<T, NC>::operator[] (const N i) noexcept {
 
 template <typename T, Long NC>
 template <typename N>
-constexpr const T&
+const T&
 Array<T, NC>::operator[] (const N i) const noexcept {
 	FFSM2_ASSERT(0 <= i && i < CAPACITY);
 
@@ -91,7 +90,7 @@ Array<T, NC>::operator[] (const N i) const noexcept {
 //------------------------------------------------------------------------------
 
 template <typename T, Long NC>
-constexpr Array<T, NC>&
+Array<T, NC>&
 Array<T, NC>::operator += (const Item& item) noexcept {
 	append(item);
 
@@ -101,7 +100,7 @@ Array<T, NC>::operator += (const Item& item) noexcept {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename T, Long NC>
-constexpr Array<T, NC>&
+Array<T, NC>&
 Array<T, NC>::operator += (Item&& item) noexcept {
 	append(std::move(item));
 
@@ -112,7 +111,7 @@ Array<T, NC>::operator += (Item&& item) noexcept {
 
 template <typename T, Long NC>
 template <Long N>
-constexpr Array<T, NC>&
+Array<T, NC>&
 Array<T, NC>::operator += (const Array<T, N>& other) noexcept {
 	for (const auto& item : other)
 		append(item);

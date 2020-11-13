@@ -44,14 +44,14 @@ struct Event {
 
 	Event(const ffsm2::StateID origin_,
 		  const Type type_,
-		  const ffsm2::StateID target_ = ffsm2::INVALID_STATE_ID)
+		  const ffsm2::StateID target_ = ffsm2::INVALID_STATE_ID) noexcept
 		: origin{origin_}
 		, type{type_}
 		, target{target_}
 	{}
 
 	Event(const Type type_,
-		  const ffsm2::StateID target_)
+		  const ffsm2::StateID target_) noexcept
 		: origin{ffsm2::INVALID_STATE_ID}
 		, type{type_}
 		, target{target_}

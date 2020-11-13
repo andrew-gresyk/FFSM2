@@ -3,14 +3,13 @@ namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-constexpr
 Status::Status(const Result result_) noexcept
 	: result{result_}
 {}
 
 //------------------------------------------------------------------------------
 
-constexpr void
+void
 Status::clear() noexcept {
 	result = Result::NONE;
 }
@@ -20,8 +19,7 @@ Status::clear() noexcept {
 #ifdef FFSM2_ENABLE_PLANS
 
 template <typename TArgs>
-constexpr
-ConstPlanT<TArgs>::Iterator::Iterator(const ConstPlanT& plan) noexcept
+CPlanT<TArgs>::Iterator::Iterator(const CPlanT& plan) noexcept
 	: _plan{plan}
 	, _curr{plan._bounds.first}
 {
@@ -31,18 +29,17 @@ ConstPlanT<TArgs>::Iterator::Iterator(const ConstPlanT& plan) noexcept
 //------------------------------------------------------------------------------
 
 template <typename TArgs>
-constexpr
-ConstPlanT<TArgs>::Iterator::operator bool() const noexcept {
-	FFSM2_ASSERT(_curr < ConstPlanT::TASK_CAPACITY || _curr == INVALID_LONG);
+CPlanT<TArgs>::Iterator::operator bool() const noexcept {
+	FFSM2_ASSERT(_curr < CPlanT::TASK_CAPACITY || _curr == INVALID_LONG);
 
-	return _curr < ConstPlanT::TASK_CAPACITY;
+	return _curr < CPlanT::TASK_CAPACITY;
 }
 
 //------------------------------------------------------------------------------
 
 template <typename TArgs>
-constexpr void
-ConstPlanT<TArgs>::Iterator::operator ++() noexcept {
+void
+CPlanT<TArgs>::Iterator::operator ++() noexcept {
 	_curr = _next;
 	_next = next();
 }
@@ -50,9 +47,9 @@ ConstPlanT<TArgs>::Iterator::operator ++() noexcept {
 //------------------------------------------------------------------------------
 
 template <typename TArgs>
-constexpr Long
-ConstPlanT<TArgs>::Iterator::next() const noexcept {
-	if (_curr < ConstPlanT::TASK_CAPACITY) {
+Long
+CPlanT<TArgs>::Iterator::next() const noexcept {
+	if (_curr < CPlanT::TASK_CAPACITY) {
 		const TaskLink& link = _plan._planData.taskLinks[_curr];
 
 		return link.next;
@@ -66,8 +63,7 @@ ConstPlanT<TArgs>::Iterator::next() const noexcept {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TArgs>
-constexpr
-ConstPlanT<TArgs>::ConstPlanT(const PlanData& planData) noexcept
+CPlanT<TArgs>::CPlanT(const PlanData& planData) noexcept
 	: _planData{planData}
 	, _bounds{planData.tasksBounds}
 {}
@@ -75,8 +71,7 @@ ConstPlanT<TArgs>::ConstPlanT(const PlanData& planData) noexcept
 //------------------------------------------------------------------------------
 
 template <typename TArgs>
-constexpr
-ConstPlanT<TArgs>::operator bool() const noexcept {
+CPlanT<TArgs>::operator bool() const noexcept {
 	if (_bounds.first < TASK_CAPACITY) {
 		FFSM2_ASSERT(_bounds.last < TASK_CAPACITY);
 		return true;
@@ -89,7 +84,6 @@ ConstPlanT<TArgs>::operator bool() const noexcept {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TArgs>
-constexpr
 PlanBaseT<TArgs>::Iterator::Iterator(PlanBaseT& plan) noexcept
 	: _plan{plan}
 	, _curr{plan._bounds.first}
@@ -100,7 +94,6 @@ PlanBaseT<TArgs>::Iterator::Iterator(PlanBaseT& plan) noexcept
 //------------------------------------------------------------------------------
 
 template <typename TArgs>
-constexpr
 PlanBaseT<TArgs>::Iterator::operator bool() const noexcept {
 	FFSM2_ASSERT(_curr < PlanBaseT::TASK_CAPACITY || _curr == INVALID_LONG);
 
@@ -110,7 +103,7 @@ PlanBaseT<TArgs>::Iterator::operator bool() const noexcept {
 //------------------------------------------------------------------------------
 
 template <typename TArgs>
-constexpr void
+void
 PlanBaseT<TArgs>::Iterator::operator ++() noexcept {
 	_curr = _next;
 	_next = next();
@@ -119,7 +112,7 @@ PlanBaseT<TArgs>::Iterator::operator ++() noexcept {
 //------------------------------------------------------------------------------
 
 template <typename TArgs>
-constexpr void
+void
 PlanBaseT<TArgs>::Iterator::remove() noexcept {
 	_plan.remove(_curr);
 }
@@ -127,7 +120,7 @@ PlanBaseT<TArgs>::Iterator::remove() noexcept {
 //------------------------------------------------------------------------------
 
 template <typename TArgs>
-constexpr Long
+Long
 PlanBaseT<TArgs>::Iterator::next() const noexcept {
 	if (_curr < PlanBaseT::TASK_CAPACITY) {
 		const TaskLink& link = _plan._planData.taskLinks[_curr];
@@ -143,7 +136,6 @@ PlanBaseT<TArgs>::Iterator::next() const noexcept {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TArgs>
-constexpr
 PlanBaseT<TArgs>::CIterator::CIterator(const PlanBaseT& plan) noexcept
 	: _plan{plan}
 	, _curr{plan._bounds.first}
@@ -154,7 +146,6 @@ PlanBaseT<TArgs>::CIterator::CIterator(const PlanBaseT& plan) noexcept
 //------------------------------------------------------------------------------
 
 template <typename TArgs>
-constexpr
 PlanBaseT<TArgs>::CIterator::operator bool() const noexcept {
 	FFSM2_ASSERT(_curr < PlanBaseT::TASK_CAPACITY || _curr == INVALID_LONG);
 
@@ -164,7 +155,7 @@ PlanBaseT<TArgs>::CIterator::operator bool() const noexcept {
 //------------------------------------------------------------------------------
 
 template <typename TArgs>
-constexpr void
+void
 PlanBaseT<TArgs>::CIterator::operator ++() noexcept {
 	_curr = _next;
 	_next = next();
@@ -173,7 +164,7 @@ PlanBaseT<TArgs>::CIterator::operator ++() noexcept {
 //------------------------------------------------------------------------------
 
 template <typename TArgs>
-constexpr Long
+Long
 PlanBaseT<TArgs>::CIterator::next() const noexcept {
 	if (_curr < PlanBaseT::TASK_CAPACITY) {
 		const TaskLink& link = _plan._planData.taskLinks[_curr];
@@ -189,7 +180,6 @@ PlanBaseT<TArgs>::CIterator::next() const noexcept {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TArgs>
-constexpr
 PlanBaseT<TArgs>::PlanBaseT(PlanData& planData) noexcept
 	: _planData{planData}
 	, _bounds{planData.tasksBounds}
@@ -198,7 +188,6 @@ PlanBaseT<TArgs>::PlanBaseT(PlanData& planData) noexcept
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename TArgs>
-constexpr
 PlanBaseT<TArgs>::operator bool() const noexcept {
 	if (_bounds.first < TASK_CAPACITY) {
 		FFSM2_ASSERT(_bounds.last < TASK_CAPACITY);
@@ -212,7 +201,7 @@ PlanBaseT<TArgs>::operator bool() const noexcept {
 //------------------------------------------------------------------------------
 
 template <typename TArgs>
-constexpr bool
+bool
 PlanBaseT<TArgs>::append(const StateID origin,
 						 const StateID destination) noexcept
 {
@@ -227,7 +216,7 @@ PlanBaseT<TArgs>::append(const StateID origin,
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename TArgs>
-constexpr bool
+bool
 PlanBaseT<TArgs>::linkTask(const Long index) noexcept {
 	if (index != Tasks::INVALID) {
 		if (_bounds.first == INVALID_LONG) {
@@ -262,7 +251,7 @@ PlanBaseT<TArgs>::linkTask(const Long index) noexcept {
 //------------------------------------------------------------------------------
 
 template <typename TArgs>
-constexpr void
+void
 PlanBaseT<TArgs>::clear() noexcept {
 	if (_bounds.first < TaskLinks::CAPACITY) {
 		FFSM2_ASSERT(_bounds.last < TaskLinks::CAPACITY);
@@ -296,7 +285,7 @@ PlanBaseT<TArgs>::clear() noexcept {
 //------------------------------------------------------------------------------
 
 template <typename TArgs>
-constexpr void
+void
 PlanBaseT<TArgs>::remove(const Long task) noexcept {
 	FFSM2_ASSERT(_planData.planExists);
 	FFSM2_ASSERT(_bounds.first < TaskLinks::CAPACITY);
@@ -331,7 +320,7 @@ PlanBaseT<TArgs>::remove(const Long task) noexcept {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TC, typename TG, typename TSL, Long NSL, Long NTC, typename TTP>
-constexpr bool
+bool
 PlanT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::append(const StateID origin,
 												 const StateID destination,
 												 const Payload& payload) noexcept
@@ -344,7 +333,7 @@ PlanT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::append(const StateID origin,
 //------------------------------------------------------------------------------
 
 template <typename TC, typename TG, typename TSL, Long NSL, Long NTC, typename TTP>
-constexpr bool
+bool
 PlanT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::append(const StateID origin,
 												 const StateID destination,
 												 Payload&& payload) noexcept

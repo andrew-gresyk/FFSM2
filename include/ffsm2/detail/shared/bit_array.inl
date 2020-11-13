@@ -4,7 +4,6 @@ namespace detail {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TI, Short NC>
-constexpr
 BitArray<TI, NC>::Bits::operator bool() const noexcept {
 	const Short fullUnits = _width / (sizeof(Unit) * 8);
 
@@ -23,7 +22,7 @@ BitArray<TI, NC>::Bits::operator bool() const noexcept {
 //------------------------------------------------------------------------------
 
 template <typename TI, Short NC>
-constexpr void
+void
 BitArray<TI, NC>::Bits::clear() noexcept {
 	const Index count = (_width + 7) / (sizeof(Unit) * 8);
 
@@ -34,7 +33,7 @@ BitArray<TI, NC>::Bits::clear() noexcept {
 //------------------------------------------------------------------------------
 
 template <typename TI, Short NC>
-constexpr bool
+bool
 BitArray<TI, NC>::Bits::get(const Index index) const noexcept {
 	FFSM2_ASSERT(index < _width);
 
@@ -48,7 +47,7 @@ BitArray<TI, NC>::Bits::get(const Index index) const noexcept {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename TI, Short NC>
-constexpr void
+void
 BitArray<TI, NC>::Bits::set(const Index index) noexcept {
 	FFSM2_ASSERT(index < _width);
 
@@ -62,7 +61,7 @@ BitArray<TI, NC>::Bits::set(const Index index) noexcept {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename TI, Short NC>
-constexpr void
+void
 BitArray<TI, NC>::Bits::clear(const Index index) noexcept {
 	FFSM2_ASSERT(index < _width);
 
@@ -76,7 +75,6 @@ BitArray<TI, NC>::Bits::clear(const Index index) noexcept {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TI, Short NC>
-constexpr
 BitArray<TI, NC>::CBits::operator bool() const noexcept {
 	const Short fullUnits = _width / (sizeof(Unit) * 8);
 
@@ -94,7 +92,7 @@ BitArray<TI, NC>::CBits::operator bool() const noexcept {
 //------------------------------------------------------------------------------
 
 template <typename TI, Short NC>
-constexpr bool
+bool
 BitArray<TI, NC>::CBits::get(const Index index) const noexcept {
 	FFSM2_ASSERT(index < _width);
 
@@ -108,7 +106,7 @@ BitArray<TI, NC>::CBits::get(const Index index) const noexcept {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TI, Short NC>
-constexpr void
+void
 BitArray<TI, NC>::clear() noexcept {
 	for (Unit& unit: _storage)
 		unit = Unit{0};
@@ -117,7 +115,7 @@ BitArray<TI, NC>::clear() noexcept {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TI, Short NC>
-constexpr bool
+bool
 BitArray<TI, NC>::get(const Index index) const noexcept {
 	FFSM2_ASSERT(index < CAPACITY);
 
@@ -131,7 +129,7 @@ BitArray<TI, NC>::get(const Index index) const noexcept {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename TI, Short NC>
-constexpr void
+void
 BitArray<TI, NC>::set(const Index index) noexcept {
 	FFSM2_ASSERT(index < CAPACITY);
 
@@ -145,7 +143,7 @@ BitArray<TI, NC>::set(const Index index) noexcept {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename TI, Short NC>
-constexpr void
+void
 BitArray<TI, NC>::clear(const Index index) noexcept {
 	FFSM2_ASSERT(index < CAPACITY);
 
@@ -160,10 +158,10 @@ BitArray<TI, NC>::clear(const Index index) noexcept {
 
 template <typename TI, Short NC>
 template <Short NUnit, Short NWidth>
-constexpr typename BitArray<TI, NC>::Bits
+typename BitArray<TI, NC>::Bits
 BitArray<TI, NC>::bits() noexcept {
-	constexpr Short UNIT  = NUnit;
-	constexpr Short WIDTH = NWidth;
+	static constexpr Short UNIT  = NUnit;
+	static constexpr Short WIDTH = NWidth;
 	static_assert(UNIT + (WIDTH + 7) / (sizeof(Unit) * 8) <= CAPACITY, "");
 
 	return Bits{_storage + UNIT, WIDTH};
@@ -173,10 +171,10 @@ BitArray<TI, NC>::bits() noexcept {
 
 template <typename TI, Short NC>
 template <Short NUnit, Short NWidth>
-constexpr typename BitArray<TI, NC>::CBits
+typename BitArray<TI, NC>::CBits
 BitArray<TI, NC>::bits() const noexcept {
-	constexpr Short UNIT  = NUnit;
-	constexpr Short WIDTH = NWidth;
+	static constexpr Short UNIT  = NUnit;
+	static constexpr Short WIDTH = NWidth;
 	static_assert(UNIT + (WIDTH + 7) / (sizeof(Unit) * 8) <= CAPACITY, "");
 
 	return CBits{_storage + UNIT, WIDTH};
@@ -185,7 +183,7 @@ BitArray<TI, NC>::bits() const noexcept {
 //------------------------------------------------------------------------------
 
 template <typename TI, Short NC>
-constexpr typename BitArray<TI, NC>::Bits
+typename BitArray<TI, NC>::Bits
 BitArray<TI, NC>::bits(const Units& units) noexcept {
 	FFSM2_ASSERT(units.unit + (units.width + 7) / (sizeof(Unit) * 8) <= CAPACITY);
 
@@ -195,7 +193,7 @@ BitArray<TI, NC>::bits(const Units& units) noexcept {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename TI, Short NC>
-constexpr typename BitArray<TI, NC>::CBits
+typename BitArray<TI, NC>::CBits
 BitArray<TI, NC>::bits(const Units& units) const noexcept {
 	FFSM2_ASSERT(units.unit + (units.width + 7) / (sizeof(Unit) * 8) <= CAPACITY);
 

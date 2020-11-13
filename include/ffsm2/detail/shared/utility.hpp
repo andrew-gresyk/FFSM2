@@ -23,8 +23,7 @@ namespace detail {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-FFSM2_INLINE
-constexpr void
+FFSM2_INLINE void
 fill(T& a, const char value) noexcept {
 	memset(&a, (int) value, sizeof(a));
 }
@@ -121,7 +120,7 @@ bitWidth(const Short x) {
 //------------------------------------------------------------------------------
 
 template <typename TTo, typename TFrom>
-constexpr void
+FFSM2_INLINE void
 overwrite(TTo& to, const TFrom& from) {
 	static_assert(sizeof(TTo) == sizeof(TFrom), "STATIC ASSERT");
 
@@ -135,7 +134,7 @@ overwrite(TTo& to, const TFrom& from) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename TO, typename TI>
-constexpr TO
+FFSM2_INLINE TO
 convert(const TI& in) {
 	TO out;
 

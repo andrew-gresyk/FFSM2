@@ -5,7 +5,7 @@ namespace detail {
 
 template <typename T, Long NC>
 template <typename... TA>
-constexpr Long
+Long
 List<T, NC>::emplace(TA... args) noexcept {
 	if (_count < CAPACITY) {
 		FFSM2_ASSERT(_vacantHead < CAPACITY);
@@ -60,7 +60,7 @@ List<T, NC>::emplace(TA... args) noexcept {
 //------------------------------------------------------------------------------
 
 template <typename T, Long NC>
-constexpr void
+void
 List<T, NC>::remove(const Index i) noexcept {
 	FFSM2_ASSERT(i < CAPACITY && _count);
 
@@ -98,7 +98,7 @@ List<T, NC>::remove(const Index i) noexcept {
 //------------------------------------------------------------------------------
 
 template <typename T, Long NC>
-constexpr T&
+T&
 List<T, NC>::operator[] (const Index i) noexcept {
 	FFSM2_IF_ASSERT(verifyStructure());
 
@@ -108,7 +108,7 @@ List<T, NC>::operator[] (const Index i) noexcept {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename T, Long NC>
-constexpr const T&
+const T&
 List<T, NC>::operator[] (const Index i) const noexcept {
 	FFSM2_IF_ASSERT(verifyStructure());
 
@@ -120,7 +120,7 @@ List<T, NC>::operator[] (const Index i) const noexcept {
 #ifdef FFSM2_ENABLE_ASSERT
 
 template <typename T, Long NC>
-constexpr void
+void
 List<T, NC>::verifyStructure(const Index occupied) const noexcept {
 	if (_count < CAPACITY) {
 		FFSM2_ASSERT(_vacantHead < CAPACITY);

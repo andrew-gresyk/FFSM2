@@ -4,7 +4,7 @@ namespace detail {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename T, typename TA>
-constexpr void
+void
 DynamicBox<T, TA>::construct() noexcept {
 	FFSM2_ASSERT(!initialized_);
 
@@ -16,7 +16,7 @@ DynamicBox<T, TA>::construct() noexcept {
 //------------------------------------------------------------------------------
 
 template <typename T, typename TA>
-constexpr void
+void
 DynamicBox<T, TA>::destruct() noexcept {
 	FFSM2_ASSERT(initialized_);
 
@@ -28,7 +28,7 @@ DynamicBox<T, TA>::destruct() noexcept {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename T, typename TA>
-constexpr void
+void
 StaticBox<T, TA>::guard(GuardControlT<TA>& control) noexcept {
 	t_.widePreEntryGuard(control.context());
 	t_.		  entryGuard(control);
