@@ -1,4 +1,3 @@
-#define HFSM2_ENABLE_UTILITY_THEORY
 #include <iostream>
 #include <ffsm2/machine.hpp>
 

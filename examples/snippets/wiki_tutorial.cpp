@@ -1,15 +1,15 @@
-// HFSM2 (hierarchical state machine for games and interactive applications)
+// FFSM2 (hierarchical state machine for games and interactive applications)
 // Created by Andrew Gresyk
 
 #include <catch2/catch.hpp>
 #undef assert
 #define assert(x) REQUIRE(x)
 
-// Configure optional HFSM2 functionality using #defines
+// Configure optional FFSM2 functionality using #defines
 // (in this case we're using Plans to make transition cycle more straightforward):
 #define FFSM2_ENABLE_PLANS
 
-// Include HFSM2 header:
+// Include FFSM2 header:
 #include <ffsm2/machine.hpp>
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -23,7 +23,7 @@ struct Context {
 // (Optional) Define type config:
 using Config = ffsm2::Config::ContextT<Context>;
 
-// (Optional, recommended) Definehfsm2::Machine for convenience:
+// (Optional, recommended) Define ffsm2::Machine for convenience:
 using M = ffsm2::MachineT<Config>;
 
 //------------------------------------------------------------------------------
@@ -44,7 +44,7 @@ using FSM = M::Root<S(On),
 
 //------------------------------------------------------------------------------
 
-// While HFSM2 transitions aren't event-based,
+// While FFSM2 transitions aren't event-based,
 // events can be used to have FSM react to external stimuli:
 struct Event {};
 

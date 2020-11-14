@@ -1,4 +1,4 @@
-﻿// HFSM2 (hierarchical state machine for games and interactive applications)
+﻿// FFSM2 (hierarchical state machine for games and interactive applications)
 // Created by Andrew Gresyk
 
 #define CATCH_CONFIG_MAIN
