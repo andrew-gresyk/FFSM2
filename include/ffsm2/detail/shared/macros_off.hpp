@@ -8,6 +8,10 @@
 	#pragma clang diagnostic pop
 #endif
 
+#if _MSC_VER == 1900
+	#pragma warning(pop)
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
 
 #undef FFSM2_INLINE

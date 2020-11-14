@@ -16,18 +16,22 @@ PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::clearTaskStatus(const StateID stat
 
 //------------------------------------------------------------------------------
 
-#ifdef FFSM2_ENABLE_ASSERT
-
 template <typename TC, typename TG, typename TSL, Long NSL, Long NTC, typename TTP>
 void
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::verifyEmptyStatus(const StateID stateId) const noexcept {
+PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::verifyEmptyStatus(const StateID FFSM2_IF_ASSERT(stateId)) const noexcept {
+#ifdef FFSM2_ENABLE_ASSERT
+
 	if (stateId != INVALID_STATE_ID) {
 		FFSM2_ASSERT(!tasksSuccesses.get(stateId));
 		FFSM2_ASSERT(!tasksFailures .get(stateId));
 	}
+
+#endif
 }
 
 //------------------------------------------------------------------------------
+
+#ifdef FFSM2_ENABLE_ASSERT
 
 template <typename TC, typename TG, typename TSL, Long NSL, Long NTC, typename TTP>
 void
@@ -91,18 +95,22 @@ PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::clearTaskStatus(const StateID sta
 
 //------------------------------------------------------------------------------
 
-#ifdef FFSM2_ENABLE_ASSERT
-
 template <typename TC, typename TG, typename TSL, Long NSL, Long NTC>
 void
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::verifyEmptyStatus(const StateID stateId) const noexcept {
+PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::verifyEmptyStatus(const StateID FFSM2_IF_ASSERT(stateId)) const noexcept {
+#ifdef FFSM2_ENABLE_ASSERT
+
 	if (stateId != INVALID_STATE_ID) {
 		FFSM2_ASSERT(!tasksSuccesses.get(stateId));
 		FFSM2_ASSERT(!tasksFailures .get(stateId));
 	}
+
+#endif
 }
 
 //------------------------------------------------------------------------------
+
+#ifdef FFSM2_ENABLE_ASSERT
 
 template <typename TC, typename TG, typename TSL, Long NSL, Long NTC>
 void

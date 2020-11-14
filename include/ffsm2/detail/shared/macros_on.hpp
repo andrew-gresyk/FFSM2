@@ -143,8 +143,8 @@
 	#define FFSM2_LOG_TRANSITION(CONTEXT, ORIGIN, DESTINATION)
 
 #ifdef FFSM2_ENABLE_PLANS
-	#define FFSM2_LOG_TASK_STATUS(CONTEXT, , ORIGIN, STATUS)
-	#define FFSM2_LOG_PLAN_STATUS(CONTEXT, , STATUS)
+	#define FFSM2_LOG_TASK_STATUS(CONTEXT, ORIGIN, STATUS)
+	#define FFSM2_LOG_PLAN_STATUS(CONTEXT, STATUS)
 #endif
 
 	#define FFSM2_LOG_CANCELLED_PENDING(CONTEXT, ORIGIN)
@@ -196,6 +196,11 @@ constexpr FeatureTag FFSM2_FEATURE_TAG = FFSM2_PLANS_MASK						|
 #undef FFSM2_LOG_INTERFACE_MASK
 
 ////////////////////////////////////////////////////////////////////////////////
+
+#if _MSC_VER == 1900
+	#pragma warning(push)
+	#pragma warning(disable: 4814) // in C++14 'constexpr' will not imply 'const'; consider explicitly specifying 'const'
+#endif
 
 #ifdef __clang__
 	#pragma clang diagnostic push

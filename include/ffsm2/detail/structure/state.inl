@@ -22,7 +22,11 @@ S_<N, TA, TH>::deepEntryGuard(GuardControl& control) noexcept {
 
 template <StateID N, typename TA, typename TH>
 void
-S_<N, TA, TH>::deepConstruct(PlanControl& FFSM2_IF_LOG_INTERFACE(control)) noexcept {
+S_<N, TA, TH>::deepConstruct(PlanControl&
+						 #if defined FFSM2_ENABLE_PLANS || defined FFSM2_ENABLE_LOG_INTERFACE
+							 control
+						 #endif
+							 ) noexcept {
 	FFSM2_IF_PLANS(control._planData.verifyEmptyStatus(STATE_ID));
 
 	FFSM2_LOG_STATE_METHOD(&Head::enter,

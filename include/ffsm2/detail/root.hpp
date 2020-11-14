@@ -65,7 +65,7 @@ public:
 	/// @tparam TState State type
 	/// @return Numeric state identifier
 	template <typename TState>
-	static constexpr StateID stateId() noexcept				{ return index<StateList, TState>();	}
+	static constexpr StateID stateId()						noexcept	{ return index<StateList, TState>();	}
 
 	//----------------------------------------------------------------------
 
@@ -82,18 +82,31 @@ public:
 
 	/// @brief Get current active state ID
 	/// @return Current active state ID
-	FFSM2_INLINE StateID activeStateId() const noexcept		{ return _registry.active;				}
+	FFSM2_INLINE StateID activeStateId()			  const	noexcept	{ return _registry.active;						}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	/// @brief Check if a state is active
+	/// @param stateId Destination state identifier
+	/// @return State active status
+	FFSM2_INLINE bool isActive(const StateID stateId) const	noexcept	{ return _registry.active == stateId;			}
+
+	/// @brief Check if a state is active
+	/// @tparam TState Destination state type
+	/// @return State active status
+	template <typename TState>
+	FFSM2_INLINE bool isActive()					  const	noexcept	{ return _registry.active == stateId<TState>();	}
 
 	//------------------------------------------------------------------------------
 
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
-	FFSM2_INLINE void changeTo(const StateID stateId) noexcept;
+	FFSM2_INLINE void changeTo(const StateID stateId)		noexcept;
 
 	/// @brief Transition into a state
 	/// @tparam TState Destination state type
 	template <typename TState>
-	FFSM2_INLINE void changeTo() noexcept					{ changeTo (stateId<TState>());			}
+	FFSM2_INLINE void changeTo()							noexcept	{ changeTo (stateId<TState>());			}
 
 	//------------------------------------------------------------------------------
 
@@ -102,7 +115,7 @@ public:
 	/// @brief Attach logger
 	/// @param logger A logger implementing 'ffsm2::LoggerInterfaceT<>' interface
 	/// @see FFSM2_ENABLE_LOG_INTERFACE
-	inline void attachLogger(Logger* const logger) noexcept				{ _logger = logger;						}
+	inline void attachLogger(Logger* const logger)			noexcept	{ _logger = logger;						}
 
 #endif
 
@@ -170,26 +183,26 @@ public:
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
-	FFSM2_INLINE void changeWith   (const StateID  stateId,
-									const Payload& payload) noexcept;
+	FFSM2_INLINE void changeWith(const StateID  stateId,
+								 const Payload& payload) noexcept;
 
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
-	FFSM2_INLINE void changeWith   (const StateID  stateId,
-										 Payload&& payload) noexcept;
+	FFSM2_INLINE void changeWith(const StateID  stateId,
+									  Payload&& payload) noexcept;
 
 	/// @brief Transition into a state
 	/// @tparam TState Destination state type
 	/// @param payload Payload
 	template <typename TState>
-	FFSM2_INLINE void changeWith   (const Payload& payload) noexcept	{ changeWith(stateId<TState>(),			  payload );	}
+	FFSM2_INLINE void changeWith(const Payload& payload) noexcept	{ changeWith(stateId<TState>(),			  payload );	}
 
 	/// @brief Transition into a state
 	/// @tparam TState Destination state type
 	/// @param payload Payload
 	template <typename TState>
-	FFSM2_INLINE void changeWith   (	 Payload&& payload) noexcept	{ changeWith(stateId<TState>(), std::move(payload));	}
+	FFSM2_INLINE void changeWith(	  Payload&& payload) noexcept	{ changeWith(stateId<TState>(), std::move(payload));	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
