@@ -147,9 +147,9 @@ struct PlanDataT<ArgsT<TContext
 
 	void clearTaskStatus(const StateID stateId) noexcept;
 
-#ifdef FFSM2_ENABLE_ASSERT
 	void verifyEmptyStatus(const StateID stateId) const noexcept;
 
+#ifdef FFSM2_ENABLE_ASSERT
 	void verifyPlans() const noexcept;
 	Long verifyPlan()  const noexcept;
 #endif
@@ -189,9 +189,9 @@ struct PlanDataT<ArgsT<TContext
 
 	void clearTaskStatus(const StateID stateId) noexcept;
 
-#ifdef FFSM2_ENABLE_ASSERT
 	void verifyEmptyStatus(const StateID stateId) const noexcept;
 
+#ifdef FFSM2_ENABLE_ASSERT
 	void verifyPlans() const noexcept;
 	Long verifyPlan()  const noexcept;
 #endif

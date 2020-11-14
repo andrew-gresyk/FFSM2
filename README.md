@@ -11,11 +11,19 @@
 
 Header-only flat FSM framework in C++11, with fully statically-defined structure (no dynamic allocations), built with variadic templates.
 
+---
+
 ## Compiler Support
 
 - Visual Studio 14, 15, 16
 - GCC 5, 6, 7, 8, 9
 - Clang 3.7, 3.8, 3.9, 4, 5, 6, 7, 8, 9, 10
+
+---
+
+## Quick Start
+
+- **[Tutorial](https://github.com/andrew-gresyk/FFSM2/blob/master/examples/snippets/wiki_tutorial.cpp)**
 
 ---
 

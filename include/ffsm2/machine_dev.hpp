@@ -150,29 +150,16 @@ struct M_	   <G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTas
 
 	//----------------------------------------------------------------------
 
-	/// @brief Composite region
-	/// @tparam THead Head state
-	/// @tparam TSubStates Sub-states
-	template <typename THead, typename... TSubStates>
-	using Composite		 = CI_<THead, TSubStates...>;
-
-	/// @brief Headless composite region
-	/// @tparam TSubStates Sub-states
-	template <				  typename... TSubStates>
-	using CompositePeers = CI_<void,  TSubStates...>;
-
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 	/// @brief Root
 	/// @tparam THead Head state
 	/// @tparam TSubStates Sub-states
 	template <typename THead, typename... TSubStates>
-	using Root			 = RF_<Cfg, Composite  <THead, TSubStates...>>;
+	using Root			 = RF_<Cfg, CI_<THead, TSubStates...>>;
 
 	/// @brief Headless root
 	/// @tparam TSubStates Sub-states
 	template <				  typename... TSubStates>
-	using PeerRoot		 = RF_<Cfg, CompositePeers  <  TSubStates...>>;
+	using PeerRoot		 = RF_<Cfg, CI_<void,  TSubStates...>>;
 
 	//----------------------------------------------------------------------
 };

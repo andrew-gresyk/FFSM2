@@ -14,7 +14,7 @@ struct ArgsT;
 //------------------------------------------------------------------------------
 
 struct Registry {
-	constexpr void clearRequests() noexcept {
+	FFSM2_INLINE void clearRequests() noexcept {
 		requested = INVALID_SHORT;
 	}
 
