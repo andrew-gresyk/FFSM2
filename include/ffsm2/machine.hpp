@@ -2397,7 +2397,7 @@ struct Status {
 
 	inline Status(const Result result_ = Result::NONE) noexcept;
 
-	constexpr explicit operator bool() const noexcept		{ return result != Result::NONE;	}
+	inline explicit operator bool() const noexcept		{ return result != Result::NONE;	}
 
 	inline void clear() noexcept;
 };
