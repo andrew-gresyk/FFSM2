@@ -5,7 +5,7 @@ namespace detail {
 
 template <typename TArgs>
 ControlT<TArgs>::Origin::Origin(ControlT& control_,
-								const StateID stateId)
+								const StateID stateId) noexcept
 	: control{control_}
 	, prevId{control._originId}
 {
@@ -15,14 +15,14 @@ ControlT<TArgs>::Origin::Origin(ControlT& control_,
 //------------------------------------------------------------------------------
 
 template <typename TArgs>
-ControlT<TArgs>::Origin::~Origin() {
+ControlT<TArgs>::Origin::~Origin() noexcept {
 	control._originId = prevId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TArgs>
-FullControlBaseT<TArgs>::Lock::Lock(FullControlBaseT& control_)
+FullControlBaseT<TArgs>::Lock::Lock(FullControlBaseT& control_) noexcept
 	: control{!control_._locked ? &control_ : nullptr}
 {
 	if (control)
@@ -32,7 +32,7 @@ FullControlBaseT<TArgs>::Lock::Lock(FullControlBaseT& control_)
 //------------------------------------------------------------------------------
 
 template <typename TArgs>
-FullControlBaseT<TArgs>::Lock::~Lock() {
+FullControlBaseT<TArgs>::Lock::~Lock() noexcept {
 	if (control)
 		control->_locked = false;
 }
@@ -41,7 +41,7 @@ FullControlBaseT<TArgs>::Lock::~Lock() {
 
 template <typename TArgs>
 void
-FullControlBaseT<TArgs>::changeTo(const StateID stateId) {
+FullControlBaseT<TArgs>::changeTo(const StateID stateId) noexcept {
 	if (!_locked) {
 		_request = Transition{_originId, stateId};
 
@@ -55,7 +55,7 @@ FullControlBaseT<TArgs>::changeTo(const StateID stateId) {
 
 template <typename TArgs>
 void
-FullControlBaseT<TArgs>::succeed() {
+FullControlBaseT<TArgs>::succeed() noexcept {
 	_status.result = Status::Result::SUCCESS;
 
 	_planData.tasksSuccesses.set(_originId);
@@ -67,7 +67,7 @@ FullControlBaseT<TArgs>::succeed() {
 
 template <typename TArgs>
 void
-FullControlBaseT<TArgs>::fail() {
+FullControlBaseT<TArgs>::fail() noexcept {
 	_status.result = Status::Result::FAILURE;
 
 	_planData.tasksFailures.set(_originId);
@@ -85,7 +85,7 @@ template <typename TC, typename TG, typename TSL, Long NSL, Long NTC, typename T
 template <typename TState>
 void
 FullControlT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::updatePlan(TState& headState,
-															const Status subStatus)
+															const Status subStatus) noexcept
 {
 	FFSM2_ASSERT(subStatus);
 
@@ -125,8 +125,8 @@ FullControlT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::updatePlan(TState& headState,
 
 template <typename TC, typename TG, typename TSL, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TTP>
 void
-FullControlT<ArgsT<TC, TG, TSL, NSL FFSM2_IF_PLANS(, NTC), TTP>>::changeWith(const StateID stateId,
-																			 const Payload& payload)
+FullControlT<ArgsT<TC, TG, TSL, NSL FFSM2_IF_PLANS(, NTC), TTP>>::changeWith(const StateID  stateId,
+																			 const Payload& payload) noexcept
 {
 	if (!_locked) {
 		_request = Transition{_originId, stateId, payload};
@@ -139,8 +139,8 @@ FullControlT<ArgsT<TC, TG, TSL, NSL FFSM2_IF_PLANS(, NTC), TTP>>::changeWith(con
 
 template <typename TC, typename TG, typename TSL, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TTP>
 void
-FullControlT<ArgsT<TC, TG, TSL, NSL FFSM2_IF_PLANS(, NTC), TTP>>::changeWith(const StateID stateId,
-																				  Payload&& payload)
+FullControlT<ArgsT<TC, TG, TSL, NSL FFSM2_IF_PLANS(, NTC), TTP>>::changeWith(const StateID  stateId,
+																				  Payload&& payload) noexcept
 {
 	if (!_locked) {
 		_request = Transition{_originId, stateId, std::move(payload)};
@@ -157,7 +157,7 @@ template <typename TC, typename TG, typename TSL, Long NSL, Long NTC>
 template <typename TState>
 void
 FullControlT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::updatePlan(TState& headState,
-															 const Status subStatus)
+															 const Status subStatus) noexcept
 {
 	FFSM2_ASSERT(subStatus);
 
@@ -197,7 +197,7 @@ FullControlT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::updatePlan(TState& headState,
 
 template <typename TArgs>
 void
-GuardControlT<TArgs>::cancelPendingTransition() {
+GuardControlT<TArgs>::cancelPendingTransition() noexcept {
 	_cancelled = true;
 
 	FFSM2_LOG_CANCELLED_PENDING(context(), _originId);

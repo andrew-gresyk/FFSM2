@@ -6,7 +6,7 @@ namespace detail {
 template <StateID N, typename TA, Short NI, typename T>
 bool
 CS_<N, TA, NI, T>::wideEntryGuard(GuardControl& control,
-								  const Short FFSM2_IF_ASSERT(prong))
+								  const Short FFSM2_IF_ASSERT(prong)) noexcept
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
@@ -18,7 +18,7 @@ CS_<N, TA, NI, T>::wideEntryGuard(GuardControl& control,
 template <StateID N, typename TA, Short NI, typename T>
 void
 CS_<N, TA, NI, T>::wideConstruct(PlanControl& control,
-								 const Short FFSM2_IF_ASSERT(prong))
+								 const Short FFSM2_IF_ASSERT(prong)) noexcept
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
@@ -30,7 +30,7 @@ CS_<N, TA, NI, T>::wideConstruct(PlanControl& control,
 template <StateID N, typename TA, Short NI, typename T>
 void
 CS_<N, TA, NI, T>::wideEnter(PlanControl& control,
-							 const Short FFSM2_IF_ASSERT(prong))
+							 const Short FFSM2_IF_ASSERT(prong)) noexcept
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
@@ -42,7 +42,7 @@ CS_<N, TA, NI, T>::wideEnter(PlanControl& control,
 template <StateID N, typename TA, Short NI, typename T>
 void
 CS_<N, TA, NI, T>::wideReenter(PlanControl& control,
-							   const Short FFSM2_IF_ASSERT(prong))
+							   const Short FFSM2_IF_ASSERT(prong)) noexcept
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
@@ -54,7 +54,7 @@ CS_<N, TA, NI, T>::wideReenter(PlanControl& control,
 template <StateID N, typename TA, Short NI, typename T>
 Status
 CS_<N, TA, NI, T>::wideUpdate(FullControl& control,
-							  const Short FFSM2_IF_ASSERT(prong))
+							  const Short FFSM2_IF_ASSERT(prong)) noexcept
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
@@ -68,7 +68,7 @@ template <typename TEvent>
 Status
 CS_<N, TA, NI, T>::wideReact(FullControl& control,
 							 const TEvent& event,
-							 const Short FFSM2_IF_ASSERT(prong))
+							 const Short FFSM2_IF_ASSERT(prong)) noexcept
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
@@ -80,7 +80,7 @@ CS_<N, TA, NI, T>::wideReact(FullControl& control,
 template <StateID N, typename TA, Short NI, typename T>
 bool
 CS_<N, TA, NI, T>::wideExitGuard(GuardControl& control,
-								 const Short FFSM2_IF_ASSERT(prong))
+								 const Short FFSM2_IF_ASSERT(prong)) noexcept
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
@@ -92,7 +92,7 @@ CS_<N, TA, NI, T>::wideExitGuard(GuardControl& control,
 template <StateID N, typename TA, Short NI, typename T>
 void
 CS_<N, TA, NI, T>::wideExit(PlanControl& control,
-							const Short FFSM2_IF_ASSERT(prong))
+							const Short FFSM2_IF_ASSERT(prong)) noexcept
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
@@ -104,7 +104,7 @@ CS_<N, TA, NI, T>::wideExit(PlanControl& control,
 template <StateID N, typename TA, Short NI, typename T>
 void
 CS_<N, TA, NI, T>::wideDestruct(PlanControl& control,
-								const Short FFSM2_IF_ASSERT(prong))
+								const Short FFSM2_IF_ASSERT(prong)) noexcept
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 

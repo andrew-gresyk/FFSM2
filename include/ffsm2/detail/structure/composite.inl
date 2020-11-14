@@ -5,7 +5,7 @@ namespace detail {
 
 template <typename TA, typename TH, typename... TS>
 bool
-C_<TA, TH, TS...>::deepForwardEntryGuard(GuardControl& control) {
+C_<TA, TH, TS...>::deepForwardEntryGuard(GuardControl& control) noexcept {
 	FFSM2_ASSERT(control._registry.active != INVALID_SHORT);
 
 	const Short  requested  = control._registry.requested;
@@ -18,7 +18,7 @@ C_<TA, TH, TS...>::deepForwardEntryGuard(GuardControl& control) {
 
 template <typename TA, typename TH, typename... TS>
 bool
-C_<TA, TH, TS...>::deepEntryGuard(GuardControl& control) {
+C_<TA, TH, TS...>::deepEntryGuard(GuardControl& control) noexcept {
 	const Short requested = control._registry.requested;
 	FFSM2_ASSERT(requested != INVALID_SHORT);
 
@@ -30,7 +30,7 @@ C_<TA, TH, TS...>::deepEntryGuard(GuardControl& control) {
 
 template <typename TA, typename TH, typename... TS>
 void
-C_<TA, TH, TS...>::deepConstruct(PlanControl& control) {
+C_<TA, TH, TS...>::deepConstruct(PlanControl& control) noexcept {
 	Short& active	 = control._registry.active;
 	Short& requested = control._registry.requested;
 
@@ -48,7 +48,7 @@ C_<TA, TH, TS...>::deepConstruct(PlanControl& control) {
 
 template <typename TA, typename TH, typename... TS>
 void
-C_<TA, TH, TS...>::deepEnter(PlanControl& control) {
+C_<TA, TH, TS...>::deepEnter(PlanControl& control) noexcept {
 	const Short active = control._registry.active;
 	FFSM2_ASSERT(active != INVALID_SHORT);
 
@@ -62,7 +62,7 @@ C_<TA, TH, TS...>::deepEnter(PlanControl& control) {
 
 template <typename TA, typename TH, typename... TS>
 void
-C_<TA, TH, TS...>::deepUpdate(FullControl& control) {
+C_<TA, TH, TS...>::deepUpdate(FullControl& control) noexcept {
 	const Short active = control._registry.active;
 	FFSM2_ASSERT(active != INVALID_SHORT);
 
@@ -89,7 +89,7 @@ template <typename TA, typename TH, typename... TS>
 template <typename TEvent>
 void
 C_<TA, TH, TS...>::deepReact(FullControl& control,
-							 const TEvent& event)
+							 const TEvent& event) noexcept
 {
 	const Short active = control._registry.active;
 	FFSM2_ASSERT(active != INVALID_SHORT);
@@ -115,7 +115,7 @@ C_<TA, TH, TS...>::deepReact(FullControl& control,
 
 template <typename TA, typename TH, typename... TS>
 bool
-C_<TA, TH, TS...>::deepForwardExitGuard(GuardControl& control) {
+C_<TA, TH, TS...>::deepForwardExitGuard(GuardControl& control) noexcept {
 	FFSM2_ASSERT(control._registry.requested != INVALID_SHORT);
 
 	const Short  active  = control._registry.active;
@@ -128,7 +128,7 @@ C_<TA, TH, TS...>::deepForwardExitGuard(GuardControl& control) {
 
 template <typename TA, typename TH, typename... TS>
 bool
-C_<TA, TH, TS...>::deepExitGuard(GuardControl& control) {
+C_<TA, TH, TS...>::deepExitGuard(GuardControl& control) noexcept {
 	const Short active = control._registry.active;
 	FFSM2_ASSERT(active != INVALID_SHORT);
 
@@ -142,7 +142,7 @@ C_<TA, TH, TS...>::deepExitGuard(GuardControl& control) {
 
 template <typename TA, typename TH, typename... TS>
 void
-C_<TA, TH, TS...>::deepExit(PlanControl& control) {
+C_<TA, TH, TS...>::deepExit(PlanControl& control) noexcept {
 	const Short active = control._registry.active;
 	FFSM2_ASSERT(active != INVALID_SHORT);
 
@@ -154,7 +154,7 @@ C_<TA, TH, TS...>::deepExit(PlanControl& control) {
 
 template <typename TA, typename TH, typename... TS>
 void
-C_<TA, TH, TS...>::deepDestruct(PlanControl& control) {
+C_<TA, TH, TS...>::deepDestruct(PlanControl& control) noexcept {
 	Short& active = control._registry.active;
 
 	FFSM2_ASSERT(active != INVALID_SHORT);
@@ -174,7 +174,7 @@ C_<TA, TH, TS...>::deepDestruct(PlanControl& control) {
 
 template <typename TA, typename TH, typename... TS>
 void
-C_<TA, TH, TS...>::deepChangeToRequested(PlanControl& control) {
+C_<TA, TH, TS...>::deepChangeToRequested(PlanControl& control) noexcept {
 	Short& active	 = control._registry.active;
 	Short& requested = control._registry.requested;
 

@@ -2,7 +2,7 @@
 
 #define FFSM2_ENABLE_LOG_INTERFACE
 #define FFSM2_ENABLE_ASSERT
-#include <ffsm2/machine_dev.hpp>
+#include <ffsm2/machine.hpp>
 
 #include <catch2/catch.hpp>
 
@@ -44,14 +44,14 @@ struct Event {
 
 	Event(const ffsm2::StateID origin_,
 		  const Type type_,
-		  const ffsm2::StateID target_ = ffsm2::INVALID_STATE_ID)
+		  const ffsm2::StateID target_ = ffsm2::INVALID_STATE_ID) noexcept
 		: origin{origin_}
 		, type{type_}
 		, target{target_}
 	{}
 
 	Event(const Type type_,
-		  const ffsm2::StateID target_)
+		  const ffsm2::StateID target_) noexcept
 		: origin{ffsm2::INVALID_STATE_ID}
 		, type{type_}
 		, target{target_}
@@ -82,27 +82,27 @@ struct LoggerT
 
 	void recordMethod(Context& context,
 					  const StateID origin,
-					  const Method method) override;
+					  const Method method) noexcept override;
 
 	void recordTransition(Context& context,
 						  const StateID origin,
-						  const StateID target) override;
+						  const StateID target) noexcept override;
 
 #ifdef FFSM2_ENABLE_PLANS
 
 	void recordTaskStatus(Context& context,
 						  const StateID origin,
-						  const StatusEvent event) override;
+						  const StatusEvent event) noexcept override;
 
 	void recordPlanStatus(Context& context,
-						  const StatusEvent event) override;
+						  const StatusEvent event) noexcept override;
 
 #endif
 
 	void recordCancelledPending(Context& context,
-								const StateID origin) override;
+								const StateID origin) noexcept override;
 
-	void assertSequence(const Events& reference);
+	void assertSequence(const Events& reference) noexcept;
 
 	Events history;
 };

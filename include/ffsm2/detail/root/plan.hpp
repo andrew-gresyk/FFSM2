@@ -14,11 +14,11 @@ struct Status {
 
 	Result result = Result::NONE;
 
-	inline Status(const Result result_ = Result::NONE);
+	inline Status(const Result result_ = Result::NONE) noexcept;
 
-	inline explicit operator bool() const	{ return result != Result::NONE; }
+	constexpr explicit operator bool() const noexcept		{ return result != Result::NONE;	}
 
-	inline void clear();
+	inline void clear() noexcept;
 };
 
 #pragma pack(pop)
@@ -26,7 +26,7 @@ struct Status {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 inline Status
-combine(const Status lhs, const Status rhs) {
+combine(const Status lhs, const Status rhs) noexcept {
 	const Status::Result result = lhs.result > rhs.result ?
 		lhs.result : rhs.result;
 
@@ -38,7 +38,7 @@ combine(const Status lhs, const Status rhs) {
 #ifdef FFSM2_ENABLE_PLANS
 
 template <typename TArgs>
-class ConstPlanT {
+class CPlanT {
 	template <typename>
 	friend class ControlT;
 
@@ -65,18 +65,18 @@ public:
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	struct Iterator {
-		FFSM2_INLINE Iterator(const ConstPlanT& plan);
+		FFSM2_INLINE Iterator(const CPlanT& plan)		noexcept;
 
-		FFSM2_INLINE explicit operator bool() const;
+		FFSM2_INLINE explicit operator bool() const		noexcept;
 
-		FFSM2_INLINE void operator ++();
+		FFSM2_INLINE void operator ++()					noexcept;
 
-		FFSM2_INLINE const Task& operator  *() const		{ return  _plan._planData.tasks[_curr];		}
-		FFSM2_INLINE const Task* operator ->() const		{ return &_plan._planData.tasks[_curr];		}
+		FFSM2_INLINE const Task& operator  *() const	noexcept	{ return  _plan._planData.tasks[_curr];		}
+		FFSM2_INLINE const Task* operator ->() const	noexcept	{ return &_plan._planData.tasks[_curr];		}
 
-		FFSM2_INLINE Long next() const;
+		FFSM2_INLINE Long next() const					noexcept;
 
-		const ConstPlanT& _plan;
+		const CPlanT& _plan;
 		Long _curr;
 		Long _next;
 	};
@@ -84,15 +84,15 @@ public:
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 private:
-	FFSM2_INLINE ConstPlanT(const PlanData& planData);
+	FFSM2_INLINE CPlanT(const PlanData& planData)		noexcept;
 
 	template <typename T>
-	static constexpr StateID  stateId()						{ return			index<StateList , T>();	}
+	static constexpr StateID  stateId()					noexcept	{ return			index<StateList , T>();	}
 
 public:
-	FFSM2_INLINE explicit operator bool() const;
+	FFSM2_INLINE explicit operator bool() const			noexcept;
 
-	FFSM2_INLINE Iterator first()							{ return Iterator{*this};					}
+	FFSM2_INLINE Iterator first()						noexcept	{ return Iterator{*this};					}
 
 private:
 	const PlanData& _planData;
@@ -119,21 +119,21 @@ public:
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	struct Iterator {
-		FFSM2_INLINE Iterator(PlanBaseT& plan);
+		FFSM2_INLINE Iterator(PlanBaseT& plan)			noexcept;
 
-		FFSM2_INLINE explicit operator bool() const;
+		FFSM2_INLINE explicit operator bool() const		noexcept;
 
-		FFSM2_INLINE void operator ++();
+		FFSM2_INLINE void operator ++()					noexcept;
 
-		FFSM2_INLINE	   Task& operator  *()				{ return  _plan._planData.tasks[_curr];		}
-		FFSM2_INLINE const Task& operator  *() const		{ return  _plan._planData.tasks[_curr];		}
+		FFSM2_INLINE		Task& operator  *()			noexcept	{ return  _plan._planData.tasks[_curr];		}
+		FFSM2_INLINE const Task& operator  *() const	noexcept	{ return  _plan._planData.tasks[_curr];		}
 
-		FFSM2_INLINE	   Task* operator ->()				{ return &_plan._planData.tasks[_curr];		}
-		FFSM2_INLINE const Task* operator ->() const		{ return &_plan._planData.tasks[_curr];		}
+		FFSM2_INLINE		Task* operator ->()			noexcept	{ return &_plan._planData.tasks[_curr];		}
+		FFSM2_INLINE const Task* operator ->() const	noexcept	{ return &_plan._planData.tasks[_curr];		}
 
-		FFSM2_INLINE void remove();
+		FFSM2_INLINE void remove()						noexcept;
 
-		FFSM2_INLINE Long next() const;
+		FFSM2_INLINE Long next() const					noexcept;
 
 		PlanBaseT& _plan;
 		Long _curr;
@@ -142,20 +142,20 @@ public:
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	struct ConstIterator {
-		FFSM2_INLINE ConstIterator(const PlanBaseT& plan);
+	struct CIterator {
+		FFSM2_INLINE CIterator(const PlanBaseT& plan)	noexcept;
 
-		FFSM2_INLINE explicit operator bool() const;
+		FFSM2_INLINE explicit operator bool() const		noexcept;
 
-		FFSM2_INLINE void operator ++();
+		FFSM2_INLINE void operator ++()					noexcept;
 
-		FFSM2_INLINE	   Task& operator  *()				{ return  _plan._planData.tasks[_curr];		}
-		FFSM2_INLINE const Task& operator  *() const		{ return  _plan._planData.tasks[_curr];		}
+		FFSM2_INLINE		Task& operator  *()			noexcept	{ return  _plan._planData.tasks[_curr];		}
+		FFSM2_INLINE const Task& operator  *() const	noexcept	{ return  _plan._planData.tasks[_curr];		}
 
-		FFSM2_INLINE	   Task* operator ->()				{ return &_plan._planData.tasks[_curr];		}
-		FFSM2_INLINE const Task* operator ->() const		{ return &_plan._planData.tasks[_curr];		}
+		FFSM2_INLINE		Task* operator ->()			noexcept	{ return &_plan._planData.tasks[_curr];		}
+		FFSM2_INLINE const Task* operator ->() const	noexcept	{ return &_plan._planData.tasks[_curr];		}
 
-		FFSM2_INLINE Long next() const;
+		FFSM2_INLINE Long next() const					noexcept;
 
 		const PlanBaseT& _plan;
 		Long _curr;
@@ -165,21 +165,21 @@ public:
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 protected:
-	FFSM2_INLINE PlanBaseT(PlanData& planData);
+	FFSM2_INLINE PlanBaseT(PlanData& planData)			noexcept;
 
 	template <typename T>
-	static constexpr StateID  stateId()						{ return			index<StateList , T>();	}
+	static constexpr StateID  stateId()					noexcept	{ return			index<StateList , T>();	}
 
-	bool append(const StateID origin,
-				const StateID destination);
+	FFSM2_INLINE bool append(const StateID origin,
+							 const StateID destination)	noexcept;
 
-	bool linkTask(const Long index);
+	FFSM2_INLINE bool linkTask(const Long index)		noexcept;
 
 public:
-	FFSM2_INLINE explicit operator bool() const;
+	FFSM2_INLINE explicit operator bool() const			noexcept;
 
 	/// @brief Clear all tasks from the plan
-	FFSM2_INLINE void clear();
+	FFSM2_INLINE void clear()							noexcept;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -188,7 +188,7 @@ public:
 	/// @param destination Destination state identifier
 	/// @return Seccess if FSM total number of tasks is below task capacity
 	/// @note use 'Config::TaskCapacityN<>' to increase task capacity if necessary
-	FFSM2_INLINE bool change   (const StateID origin, const StateID destination)	{ return append(origin, destination);							}
+	FFSM2_INLINE bool change(const StateID origin, const StateID destination)	noexcept	{ return append(origin, destination);							}
 
 	/// @brief Add a task to transition from 'origin' to 'destination' if 'origin' completes with 'success()'
 	/// @tparam TOrigin Origin state type
@@ -196,7 +196,7 @@ public:
 	/// @return Seccess if FSM total number of tasks is below task capacity
 	/// @note use 'Config::TaskCapacityN<>' to increase task capacity if necessary
 	template <typename TOrigin>
-	FFSM2_INLINE bool change   (const StateID destination)							{ return change(stateId<TOrigin>(), destination);				}
+	FFSM2_INLINE bool change(const StateID destination)							noexcept	{ return change(stateId<TOrigin>(), destination);				}
 
 	/// @brief Add a task to transition from 'origin' to 'destination' if 'origin' completes with 'success()'
 	/// @tparam TOrigin Origin state type
@@ -204,20 +204,20 @@ public:
 	/// @return Seccess if FSM total number of tasks is below task capacity
 	/// @note use 'Config::TaskCapacityN<>' to increase task capacity if necessary
 	template <typename TOrigin, typename TDestination>
-	FFSM2_INLINE bool change   ()													{ return change(stateId<TOrigin>(), stateId<TDestination>());	}
+	FFSM2_INLINE bool change()													noexcept	{ return change(stateId<TOrigin>(), stateId<TDestination>());	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	/// @brief Begin iteration over plan tasks
 	/// @return Iterator to the first task
-	FFSM2_INLINE	  Iterator first()												{ return	  Iterator{*this};									}
+	FFSM2_INLINE  Iterator first()												noexcept	{ return  Iterator{*this};										}
 
 	/// @brief Begin iteration over plan tasks
-	/// @return ConstIterator to the first task
-	FFSM2_INLINE ConstIterator first() const										{ return ConstIterator{*this};									}
+	/// @return CIterator to the first task
+	FFSM2_INLINE CIterator first() const										noexcept	{ return CIterator{*this};										}
 
 private:
-	void remove(const Long task);
+	void remove(const Long task)												noexcept;
 
 protected:
 	PlanData& _planData;
@@ -278,11 +278,11 @@ class PlanT<ArgsT<TContext
 
 	bool append(const StateID origin,
 				const StateID destination,
-				const Payload& payload);
+				const Payload& payload) noexcept;
 
 	bool append(const StateID origin,
 				const StateID destination,
-				Payload&& payload);
+				Payload&& payload) noexcept;
 
 public:
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -293,7 +293,7 @@ public:
 	/// @param payload Payload
 	/// @return Seccess if FSM total number of tasks is below task capacity
 	/// @note use 'Config::TaskCapacityN<>' to increase task capacity if necessary
-	FFSM2_INLINE bool changeWith   (const StateID origin, const StateID destination, const Payload& payload)	{ return append		  (origin								, destination								,  			payload );	}
+	FFSM2_INLINE bool changeWith(const StateID origin, const StateID destination, const Payload& payload) noexcept	{ return append	   (origin								 , destination								 ,  		 payload );	}
 
 	/// @brief Add a task to transition from 'origin' to 'destination' if 'origin' completes with 'success()'
 	/// @param origin Origin state identifier
@@ -301,7 +301,7 @@ public:
 	/// @param payload Payload
 	/// @return Seccess if FSM total number of tasks is below task capacity
 	/// @note use 'Config::TaskCapacityN<>' to increase task capacity if necessary
-	FFSM2_INLINE bool changeWith   (const StateID origin, const StateID destination,	  Payload&& payload)	{ return append		  (origin								, destination								, std::move(payload));	}
+	FFSM2_INLINE bool changeWith(const StateID origin, const StateID destination,	   Payload&& payload) noexcept	{ return append	   (origin								 , destination								 , std::move(payload));	}
 
 	/// @brief Add a task to transition from 'origin' to 'destination' if 'origin' completes with 'success()'
 	/// @tparam TOrigin Origin state type
@@ -310,7 +310,7 @@ public:
 	/// @return Seccess if FSM total number of tasks is below task capacity
 	/// @note use 'Config::TaskCapacityN<>' to increase task capacity if necessary
 	template <typename TOrigin>
-	FFSM2_INLINE bool changeWith   (					  const StateID destination, const Payload& payload)	{ return changeWith   (PlanBase::template stateId<TOrigin>(), destination								, 			payload );	}
+	FFSM2_INLINE bool changeWith(					   const StateID destination, const Payload& payload) noexcept	{ return changeWith(PlanBase::template stateId<TOrigin>(), destination								 , 			 payload );	}
 
 	/// @brief Add a task to transition from 'origin' to 'destination' if 'origin' completes with 'success()'
 	/// @tparam TOrigin Origin state type
@@ -319,7 +319,7 @@ public:
 	/// @return Seccess if FSM total number of tasks is below task capacity
 	/// @note use 'Config::TaskCapacityN<>' to increase task capacity if necessary
 	template <typename TOrigin>
-	FFSM2_INLINE bool changeWith   (					  const StateID destination,	  Payload&& payload)	{ return changeWith   (PlanBase::template stateId<TOrigin>(), destination								, std::move(payload));	}
+	FFSM2_INLINE bool changeWith(					   const StateID destination,	   Payload&& payload) noexcept	{ return changeWith(PlanBase::template stateId<TOrigin>(), destination								 , std::move(payload));	}
 
 	/// @brief Add a task to transition from 'origin' to 'destination' if 'origin' completes with 'success()'
 	/// @tparam TOrigin Origin state type
@@ -328,7 +328,7 @@ public:
 	/// @return Seccess if FSM total number of tasks is below task capacity
 	/// @note use 'Config::TaskCapacityN<>' to increase task capacity if necessary
 	template <typename TOrigin, typename TDestination>
-	FFSM2_INLINE bool changeWith   (												 const Payload& payload)	{ return changeWith   (PlanBase::template stateId<TOrigin>(), PlanBase::template stateId<TDestination>(), 			payload );	}
+	FFSM2_INLINE bool changeWith(												  const Payload& payload) noexcept	{ return changeWith(PlanBase::template stateId<TOrigin>(), PlanBase::template stateId<TDestination>(), 			 payload );	}
 
 	/// @brief Add a task to transition from 'origin' to 'destination' if 'origin' completes with 'success()'
 	/// @tparam TOrigin Origin state type
@@ -337,7 +337,7 @@ public:
 	/// @return Seccess if FSM total number of tasks is below task capacity
 	/// @note use 'Config::TaskCapacityN<>' to increase task capacity if necessary
 	template <typename TOrigin, typename TDestination>
-	FFSM2_INLINE bool changeWith   (													  Payload&& payload)	{ return changeWith   (PlanBase::template stateId<TOrigin>(), PlanBase::template stateId<TDestination>(), std::move(payload));	}
+	FFSM2_INLINE bool changeWith(													   Payload&& payload) noexcept	{ return changeWith(PlanBase::template stateId<TOrigin>(), PlanBase::template stateId<TDestination>(), std::move(payload));	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

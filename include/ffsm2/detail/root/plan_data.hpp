@@ -8,10 +8,10 @@ namespace detail {
 #pragma pack(push, 2)
 
 struct TaskBase {
-	FFSM2_INLINE TaskBase() {}
+	FFSM2_INLINE TaskBase() noexcept {}
 
 	FFSM2_INLINE TaskBase(const StateID origin_,
-						  const StateID destination_)
+						  const StateID destination_) noexcept
 		: origin{origin_}
 		, destination{destination_}
 	{}
@@ -20,7 +20,7 @@ struct TaskBase {
 	StateID destination	= INVALID_STATE_ID;
 };
 
-inline bool operator == (const TaskBase& lhs, const TaskBase& rhs) {
+inline bool operator == (const TaskBase& lhs, const TaskBase& rhs) noexcept {
 	return lhs.origin	   == rhs.origin &&
 		   lhs.destination == rhs.destination;
 }
@@ -38,7 +38,7 @@ struct TaskT
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_INLINE TaskT() {
+	FFSM2_INLINE TaskT() noexcept {
 		new (&storage) Payload{};
 	}
 
@@ -46,7 +46,7 @@ struct TaskT
 
 	FFSM2_INLINE TaskT(const StateID origin,
 					   const StateID destination,
-					   const Payload& payload)
+					   const Payload& payload) noexcept
 		: TaskBase{origin, destination}
 		, payloadSet{true}
 	{
@@ -57,7 +57,7 @@ struct TaskT
 
 	FFSM2_INLINE TaskT(const StateID origin,
 					   const StateID destination,
-					   Payload&& payload)
+					   Payload&& payload) noexcept
 		: TaskBase{origin, destination}
 		, payloadSet{true}
 	{
@@ -145,13 +145,13 @@ struct PlanDataT<ArgsT<TContext
 	TasksBits tasksFailures;
 	bool planExists;
 
-	void clearTaskStatus(const StateID stateId);
+	void clearTaskStatus(const StateID stateId) noexcept;
 
 #ifdef FFSM2_ENABLE_ASSERT
-	void verifyEmptyStatus(const StateID stateId) const;
+	void verifyEmptyStatus(const StateID stateId) const noexcept;
 
-	void verifyPlans() const;
-	Long verifyPlan() const;
+	void verifyPlans() const noexcept;
+	Long verifyPlan()  const noexcept;
 #endif
 };
 
@@ -187,13 +187,13 @@ struct PlanDataT<ArgsT<TContext
 	TasksBits tasksFailures;
 	bool planExists;
 
-	void clearTaskStatus(const StateID stateId);
+	void clearTaskStatus(const StateID stateId) noexcept;
 
 #ifdef FFSM2_ENABLE_ASSERT
-	void verifyEmptyStatus(const StateID stateId) const;
+	void verifyEmptyStatus(const StateID stateId) const noexcept;
 
-	void verifyPlans() const;
-	Long verifyPlan() const;
+	void verifyPlans() const noexcept;
+	Long verifyPlan()  const noexcept;
 #endif
 };
 

@@ -23,18 +23,16 @@ namespace detail {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-FFSM2_INLINE
-void
-fill(T& a, const char value) {
+FFSM2_INLINE void
+fill(T& a, const char value) noexcept {
 	memset(&a, (int) value, sizeof(a));
 }
 
 //------------------------------------------------------------------------------
 
 template <typename T, unsigned NCount>
-constexpr
-unsigned
-count(const T(&)[NCount]) {
+constexpr unsigned
+count(const T(&)[NCount]) noexcept {
 	return NCount;
 }
 
@@ -55,9 +53,11 @@ struct Max {
 //------------------------------------------------------------------------------
 
 template <typename T>
-constexpr
-T
-min(const T t1, const T t2) { return t1 < t2 ? t1 : t2; }
+constexpr T
+min(const T t1, const T t2) noexcept {
+	return t1 < t2 ?
+		t1 : t2;
+}
 
 
 //------------------------------------------------------------------------------
@@ -96,8 +96,7 @@ using UnsignedBitWidth = typename UnsignedBitWidthT<NCapacity>::Type;
 
 //------------------------------------------------------------------------------
 
-constexpr
-Long
+constexpr Long
 roundUp(const Long x,
 		const Long to)
 {
@@ -106,8 +105,7 @@ roundUp(const Long x,
 
 //------------------------------------------------------------------------------
 
-constexpr
-Short
+constexpr Short
 bitWidth(const Short x) {
 	return x <=   2 ? 1 :
 		   x <=   4 ? 2 :
@@ -122,7 +120,7 @@ bitWidth(const Short x) {
 //------------------------------------------------------------------------------
 
 template <typename TTo, typename TFrom>
-void
+FFSM2_INLINE void
 overwrite(TTo& to, const TFrom& from) {
 	static_assert(sizeof(TTo) == sizeof(TFrom), "STATIC ASSERT");
 
@@ -136,7 +134,8 @@ overwrite(TTo& to, const TFrom& from) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename TO, typename TI>
-TO convert(const TI& in) {
+FFSM2_INLINE TO
+convert(const TI& in) {
 	TO out;
 
 	overwrite(out, in);

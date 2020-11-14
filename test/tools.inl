@@ -4,7 +4,7 @@ template <typename TConfig>
 void
 LoggerT<TConfig>::recordMethod(Context& /*context*/,
 							   const StateID origin,
-							   const Method method)
+							   const Method method) noexcept
 {
 	REQUIRE(ffsm2::methodName(method));
 
@@ -69,7 +69,7 @@ template <typename TConfig>
 void
 LoggerT<TConfig>::recordTransition(Context& /*context*/,
 								   const StateID origin,
-								   const StateID target)
+								   const StateID target) noexcept
 {
 	history.emplace_back(origin, Event::Type::CHANGE, target);
 }
@@ -82,7 +82,7 @@ template <typename TConfig>
 void
 LoggerT<TConfig>::recordTaskStatus(Context& /*context*/,
 								   const StateID origin,
-								   const StatusEvent event)
+								   const StatusEvent event) noexcept
 {
 	switch (event) {
 		case StatusEvent::SUCCEEDED:
@@ -103,7 +103,7 @@ LoggerT<TConfig>::recordTaskStatus(Context& /*context*/,
 template <typename TConfig>
 void
 LoggerT<TConfig>::recordPlanStatus(Context& /*context*/,
-								   const StatusEvent event)
+								   const StatusEvent event) noexcept
 {
 	switch (event) {
 		case StatusEvent::SUCCEEDED:
@@ -127,7 +127,7 @@ LoggerT<TConfig>::recordPlanStatus(Context& /*context*/,
 template <typename TConfig>
 void
 LoggerT<TConfig>::recordCancelledPending(Context& /*context*/,
-										 const StateID origin)
+										 const StateID origin) noexcept
 {
 	history.emplace_back(origin, Event::Type::CANCEL_PENDING);
 }
@@ -136,7 +136,7 @@ LoggerT<TConfig>::recordCancelledPending(Context& /*context*/,
 
 template <typename TConfig>
 void
-LoggerT<TConfig>::assertSequence(const Events& reference) {
+LoggerT<TConfig>::assertSequence(const Events& reference) noexcept {
 	const auto count = std::max(history.size(), reference.size());
 
 	for (unsigned i = 0; i < count; ++i) {

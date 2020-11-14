@@ -7,7 +7,7 @@ namespace detail {
 
 template <typename TC, typename TG, typename TSL, Long NSL, Long NTC, typename TTP>
 void
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::clearTaskStatus(const StateID stateId) {
+PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::clearTaskStatus(const StateID stateId) noexcept {
 	if (stateId != INVALID_STATE_ID) {
 		tasksSuccesses.clear(stateId);
 		tasksFailures .clear(stateId);
@@ -20,7 +20,7 @@ PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::clearTaskStatus(const StateID stat
 
 template <typename TC, typename TG, typename TSL, Long NSL, Long NTC, typename TTP>
 void
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::verifyEmptyStatus(const StateID stateId) const {
+PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::verifyEmptyStatus(const StateID stateId) const noexcept {
 	if (stateId != INVALID_STATE_ID) {
 		FFSM2_ASSERT(!tasksSuccesses.get(stateId));
 		FFSM2_ASSERT(!tasksFailures .get(stateId));
@@ -31,7 +31,7 @@ PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::verifyEmptyStatus(const StateID st
 
 template <typename TC, typename TG, typename TSL, Long NSL, Long NTC, typename TTP>
 void
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::verifyPlans() const {
+PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::verifyPlans() const noexcept {
 	FFSM2_ASSERT(tasks.count() == verifyPlan());
 }
 
@@ -39,7 +39,7 @@ PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::verifyPlans() const {
 
 template <typename TC, typename TG, typename TSL, Long NSL, Long NTC, typename TTP>
 Long
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::verifyPlan() const {
+PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::verifyPlan() const noexcept {
 	Long length = 0;
 	const Bounds& bounds = tasksBounds;
 
@@ -82,7 +82,7 @@ PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::verifyPlan() const {
 
 template <typename TC, typename TG, typename TSL, Long NSL, Long NTC>
 void
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::clearTaskStatus(const StateID stateId) {
+PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::clearTaskStatus(const StateID stateId) noexcept {
 	if (stateId != INVALID_STATE_ID) {
 		tasksSuccesses.clear(stateId);
 		tasksFailures .clear(stateId);
@@ -95,7 +95,7 @@ PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::clearTaskStatus(const StateID sta
 
 template <typename TC, typename TG, typename TSL, Long NSL, Long NTC>
 void
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::verifyEmptyStatus(const StateID stateId) const {
+PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::verifyEmptyStatus(const StateID stateId) const noexcept {
 	if (stateId != INVALID_STATE_ID) {
 		FFSM2_ASSERT(!tasksSuccesses.get(stateId));
 		FFSM2_ASSERT(!tasksFailures .get(stateId));
@@ -106,7 +106,7 @@ PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::verifyEmptyStatus(const StateID s
 
 template <typename TC, typename TG, typename TSL, Long NSL, Long NTC>
 void
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::verifyPlans() const {
+PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::verifyPlans() const noexcept {
 	FFSM2_ASSERT(tasks.count() == verifyPlan());
 }
 
@@ -114,7 +114,7 @@ PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::verifyPlans() const {
 
 template <typename TC, typename TG, typename TSL, Long NSL, Long NTC>
 Long
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::verifyPlan() const {
+PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::verifyPlan() const noexcept {
 	Long length = 0;
 	const Bounds& bounds = tasksBounds;
 

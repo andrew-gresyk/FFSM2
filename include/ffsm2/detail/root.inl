@@ -5,7 +5,7 @@ namespace detail {
 
 template <typename TG, typename TA>
 R_<TG, TA>::R_(Context& context
-			   FFSM2_IF_LOG_INTERFACE(, Logger* const logger))
+			   FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
 	: _context{context}
 	FFSM2_IF_LOG_INTERFACE(, _logger{logger})
 {
@@ -15,7 +15,7 @@ R_<TG, TA>::R_(Context& context
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename TG, typename TA>
-R_<TG, TA>::~R_() {
+R_<TG, TA>::~R_() noexcept {
 	PlanControl control{_context
 					  , _registry
 					  , _request
@@ -32,7 +32,7 @@ R_<TG, TA>::~R_() {
 
 template <typename TG, typename TA>
 void
-R_<TG, TA>::update() {
+R_<TG, TA>::update() noexcept {
 	FullControl control{_context
 					  , _registry
 					  , _request
@@ -54,7 +54,7 @@ R_<TG, TA>::update() {
 template <typename TG, typename TA>
 template <typename TEvent>
 void
-R_<TG, TA>::react(const TEvent& event) {
+R_<TG, TA>::react(const TEvent& event) noexcept {
 	FullControl control{_context
 					  , _registry
 					  , _request
@@ -73,7 +73,7 @@ R_<TG, TA>::react(const TEvent& event) {
 
 template <typename TG, typename TA>
 void
-R_<TG, TA>::changeTo(const StateID stateId) {
+R_<TG, TA>::changeTo(const StateID stateId) noexcept {
 	_request = Transition{stateId};
 
 	FFSM2_LOG_TRANSITION(_context, INVALID_STATE_ID, stateId);
@@ -83,7 +83,7 @@ R_<TG, TA>::changeTo(const StateID stateId) {
 
 template <typename TG, typename TA>
 void
-R_<TG, TA>::initialEnter() {
+R_<TG, TA>::initialEnter() noexcept {
 	FFSM2_ASSERT(_request.destination == INVALID_SHORT);
 
 	PlanControl control{_context
@@ -129,7 +129,7 @@ R_<TG, TA>::initialEnter() {
 
 template <typename TG, typename TA>
 void
-R_<TG, TA>::processTransitions(TransitionSets& currentTransitions) {
+R_<TG, TA>::processTransitions(TransitionSets& currentTransitions) noexcept {
 	FFSM2_ASSERT(_request.destination != INVALID_SHORT);
 
 	PlanControl control{_context
@@ -169,7 +169,7 @@ R_<TG, TA>::processTransitions(TransitionSets& currentTransitions) {
 template <typename TG, typename TA>
 bool
 R_<TG, TA>::cancelledByEntryGuards(const TransitionSets& currentTransitions,
-								   const Transition& pendingTransition)
+								   const Transition& pendingTransition) noexcept
 {
 	GuardControl guardControl{_context
 							, _registry
@@ -187,7 +187,7 @@ R_<TG, TA>::cancelledByEntryGuards(const TransitionSets& currentTransitions,
 template <typename TG, typename TA>
 bool
 R_<TG, TA>::cancelledByGuards(const TransitionSets& currentTransitions,
-							  const Transition& pendingTransition)
+							  const Transition& pendingTransition) noexcept
 {
 	GuardControl guardControl{_context
 							, _registry
@@ -206,7 +206,7 @@ R_<TG, TA>::cancelledByGuards(const TransitionSets& currentTransitions,
 template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
 void
 RP_<G_<NFT, TC, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  stateId,
-																const Payload& payload)
+																const Payload& payload) noexcept
 {
 	_request = Transition{stateId, payload};
 
@@ -216,7 +216,7 @@ RP_<G_<NFT, TC, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  s
 template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
 void
 RP_<G_<NFT, TC, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  stateId,
-																	 Payload&& payload)
+																	 Payload&& payload) noexcept
 {
 	_request = Transition{stateId, std::move(payload)};
 

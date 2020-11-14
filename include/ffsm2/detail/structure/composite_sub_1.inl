@@ -6,7 +6,7 @@ namespace detail {
 template <StateID N, typename TA, Short NI, typename... TS>
 bool
 CS_<N, TA, NI, TS...>::wideEntryGuard(GuardControl& control,
-									  const Short prong)
+									  const Short prong) noexcept
 {
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
@@ -21,7 +21,7 @@ CS_<N, TA, NI, TS...>::wideEntryGuard(GuardControl& control,
 template <StateID N, typename TA, Short NI, typename... TS>
 void
 CS_<N, TA, NI, TS...>::wideConstruct(PlanControl& control,
-									 const Short prong)
+									 const Short prong) noexcept
 {
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
@@ -36,7 +36,7 @@ CS_<N, TA, NI, TS...>::wideConstruct(PlanControl& control,
 template <StateID N, typename TA, Short NI, typename... TS>
 void
 CS_<N, TA, NI, TS...>::wideEnter(PlanControl& control,
-								 const Short prong)
+								 const Short prong) noexcept
 {
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
@@ -51,7 +51,7 @@ CS_<N, TA, NI, TS...>::wideEnter(PlanControl& control,
 template <StateID N, typename TA, Short NI, typename... TS>
 void
 CS_<N, TA, NI, TS...>::wideReenter(PlanControl& control,
-								   const Short prong)
+								   const Short prong) noexcept
 {
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
@@ -66,7 +66,7 @@ CS_<N, TA, NI, TS...>::wideReenter(PlanControl& control,
 template <StateID N, typename TA, Short NI, typename... TS>
 Status
 CS_<N, TA, NI, TS...>::wideUpdate(FullControl& control,
-								  const Short prong)
+								  const Short prong) noexcept
 {
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
@@ -82,7 +82,7 @@ template <typename TEvent>
 Status
 CS_<N, TA, NI, TS...>::wideReact(FullControl& control,
 								 const TEvent& event,
-								 const Short prong)
+								 const Short prong) noexcept
 {
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
@@ -96,7 +96,7 @@ CS_<N, TA, NI, TS...>::wideReact(FullControl& control,
 template <StateID N, typename TA, Short NI, typename... TS>
 bool
 CS_<N, TA, NI, TS...>::wideExitGuard(GuardControl& control,
-									 const Short prong)
+									 const Short prong) noexcept
 {
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
@@ -111,7 +111,7 @@ CS_<N, TA, NI, TS...>::wideExitGuard(GuardControl& control,
 template <StateID N, typename TA, Short NI, typename... TS>
 void
 CS_<N, TA, NI, TS...>::wideExit(PlanControl& control,
-								const Short prong)
+								const Short prong) noexcept
 {
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
@@ -126,7 +126,7 @@ CS_<N, TA, NI, TS...>::wideExit(PlanControl& control,
 template <StateID N, typename TA, Short NI, typename... TS>
 void
 CS_<N, TA, NI, TS...>::wideDestruct(PlanControl& control,
-									const Short prong)
+									const Short prong) noexcept
 {
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
@@ -141,7 +141,7 @@ CS_<N, TA, NI, TS...>::wideDestruct(PlanControl& control,
 template <StateID N, typename TA, Short NI, typename... TS>
 void
 CS_<N, TA, NI, TS...>::wideChangeToRequested(PlanControl& control,
-											 const Short prong)
+											 const Short prong) noexcept
 {
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 

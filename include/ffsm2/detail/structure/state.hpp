@@ -28,34 +28,35 @@ struct S_ final {
 
 	//----------------------------------------------------------------------
 
-	FFSM2_INLINE bool	deepEntryGuard		  (GuardControl& control);
+	FFSM2_INLINE bool	deepEntryGuard		 (GuardControl& control) noexcept;
 
-	FFSM2_INLINE void	deepConstruct		  (PlanControl&  control);
+	FFSM2_INLINE void	deepConstruct		 (PlanControl&  control) noexcept;
 
-	FFSM2_INLINE void	deepEnter			  (PlanControl&  control);
-	FFSM2_INLINE void	deepReenter			  (PlanControl&  control);
+	FFSM2_INLINE void	deepEnter			 (PlanControl&  control) noexcept;
+	FFSM2_INLINE void	deepReenter			 (PlanControl&  control) noexcept;
 
-	FFSM2_INLINE Status	deepUpdate			  (FullControl&  control);
+	FFSM2_INLINE Status deepUpdate			 (FullControl&  control) noexcept;
 
 	template <typename TEvent>
-	FFSM2_INLINE Status	deepReact			  (FullControl&	 control, const TEvent& event);
+	FFSM2_INLINE Status deepReact			 (FullControl&	control,
+											  const TEvent& event)	 noexcept;
 
-	FFSM2_INLINE bool	deepExitGuard		  (GuardControl& control);
+	FFSM2_INLINE bool	deepExitGuard		 (GuardControl& control) noexcept;
 
-	FFSM2_INLINE void	deepExit			  (PlanControl&	 control);
+	FFSM2_INLINE void	deepExit			 (PlanControl&	control) noexcept;
 
-	FFSM2_INLINE void	deepDestruct		  (PlanControl&  control);
+	FFSM2_INLINE void	deepDestruct		 (PlanControl&  control) noexcept;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #ifdef FFSM2_ENABLE_PLANS
-	FFSM2_INLINE void	wrapPlanSucceeded	  (FullControl&	 control);
-	FFSM2_INLINE void	wrapPlanFailed		  (FullControl&	 control);
+	FFSM2_INLINE void	wrapPlanSucceeded	 (FullControl&	control) noexcept;
+	FFSM2_INLINE void	wrapPlanFailed		 (FullControl&	control) noexcept;
 #endif
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_INLINE void	deepChangeToRequested(Control&)																		{}
+	FFSM2_INLINE void	deepChangeToRequested(Control&)				 noexcept {}
 
 	//----------------------------------------------------------------------
 
@@ -79,7 +80,7 @@ struct S_ final {
 	void log(TReturn(THost::*)(TParams...),
 			 Logger& logger,
 			 Context& context,
-			 const Method method) const
+			 const Method method) const noexcept
 	{
 		logger.recordMethod(context, STATE_ID, method);
 	}
@@ -90,7 +91,7 @@ struct S_ final {
 	void log(TReturn(Empty::*)(TParams...),
 			 Logger&,
 			 Context&,
-			 const Method) const
+			 const Method) const noexcept
 	{}
 
 #endif
