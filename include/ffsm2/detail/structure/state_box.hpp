@@ -5,7 +5,7 @@ namespace ffsm2 {
 template <typename>
 struct Guard {
 	template <typename TArgs>
-	static constexpr void execute(ffsm2::detail::GuardControlT<TArgs>&) noexcept {}
+	static FFSM2_INLINE void execute(ffsm2::detail::GuardControlT<TArgs>&) noexcept {}
 };
 
 namespace detail {
@@ -54,8 +54,8 @@ struct StaticBox final {
 
 	FFSM2_INLINE void guard(GuardControlT<TArgs>& control) noexcept;
 
-	constexpr void construct() noexcept 																{}
-	constexpr void destruct()  noexcept 																{}
+	FFSM2_INLINE void construct() noexcept 																{}
+	FFSM2_INLINE void destruct()  noexcept 																{}
 
 	FFSM2_INLINE	   Type& get()		 noexcept					{ return t_;						}
 	FFSM2_INLINE const Type& get() const noexcept					{ return t_;						}

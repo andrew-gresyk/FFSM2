@@ -197,11 +197,6 @@ constexpr FeatureTag FFSM2_FEATURE_TAG = FFSM2_PLANS_MASK						|
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#if _MSC_VER == 1900
-	#pragma warning(push)
-	#pragma warning(disable: 4814) // in C++14 'constexpr' will not imply 'const'; consider explicitly specifying 'const'
-#endif
-
 #ifdef __clang__
 	#pragma clang diagnostic push
 	#pragma clang diagnostic ignored "-Wextra-semi" // error : extra ';' inside a class

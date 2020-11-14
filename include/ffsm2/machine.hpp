@@ -241,11 +241,6 @@ constexpr FeatureTag FFSM2_FEATURE_TAG = FFSM2_PLANS_MASK						|
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#if _MSC_VER == 1900
-	#pragma warning(push)
-	#pragma warning(disable: 4814) // in C++14 'constexpr' will not imply 'const'; consider explicitly specifying 'const'
-#endif
-
 #ifdef __clang__
 	#pragma clang diagnostic push
 	#pragma clang diagnostic ignored "-Wextra-semi" // error : extra ';' inside a class
@@ -4205,7 +4200,7 @@ namespace ffsm2 {
 template <typename>
 struct Guard {
 	template <typename TArgs>
-	static constexpr void execute(ffsm2::detail::GuardControlT<TArgs>&) noexcept {}
+	static FFSM2_INLINE void execute(ffsm2::detail::GuardControlT<TArgs>&) noexcept {}
 };
 
 namespace detail {
@@ -4254,8 +4249,8 @@ struct StaticBox final {
 
 	FFSM2_INLINE void guard(GuardControlT<TArgs>& control) noexcept;
 
-	constexpr void construct() noexcept 																{}
-	constexpr void destruct()  noexcept 																{}
+	FFSM2_INLINE void construct() noexcept 																{}
+	FFSM2_INLINE void destruct()  noexcept 																{}
 
 	FFSM2_INLINE	   Type& get()		 noexcept					{ return t_;						}
 	FFSM2_INLINE const Type& get() const noexcept					{ return t_;						}
@@ -6211,10 +6206,6 @@ RP_<G_<NFT, TC, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  s
 
 #ifdef __clang__
 	#pragma clang diagnostic pop
-#endif
-
-#if _MSC_VER == 1900
-	#pragma warning(pop)
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
