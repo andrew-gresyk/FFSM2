@@ -185,7 +185,7 @@ struct TL_
 
 template <Long N>
 struct Const {
-	static constexpr Long Value = N;
+	static constexpr Long VALUE = N;
 };
 
 //------------------------------------------------------------------------------
@@ -289,7 +289,7 @@ template <typename, typename>
 struct Find;
 
 template <typename T, typename... Ts>
-struct Find<T, TL_<Ts...>>
+struct Find<TL_<Ts...>, T>
 	: FindImpl<0, T, Ts...>
 {};
 
@@ -300,7 +300,7 @@ struct Find<T, TL_<Ts...>>
 }
 
 template <typename TList, typename T>
-constexpr Long index   () noexcept { return detail::Find<T, TList>::Value;					}
+constexpr Long index   () noexcept { return detail::Find<TList, T>::VALUE;					}
 
 template <typename TList, typename T>
 constexpr bool contains() noexcept { return std::is_base_of<detail::Type<T>, TList>::value;	}

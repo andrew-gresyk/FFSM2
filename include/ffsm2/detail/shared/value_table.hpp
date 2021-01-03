@@ -45,14 +45,16 @@ template <typename... TKeys, typename... TValues, typename... Ts>
 struct MatchValuesN<TT_<TP_<TKeys, TValues>...>, TL_<Ts...>> {
 	using TypeList = TL_<Ts...>;
 
+	using ValueTable = VT_<
+						   VP_<
+							   index<TypeList, TKeys>(),
+							   index<TypeList, TValues>()
+						   >...
+					   >;
+
 	using Type = VL_<
 		MatchValueN<
-			VT_<
-				VP_<
-					index<TypeList, TKeys>(),
-					index<TypeList, TValues>()
-				>...
-			>,
+			ValueTable,
 			index<TypeList, Ts>()
 		>::VALUE...
 	>;

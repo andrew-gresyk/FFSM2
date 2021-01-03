@@ -277,13 +277,13 @@ TEST_CASE("FSM.Static Plans", "[machine]") {
 		step6(machine, logger);
 	}
 
-	//logger.assertSequence({
-	//	{ FSM::stateId<D>(),		Event::Type::EXIT },
-	//	{ ffsm2::INVALID_STATE_ID,	Event::Type::EXIT },
-	//
-	//	{ FSM::stateId<D>(),		Event::Type::DESTRUCT },
-	//	{ ffsm2::INVALID_STATE_ID,	Event::Type::DESTRUCT },
-	//});
+	logger.assertSequence({
+		{ FSM::stateId<D>(),		Event::Type::EXIT },
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::EXIT },
+
+		{ FSM::stateId<D>(),		Event::Type::DESTRUCT },
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::DESTRUCT },
+	});
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -89,10 +89,6 @@ struct Apex
 		plan.change<B, D>();
 	}
 
-	void planSucceeded(FullControl& control) {
-		REQUIRE(!control.plan());
-	}
-
 	void planFailed(FullControl& control) {
 		REQUIRE(!control.plan());
 	}

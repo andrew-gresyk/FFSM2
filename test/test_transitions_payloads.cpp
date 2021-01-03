@@ -128,12 +128,7 @@ struct C
 
 struct D
 	: FSM::State
-{
-	void exitGuard(GuardControl& control) {
-		control.cancelPendingTransition();
-		control.changeWith<C>(Payload{});
-	}
-};
+{};
 
 //------------------------------------------------------------------------------
 

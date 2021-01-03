@@ -1587,7 +1587,7 @@ struct TL_
 
 template <Long N>
 struct Const {
-	static constexpr Long Value = N;
+	static constexpr Long VALUE = N;
 };
 
 //------------------------------------------------------------------------------
@@ -1691,7 +1691,7 @@ template <typename, typename>
 struct Find;
 
 template <typename T, typename... Ts>
-struct Find<T, TL_<Ts...>>
+struct Find<TL_<Ts...>, T>
 	: FindImpl<0, T, Ts...>
 {};
 
@@ -1702,7 +1702,7 @@ struct Find<T, TL_<Ts...>>
 }
 
 template <typename TList, typename T>
-constexpr Long index   () noexcept { return detail::Find<T, TList>::Value;					}
+constexpr Long index   () noexcept { return detail::Find<TList, T>::VALUE;					}
 
 template <typename TList, typename T>
 constexpr bool contains() noexcept { return std::is_base_of<detail::Type<T>, TList>::value;	}
@@ -1933,11 +1933,6 @@ struct MatchValueN<TValueTable, NKey, Void<decltype(matchValue<NKey>(TValueTable
 	static constexpr Long VALUE = matchValue<NKey>(TValueTable{});
 };
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-template<typename TValueTable, Long NKey>
-constexpr Long MatchValue = MatchValueN<TValueTable, NKey>::VALUE;
-
 //------------------------------------------------------------------------------
 
 template <typename, typename>
@@ -1947,16 +1942,18 @@ template <typename... TKeys, typename... TValues, typename... Ts>
 struct MatchValuesN<TT_<TP_<TKeys, TValues>...>, TL_<Ts...>> {
 	using TypeList = TL_<Ts...>;
 
+	using ValueTable = VT_<
+						   VP_<
+							   index<TypeList, TKeys>(),
+							   index<TypeList, TValues>()
+						   >...
+					   >;
+
 	using Type = VL_<
-		MatchValue<
-			VT_<
-				VP_<
-					index<TypeList, TKeys>(),
-					index<TypeList, TValues>()
-				>...
-			>,
+		MatchValueN<
+			ValueTable,
 			index<TypeList, Ts>()
-		>...
+		>::VALUE...
 	>;
 };
 
