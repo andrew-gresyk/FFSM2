@@ -125,10 +125,10 @@ public:
 
 		FFSM2_INLINE void operator ++()					noexcept;
 
-		FFSM2_INLINE		Task& operator  *()			noexcept	{ return  _plan._planData.tasks[_curr];		}
+		FFSM2_INLINE	   Task& operator  *()			noexcept	{ return  _plan._planData.tasks[_curr];		}
 		FFSM2_INLINE const Task& operator  *() const	noexcept	{ return  _plan._planData.tasks[_curr];		}
 
-		FFSM2_INLINE		Task* operator ->()			noexcept	{ return &_plan._planData.tasks[_curr];		}
+		FFSM2_INLINE	   Task* operator ->()			noexcept	{ return &_plan._planData.tasks[_curr];		}
 		FFSM2_INLINE const Task* operator ->() const	noexcept	{ return &_plan._planData.tasks[_curr];		}
 
 		FFSM2_INLINE void remove()						noexcept;
@@ -149,10 +149,10 @@ public:
 
 		FFSM2_INLINE void operator ++()					noexcept;
 
-		FFSM2_INLINE		Task& operator  *()			noexcept	{ return  _plan._planData.tasks[_curr];		}
+		FFSM2_INLINE	   Task& operator  *()			noexcept	{ return  _plan._planData.tasks[_curr];		}
 		FFSM2_INLINE const Task& operator  *() const	noexcept	{ return  _plan._planData.tasks[_curr];		}
 
-		FFSM2_INLINE		Task* operator ->()			noexcept	{ return &_plan._planData.tasks[_curr];		}
+		FFSM2_INLINE	   Task* operator ->()			noexcept	{ return &_plan._planData.tasks[_curr];		}
 		FFSM2_INLINE const Task* operator ->() const	noexcept	{ return &_plan._planData.tasks[_curr];		}
 
 		FFSM2_INLINE Long next() const					noexcept;

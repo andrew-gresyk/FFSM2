@@ -211,6 +211,8 @@ void step4(FSM::Instance& machine, Logger& logger) {
 		{ FSM::stateId<B>(),		Event::Type::UPDATE },
 
 		{ FSM::stateId<B>(),		Event::Type::TASK_SUCCESS },
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::PLAN_SUCCEEDED },
+
 		{ FSM::stateId<B>(),		Event::Type::CHANGE,	FSM::stateId<C>() },
 
 		{ FSM::stateId<B>(),		Event::Type::EXIT_GUARD },

@@ -2776,10 +2776,10 @@ public:
 
 		FFSM2_INLINE void operator ++()					noexcept;
 
-		FFSM2_INLINE		Task& operator  *()			noexcept	{ return  _plan._planData.tasks[_curr];		}
+		FFSM2_INLINE	   Task& operator  *()			noexcept	{ return  _plan._planData.tasks[_curr];		}
 		FFSM2_INLINE const Task& operator  *() const	noexcept	{ return  _plan._planData.tasks[_curr];		}
 
-		FFSM2_INLINE		Task* operator ->()			noexcept	{ return &_plan._planData.tasks[_curr];		}
+		FFSM2_INLINE	   Task* operator ->()			noexcept	{ return &_plan._planData.tasks[_curr];		}
 		FFSM2_INLINE const Task* operator ->() const	noexcept	{ return &_plan._planData.tasks[_curr];		}
 
 		FFSM2_INLINE void remove()						noexcept;
@@ -2800,10 +2800,10 @@ public:
 
 		FFSM2_INLINE void operator ++()					noexcept;
 
-		FFSM2_INLINE		Task& operator  *()			noexcept	{ return  _plan._planData.tasks[_curr];		}
+		FFSM2_INLINE	   Task& operator  *()			noexcept	{ return  _plan._planData.tasks[_curr];		}
 		FFSM2_INLINE const Task& operator  *() const	noexcept	{ return  _plan._planData.tasks[_curr];		}
 
-		FFSM2_INLINE		Task* operator ->()			noexcept	{ return &_plan._planData.tasks[_curr];		}
+		FFSM2_INLINE	   Task* operator ->()			noexcept	{ return &_plan._planData.tasks[_curr];		}
 		FFSM2_INLINE const Task* operator ->() const	noexcept	{ return &_plan._planData.tasks[_curr];		}
 
 		FFSM2_INLINE Long next() const					noexcept;
@@ -4077,7 +4077,7 @@ FullControlT<ArgsT<TC, TG, TSL, NSL FFSM2_IF_DYNAMIC_PLANS(, NTC) FFSM2_IF_STATI
 	#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
 
 		if (Plan p = plan()) {
-			for (auto it = p.first(); it; ++it) {
+			for (auto it = p.first(); it; ++it)
 				if (_registry.active == it->origin &&
 					_planData.tasksSuccesses.get(it->origin))
 				{
@@ -4090,12 +4090,9 @@ FullControlT<ArgsT<TC, TG, TSL, NSL FFSM2_IF_DYNAMIC_PLANS(, NTC) FFSM2_IF_STATI
 					FFSM2_IF_STATIC_PLANS(processed = true);
 					break;
 				}
-			}
-
-			if (!p) {
-				_status.result = Status::Result::SUCCESS;
-				headState.wrapPlanSucceeded(*this);
-			}
+		} else {
+			_status.result = Status::Result::SUCCESS;
+			headState.wrapPlanSucceeded(*this);
 		}
 
 	#endif
@@ -4176,7 +4173,7 @@ FullControlT<ArgsT<TC, TG, TSL, NSL FFSM2_IF_DYNAMIC_PLANS(, NTC) FFSM2_IF_STATI
 	#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
 
 		if (Plan p = plan()) {
-			for (auto it = p.first(); it; ++it) {
+			for (auto it = p.first(); it; ++it)
 				if (_registry.active == it->origin &&
 					_planData.tasksSuccesses.get(it->origin))
 				{
@@ -4189,12 +4186,9 @@ FullControlT<ArgsT<TC, TG, TSL, NSL FFSM2_IF_DYNAMIC_PLANS(, NTC) FFSM2_IF_STATI
 					FFSM2_IF_STATIC_PLANS(processed = true);
 					break;
 				}
-			}
-
-			if (!p) {
-				_status.result = Status::Result::SUCCESS;
-				headState.wrapPlanSucceeded(*this);
-			}
+		} else {
+			_status.result = Status::Result::SUCCESS;
+			headState.wrapPlanSucceeded(*this);
 		}
 
 	#endif
@@ -4342,40 +4336,40 @@ struct B_<TFirst>
 
 	using TFirst::stateId;
 
-	FFSM2_INLINE void entryGuard	   (GuardControl&)		  noexcept {}
+	FFSM2_INLINE void entryGuard	   (GuardControl&)		noexcept {}
 
-	FFSM2_INLINE void enter			   (PlanControl& )		  noexcept {}
-	FFSM2_INLINE void reenter		   (PlanControl& )		  noexcept {}
+	FFSM2_INLINE void enter			   (PlanControl&)		noexcept {}
+	FFSM2_INLINE void reenter		   (PlanControl&)		noexcept {}
 
-	FFSM2_INLINE void update		   (FullControl& )		  noexcept {}
+	FFSM2_INLINE void update		   (FullControl&)		noexcept {}
 
 	template <typename TEvent>
 	FFSM2_INLINE void react			   (const TEvent&,
-										FullControl& )		  noexcept {}
+										FullControl&)		noexcept {}
 
-	FFSM2_INLINE void exitGuard		   (GuardControl&)		  noexcept {}
+	FFSM2_INLINE void exitGuard		   (GuardControl&)		noexcept {}
 
-	FFSM2_INLINE void exit			   (PlanControl& )		  noexcept {}
+	FFSM2_INLINE void exit			   (PlanControl&)		noexcept {}
 
 #ifdef FFSM2_ENABLE_ANY_PLANS
-	FFSM2_INLINE void planSucceeded	   (FullControl& control) noexcept { control.succeed();	}
-	FFSM2_INLINE void planFailed	   (FullControl& control) noexcept { control.fail();	}
+	FFSM2_INLINE void planSucceeded	   (FullControl&)		noexcept {}
+	FFSM2_INLINE void planFailed	   (FullControl&)		noexcept {}
 #endif
 
-	FFSM2_INLINE void widePreEntryGuard(Context& context)	  noexcept;
+	FFSM2_INLINE void widePreEntryGuard(Context& context)	noexcept;
 
-	FFSM2_INLINE void widePreEnter	   (Context& context)	  noexcept;
-	FFSM2_INLINE void widePreReenter   (Context& context)	  noexcept;
+	FFSM2_INLINE void widePreEnter	   (Context& context)	noexcept;
+	FFSM2_INLINE void widePreReenter   (Context& context)	noexcept;
 
-	FFSM2_INLINE void widePreUpdate	   (Context& context)	  noexcept;
+	FFSM2_INLINE void widePreUpdate	   (Context& context)	noexcept;
 
 	template <typename TEvent>
 	FFSM2_INLINE void widePreReact	   (const TEvent& event,
-										Context& context)	  noexcept;
+										Context& context)	noexcept;
 
-	FFSM2_INLINE void widePreExitGuard (Context& context)	  noexcept;
+	FFSM2_INLINE void widePreExitGuard (Context& context)	noexcept;
 
-	FFSM2_INLINE void widePostExit	   (Context& context)	  noexcept;
+	FFSM2_INLINE void widePostExit	   (Context& context)	noexcept;
 };
 
 //------------------------------------------------------------------------------

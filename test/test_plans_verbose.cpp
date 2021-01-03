@@ -151,7 +151,11 @@ struct C
 
 struct D
 	: FSM::State
-{};
+{
+	void update(FullControl& control) {
+		control.succeed();
+	}
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -274,8 +278,6 @@ void step6(FSM::Instance& machine, Logger& logger) {
 		{ FSM::stateId<C>(),		Event::Type::TASK_SUCCESS },
 		{ FSM::stateId<C>(),		Event::Type::CHANGE,	FSM::stateId<D>() },
 
-		{ ffsm2::INVALID_STATE_ID,	Event::Type::PLAN_SUCCEEDED },
-
 		{ FSM::stateId<C>(),		Event::Type::EXIT_GUARD },
 		{ FSM::stateId<D>(),		Event::Type::ENTRY_GUARD },
 
@@ -284,6 +286,22 @@ void step6(FSM::Instance& machine, Logger& logger) {
 
 		{ FSM::stateId<D>(),		Event::Type::CONSTRUCT },
 		{ FSM::stateId<D>(),		Event::Type::ENTER },
+	});
+
+	REQUIRE(machine.activeStateId() == FSM::stateId<D>());
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+void step7(FSM::Instance& machine, Logger& logger) {
+	machine.update();
+
+	logger.assertSequence({
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::UPDATE },
+		{ FSM::stateId<D>(),		Event::Type::UPDATE },
+
+		{ FSM::stateId<D>(),		Event::Type::TASK_SUCCESS },
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::PLAN_SUCCEEDED },
 	});
 
 	REQUIRE(machine.activeStateId() == FSM::stateId<D>());
@@ -304,6 +322,7 @@ TEST_CASE("FSM.Plans Verbose", "[machine]") {
 		step4(machine, logger);
 		step5(machine, logger);
 		step6(machine, logger);
+		step7(machine, logger);
 	}
 
 	logger.assertSequence({

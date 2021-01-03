@@ -106,7 +106,7 @@ FullControlT<ArgsT<TC, TG, TSL, NSL FFSM2_IF_DYNAMIC_PLANS(, NTC) FFSM2_IF_STATI
 	#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
 
 		if (Plan p = plan()) {
-			for (auto it = p.first(); it; ++it) {
+			for (auto it = p.first(); it; ++it)
 				if (_registry.active == it->origin &&
 					_planData.tasksSuccesses.get(it->origin))
 				{
@@ -119,12 +119,9 @@ FullControlT<ArgsT<TC, TG, TSL, NSL FFSM2_IF_DYNAMIC_PLANS(, NTC) FFSM2_IF_STATI
 					FFSM2_IF_STATIC_PLANS(processed = true);
 					break;
 				}
-			}
-
-			if (!p) {
-				_status.result = Status::Result::SUCCESS;
-				headState.wrapPlanSucceeded(*this);
-			}
+		} else {
+			_status.result = Status::Result::SUCCESS;
+			headState.wrapPlanSucceeded(*this);
 		}
 
 	#endif
@@ -205,7 +202,7 @@ FullControlT<ArgsT<TC, TG, TSL, NSL FFSM2_IF_DYNAMIC_PLANS(, NTC) FFSM2_IF_STATI
 	#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
 
 		if (Plan p = plan()) {
-			for (auto it = p.first(); it; ++it) {
+			for (auto it = p.first(); it; ++it)
 				if (_registry.active == it->origin &&
 					_planData.tasksSuccesses.get(it->origin))
 				{
@@ -218,12 +215,9 @@ FullControlT<ArgsT<TC, TG, TSL, NSL FFSM2_IF_DYNAMIC_PLANS(, NTC) FFSM2_IF_STATI
 					FFSM2_IF_STATIC_PLANS(processed = true);
 					break;
 				}
-			}
-
-			if (!p) {
-				_status.result = Status::Result::SUCCESS;
-				headState.wrapPlanSucceeded(*this);
-			}
+		} else {
+			_status.result = Status::Result::SUCCESS;
+			headState.wrapPlanSucceeded(*this);
 		}
 
 	#endif
