@@ -1,3 +1,5 @@
+#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
+
 namespace ffsm2 {
 namespace detail {
 
@@ -160,8 +162,8 @@ template <typename TI, Short NC>
 template <Short NUnit, Short NWidth>
 typename BitArray<TI, NC>::Bits
 BitArray<TI, NC>::bits() noexcept {
-	static constexpr Short UNIT  = NUnit;
-	static constexpr Short WIDTH = NWidth;
+	constexpr Short UNIT  = NUnit;
+	constexpr Short WIDTH = NWidth;
 	static_assert(UNIT + (WIDTH + 7) / (sizeof(Unit) * 8) <= CAPACITY, "");
 
 	return Bits{_storage + UNIT, WIDTH};
@@ -173,8 +175,8 @@ template <typename TI, Short NC>
 template <Short NUnit, Short NWidth>
 typename BitArray<TI, NC>::CBits
 BitArray<TI, NC>::bits() const noexcept {
-	static constexpr Short UNIT  = NUnit;
-	static constexpr Short WIDTH = NWidth;
+	constexpr Short UNIT  = NUnit;
+	constexpr Short WIDTH = NWidth;
 	static_assert(UNIT + (WIDTH + 7) / (sizeof(Unit) * 8) <= CAPACITY, "");
 
 	return CBits{_storage + UNIT, WIDTH};
@@ -204,3 +206,5 @@ BitArray<TI, NC>::bits(const Units& units) const noexcept {
 
 }
 }
+
+#endif

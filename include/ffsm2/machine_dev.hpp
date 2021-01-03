@@ -50,6 +50,9 @@
 #include "detail/shared/bit_array.hpp"
 #include "detail/shared/list.hpp"
 #include "detail/shared/type_list.hpp"
+#include "detail/shared/type_table.hpp"
+#include "detail/shared/value_list.hpp"
+#include "detail/shared/value_table.hpp"
 
 #include "detail/features/common.hpp"
 #include "detail/features/logger_interface.hpp"
@@ -75,7 +78,7 @@ namespace detail {
 template <FeatureTag NFeatureTag
 		, typename TContext
 		, Long NSubstitutionLimit
-		FFSM2_IF_PLANS(, Long NTaskCapacity)
+		FFSM2_IF_DYNAMIC_PLANS(, Long NTaskCapacity)
 		, typename TPayload>
 struct G_ {
 	static constexpr FeatureTag FEATURE_TAG = NFeatureTag;
@@ -88,28 +91,28 @@ struct G_ {
 
 	static constexpr Long SUBSTITUTION_LIMIT = NSubstitutionLimit;
 
-#ifdef FFSM2_ENABLE_PLANS
+#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
 	static constexpr Long TASK_CAPACITY	  = NTaskCapacity;
 #endif
 
 	using Payload			 = TPayload;
 	using Transition		 = TransitionT<Payload>;
 
-#ifdef FFSM2_ENABLE_PLANS
+#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
 	using Task				 = TaskT<Payload>;
 #endif
 
 	/// @brief Set Context type
 	/// @tparam T Context type for data shared between states and/or data interface between FSM and external code
 	template <typename T>
-	using ContextT			 = G_<FEATURE_TAG, T	  , SUBSTITUTION_LIMIT FFSM2_IF_PLANS(, TASK_CAPACITY), Payload>;
+	using ContextT			 = G_<FEATURE_TAG, T	  , SUBSTITUTION_LIMIT FFSM2_IF_DYNAMIC_PLANS(, TASK_CAPACITY), Payload>;
 
 	/// @brief Set Substitution limit
 	/// @tparam N Maximum number times 'guard()' methods can substitute their states for others
 	template <Long N>
-	using SubstitutionLimitN = G_<FEATURE_TAG, Context, N				   FFSM2_IF_PLANS(, TASK_CAPACITY), Payload>;
+	using SubstitutionLimitN = G_<FEATURE_TAG, Context, N				   FFSM2_IF_DYNAMIC_PLANS(, TASK_CAPACITY), Payload>;
 
-#ifdef FFSM2_ENABLE_PLANS
+#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
 
 	/// @brief Set Task capacity
 	/// @tparam N Maximum number of tasks across all plans
@@ -121,7 +124,7 @@ struct G_ {
 	/// @brief Set Transition Payload type
 	/// @tparam T Utility type for 'TUtility State::utility() const' method
 	template <typename T>
-	using PayloadT			 = G_<FEATURE_TAG, Context, SUBSTITUTION_LIMIT FFSM2_IF_PLANS(, TASK_CAPACITY), T      >;
+	using PayloadT			 = G_<FEATURE_TAG, Context, SUBSTITUTION_LIMIT FFSM2_IF_DYNAMIC_PLANS(, TASK_CAPACITY), T      >;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -132,10 +135,10 @@ struct M_;
 template <FeatureTag NFeatureTag
 		, typename TContext
 		, Long NSubstitutionLimit
-		FFSM2_IF_PLANS(, Long NTaskCapacity)
+		FFSM2_IF_DYNAMIC_PLANS(, Long NTaskCapacity)
 		, typename TPayload>
-struct M_	   <G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>> {
-	using Cfg = G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>;
+struct M_	   <G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_DYNAMIC_PLANS(, NTaskCapacity), TPayload>> {
+	using Cfg = G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_DYNAMIC_PLANS(, NTaskCapacity), TPayload>;
 
 	static constexpr FeatureTag FEATURE_TAG = NFeatureTag;
 
@@ -150,16 +153,86 @@ struct M_	   <G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTas
 
 	//----------------------------------------------------------------------
 
+	/// @brief Topology An optional wrapper
+	///		should be passed in conjunction with StaticPlan
+	/// @tparam TSubStates Sub-states
+	template <typename... TSubStates>
+	struct Topology;
+
+#ifdef FFSM2_ENABLE_STATIC_PLANS
+
+	/// @brief An entry in a transition table
+	/// @tparam TOrigin Origin state
+	/// @tparam TDestination Destination state
+	template <typename TOrigin, typename TDestination>
+	using TaskLink = TP_<TOrigin, TDestination>;
+
+	/// <summary>
+	///
+	/// </summary>
+	/// <typeparam name="...TLinks"></typeparam>
+	template <typename... TLinks>
+	using StaticPlan = TT_<TLinks...>;
+
+#endif
+
+	//----------------------------------------------------------------------
+
 	/// @brief Root
 	/// @tparam THead Head state
 	/// @tparam TSubStates Sub-states
 	template <typename THead, typename... TSubStates>
-	using Root			 = RF_<Cfg, CI_<THead, TSubStates...>>;
+	struct Root final
+		: RF_<Cfg,	 CI_<THead, TSubStates...> FFSM2_IF_STATIC_PLANS(, TT_<>)>
+	{};
+
+	/// @brief Root
+	/// @tparam THead Head state
+	/// @tparam TSubStates Sub-states
+	template <typename THead, typename... TSubStates>
+	struct Root<THead, Topology<TSubStates...>> final
+		: RF_<Cfg,	 CI_<THead, TSubStates...> FFSM2_IF_STATIC_PLANS(, TT_<>)>
+	{};
+
+#ifdef FFSM2_ENABLE_STATIC_PLANS
+
+	/// @brief Root
+	/// @tparam THead Head state
+	/// @tparam Topology A list of sub-states
+	/// @tparam StaticPlan Static plan
+	template <typename THead, typename... TSubStates, typename... TOrigins, typename... TDestinations>
+	struct Root<THead, Topology<TSubStates...>, TT_<TP_<TOrigins, TDestinations>...>> final
+		: RF_<Cfg,	 CI_<THead, TSubStates...>, TT_<TP_<TOrigins, TDestinations>...>>
+	{};
+
+#endif
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	/// @brief Headless root
 	/// @tparam TSubStates Sub-states
-	template <				  typename... TSubStates>
-	using PeerRoot		 = RF_<Cfg, CI_<void,  TSubStates...>>;
+	template <	 typename... TSubStates>
+	struct PeerRoot final
+		: RF_<Cfg, CI_<void, TSubStates...> FFSM2_IF_STATIC_PLANS(, TT_<>)>
+	{};
+
+	/// @brief Headless root
+	/// @tparam Topology A list of sub-states
+	template <	 typename... TSubStates>
+	struct PeerRoot<Topology<TSubStates...>> final
+		: RF_<Cfg, CI_<void, TSubStates...> FFSM2_IF_STATIC_PLANS(, TT_<>)>
+	{};
+
+#ifdef FFSM2_ENABLE_STATIC_PLANS
+
+	/// @brief Headless root
+	/// @tparam Topology A list of sub-states
+	template <	 typename... TSubStates, typename... TOrigins, typename... TDestinations>
+	struct PeerRoot<Topology<TSubStates...>, TT_<TP_<TOrigins, TDestinations>...>> final
+		: RF_<Cfg, CI_<void, TSubStates...>, TT_<TP_<TOrigins, TDestinations>...>>
+	{};
+
+#endif
 
 	//----------------------------------------------------------------------
 };
@@ -175,9 +248,9 @@ struct M_	   <G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTas
 /// @tparam TPayload Payload type
 template <typename TContext = EmptyContext
 		, Long NSubstitutionLimit = 4
-		FFSM2_IF_PLANS(, Long NTaskCapacity = INVALID_LONG)
+		FFSM2_IF_DYNAMIC_PLANS(, Long NTaskCapacity = INVALID_LONG)
 		, typename TPayload = void>
-using ConfigT = detail::G_<FFSM2_FEATURE_TAG, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>;
+using ConfigT = detail::G_<FFSM2_FEATURE_TAG, TContext, NSubstitutionLimit FFSM2_IF_DYNAMIC_PLANS(, NTaskCapacity), TPayload>;
 
 /// @brief Type configuration for MachineT<>
 using Config = ConfigT<>;

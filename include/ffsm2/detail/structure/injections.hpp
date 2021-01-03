@@ -16,7 +16,7 @@ protected:
 	using Control		= ControlT<TArgs>;
 	using PlanControl	= PlanControlT<TArgs>;
 
-#ifdef FFSM2_ENABLE_PLANS
+#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
 	using Plan			= PlanT<TArgs>;
 #endif
 
@@ -62,7 +62,7 @@ struct B_<TFirst, TRest...>
 	using typename TFirst::Control;
 	using typename TFirst::PlanControl;
 
-#ifdef FFSM2_ENABLE_PLANS
+#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
 	using typename TFirst::Plan;
 #endif
 
@@ -100,7 +100,7 @@ struct B_<TFirst>
 	using typename TFirst::Control;
 	using typename TFirst::PlanControl;
 
-#ifdef FFSM2_ENABLE_PLANS
+#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
 	using typename TFirst::Plan;
 #endif
 
@@ -109,40 +109,40 @@ struct B_<TFirst>
 
 	using TFirst::stateId;
 
-	FFSM2_INLINE void entryGuard	   (GuardControl&)			noexcept {}
+	FFSM2_INLINE void entryGuard	   (GuardControl&)		noexcept {}
 
-	FFSM2_INLINE void enter			   (PlanControl& )			noexcept {}
-	FFSM2_INLINE void reenter		   (PlanControl& )			noexcept {}
+	FFSM2_INLINE void enter			   (PlanControl&)		noexcept {}
+	FFSM2_INLINE void reenter		   (PlanControl&)		noexcept {}
 
-	FFSM2_INLINE void update		   (FullControl& )			noexcept {}
+	FFSM2_INLINE void update		   (FullControl&)		noexcept {}
 
 	template <typename TEvent>
 	FFSM2_INLINE void react			   (const TEvent&,
-										FullControl& )			noexcept {}
+										FullControl&)		noexcept {}
 
-	FFSM2_INLINE void exitGuard		   (GuardControl&)			noexcept {}
+	FFSM2_INLINE void exitGuard		   (GuardControl&)		noexcept {}
 
-	FFSM2_INLINE void exit			   (PlanControl& )			noexcept {}
+	FFSM2_INLINE void exit			   (PlanControl&)		noexcept {}
 
-#ifdef FFSM2_ENABLE_PLANS
-	FFSM2_INLINE void planSucceeded	   (FullControl& control)	noexcept { control.succeed();	}
-	FFSM2_INLINE void planFailed	   (FullControl& control)	noexcept { control.fail();		}
+#ifdef FFSM2_ENABLE_ANY_PLANS
+	FFSM2_INLINE void planSucceeded	   (FullControl&)		noexcept {}
+	FFSM2_INLINE void planFailed	   (FullControl&)		noexcept {}
 #endif
 
-	FFSM2_INLINE void widePreEntryGuard(Context& context)		noexcept;
+	FFSM2_INLINE void widePreEntryGuard(Context& context)	noexcept;
 
-	FFSM2_INLINE void widePreEnter	   (Context& context)		noexcept;
-	FFSM2_INLINE void widePreReenter   (Context& context)		noexcept;
+	FFSM2_INLINE void widePreEnter	   (Context& context)	noexcept;
+	FFSM2_INLINE void widePreReenter   (Context& context)	noexcept;
 
-	FFSM2_INLINE void widePreUpdate	   (Context& context)		noexcept;
+	FFSM2_INLINE void widePreUpdate	   (Context& context)	noexcept;
 
 	template <typename TEvent>
 	FFSM2_INLINE void widePreReact	   (const TEvent& event,
-										Context& context)		noexcept;
+										Context& context)	noexcept;
 
-	FFSM2_INLINE void widePreExitGuard (Context& context)		noexcept;
+	FFSM2_INLINE void widePreExitGuard (Context& context)	noexcept;
 
-	FFSM2_INLINE void widePostExit	   (Context& context)		noexcept;
+	FFSM2_INLINE void widePostExit	   (Context& context)	noexcept;
 };
 
 //------------------------------------------------------------------------------

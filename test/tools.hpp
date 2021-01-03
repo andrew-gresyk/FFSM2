@@ -22,10 +22,12 @@ struct Event {
 		EXIT,
 		DESTRUCT,
 
-	//#ifdef FFSM2_ENABLE_PLANS
+	//#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
 		PLAN_SUCCEEDED,
 		PLAN_FAILED,
+	//#endif
 
+	//#ifdef FFSM2_ENABLE_ANY_PLANS
 		TASK_SUCCESS,
 		TASK_FAILURE,
 		PLAN_SUCCESS,
@@ -76,7 +78,7 @@ struct LoggerT
 	using typename Interface::Method;
 	using typename Interface::StateID;
 
-#ifdef FFSM2_ENABLE_PLANS
+#ifdef FFSM2_ENABLE_ANY_PLANS
 	using StatusEvent	  = typename Interface::StatusEvent;
 #endif
 
@@ -88,7 +90,7 @@ struct LoggerT
 						  const StateID origin,
 						  const StateID target) noexcept override;
 
-#ifdef FFSM2_ENABLE_PLANS
+#ifdef FFSM2_ENABLE_ANY_PLANS
 
 	void recordTaskStatus(Context& context,
 						  const StateID origin,

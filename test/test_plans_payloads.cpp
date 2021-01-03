@@ -1,4 +1,4 @@
-#define FFSM2_ENABLE_PLANS
+#define FFSM2_ENABLE_DYNAMIC_PLANS
 #include "tools.hpp"
 
 namespace test_plans_payloads {
@@ -77,11 +77,11 @@ struct Apex
 	}
 
 	void planSucceeded(FullControl& control) {
-		REQUIRE(control.plan());
+		REQUIRE(!control.plan());
 	}
 
 	void planFailed(FullControl& control) {
-		REQUIRE(*control.plan().first() == FSM::Task{ FSM::stateId<B>(), FSM::stateId<D>() });
+		REQUIRE(!control.plan());
 
 		control.changeWith<D>(Payload{});
 	}
@@ -152,7 +152,11 @@ struct C
 
 struct D
 	: FSM::State
-{};
+{
+	void update(FullControl& control) {
+		control.succeed();
+	}
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -263,6 +267,21 @@ void step6(FSM::Instance& machine, Logger& logger) {
 	REQUIRE(machine.activeStateId() == FSM::stateId<D>());
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+void step7(FSM::Instance& machine, Logger& logger) {
+	machine.update();
+
+	logger.assertSequence({
+		{ FSM::stateId<D>(),		Event::Type::UPDATE },
+
+		{ FSM::stateId<D>(),		Event::Type::TASK_SUCCESS },
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::PLAN_SUCCEEDED },
+	});
+
+	REQUIRE(machine.activeStateId() == FSM::stateId<D>());
+}
+
 //------------------------------------------------------------------------------
 
 TEST_CASE("FSM.Plans Payloads", "[machine]") {
@@ -278,6 +297,7 @@ TEST_CASE("FSM.Plans Payloads", "[machine]") {
 		step4(machine, logger);
 		step5(machine, logger);
 		step6(machine, logger);
+		step7(machine, logger);
 	}
 
 	logger.assertSequence({});

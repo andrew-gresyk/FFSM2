@@ -15,7 +15,7 @@ enum class Method : uint8_t {
 	EXIT,
 	DESTRUCT,
 
-#ifdef FFSM2_ENABLE_PLANS
+#ifdef FFSM2_ENABLE_ANY_PLANS
 	PLAN_SUCCEEDED,
 	PLAN_FAILED,
 #endif
@@ -23,7 +23,7 @@ enum class Method : uint8_t {
 	COUNT
 };
 
-#ifdef FFSM2_ENABLE_PLANS
+#ifdef FFSM2_ENABLE_ANY_PLANS
 
 enum class StatusEvent : uint8_t {
 	SUCCEEDED,
@@ -76,7 +76,7 @@ methodName(const Method method) noexcept {
 	case Method::EXIT:			 return "exit";
 	case Method::DESTRUCT:		 return "destruct";
 
-#ifdef FFSM2_ENABLE_PLANS
+#ifdef FFSM2_ENABLE_ANY_PLANS
 	case Method::PLAN_SUCCEEDED: return "planSucceeded";
 	case Method::PLAN_FAILED:	 return "planFailed";
 #endif
@@ -148,6 +148,8 @@ struct alignas(4) TransitionT
 {
 	using Payload = TPayload;
 	using Storage = typename std::aligned_storage<sizeof(Payload), 4>::type;
+
+	//FFSM2_INLINE TransitionT() noexcept = default;
 
 	using TransitionBase::TransitionBase;
 

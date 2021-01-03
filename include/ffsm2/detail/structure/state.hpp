@@ -49,7 +49,7 @@ struct S_ final {
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-#ifdef FFSM2_ENABLE_PLANS
+#ifdef FFSM2_ENABLE_ANY_PLANS
 	FFSM2_INLINE void	wrapPlanSucceeded	 (FullControl&	control) noexcept;
 	FFSM2_INLINE void	wrapPlanFailed		 (FullControl&	control) noexcept;
 #endif

@@ -3,9 +3,9 @@ namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename TG, typename TA>
-R_<TG, TA>::R_(Context& context
-			   FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
+template <typename TG, typename TA FFSM2_IF_STATIC_PLANS(, typename TPL)>
+R_<TG, TA FFSM2_IF_STATIC_PLANS(, TPL)>::R_(Context& context
+										  FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
 	: _context{context}
 	FFSM2_IF_LOG_INTERFACE(, _logger{logger})
 {
@@ -14,34 +14,34 @@ R_<TG, TA>::R_(Context& context
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename TG, typename TA>
-R_<TG, TA>::~R_() noexcept {
+template <typename TG, typename TA FFSM2_IF_STATIC_PLANS(, typename TPL)>
+R_<TG, TA FFSM2_IF_STATIC_PLANS(, TPL)>::~R_() noexcept {
 	PlanControl control{_context
 					  , _registry
 					  , _request
-					  FFSM2_IF_PLANS(, _planData)
+					  FFSM2_IF_DYNAMIC_PLANS(, _planData)
 					  FFSM2_IF_LOG_INTERFACE(, _logger)};
 
 	_apex.deepExit	  (control);
 	_apex.deepDestruct(control);
 
-	FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
+	FFSM2_IF_DYNAMIC_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
 }
 
 //------------------------------------------------------------------------------
 
-template <typename TG, typename TA>
+template <typename TG, typename TA FFSM2_IF_STATIC_PLANS(, typename TPL)>
 void
-R_<TG, TA>::update() noexcept {
+R_<TG, TA FFSM2_IF_STATIC_PLANS(, TPL)>::update() noexcept {
 	FullControl control{_context
 					  , _registry
 					  , _request
-					  FFSM2_IF_PLANS(, _planData)
+					  FFSM2_IF_DYNAMIC_PLANS(, _planData)
 					  FFSM2_IF_LOG_INTERFACE(, _logger)};
 
 	_apex.deepUpdate(control);
 
-	FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
+	FFSM2_IF_DYNAMIC_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
 
 	TransitionSets currentTransitions;
 
@@ -51,14 +51,14 @@ R_<TG, TA>::update() noexcept {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename TG, typename TA>
+template <typename TG, typename TA FFSM2_IF_STATIC_PLANS(, typename TPL)>
 template <typename TEvent>
 void
-R_<TG, TA>::react(const TEvent& event) noexcept {
+R_<TG, TA FFSM2_IF_STATIC_PLANS(, TPL)>::react(const TEvent& event) noexcept {
 	FullControl control{_context
 					  , _registry
 					  , _request
-					  FFSM2_IF_PLANS(, _planData)
+					  FFSM2_IF_DYNAMIC_PLANS(, _planData)
 					  FFSM2_IF_LOG_INTERFACE(, _logger)};
 
 	_apex.deepReact(control, event);
@@ -71,9 +71,9 @@ R_<TG, TA>::react(const TEvent& event) noexcept {
 
 //------------------------------------------------------------------------------
 
-template <typename TG, typename TA>
+template <typename TG, typename TA FFSM2_IF_STATIC_PLANS(, typename TPL)>
 void
-R_<TG, TA>::changeTo(const StateID stateId) noexcept {
+R_<TG, TA FFSM2_IF_STATIC_PLANS(, TPL)>::changeTo(const StateID stateId) noexcept {
 	_request = Transition{stateId};
 
 	FFSM2_LOG_TRANSITION(_context, INVALID_STATE_ID, stateId);
@@ -81,15 +81,15 @@ R_<TG, TA>::changeTo(const StateID stateId) noexcept {
 
 //------------------------------------------------------------------------------
 
-template <typename TG, typename TA>
+template <typename TG, typename TA FFSM2_IF_STATIC_PLANS(, typename TPL)>
 void
-R_<TG, TA>::initialEnter() noexcept {
+R_<TG, TA FFSM2_IF_STATIC_PLANS(, TPL)>::initialEnter() noexcept {
 	FFSM2_ASSERT(_request.destination == INVALID_SHORT);
 
 	PlanControl control{_context
 					  , _registry
 					  , _request
-					  FFSM2_IF_PLANS(, _planData)
+					  FFSM2_IF_DYNAMIC_PLANS(, _planData)
 					  FFSM2_IF_LOG_INTERFACE(, _logger)};
 
 	_registry.requested = 0;
@@ -122,20 +122,20 @@ R_<TG, TA>::initialEnter() noexcept {
 
 	_registry.clearRequests();
 
-	FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
+	FFSM2_IF_DYNAMIC_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename TG, typename TA>
+template <typename TG, typename TA FFSM2_IF_STATIC_PLANS(, typename TPL)>
 void
-R_<TG, TA>::processTransitions(TransitionSets& currentTransitions) noexcept {
+R_<TG, TA FFSM2_IF_STATIC_PLANS(, TPL)>::processTransitions(TransitionSets& currentTransitions) noexcept {
 	FFSM2_ASSERT(_request.destination != INVALID_SHORT);
 
 	PlanControl control{_context
 					  , _registry
 					  , _request
-					  FFSM2_IF_PLANS(, _planData)
+					  FFSM2_IF_DYNAMIC_PLANS(, _planData)
 					  FFSM2_IF_LOG_INTERFACE(, _logger)};
 
 	Transition pendingTransition;
@@ -161,22 +161,22 @@ R_<TG, TA>::processTransitions(TransitionSets& currentTransitions) noexcept {
 
 	_registry.clearRequests();
 
-	FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
+	FFSM2_IF_DYNAMIC_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
 }
 
 //------------------------------------------------------------------------------
 
-template <typename TG, typename TA>
+template <typename TG, typename TA FFSM2_IF_STATIC_PLANS(, typename TPL)>
 bool
-R_<TG, TA>::cancelledByEntryGuards(const TransitionSets& currentTransitions,
-								   const Transition& pendingTransition) noexcept
+R_<TG, TA FFSM2_IF_STATIC_PLANS(, TPL)>::cancelledByEntryGuards(const TransitionSets& currentTransitions,
+																const Transition& pendingTransition) noexcept
 {
 	GuardControl guardControl{_context
 							, _registry
 							, _request
 							, currentTransitions
 							, pendingTransition
-							FFSM2_IF_PLANS(, _planData)
+							FFSM2_IF_DYNAMIC_PLANS(, _planData)
 							FFSM2_IF_LOG_INTERFACE(, _logger)};
 
 	return _apex.deepEntryGuard(guardControl);
@@ -184,17 +184,17 @@ R_<TG, TA>::cancelledByEntryGuards(const TransitionSets& currentTransitions,
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename TG, typename TA>
+template <typename TG, typename TA FFSM2_IF_STATIC_PLANS(, typename TPL)>
 bool
-R_<TG, TA>::cancelledByGuards(const TransitionSets& currentTransitions,
-							  const Transition& pendingTransition) noexcept
+R_<TG, TA FFSM2_IF_STATIC_PLANS(, TPL)>::cancelledByGuards(const TransitionSets& currentTransitions,
+														   const Transition& pendingTransition) noexcept
 {
 	GuardControl guardControl{_context
 							, _registry
 							, _request
 							, currentTransitions
 							, pendingTransition
-							FFSM2_IF_PLANS(, _planData)
+							FFSM2_IF_DYNAMIC_PLANS(, _planData)
 							FFSM2_IF_LOG_INTERFACE(, _logger)};
 
 	return _apex.deepForwardExitGuard(guardControl) ||
@@ -203,20 +203,20 @@ R_<TG, TA>::cancelledByGuards(const TransitionSets& currentTransitions,
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
+template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_DYNAMIC_PLANS(, Long NTC), typename TP, typename TA FFSM2_IF_STATIC_PLANS(, typename TPL)>
 void
-RP_<G_<NFT, TC, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  stateId,
-																const Payload& payload) noexcept
+RP_<G_<NFT, TC, NSL FFSM2_IF_DYNAMIC_PLANS(, NTC), TP>, TA FFSM2_IF_STATIC_PLANS(, TPL)>::changeWith(const StateID  stateId,
+																									 const Payload& payload) noexcept
 {
 	_request = Transition{stateId, payload};
 
 	FFSM2_LOG_TRANSITION(_context, INVALID_STATE_ID, stateId);
 }
 
-template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
+template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_DYNAMIC_PLANS(, Long NTC), typename TP, typename TA FFSM2_IF_STATIC_PLANS(, typename TPL)>
 void
-RP_<G_<NFT, TC, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  stateId,
-																	 Payload&& payload) noexcept
+RP_<G_<NFT, TC, NSL FFSM2_IF_DYNAMIC_PLANS(, NTC), TP>, TA FFSM2_IF_STATIC_PLANS(, TPL)>::changeWith(const StateID  stateId,
+																										  Payload&& payload) noexcept
 {
 	_request = Transition{stateId, std::move(payload)};
 
