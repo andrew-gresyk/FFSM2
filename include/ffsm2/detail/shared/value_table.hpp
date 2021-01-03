@@ -36,11 +36,6 @@ struct MatchValueN<TValueTable, NKey, Void<decltype(matchValue<NKey>(TValueTable
 	static constexpr Long VALUE = matchValue<NKey>(TValueTable{});
 };
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-template<typename TValueTable, Long NKey>
-constexpr Long MatchValue = MatchValueN<TValueTable, NKey>::VALUE;
-
 //------------------------------------------------------------------------------
 
 template <typename, typename>
@@ -51,7 +46,7 @@ struct MatchValuesN<TT_<TP_<TKeys, TValues>...>, TL_<Ts...>> {
 	using TypeList = TL_<Ts...>;
 
 	using Type = VL_<
-		MatchValue<
+		MatchValueN<
 			VT_<
 				VP_<
 					index<TypeList, TKeys>(),
@@ -59,7 +54,7 @@ struct MatchValuesN<TT_<TP_<TKeys, TValues>...>, TL_<Ts...>> {
 				>...
 			>,
 			index<TypeList, Ts>()
-		>...
+		>::VALUE...
 	>;
 };
 

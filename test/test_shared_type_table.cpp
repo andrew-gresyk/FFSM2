@@ -85,10 +85,10 @@ using VT = ValueTable<
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-static constexpr Long NB = M::MatchValue<VT, 1>;
+static constexpr Long NB = M::MatchValueN<VT, 1>::VALUE;
 static_assert(NB == 2, "");
 
-static constexpr Long NV = M::MatchValue<VT, 2>;
+static constexpr Long NV = M::MatchValueN<VT, 2>::VALUE;
 static_assert(NV == INVALID_LONG, "");
 
 //------------------------------------------------------------------------------
