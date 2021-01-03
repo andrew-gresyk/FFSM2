@@ -1,4 +1,4 @@
-﻿// FFSM2 (hierarchical state machine for games and interactive applications)
+﻿// FFSM2 (flat state machine for games and interactive applications)
 // Created by Andrew Gresyk
 //
 // Attachable logger example:

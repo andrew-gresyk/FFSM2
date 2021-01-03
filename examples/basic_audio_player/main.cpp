@@ -1,4 +1,4 @@
-﻿// FFSM2 (hierarchical state machine for games and interactive applications)
+﻿// FFSM2 (flat state machine for games and interactive applications)
 // Created by Andrew Gresyk
 //
 // An FFSM2 port of https://gist.github.com/martinmoene/797b1923f9c6c1ae355bb2d6870be25e
