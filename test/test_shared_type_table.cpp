@@ -40,10 +40,10 @@ using TT = TypeTable<
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 using TB = M::MatchType<TT, A>;
-static_assert(std::is_same_v<TB, B>, "");
+static_assert(std::is_same<TB, B>::value, "");
 
 using TV = M::MatchType<TT, C>;
-static_assert(std::is_same_v<TV, void>, "");
+static_assert(std::is_same<TV, void>::value, "");
 
 //------------------------------------------------------------------------------
 
@@ -60,7 +60,7 @@ static_assert(IV == INVALID_LONG, "");
 //------------------------------------------------------------------------------
 
 using TML = M::MatchTypes<TT, TL>;
-static_assert(std::is_same_v<TML, TypeList<B, C, void, F, void, void>>, "");
+static_assert(std::is_same<TML, TypeList<B, C, void, F, void, void>>::value, "");
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -94,15 +94,15 @@ static_assert(NV == INVALID_LONG, "");
 //------------------------------------------------------------------------------
 
 using VML = M::MatchValues<TT, TL>;
-static_assert(std::is_same_v<VML, ValueList<1, 2, INVALID_LONG, 5, INVALID_LONG, INVALID_LONG>>, "");
+static_assert(std::is_same<VML, ValueList<1, 2, INVALID_LONG, 5, INVALID_LONG, INVALID_LONG>>::value, "");
 
 ////////////////////////////////////////////////////////////////////////////////
 
 using LHalf = M::LHalfValues<0, 1, 2, 3, 4, 5>;
-static_assert(std::is_same_v<LHalf, ValueList<0, 1, 2>>, "");
+static_assert(std::is_same<LHalf, ValueList<0, 1, 2>>::value, "");
 
 using RHalf = M::RHalfValues<0, 1, 2, 3, 4, 5>;
-static_assert(std::is_same_v<RHalf, ValueList<3, 4, 5>>, "");
+static_assert(std::is_same<RHalf, ValueList<3, 4, 5>>::value, "");
 
 using VL = ValueList<5, 7, 3, 0, 9, 5>;
 using VA = M::BinaryLookup<VL>;
