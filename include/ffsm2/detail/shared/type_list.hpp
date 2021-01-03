@@ -1,10 +1,9 @@
 namespace ffsm2 {
+namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
 #if 0
-
-namespace detail {
 
 template<Long N>
 struct IndexConstant {};
@@ -65,148 +64,124 @@ struct ITL_Impl<IndexSequence<Ns...>, Ts...>
 	: ITL_EntryN<Ts, Ns>...
 {
 	template <typename T, Long N>
-	static constexpr Long select(ITL_EntryN<T, N>) { return (Long) N; }
+	static constexpr Long select(ITL_EntryN<T, N>) noexcept { return (Long) N; }
 };
-
-}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename... Ts>
-struct TypeList
-	: private	 detail::ITL_Impl<detail::IndexSequenceFor<Ts...>, Ts...>
+struct TL_
+	: private	 ITL_Impl<IndexSequenceFor<Ts...>, Ts...>
 {
-	using Base = detail::ITL_Impl<detail::IndexSequenceFor<Ts...>, Ts...>;
+	using Base = ITL_Impl<IndexSequenceFor<Ts...>, Ts...>;
 
 	static constexpr Long SIZE = sizeof...(Ts);
 
 	template <typename T>
-	static constexpr Long index() {
-		return Base::template select<T>(TypeList{});
+	static constexpr Long index() noexcept {
+		return Base::template select<T>(TL_{});
 	}
 };
 
 template <typename TList, typename T>
-constexpr Long index   () { return TList::template index   <T>(); }
+constexpr Long index   () noexcept { return TList::template index   <T>(); }
 
 template <typename TList, typename T>
-constexpr bool contains() { return std::is_base_of<detail::ITL_EntryT<T>, TList>::value; }
+constexpr bool contains() noexcept { return std::is_base_of<ITL_EntryT<T>, TList>::value; }
 
 ////////////////////////////////////////////////////////////////////////////////
-
-namespace detail {
 
 template <typename...>
 struct PrependT;
 
 template <typename T, typename... Ts>
-struct PrependT<T, TypeList<Ts...>> {
-	using Type = TypeList<T, Ts...>;
+struct PrependT<T, TL_<Ts...>> {
+	using Type = TL_<T, Ts...>;
 };
 
-}
-
 template <typename... Ts>
-using Prepend = typename detail::PrependT<Ts...>::Type;
+using PrependTypes = typename PrependT<Ts...>::Type;
 
 //------------------------------------------------------------------------------
-
-namespace detail {
 
 template <typename...>
 struct MergeT;
 
 template <typename... Ts1, typename... Ts2>
-struct MergeT<TypeList<Ts1...>, TypeList<Ts2...>> {
-	using Type = TypeList<Ts1..., Ts2...>;
+struct MergeT<TL_<Ts1...>, TL_<Ts2...>> {
+	using Type = TL_<Ts1..., Ts2...>;
 };
 
-}
-
 template <typename... Ts>
-using Merge = typename detail::MergeT<Ts...>::Type;
+using Merge = typename MergeT<Ts...>::Type;
 
 //------------------------------------------------------------------------------
-
-namespace detail {
 
 template <Long, Long, typename...>
 struct LowerT;
 
-template <Long H, Long I, typename... Ts>
-using Lower = typename LowerT<H, I, Ts...>::Type;
+template <Long NHalf, Long NIndex, typename... Ts>
+using LowerTypes = typename LowerT<NHalf, NIndex, Ts...>::Type;
 
-template <Long H, Long I, typename TFirst, typename... TRest>
-struct LowerT<H, I, TFirst, TRest...> {
+template <Long NHalf, Long NIndex, typename TFirst, typename... TRest>
+struct LowerT<NHalf, NIndex, TFirst, TRest...> {
 	using Type = typename std::conditional<
-					 (I < H),
-					 Prepend<TFirst, Lower<H, I + 1, TRest...>>,
-					 Lower<H, I + 1, TRest...>
+					 (NIndex < NHalf),
+					 PrependTypes<TFirst, LowerTypes<NHalf, NIndex + 1, TRest...>>,
+					 LowerTypes<NHalf, NIndex + 1, TRest...>
 				 >::type;
 };
 
-template <Long H, Long I>
-struct LowerT<H, I> {
-	using Type = TypeList<>;
+template <Long NHalf, Long NIndex>
+struct LowerT<NHalf, NIndex> {
+	using Type = TL_<>;
 };
 
-}
-
 template <typename... Ts>
-using LHalf = detail::Lower<sizeof...(Ts) / 2, 0, Ts...>;
+using LHalfTypes = LowerTypes<sizeof...(Ts) / 2, 0, Ts...>;
 
 //------------------------------------------------------------------------------
-
-namespace detail {
 
 template <Long, Long, typename...>
 struct UpperT;
 
-template <Long H, Long I, typename... Ts>
-using Upper = typename UpperT<H, I, Ts...>::Type;
+template <Long NHalf, Long NIndex, typename... Ts>
+using UpperTypes = typename UpperT<NHalf, NIndex, Ts...>::Type;
 
-template <Long H, Long I, typename TFirst, typename... TRest>
-struct UpperT<H, I, TFirst, TRest...> {
+template <Long NHalf, Long NIndex, typename TFirst, typename... TRest>
+struct UpperT<NHalf, NIndex, TFirst, TRest...> {
 	using Type = typename std::conditional<
-					 (I < H),
-					 UpperT<H, I + 1, TRest...>,
-					 TypeList<TFirst, TRest...>
+					 (NIndex < NHalf),
+					 UpperTypes<NHalf, NIndex + 1, TRest...>,
+					 TL_<TFirst, TRest...>
 				 >::type;
 };
 
-template <Long H, Long I>
-struct UpperT<H, I> {
-	using Type = TypeList<>;
+template <Long NHalf, Long NIndex>
+struct UpperT<NHalf, NIndex> {
+	using Type = TL_<>;
 };
 
-}
-
 template <typename... Ts>
-using RHalf = detail::Upper<sizeof...(Ts) / 2, 0, Ts...>;
+using RHalfTypes = UpperTypes<sizeof...(Ts) / 2, 0, Ts...>;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 #else
 
-namespace detail {
-
 template <typename>
 struct Type {};
-
-}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename... Ts>
-struct TypeList
-	: detail::Type<Ts>...
+struct TL_
+	: Type<Ts>...
 {
 	static constexpr Long SIZE = sizeof...(Ts);
 };
 
 //------------------------------------------------------------------------------
-
-namespace detail {
 
 template <Long N>
 struct Const {
@@ -215,97 +190,83 @@ struct Const {
 
 //------------------------------------------------------------------------------
 
-template <typename...>
+template <typename, typename>
 struct PrependT;
 
 template <typename T, typename... Ts>
-struct PrependT<T, TypeList<Ts...>> {
-	using Type = TypeList<T, Ts...>;
+struct PrependT<T, TL_<Ts...>> {
+	using Type = TL_<T, Ts...>;
 };
 
-}
-
 template <typename... Ts>
-using Prepend = typename detail::PrependT<Ts...>::Type;
+using PrependTypes = typename PrependT<Ts...>::Type;
 
 //------------------------------------------------------------------------------
 
-namespace detail {
-
-template <typename...>
+template <typename, typename>
 struct MergeT;
 
 template <typename... Ts1, typename... Ts2>
-struct MergeT<TypeList<Ts1...>, TypeList<Ts2...>> {
-	using Type = TypeList<Ts1..., Ts2...>;
+struct MergeT<TL_<Ts1...>, TL_<Ts2...>> {
+	using Type = TL_<Ts1..., Ts2...>;
 };
 
-}
-
 template <typename... Ts>
-using Merge = typename detail::MergeT<Ts...>::Type;
+using Merge = typename MergeT<Ts...>::Type;
 
 //------------------------------------------------------------------------------
-
-namespace detail {
 
 template <Long, Long, typename...>
 struct LowerT;
 
-template <Long H, Long I, typename... Ts>
-using Lower = typename LowerT<H, I, Ts...>::Type;
+template <Long NHalf, Long NIndex, typename... Ts>
+using LowerTypes = typename LowerT<NHalf, NIndex, Ts...>::Type;
 
-template <Long H, Long I, typename TFirst, typename... TRest>
-struct LowerT<H, I, TFirst, TRest...> {
+template <Long NHalf, Long NIndex, typename TFirst, typename... TRest>
+struct LowerT<NHalf, NIndex, TFirst, TRest...> {
+	using LTypeList = typename LowerT<NHalf, NIndex + 1, TRest...>::Type;
+
 	using Type = typename std::conditional<
-					 (I < H),
-					 Prepend<TFirst, Lower<H, I + 1, TRest...>>,
-					 Lower<H, I + 1, TRest...>
+					 (NIndex < NHalf),
+					 PrependTypes<TFirst, LTypeList>,
+					 LTypeList
 				 >::type;
 };
 
-template <Long H, Long I>
-struct LowerT<H, I> {
-	using Type = TypeList<>;
+template <Long NHalf, Long NIndex>
+struct LowerT<NHalf, NIndex> {
+	using Type = TL_<>;
 };
 
-}
-
 template <typename... Ts>
-using LHalf = detail::Lower<sizeof...(Ts) / 2, 0, Ts...>;
+using LHalfTypes = LowerTypes<sizeof...(Ts) / 2, 0, Ts...>;
 
 //------------------------------------------------------------------------------
-
-namespace detail {
 
 template <Long, Long, typename...>
 struct UpperT;
 
-template <Long H, Long I, typename... Ts>
-using Upper = typename UpperT<H, I, Ts...>::Type;
+template <Long NHalf, Long NIndex, typename... Ts>
+using UpperTypes = typename UpperT<NHalf, NIndex, Ts...>::Type;
 
-template <Long H, Long I, typename TFirst, typename... TRest>
-struct UpperT<H, I, TFirst, TRest...> {
+template <Long NHalf, Long NIndex, typename TFirst, typename... TRest>
+struct UpperT<NHalf, NIndex, TFirst, TRest...> {
 	using Type = typename std::conditional<
-					 (I < H),
-					 Upper<H, I + 1, TRest...>,
-					 TypeList<TFirst, TRest...>
+					 (NIndex < NHalf),
+					 UpperTypes<NHalf, NIndex + 1, TRest...>,
+					 TL_<TFirst, TRest...>
 				 >::type;
 };
 
-template <Long H, Long I>
-struct UpperT<H, I> {
-	using Type = TypeList<>;
+template <Long NHalf, Long NIndex>
+struct UpperT<NHalf, NIndex> {
+	using Type = TL_<>;
 };
 
-}
-
 template <typename... Ts>
-using RHalf = detail::Upper<sizeof...(Ts) / 2, 0, Ts...>;
+using RHalfTypes = UpperTypes<sizeof...(Ts) / 2, 0, Ts...>;
 
 //------------------------------------------------------------------------------
-
-namespace detail {
 
 template<Long, typename...>
 struct FindImpl
@@ -328,22 +289,22 @@ template <typename, typename>
 struct Find;
 
 template <typename T, typename... Ts>
-struct Find<T, TypeList<Ts...>>
+struct Find<T, TL_<Ts...>>
 	: FindImpl<0, T, Ts...>
 {};
-
-}
-
-//------------------------------------------------------------------------------
-
-template <typename TList, typename T>
-constexpr Long index   () { return detail::Find<T, TList>::Value;					}
-
-template <typename TList, typename T>
-constexpr bool contains() { return std::is_base_of<detail::Type<T>, TList>::value;	}
 
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
+
+}
+
+template <typename TList, typename T>
+constexpr Long index   () noexcept { return detail::Find<T, TList>::Value;					}
+
+template <typename TList, typename T>
+constexpr bool contains() noexcept { return std::is_base_of<detail::Type<T>, TList>::value;	}
+
+//------------------------------------------------------------------------------
 
 }

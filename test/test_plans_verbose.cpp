@@ -1,4 +1,4 @@
-#define FFSM2_ENABLE_PLANS
+#define FFSM2_ENABLE_DYNAMIC_PLANS
 #define FFSM2_ENABLE_VERBOSE_DEBUG_LOG
 #include "tools.hpp"
 
@@ -76,11 +76,11 @@ struct Apex
 	}
 
 	void planSucceeded(FullControl& control) {
-		REQUIRE(control.plan());
+		REQUIRE(!control.plan());
 	}
 
 	void planFailed(FullControl& control) {
-		REQUIRE(*control.plan().first() == FSM::Task{ FSM::stateId<B>(), FSM::stateId<D>() });
+		REQUIRE(!control.plan());
 
 		control.changeTo<D>();
 	}
@@ -273,6 +273,8 @@ void step6(FSM::Instance& machine, Logger& logger) {
 
 		{ FSM::stateId<C>(),		Event::Type::TASK_SUCCESS },
 		{ FSM::stateId<C>(),		Event::Type::CHANGE,	FSM::stateId<D>() },
+
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::PLAN_SUCCEEDED },
 
 		{ FSM::stateId<C>(),		Event::Type::EXIT_GUARD },
 		{ FSM::stateId<D>(),		Event::Type::ENTRY_GUARD },

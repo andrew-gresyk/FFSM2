@@ -11,7 +11,7 @@ class ControlT {
 	template <typename, typename, typename...>
 	friend struct C_;
 
-	template <typename, typename>
+	template <typename, typename FFSM2_IF_STATIC_PLANS(, typename)>
 	friend class R_;
 
 protected:
@@ -23,7 +23,7 @@ protected:
 	using Transition		= TransitionT<Payload>;
 	using TransitionSets	= Array<Transition, TArgs::SUBSTITUTION_LIMIT>;
 
-#ifdef FFSM2_ENABLE_PLANS
+#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
 	using PlanData			= PlanDataT<TArgs>;
 	using CPlan				= CPlanT<TArgs>;
 #endif
@@ -49,12 +49,12 @@ protected:
 	FFSM2_INLINE ControlT(Context& context
 						, Registry& registry
 						, Transition& request
-						FFSM2_IF_PLANS(, PlanData& planData)
+						FFSM2_IF_DYNAMIC_PLANS(, PlanData& planData)
 						FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
 		: _context{context}
 		, _registry{registry}
 		, _request{request}
-		FFSM2_IF_PLANS(, _planData{planData})
+		FFSM2_IF_DYNAMIC_PLANS(, _planData{planData})
 		FFSM2_IF_LOG_INTERFACE(, _logger{logger})
 	{}
 
@@ -64,41 +64,41 @@ public:
 	/// @tparam TState State type
 	/// @return Numeric state identifier
 	template <typename TState>
-	static constexpr StateID stateId()				noexcept	{ return index<StateList, TState>();	}
+	static constexpr StateID stateId()			   noexcept	{ return index<StateList, TState>();	}
 
 	/// @brief Access FSM context (data shared between states and/or data interface between FSM and external code)
 	/// @return context
 	/// @see Control::context()
-	FFSM2_INLINE	   Context& _()					noexcept	{ return _context;						}
+	FFSM2_INLINE	   Context& _()				   noexcept	{ return _context;						}
 
 	/// @brief Access FSM context (data shared between states and/or data interface between FSM and external code)
 	/// @return context
 	/// @see Control::context()
-	FFSM2_INLINE const Context& _() const			noexcept	{ return _context;						}
+	FFSM2_INLINE const Context& _()			 const noexcept	{ return _context;						}
 
 	/// @brief Access FSM context (data shared between states and/or data interface between FSM and external code)
 	/// @return context
 	/// @see Control::_()
-	FFSM2_INLINE	   Context& context()			noexcept	{ return _context;						}
+	FFSM2_INLINE	   Context& context()		   noexcept	{ return _context;						}
 
 	/// @brief Access FSM context (data shared between states and/or data interface between FSM and external code)
 	/// @return context
 	/// @see Control::_()
-	FFSM2_INLINE const Context& context() const		noexcept	{ return _context;						}
+	FFSM2_INLINE const Context& context()	 const noexcept	{ return _context;						}
 
 	//----------------------------------------------------------------------
 
 	/// @brief Inspect current transition requests
 	/// @return Array of transition requests
-	FFSM2_INLINE const Transition& request() const	noexcept	{ return _request;						}
+	FFSM2_INLINE const Transition& request() const noexcept	{ return _request;						}
 
 	//----------------------------------------------------------------------
 
-#ifdef FFSM2_ENABLE_PLANS
+#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
 
 	/// @brief Access read-only plan
 	/// @return Plan
-	FFSM2_INLINE CPlan plan() const					noexcept	{ return CPlan{_planData};				}
+	FFSM2_INLINE CPlan plan()				 const noexcept	{ return CPlan{_planData};				}
 
 #endif
 
@@ -106,7 +106,7 @@ public:
 
 protected:
 #ifdef FFSM2_ENABLE_LOG_INTERFACE
-	FFSM2_INLINE Logger* logger()					noexcept	{ return _logger;						}
+	FFSM2_INLINE Logger* logger()				   noexcept	{ return _logger;						}
 #endif
 
 protected:
@@ -114,7 +114,7 @@ protected:
 	Registry& _registry;
 	Transition& _request;
 	StateID _originId = INVALID_STATE_ID;
-	FFSM2_IF_PLANS(PlanData& _planData);
+	FFSM2_IF_DYNAMIC_PLANS(PlanData& _planData);
 	FFSM2_IF_LOG_INTERFACE(Logger* _logger);
 };
 
@@ -130,7 +130,7 @@ class PlanControlT
 	template <typename, typename, typename...>
 	friend struct C_;
 
-	template <typename, typename>
+	template <typename, typename FFSM2_IF_STATIC_PLANS(, typename)>
 	friend class R_;
 
 protected:
@@ -138,7 +138,7 @@ protected:
 
 	using typename Control::StateList;
 
-#ifdef FFSM2_ENABLE_PLANS
+#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
 	using typename Control::PlanData;
 	using typename Control::CPlan;
 
@@ -150,7 +150,7 @@ protected:
 public:
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-#ifdef FFSM2_ENABLE_PLANS
+#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
 
 	/// @brief Access plan
 	/// @return Plan
@@ -165,7 +165,7 @@ public:
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 protected:
-	FFSM2_IF_PLANS(using Control::_planData);
+	FFSM2_IF_DYNAMIC_PLANS(using Control::_planData);
 	FFSM2_IF_LOG_INTERFACE(using Control::_logger);
 
 	Status _status;
@@ -183,18 +183,24 @@ class FullControlBaseT
 	template <typename, typename, typename...>
 	friend struct C_;
 
-	template <typename, typename>
+	template <typename, typename FFSM2_IF_STATIC_PLANS(, typename)>
 	friend class R_;
 
 protected:
-	using PlanControl	= PlanControlT<TArgs>;
+	using PlanControl		= PlanControlT<TArgs>;
 
 	using typename PlanControl::StateList;
 
 	using typename PlanControl::Transition;
 
-#ifdef FFSM2_ENABLE_PLANS
-	using TasksBits		= BitArray<StateID, StateList::SIZE>;
+#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
+	using TasksBits			= BitArray<StateID, StateList::SIZE>;
+#endif
+
+#ifdef FFSM2_ENABLE_STATIC_PLANS
+	using LinksTypeTable	= typename TArgs::LinksTypeTable;
+	using LinksStateIDs		= MatchValues<LinksTypeTable, StateList>;
+	using LinksLookup		= BinaryLookup<LinksStateIDs>;
 #endif
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -227,7 +233,7 @@ public:
 
 	//----------------------------------------------------------------------
 
-#ifdef FFSM2_ENABLE_PLANS
+#ifdef FFSM2_ENABLE_ANY_PLANS
 
 	/// @brief Succeed a plan task for the current state
 	FFSM2_INLINE void succeed() noexcept;
@@ -241,7 +247,7 @@ public:
 
 protected:
 	using PlanControl::_request;
-	FFSM2_IF_PLANS(using PlanControl::_planData);
+	FFSM2_IF_DYNAMIC_PLANS(using PlanControl::_planData);
 	FFSM2_IF_LOG_INTERFACE(using PlanControl::_logger);
 
 	using PlanControl::_originId;
@@ -261,19 +267,22 @@ template <typename TContext
 		, typename TConfig
 		, typename TStateList
 		, Long NSubstitutionLimit
-		FFSM2_IF_PLANS(, Long NTaskCapacity)
+		FFSM2_IF_DYNAMIC_PLANS(, Long NTaskCapacity)
+		FFSM2_IF_STATIC_PLANS(, typename TLinksTypeTable)
 		, typename TPayload>
 class FullControlT<ArgsT<TContext
 					   , TConfig
 					   , TStateList
 					   , NSubstitutionLimit
-					   FFSM2_IF_PLANS(, NTaskCapacity)
+					   FFSM2_IF_DYNAMIC_PLANS(, NTaskCapacity)
+					   FFSM2_IF_STATIC_PLANS(, TLinksTypeTable)
 					   , TPayload>>
 	: public FullControlBaseT<ArgsT<TContext
 								  , TConfig
 								  , TStateList
 								  , NSubstitutionLimit
-								  FFSM2_IF_PLANS(, NTaskCapacity)
+								  FFSM2_IF_DYNAMIC_PLANS(, NTaskCapacity)
+								  FFSM2_IF_STATIC_PLANS(, TLinksTypeTable)
 								  , TPayload>>
 {
 	template <StateID, typename, typename>
@@ -282,14 +291,15 @@ class FullControlT<ArgsT<TContext
 	template <typename, typename, typename...>
 	friend struct C_;
 
-	template <typename, typename>
+	template <typename, typename FFSM2_IF_STATIC_PLANS(, typename)>
 	friend class R_;
 
 	using Args = ArgsT<TContext
 					 , TConfig
 					 , TStateList
 					 , NSubstitutionLimit
-					 FFSM2_IF_PLANS(, NTaskCapacity)
+					 FFSM2_IF_DYNAMIC_PLANS(, NTaskCapacity)
+					 FFSM2_IF_STATIC_PLANS(, TLinksTypeTable)
 					 , TPayload>;
 
 protected:
@@ -300,16 +310,20 @@ protected:
 
 	using typename FullControlBase::Origin;
 
-#ifdef FFSM2_ENABLE_PLANS
+#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
 	using typename FullControlBase::Plan;
 	using typename FullControlBase::TasksBits;
+#endif
+
+#ifdef FFSM2_ENABLE_STATIC_PLANS
+	using LinksLookup	= typename FullControlBase::LinksLookup;
 #endif
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	using FullControlBase::FullControlBase;
 
-#ifdef FFSM2_ENABLE_PLANS
+#ifdef FFSM2_ENABLE_ANY_PLANS
 
 	template <typename TState>
 	void updatePlan(TState& headState, const Status subStatus) noexcept;
@@ -321,7 +335,7 @@ public:
 
 	using FullControlBase::changeTo;
 
-	FFSM2_IF_PLANS(using FullControlBase::plan);
+	FFSM2_IF_DYNAMIC_PLANS(using FullControlBase::plan);
 
 	//------------------------------------------------------------------------------
 
@@ -353,8 +367,8 @@ public:
 
 protected:
 	using FullControlBase::_request;
-	FFSM2_IF_PLANS(using FullControlBase::_planData);
-	FFSM2_IF_PLANS(using FullControlBase::_registry);
+	FFSM2_IF_DYNAMIC_PLANS(using FullControlBase::_planData);
+	FFSM2_IF_ANY_PLANS(using FullControlBase::_registry);
 	FFSM2_IF_LOG_INTERFACE(using FullControlBase::_logger);
 
 	using FullControlBase::_originId;
@@ -369,18 +383,21 @@ template <typename TContext
 		, typename TConfig
 		, typename TStateList
 		, Long NSubstitutionLimit
-		FFSM2_IF_PLANS(, Long NTaskCapacity)>
+		FFSM2_IF_DYNAMIC_PLANS(, Long NTaskCapacity)
+		FFSM2_IF_STATIC_PLANS(, typename TLinksTypeTable)>
 class FullControlT<ArgsT<TContext
 					   , TConfig
 					   , TStateList
 					   , NSubstitutionLimit
-					   FFSM2_IF_PLANS(, NTaskCapacity)
+					   FFSM2_IF_DYNAMIC_PLANS(, NTaskCapacity)
+					   FFSM2_IF_STATIC_PLANS(, TLinksTypeTable)
 					   , void>>
 	: public FullControlBaseT<ArgsT<TContext
 								  , TConfig
 								  , TStateList
 								  , NSubstitutionLimit
-								  FFSM2_IF_PLANS(, NTaskCapacity)
+								  FFSM2_IF_DYNAMIC_PLANS(, NTaskCapacity)
+								  FFSM2_IF_STATIC_PLANS(, TLinksTypeTable)
 								  , void>>
 {
 	template <StateID, typename, typename>
@@ -389,14 +406,15 @@ class FullControlT<ArgsT<TContext
 	template <typename, typename, typename...>
 	friend struct C_;
 
-	template <typename, typename>
+	template <typename, typename FFSM2_IF_STATIC_PLANS(, typename)>
 	friend class R_;
 
 	using Args = ArgsT<TContext
 					 , TConfig
 					 , TStateList
 					 , NSubstitutionLimit
-					 FFSM2_IF_PLANS(, NTaskCapacity)
+					 FFSM2_IF_DYNAMIC_PLANS(, NTaskCapacity)
+					 FFSM2_IF_STATIC_PLANS(, TLinksTypeTable)
 					 , void>;
 
 protected:
@@ -404,16 +422,20 @@ protected:
 
 	using typename FullControlBase::Origin;
 
-#ifdef FFSM2_ENABLE_PLANS
+#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
 	using typename FullControlBase::Plan;
 	using typename FullControlBase::TasksBits;
+#endif
+
+#ifdef FFSM2_ENABLE_STATIC_PLANS
+	using LinksLookup	= typename FullControlBase::LinksLookup;
 #endif
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	using FullControlBase::FullControlBase;
 
-#ifdef FFSM2_ENABLE_PLANS
+#ifdef FFSM2_ENABLE_ANY_PLANS
 
 	template <typename TState>
 	void updatePlan(TState& headState, const Status subStatus) noexcept;
@@ -423,11 +445,11 @@ protected:
 public:
 	using FullControlBase::changeTo;
 
-	FFSM2_IF_PLANS(using FullControlBase::plan);
+	FFSM2_IF_DYNAMIC_PLANS(using FullControlBase::plan);
 
 protected:
-	FFSM2_IF_PLANS(using FullControlBase::_registry);
-	FFSM2_IF_PLANS(using FullControlBase::_planData);
+	FFSM2_IF_DYNAMIC_PLANS(using FullControlBase::_planData);
+	FFSM2_IF_ANY_PLANS(using FullControlBase::_registry);
 
 	using FullControlBase::_status;
 };
@@ -444,7 +466,7 @@ class GuardControlT final
 	template <typename, typename, typename...>
 	friend struct C_;
 
-	template <typename, typename>
+	template <typename, typename FFSM2_IF_STATIC_PLANS(, typename)>
 	friend class R_;
 
 	using FullControl	= FullControlT<TArgs>;
@@ -454,7 +476,7 @@ class GuardControlT final
 	using typename FullControl::Transition;
 	using typename FullControl::TransitionSets;
 
-#ifdef FFSM2_ENABLE_PLANS
+#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
 	using typename FullControl::PlanData;
 #endif
 
@@ -469,12 +491,12 @@ class GuardControlT final
 						  , Transition& request
 						  , const TransitionSets& currentTransitions
 						  , const Transition& pendingTransition
-						  FFSM2_IF_PLANS(, PlanData& planData)
+						  FFSM2_IF_DYNAMIC_PLANS(, PlanData& planData)
 						  FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
 		: FullControl{context
 					, registry
 					, request
-					FFSM2_IF_PLANS(, planData)
+					FFSM2_IF_DYNAMIC_PLANS(, planData)
 					FFSM2_IF_LOG_INTERFACE(, logger)}
 		, _currentTransitions{currentTransitions}
 		, _pendingTransition{pendingTransition}

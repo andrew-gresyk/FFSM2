@@ -1,4 +1,4 @@
-#define FFSM2_ENABLE_PLANS
+#define FFSM2_ENABLE_DYNAMIC_PLANS
 #include "tools.hpp"
 
 namespace test_plans_payloads {
@@ -77,11 +77,11 @@ struct Apex
 	}
 
 	void planSucceeded(FullControl& control) {
-		REQUIRE(control.plan());
+		REQUIRE(!control.plan());
 	}
 
 	void planFailed(FullControl& control) {
-		REQUIRE(*control.plan().first() == FSM::Task{ FSM::stateId<B>(), FSM::stateId<D>() });
+		REQUIRE(!control.plan());
 
 		control.changeWith<D>(Payload{});
 	}
@@ -253,6 +253,8 @@ void step6(FSM::Instance& machine, Logger& logger) {
 
 		{ FSM::stateId<C>(),		Event::Type::TASK_SUCCESS },
 		{ FSM::stateId<C>(),		Event::Type::CHANGE,	FSM::stateId<D>() },
+
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::PLAN_SUCCEEDED },
 
 		{ FSM::stateId<C>(),		Event::Type::EXIT_GUARD },
 

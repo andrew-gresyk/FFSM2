@@ -1,13 +1,13 @@
-#ifdef FFSM2_ENABLE_PLANS
+#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
 
 namespace ffsm2 {
 namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC, typename TTP>
+template <typename TC, typename TG, typename TSL, Long NSL, Long NTC FFSM2_IF_STATIC_PLANS(, typename TPL), typename TTP>
 void
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::clearTaskStatus(const StateID stateId) noexcept {
+PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC FFSM2_IF_STATIC_PLANS(, TPL), TTP>>::clearTaskStatus(const StateID stateId) noexcept {
 	if (stateId != INVALID_STATE_ID) {
 		tasksSuccesses.clear(stateId);
 		tasksFailures .clear(stateId);
@@ -16,9 +16,9 @@ PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::clearTaskStatus(const StateID stat
 
 //------------------------------------------------------------------------------
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC, typename TTP>
+template <typename TC, typename TG, typename TSL, Long NSL, Long NTC FFSM2_IF_STATIC_PLANS(, typename TPL), typename TTP>
 void
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::verifyEmptyStatus(const StateID FFSM2_IF_ASSERT(stateId)) const noexcept {
+PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC FFSM2_IF_STATIC_PLANS(, TPL), TTP>>::verifyEmptyStatus(const StateID FFSM2_IF_ASSERT(stateId)) const noexcept {
 #ifdef FFSM2_ENABLE_ASSERT
 
 	if (stateId != INVALID_STATE_ID) {
@@ -33,17 +33,17 @@ PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::verifyEmptyStatus(const StateID FF
 
 #ifdef FFSM2_ENABLE_ASSERT
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC, typename TTP>
+template <typename TC, typename TG, typename TSL, Long NSL, Long NTC FFSM2_IF_STATIC_PLANS(, typename TPL), typename TTP>
 void
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::verifyPlans() const noexcept {
+PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC FFSM2_IF_STATIC_PLANS(, TPL), TTP>>::verifyPlans() const noexcept {
 	FFSM2_ASSERT(tasks.count() == verifyPlan());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC, typename TTP>
+template <typename TC, typename TG, typename TSL, Long NSL, Long NTC FFSM2_IF_STATIC_PLANS(, typename TPL), typename TTP>
 Long
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::verifyPlan() const noexcept {
+PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC FFSM2_IF_STATIC_PLANS(, TPL), TTP>>::verifyPlan() const noexcept {
 	Long length = 0;
 	const Bounds& bounds = tasksBounds;
 
@@ -84,9 +84,9 @@ PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::verifyPlan() const noexcept {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC>
+template <typename TC, typename TG, typename TSL, Long NSL, Long NTC FFSM2_IF_STATIC_PLANS(, typename TPL)>
 void
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::clearTaskStatus(const StateID stateId) noexcept {
+PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC FFSM2_IF_STATIC_PLANS(, TPL), void>>::clearTaskStatus(const StateID stateId) noexcept {
 	if (stateId != INVALID_STATE_ID) {
 		tasksSuccesses.clear(stateId);
 		tasksFailures .clear(stateId);
@@ -95,9 +95,9 @@ PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::clearTaskStatus(const StateID sta
 
 //------------------------------------------------------------------------------
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC>
+template <typename TC, typename TG, typename TSL, Long NSL, Long NTC FFSM2_IF_STATIC_PLANS(, typename TPL)>
 void
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::verifyEmptyStatus(const StateID FFSM2_IF_ASSERT(stateId)) const noexcept {
+PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC FFSM2_IF_STATIC_PLANS(, TPL), void>>::verifyEmptyStatus(const StateID FFSM2_IF_ASSERT(stateId)) const noexcept {
 #ifdef FFSM2_ENABLE_ASSERT
 
 	if (stateId != INVALID_STATE_ID) {
@@ -112,17 +112,17 @@ PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::verifyEmptyStatus(const StateID F
 
 #ifdef FFSM2_ENABLE_ASSERT
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC>
+template <typename TC, typename TG, typename TSL, Long NSL, Long NTC FFSM2_IF_STATIC_PLANS(, typename TPL)>
 void
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::verifyPlans() const noexcept {
+PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC FFSM2_IF_STATIC_PLANS(, TPL), void>>::verifyPlans() const noexcept {
 	FFSM2_ASSERT(tasks.count() == verifyPlan());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC>
+template <typename TC, typename TG, typename TSL, Long NSL, Long NTC FFSM2_IF_STATIC_PLANS(, typename TPL)>
 Long
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::verifyPlan() const noexcept {
+PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC FFSM2_IF_STATIC_PLANS(, TPL), void>>::verifyPlan() const noexcept {
 	Long length = 0;
 	const Bounds& bounds = tasksBounds;
 

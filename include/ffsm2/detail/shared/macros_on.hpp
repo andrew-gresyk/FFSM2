@@ -62,50 +62,84 @@
 //------------------------------------------------------------------------------
 
 #ifdef FFSM2_ENABLE_PLANS
-	#define FFSM2_IF_PLANS(...)										  __VA_ARGS__
-	#define FFSM2_PLANS_MASK											 (1 << 0)
+	#define FFSM2_ENABLE_DYNAMIC_PLANS
+	#define FFSM2_ENABLE_STATIC_PLANS
+#endif
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
+	#define FFSM2_ENABLE_ANY_PLANS
+
+	#define FFSM2_IF_DYNAMIC_PLANS(...)								  __VA_ARGS__
+	#define FFSM2_DYNAMIC_PLANS_MASK									 (1 << 0)
 #else
-	#define FFSM2_IF_PLANS(...)
-	#define FFSM2_PLANS_MASK											 (0 << 0)
+	#define FFSM2_IF_DYNAMIC_PLANS(...)
+	#define FFSM2_DYNAMIC_PLANS_MASK									 (0 << 0)
+#endif
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+#if defined _MSC_VER && _MSC_VER < 1910
+	#undef FFSM2_ENABLE_STATIC_PLANS
+#endif
+
+#ifdef FFSM2_ENABLE_STATIC_PLANS
+	#define FFSM2_ENABLE_ANY_PLANS
+
+	#define FFSM2_IF_STATIC_PLANS(...)								  __VA_ARGS__
+	#define FFSM2_STATIC_PLANS_MASK										 (1 << 1)
+#else
+	#define FFSM2_IF_STATIC_PLANS(...)
+	#define FFSM2_STATIC_PLANS_MASK										 (0 << 1)
+#endif
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+#ifdef FFSM2_ENABLE_ANY_PLANS
+	#define FFSM2_IF_ANY_PLANS(...)									  __VA_ARGS__
+#else
+	#define FFSM2_IF_ANY_PLANS(...)
 #endif
 
 //------------------------------------------------------------------------------
 
 #ifdef FFSM2_ENABLE_SERIALIZATION
 	#define FFSM2_IF_SERIALIZATION(...)								  __VA_ARGS__
-	#define FFSM2_SERIALIZATION_MASK									 (1 << 1)
+	#define FFSM2_SERIALIZATION_MASK									 (1 << 2)
 #else
 	#define FFSM2_IF_SERIALIZATION(...)
-	#define FFSM2_SERIALIZATION_MASK									 (0 << 1)
+	#define FFSM2_SERIALIZATION_MASK									 (0 << 2)
 #endif
 
 //------------------------------------------------------------------------------
 
 #ifdef FFSM2_ENABLE_TRANSITION_HISTORY
 	#define FFSM2_IF_TRANSITION_HISTORY(...)						  __VA_ARGS__
-	#define FFSM2_TRANSITION_HISTORY_MASK								 (1 << 2)
+	#define FFSM2_TRANSITION_HISTORY_MASK								 (1 << 3)
 #else
 	#define FFSM2_IF_TRANSITION_HISTORY(...)
-	#define FFSM2_TRANSITION_HISTORY_MASK								 (0 << 2)
+	#define FFSM2_TRANSITION_HISTORY_MASK								 (0 << 3)
 #endif
 
 //------------------------------------------------------------------------------
 
 #ifdef FFSM2_ENABLE_STRUCTURE_REPORT
 	#define FFSM2_IF_STRUCTURE_REPORT(...)							  __VA_ARGS__
-	#define FFSM2_STRUCTURE_REPORT_MASK									 (1 << 3)
+	#define FFSM2_STRUCTURE_REPORT_MASK									 (1 << 4)
 #else
 	#define FFSM2_IF_STRUCTURE_REPORT(...)
-	#define FFSM2_STRUCTURE_REPORT_MASK									 (0 << 3)
+	#define FFSM2_STRUCTURE_REPORT_MASK									 (0 << 4)
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
 
 #ifdef FFSM2_ENABLE_VERBOSE_DEBUG_LOG
 	#define FFSM2_ENABLE_LOG_INTERFACE
-	#define FFSM2_VERBOSE_DEBUG_LOG_MASK								 (1 << 4)
+
+	#define FFSM2_VERBOSE_DEBUG_LOG_MASK								 (1 << 5)
 #else
-	#define FFSM2_VERBOSE_DEBUG_LOG_MASK								 (0 << 4)
+	#define FFSM2_VERBOSE_DEBUG_LOG_MASK								 (0 << 5)
 #endif
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -113,23 +147,23 @@
 #ifdef FFSM2_ENABLE_LOG_INTERFACE
 
 	#define FFSM2_IF_LOG_INTERFACE(...)								  __VA_ARGS__
-	#define FFSM2_LOG_INTERFACE_MASK									 (1 << 5)
+	#define FFSM2_LOG_INTERFACE_MASK									 (1 << 6)
 
 	#define FFSM2_LOG_TRANSITION(CONTEXT, ORIGIN, DESTINATION)					\
 		if (_logger)															\
 			_logger->recordTransition(CONTEXT, ORIGIN, DESTINATION)
 
-#ifdef FFSM2_ENABLE_PLANS
+	#ifdef FFSM2_ENABLE_ANY_PLANS
 
-	#define FFSM2_LOG_TASK_STATUS(CONTEXT, ORIGIN, STATUS)						\
-		if (_logger)															\
-			_logger->recordTaskStatus(CONTEXT, ORIGIN, STATUS)
+		#define FFSM2_LOG_TASK_STATUS(CONTEXT, ORIGIN, STATUS)					\
+			if (_logger)														\
+				_logger->recordTaskStatus(CONTEXT, ORIGIN, STATUS)
 
-	#define FFSM2_LOG_PLAN_STATUS(CONTEXT, STATUS)								\
-		if (_logger)															\
-			_logger->recordPlanStatus(CONTEXT, STATUS)
+		#define FFSM2_LOG_PLAN_STATUS(CONTEXT, STATUS)							\
+			if (_logger)														\
+				_logger->recordPlanStatus(CONTEXT, STATUS)
 
-#endif
+	#endif
 
 	#define FFSM2_LOG_CANCELLED_PENDING(CONTEXT, ORIGIN)						\
 		if (_logger)															\
@@ -138,14 +172,14 @@
 #else
 
 	#define FFSM2_IF_LOG_INTERFACE(...)
-	#define FFSM2_LOG_INTERFACE_MASK									 (0 << 5)
+	#define FFSM2_LOG_INTERFACE_MASK									 (0 << 6)
 
 	#define FFSM2_LOG_TRANSITION(CONTEXT, ORIGIN, DESTINATION)
 
-#ifdef FFSM2_ENABLE_PLANS
-	#define FFSM2_LOG_TASK_STATUS(CONTEXT, ORIGIN, STATUS)
-	#define FFSM2_LOG_PLAN_STATUS(CONTEXT, STATUS)
-#endif
+	#ifdef FFSM2_ENABLE_ANY_PLANS
+		#define FFSM2_LOG_TASK_STATUS(CONTEXT, ORIGIN, STATUS)
+		#define FFSM2_LOG_PLAN_STATUS(CONTEXT, STATUS)
+	#endif
 
 	#define FFSM2_LOG_CANCELLED_PENDING(CONTEXT, ORIGIN)
 
@@ -177,18 +211,20 @@ namespace ffsm2 {
 
 using FeatureTag = uint8_t;
 
-constexpr FeatureTag FFSM2_FEATURE_TAG = FFSM2_PLANS_MASK						|
-										 FFSM2_SERIALIZATION_MASK				|
-										 FFSM2_TRANSITION_HISTORY_MASK			|
-										 FFSM2_STRUCTURE_REPORT_MASK			|
-										 FFSM2_VERBOSE_DEBUG_LOG_MASK			|
-										 FFSM2_LOG_INTERFACE_MASK;
+constexpr FeatureTag FFSM2_FEATURE_TAG = FFSM2_DYNAMIC_PLANS_MASK
+									   | FFSM2_STATIC_PLANS_MASK
+									   | FFSM2_SERIALIZATION_MASK
+									   | FFSM2_TRANSITION_HISTORY_MASK
+									   | FFSM2_STRUCTURE_REPORT_MASK
+									   | FFSM2_VERBOSE_DEBUG_LOG_MASK
+									   | FFSM2_LOG_INTERFACE_MASK;
 
 }
 
 //------------------------------------------------------------------------------
 
-#undef FFSM2_PLANS_MASK
+#undef FFSM2_DYNAMIC_PLANS_MASK
+#undef FFSM2_STATIC_PLANS_MASK
 #undef FFSM2_SERIALIZATION_MASK
 #undef FFSM2_TRANSITION_HISTORY_MASK
 #undef FFSM2_STRUCTURE_REPORT_MASK

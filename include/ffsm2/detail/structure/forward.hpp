@@ -43,7 +43,7 @@ using WrapInfo = typename WrapInfoT<TS...>::Type;
 template <typename THead>
 struct SI_ final {
 	using Head				= THead;
-	using StateList			= TypeList<Head>;
+	using StateList			= TL_<Head>;
 
 	static constexpr Short WIDTH			  = 1;
 
@@ -69,6 +69,8 @@ struct CSI_<TInitial> {
 	static constexpr Long  STATE_COUNT		  = StateList::SIZE;
 };
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 template <typename THead, typename... TSubStates>
 struct CI_ final {
 	using Head				= THead;
@@ -87,25 +89,30 @@ template <typename TContext
 		, typename TConfig
 		, typename TStateList
 		, Long NSubstitutionLimit
-		FFSM2_IF_PLANS(, Long NTaskCapacity)
+		FFSM2_IF_DYNAMIC_PLANS(, Long NTaskCapacity)
+		FFSM2_IF_STATIC_PLANS(, typename TLinksTypeTable)
 		, typename TPayload>
 struct ArgsT final {
-	using Context		= TContext;
+	using Context			= TContext;
 
 #ifdef FFSM2_ENABLE_LOG_INTERFACE
-	using Logger		= typename TConfig::LoggerInterface;
+	using Logger			= typename TConfig::LoggerInterface;
 #endif
 
-	using StateList		= TStateList;
+	using StateList			= TStateList;
 
 	static constexpr Long  STATE_COUNT		  = StateList::SIZE;
 	static constexpr Short SUBSTITUTION_LIMIT = NSubstitutionLimit;
 
-#ifdef FFSM2_ENABLE_PLANS
+#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
 	static constexpr Long  TASK_CAPACITY	  = NTaskCapacity;
 #endif
 
-	using Payload	= TPayload;
+#ifdef FFSM2_ENABLE_STATIC_PLANS
+	using LinksTypeTable	= TLinksTypeTable;
+#endif
+
+	using Payload			= TPayload;
 };
 
 //------------------------------------------------------------------------------
@@ -119,7 +126,7 @@ struct C_;
 template <StateID, typename, Short, typename...>
 struct CS_;
 
-template <typename, typename>
+template <typename, typename FFSM2_IF_STATIC_PLANS(, typename)>
 class RW_;
 
 //------------------------------------------------------------------------------
@@ -147,9 +154,10 @@ using Material = typename MaterialT<N, TS...>::Type;
 
 //------------------------------------------------------------------------------
 
-template <typename TConfig,
-		  typename TApex>
-struct RF_ final {
+template <typename TConfig
+		, typename TApex
+		FFSM2_IF_STATIC_PLANS(, typename TLinksTypeTable)>
+struct RF_ {
 	using Context		= typename TConfig::Context;
 	using Apex			= TApex;
 
@@ -157,14 +165,14 @@ struct RF_ final {
 
 	static constexpr Long  SUBSTITUTION_LIMIT = TConfig::SUBSTITUTION_LIMIT;
 
-#ifdef FFSM2_ENABLE_PLANS
+#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
 	static constexpr Long  TASK_CAPACITY	  = TConfig::TASK_CAPACITY != INVALID_LONG ?
 													  TConfig::TASK_CAPACITY : Apex::STATE_COUNT;
 #endif
 
 	using Payload		= typename TConfig::Payload;
 
-#ifdef FFSM2_ENABLE_PLANS
+#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
 	using Task			= typename TConfig::Task;
 #endif
 
@@ -174,12 +182,13 @@ struct RF_ final {
 							  , TConfig
 							  , StateList
 							  , SUBSTITUTION_LIMIT
-							  FFSM2_IF_PLANS(, TASK_CAPACITY)
+							  FFSM2_IF_DYNAMIC_PLANS(, TASK_CAPACITY)
+							  FFSM2_IF_STATIC_PLANS(, TLinksTypeTable)
 							  , Payload>;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	using Instance		= RW_<TConfig, Apex>;
+	using Instance		= RW_<TConfig, Apex FFSM2_IF_STATIC_PLANS(, TLinksTypeTable)>;
 
 	using Control		= ControlT	   <Args>;
 	using FullControl	= FullControlT <Args>;
@@ -229,12 +238,12 @@ template <StateID, typename, Short, typename>
 struct CSubMaterialT;
 
 template <StateID N, typename TA, Short NI, typename... TS>
-struct CSubMaterialT<N, TA, NI, TypeList<TS...>> {
-	using Type = CS_<N, TA, NI,			 TS...>;
+struct CSubMaterialT<N, TA, NI, TL_<TS...>> {
+	using Type = CS_<N, TA, NI,		TS...>;
 };
 
-template <StateID N, typename TA, Short NI, typename TList>
-using CSubMaterial = typename CSubMaterialT<N, TA, NI, TList>::Type;
+template <StateID N, typename TA, Short NI, typename TL>
+using CSubMaterial = typename CSubMaterialT<N, TA, NI, TL>::Type;
 
 ////////////////////////////////////////////////////////////////////////////////
 

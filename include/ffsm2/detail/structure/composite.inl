@@ -73,11 +73,11 @@ C_<TA, TH, TS...>::deepUpdate(FullControl& control) noexcept {
 
 		_subStates.wideUpdate(control, active);
 	} else {
-		FFSM2_IF_PLANS(const Status subStatus =)
+		FFSM2_IF_ANY_PLANS(const Status subStatus =)
 		_subStates.wideUpdate(control, active);
 
-	#ifdef FFSM2_ENABLE_PLANS
-		if (subStatus && control._planData.planExists)
+	#ifdef FFSM2_ENABLE_ANY_PLANS
+		if (subStatus FFSM2_IF_DYNAMIC_PLANS(&& control._planData.planExists))
 			control.updatePlan(_headState, subStatus);
 	#endif
 	}
@@ -101,11 +101,11 @@ C_<TA, TH, TS...>::deepReact(FullControl& control,
 
 		_subStates.wideReact(control, event, active);
 	} else {
-		FFSM2_IF_PLANS(const Status subStatus =)
+		FFSM2_IF_ANY_PLANS(const Status subStatus =)
 		_subStates.wideReact(control, event, active);
 
-	#ifdef FFSM2_ENABLE_PLANS
-		if (subStatus && control._planData.planExists)
+	#ifdef FFSM2_ENABLE_ANY_PLANS
+		if (subStatus FFSM2_IF_DYNAMIC_PLANS(&& control._planData.planExists))
 			control.updatePlan(_headState, subStatus);
 	#endif
 	}
@@ -164,7 +164,7 @@ C_<TA, TH, TS...>::deepDestruct(PlanControl& control) noexcept {
 
 	active = INVALID_SHORT;
 
-#ifdef FFSM2_ENABLE_PLANS
+#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
 	auto plan = control.plan();
 	plan.clear();
 #endif

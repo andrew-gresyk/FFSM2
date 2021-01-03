@@ -31,7 +31,7 @@ struct CS_ final {
 
 	static constexpr Short	  L_PRONG	  = PRONG_INDEX;
 
-	using LStateList	= LHalf<TStates...>;
+	using LStateList	= LHalfTypes<TStates...>;
 	using LMaterial		= CSubMaterial<INITIAL_ID,
 									   Args,
 									   L_PRONG,
@@ -39,7 +39,7 @@ struct CS_ final {
 
 	static constexpr Short	  R_PRONG	  = PRONG_INDEX + LStateList::SIZE;
 
-	using RStateList	= RHalf<TStates...>;
+	using RStateList	= RHalfTypes<TStates...>;
 	using RMaterial		= CSubMaterial<INITIAL_ID + LStateList::SIZE,
 									   Args,
 									   R_PRONG,

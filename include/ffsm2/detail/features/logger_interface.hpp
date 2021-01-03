@@ -12,7 +12,7 @@ struct LoggerInterfaceT {
 	using Method		 = ::ffsm2::Method;
 	using StateID		 = ::ffsm2::StateID;
 
-#ifdef FFSM2_ENABLE_PLANS
+#ifdef FFSM2_ENABLE_ANY_PLANS
 	using StatusEvent	 = ::ffsm2::StatusEvent;
 #endif
 
@@ -26,7 +26,7 @@ struct LoggerInterfaceT {
 								  const StateID /*target*/) noexcept
 	{}
 
-#ifdef FFSM2_ENABLE_PLANS
+#ifdef FFSM2_ENABLE_ANY_PLANS
 
 	virtual void recordTaskStatus(Context& /*context*/,
 								  const StateID /*origin*/,

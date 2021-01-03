@@ -16,7 +16,7 @@ Status::clear() noexcept {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifdef FFSM2_ENABLE_PLANS
+#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
 
 template <typename TArgs>
 CPlanT<TArgs>::Iterator::Iterator(const CPlanT& plan) noexcept
@@ -319,11 +319,11 @@ PlanBaseT<TArgs>::remove(const Long task) noexcept {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC, typename TTP>
+template <typename TC, typename TG, typename TSL, Long NSL, Long NTC FFSM2_IF_STATIC_PLANS(, typename TPL), typename TTP>
 bool
-PlanT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::append(const StateID origin,
-												 const StateID destination,
-												 const Payload& payload) noexcept
+PlanT<ArgsT<TC, TG, TSL, NSL, NTC FFSM2_IF_STATIC_PLANS(, TPL), TTP>>::append(const StateID origin,
+																			  const StateID destination,
+																			  const Payload& payload) noexcept
 {
 	_planData.planExists = true;
 
@@ -332,11 +332,11 @@ PlanT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::append(const StateID origin,
 
 //------------------------------------------------------------------------------
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC, typename TTP>
+template <typename TC, typename TG, typename TSL, Long NSL, Long NTC FFSM2_IF_STATIC_PLANS(, typename TPL), typename TTP>
 bool
-PlanT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::append(const StateID origin,
-												 const StateID destination,
-												 Payload&& payload) noexcept
+PlanT<ArgsT<TC, TG, TSL, NSL, NTC FFSM2_IF_STATIC_PLANS(, TPL), TTP>>::append(const StateID origin,
+																			  const StateID destination,
+																			  Payload&& payload) noexcept
 {
 	_planData.planExists = true;
 

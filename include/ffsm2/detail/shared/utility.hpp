@@ -98,7 +98,7 @@ using UnsignedBitWidth = typename UnsignedBitWidthT<NCapacity>::Type;
 
 constexpr Long
 roundUp(const Long x,
-		const Long to)
+		const Long to) noexcept
 {
 	return (x + (to - 1)) / to;
 }
@@ -106,7 +106,7 @@ roundUp(const Long x,
 //------------------------------------------------------------------------------
 
 constexpr Short
-bitWidth(const Short x) {
+bitWidth(const Short x) noexcept {
 	return x <=   2 ? 1 :
 		   x <=   4 ? 2 :
 		   x <=   8 ? 3 :
@@ -121,7 +121,7 @@ bitWidth(const Short x) {
 
 template <typename TTo, typename TFrom>
 FFSM2_INLINE void
-overwrite(TTo& to, const TFrom& from) {
+overwrite(TTo& to, const TFrom& from) noexcept {
 	static_assert(sizeof(TTo) == sizeof(TFrom), "STATIC ASSERT");
 
 #if defined(__GNUC__) || defined(__GNUG__)
@@ -135,7 +135,7 @@ overwrite(TTo& to, const TFrom& from) {
 
 template <typename TO, typename TI>
 FFSM2_INLINE TO
-convert(const TI& in) {
+convert(const TI& in) noexcept {
 	TO out;
 
 	overwrite(out, in);

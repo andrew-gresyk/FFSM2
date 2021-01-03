@@ -1,7 +1,10 @@
-#define FFSM2_ENABLE_DYNAMIC_PLANS
+#define FFSM2_ENABLE_PLANS
+#define FFSM2_ENABLE_VERBOSE_DEBUG_LOG
 #include "tools.hpp"
 
-namespace test_plans {
+#ifdef FFSM2_ENABLE_STATIC_PLANS
+
+namespace test_mixed_plans {
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -21,10 +24,17 @@ using Logger = LoggerT<Config>;
 #define S(s) struct s
 
 using FSM = M::Root<S(Apex),
-				S(A),
-				S(B),
-				S(C),
-				S(D)
+				M::Topology<
+					S(A),
+					S(B),
+					S(C),
+					S(D)
+				>,
+				M::StaticPlan<
+					M::TaskLink<A, B>,
+					M::TaskLink<B, C>,
+					M::TaskLink<C, D>
+				>
 			>;
 
 #undef S
@@ -52,14 +62,20 @@ public:
 		++_totalUpdateCount;
 	}
 
+	void preExitGuard(Context&) {
+		++_exitAttemptCount;
+	}
+
 	unsigned entryAttemptCount() const			{ return _entryAttemptCount;	}
 	unsigned currentUpdateCount() const			{ return _currentUpdateCount;	}
 	unsigned totalUpdateCount() const			{ return _totalUpdateCount;		}
+	unsigned exitAttemptCount() const			{ return _exitAttemptCount;		}
 
 private:
 	unsigned _entryAttemptCount	 = 0;
 	unsigned _currentUpdateCount = 0;
 	unsigned _totalUpdateCount	 = 0;
+	unsigned _exitAttemptCount	 = 0;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -70,7 +86,6 @@ struct Apex
 	void entryGuard(GuardControl& control) {
 		auto plan = control.plan();
 
-		plan.change<A, B>();
 		plan.change<B, D>();
 	}
 
@@ -80,8 +95,6 @@ struct Apex
 
 	void planFailed(FullControl& control) {
 		REQUIRE(!control.plan());
-
-		control.changeTo<D>();
 	}
 };
 
@@ -90,21 +103,6 @@ struct Apex
 struct A
 	: FSM::State
 {
-	void enter(PlanControl& control) {
-		const auto plan = control.plan();
-
-		auto it = plan.first();
-		REQUIRE(it);
-		REQUIRE(*it == FSM::Task{ FSM::stateId<A>(), FSM::stateId<B>() });
-
-		++it;
-		REQUIRE(it);
-		REQUIRE(*it == FSM::Task{ FSM::stateId<B>(), FSM::stateId<D>() });
-
-		++it;
-		REQUIRE(!it);
-	}
-
 	void update(FullControl& control) {
 		control.succeed();
 	}
@@ -127,11 +125,8 @@ struct B
 		auto plan = control.plan();
 
 		if (!plan) {
-			control.cancelPendingTransition();
-
-			plan.change<B, C>();
 			plan.change<C>(stateId<C>());
-			plan.change(stateId<C>(), stateId<D>());
+			plan.change(stateId<D>(), stateId<A>());
 		}
 	}
 };
@@ -157,7 +152,12 @@ struct D
 void step1(FSM::Instance& machine, Logger& logger) {
 	logger.assertSequence({
 		{ ffsm2::INVALID_STATE_ID,	Event::Type::ENTRY_GUARD },
+		{ FSM::stateId<A>(),		Event::Type::ENTRY_GUARD },
+
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::CONSTRUCT },
 		{ FSM::stateId<A>(),		Event::Type::CONSTRUCT },
+
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::ENTER },
 		{ FSM::stateId<A>(),		Event::Type::ENTER },
 	});
 
@@ -170,10 +170,20 @@ void step2(FSM::Instance& machine, Logger& logger) {
 	machine.update();
 
 	logger.assertSequence({
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::UPDATE },
 		{ FSM::stateId<A>(),		Event::Type::UPDATE },
 
 		{ FSM::stateId<A>(),		Event::Type::TASK_SUCCESS },
 		{ FSM::stateId<A>(),		Event::Type::CHANGE,	FSM::stateId<B>() },
+
+		{ FSM::stateId<A>(),		Event::Type::EXIT_GUARD },
+		{ FSM::stateId<B>(),		Event::Type::ENTRY_GUARD },
+
+		{ FSM::stateId<A>(),		Event::Type::EXIT },
+		{ FSM::stateId<A>(),		Event::Type::DESTRUCT },
+
+		{ FSM::stateId<B>(),		Event::Type::CONSTRUCT },
+		{ FSM::stateId<B>(),		Event::Type::ENTER },
 	});
 
 	REQUIRE(machine.activeStateId() == FSM::stateId<B>());
@@ -190,11 +200,6 @@ void step3(FSM::Instance& machine, Logger& logger) {
 
 		{ FSM::stateId<B>(),		Event::Type::TASK_FAILURE },
 		{ ffsm2::INVALID_STATE_ID,	Event::Type::PLAN_FAILED },
-
-		{							Event::Type::CHANGE,	FSM::stateId<D>() },
-
-		{ FSM::stateId<B>(),		Event::Type::EXIT_GUARD },
-		{ FSM::stateId<B>(),		Event::Type::CANCEL_PENDING },
 	});
 
 	REQUIRE(machine.activeStateId() == FSM::stateId<B>());
@@ -206,6 +211,7 @@ void step4(FSM::Instance& machine, Logger& logger) {
 	machine.update();
 
 	logger.assertSequence({
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::UPDATE },
 		{ FSM::stateId<B>(),		Event::Type::UPDATE },
 
 		{ FSM::stateId<B>(),		Event::Type::TASK_SUCCESS },
@@ -213,6 +219,9 @@ void step4(FSM::Instance& machine, Logger& logger) {
 
 		{ FSM::stateId<B>(),		Event::Type::EXIT_GUARD },
 		{ FSM::stateId<C>(),		Event::Type::ENTRY_GUARD },
+
+		{ FSM::stateId<B>(),		Event::Type::EXIT },
+		{ FSM::stateId<B>(),		Event::Type::DESTRUCT },
 
 		{ FSM::stateId<C>(),		Event::Type::CONSTRUCT },
 		{ FSM::stateId<C>(),		Event::Type::ENTER },
@@ -227,6 +236,7 @@ void step5(FSM::Instance& machine, Logger& logger) {
 	machine.update();
 
 	logger.assertSequence({
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::UPDATE },
 		{ FSM::stateId<C>(),		Event::Type::UPDATE },
 
 		{ FSM::stateId<C>(),		Event::Type::TASK_SUCCESS },
@@ -247,17 +257,20 @@ void step6(FSM::Instance& machine, Logger& logger) {
 	machine.update();
 
 	logger.assertSequence({
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::UPDATE },
 		{ FSM::stateId<C>(),		Event::Type::UPDATE },
 
 		{ FSM::stateId<C>(),		Event::Type::TASK_SUCCESS },
 		{ FSM::stateId<C>(),		Event::Type::CHANGE,	FSM::stateId<D>() },
 
-		{ ffsm2::INVALID_STATE_ID,	Event::Type::PLAN_SUCCEEDED },
-
 		{ FSM::stateId<C>(),		Event::Type::EXIT_GUARD },
+		{ FSM::stateId<D>(),		Event::Type::ENTRY_GUARD },
 
 		{ FSM::stateId<C>(),		Event::Type::EXIT },
 		{ FSM::stateId<C>(),		Event::Type::DESTRUCT },
+
+		{ FSM::stateId<D>(),		Event::Type::CONSTRUCT },
+		{ FSM::stateId<D>(),		Event::Type::ENTER },
 	});
 
 	REQUIRE(machine.activeStateId() == FSM::stateId<D>());
@@ -265,7 +278,7 @@ void step6(FSM::Instance& machine, Logger& logger) {
 
 //------------------------------------------------------------------------------
 
-TEST_CASE("FSM.Plans", "[machine]") {
+TEST_CASE("FSM.Mixed Plans", "[machine]") {
 	Context _;
 	LoggerT<Config> logger;
 
@@ -280,9 +293,17 @@ TEST_CASE("FSM.Plans", "[machine]") {
 		step6(machine, logger);
 	}
 
-	logger.assertSequence({});
+	logger.assertSequence({
+		{ FSM::stateId<D>(),		Event::Type::EXIT },
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::EXIT },
+
+		{ FSM::stateId<D>(),		Event::Type::DESTRUCT },
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::DESTRUCT },
+	});
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 }
+
+#endif

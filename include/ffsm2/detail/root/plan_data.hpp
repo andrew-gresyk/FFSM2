@@ -1,4 +1,4 @@
-#ifdef FFSM2_ENABLE_PLANS
+#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
 
 namespace ffsm2 {
 namespace detail {
@@ -102,6 +102,7 @@ template <typename
 		, typename
 		, Long
 		, Long
+		FFSM2_IF_STATIC_PLANS(, typename)
 		, typename>
 struct ArgsT;
 
@@ -115,12 +116,14 @@ template <typename TContext
 		, typename TStateList
 		, Long NSubstitutionLimit
 		, Long NTaskCapacity
+		FFSM2_IF_STATIC_PLANS(, typename TLinksTypeTable)
 		, typename TPayload>
 struct PlanDataT<ArgsT<TContext
 					 , TConfig
 					 , TStateList
 					 , NSubstitutionLimit
 					 , NTaskCapacity
+					 FFSM2_IF_STATIC_PLANS(, TLinksTypeTable)
 					 , TPayload>>
 {
 	using StateList		= TStateList;
@@ -161,12 +164,14 @@ template <typename TContext
 		, typename TConfig
 		, typename TStateList
 		, Long NSubstitutionLimit
-		, Long NTaskCapacity>
+		, Long NTaskCapacity
+		FFSM2_IF_STATIC_PLANS(, typename TLinksTypeTable)>
 struct PlanDataT<ArgsT<TContext
 					 , TConfig
 					 , TStateList
 					 , NSubstitutionLimit
 					 , NTaskCapacity
+					 FFSM2_IF_STATIC_PLANS(, TLinksTypeTable)
 					 , void>>
 {
 	using StateList		= TStateList;

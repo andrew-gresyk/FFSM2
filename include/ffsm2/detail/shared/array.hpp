@@ -13,14 +13,14 @@ public:
 	using Index = UnsignedCapacity<CAPACITY>;
 
 public:
-	FFSM2_INLINE StaticArray()								noexcept = default;
+	FFSM2_INLINE StaticArray() = default;
 	FFSM2_INLINE StaticArray(const Item filler)				noexcept;
 
 	template <typename N>
 	FFSM2_INLINE	   Item& operator[] (const N i)			noexcept;
 
 	template <typename N>
-	FFSM2_INLINE const Item& operator[] (const N i) const	noexcept;
+	FFSM2_INLINE const Item& operator[] (const N i)	  const noexcept;
 
 	FFSM2_INLINE Long count() const							noexcept	{ return CAPACITY;									}
 
@@ -64,40 +64,40 @@ public:
 	using Index = UnsignedCapacity<CAPACITY>;
 
 public:
-	FFSM2_INLINE void clear()										noexcept	{ _count = 0;		}
+	FFSM2_INLINE void clear()									  noexcept	{ _count = 0;		}
 
 	// TODO: replace with 'emplace<>()'?
 	template <typename TValue>
-	FFSM2_INLINE Long append(const TValue& value)					noexcept;
+	FFSM2_INLINE Long append(const TValue& value)				  noexcept;
 
 	template <typename TValue>
-	FFSM2_INLINE Long append(	  TValue&& value)					noexcept;
+	FFSM2_INLINE Long append(	  TValue&& value)				  noexcept;
 
 	template <typename N>
-	FFSM2_INLINE	   Item& operator[] (const N i)					noexcept;
+	FFSM2_INLINE	   Item& operator[] (const N i)				  noexcept;
 
 	template <typename N>
-	FFSM2_INLINE const Item& operator[] (const N i) const			noexcept;
+	FFSM2_INLINE const Item& operator[] (const N i)			const noexcept;
 
-	FFSM2_INLINE Long count() const									noexcept	{ return _count;	}
+	FFSM2_INLINE Long count()								const noexcept	{ return _count;	}
 
-	FFSM2_INLINE Array& operator += (const Item& item)				noexcept;
-	FFSM2_INLINE Array& operator += (	  Item&& item)				noexcept;
+	FFSM2_INLINE Array& operator += (const Item& item)			  noexcept;
+	FFSM2_INLINE Array& operator += (	  Item&& item)			  noexcept;
 
 	template <Long N>
-	FFSM2_INLINE Array& operator += (const Array<Item, N>& other)	noexcept;
+	FFSM2_INLINE Array& operator += (const Array<Item, N>& other) noexcept;
 
-	FFSM2_INLINE Iterator<      Array>  begin()						noexcept	{ return Iterator<		Array>(*this,     0);	}
-	FFSM2_INLINE Iterator<const Array>  begin() const				noexcept	{ return Iterator<const Array>(*this,     0);	}
-	FFSM2_INLINE Iterator<const Array> cbegin() const				noexcept	{ return Iterator<const Array>(*this,     0);	}
+	FFSM2_INLINE Iterator<      Array>  begin()					  noexcept	{ return Iterator<		Array>(*this,     0);	}
+	FFSM2_INLINE Iterator<const Array>  begin()				const noexcept	{ return Iterator<const Array>(*this,     0);	}
+	FFSM2_INLINE Iterator<const Array> cbegin()				const noexcept	{ return Iterator<const Array>(*this,     0);	}
 
-	FFSM2_INLINE Iterator<      Array>	  end()						noexcept	{ return Iterator<		Array>(*this, DUMMY);	}
-	FFSM2_INLINE Iterator<const Array>	  end()  const				noexcept	{ return Iterator<const Array>(*this, DUMMY);	}
-	FFSM2_INLINE Iterator<const Array>   cend() const				noexcept	{ return Iterator<const Array>(*this, DUMMY);	}
+	FFSM2_INLINE Iterator<      Array>	  end()					  noexcept	{ return Iterator<		Array>(*this, DUMMY);	}
+	FFSM2_INLINE Iterator<const Array>	  end()				const noexcept	{ return Iterator<const Array>(*this, DUMMY);	}
+	FFSM2_INLINE Iterator<const Array>   cend()				const noexcept	{ return Iterator<const Array>(*this, DUMMY);	}
 
 private:
-	FFSM2_INLINE Long next(const Long i) const						noexcept	{ return i + 1;		}
-	FFSM2_INLINE Long limit() const									noexcept	{ return _count;	}
+	FFSM2_INLINE Long next(const Long i)					const noexcept	{ return i + 1;		}
+	FFSM2_INLINE Long limit()								const noexcept	{ return _count;	}
 
 private:
 	Long _count = 0;
