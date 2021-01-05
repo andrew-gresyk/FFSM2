@@ -313,6 +313,23 @@ namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+template <bool B, class TT, class TF>
+struct ConditionalT {
+	using Type = TT;
+};
+
+template <class TT, class TF>
+struct ConditionalT<false, TT, TF> {
+	using Type = TF;
+};
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <bool B, class TT, class TF>
+using Conditional = typename ConditionalT<B, TT, TF>::Type;
+
+////////////////////////////////////////////////////////////////////////////////
+
 template <typename T>
 FFSM2_INLINE void
 fill(T& a, const char value) noexcept {
@@ -357,10 +374,10 @@ template <unsigned NCapacity>
 struct UnsignedCapacityT {
 	static constexpr Long CAPACITY = NCapacity;
 
-	using Type = typename std::conditional<CAPACITY <= UINT8_MAX,  uint8_t,
-				 typename std::conditional<CAPACITY <= UINT16_MAX, uint16_t,
-				 typename std::conditional<CAPACITY <= UINT32_MAX, uint32_t,
-																   uint64_t>::type>::type>::type;
+	using Type = Conditional<CAPACITY <= UINT8_MAX,  uint8_t,
+				 Conditional<CAPACITY <= UINT16_MAX, uint16_t,
+				 Conditional<CAPACITY <= UINT32_MAX, uint32_t,
+													 uint64_t>>>;
 
 	static_assert(CAPACITY <= UINT64_MAX, "STATIC ASSERT");
 };
@@ -374,13 +391,15 @@ template <unsigned NBitWidth>
 struct UnsignedBitWidthT {
 	static constexpr Short BIT_WIDTH = NBitWidth;
 
-	using Type = typename std::conditional<BIT_WIDTH <= 8,  uint8_t,
-				 typename std::conditional<BIT_WIDTH <= 16, uint16_t,
-				 typename std::conditional<BIT_WIDTH <= 32, uint32_t,
-															uint64_t>::type>::type>::type;
+	using Type = Conditional<BIT_WIDTH <= 8,  uint8_t,
+				 Conditional<BIT_WIDTH <= 16, uint16_t,
+				 Conditional<BIT_WIDTH <= 32, uint32_t,
+											  uint64_t>>>;
 
 	static_assert(BIT_WIDTH <= 64, "STATIC ASSERT");
 };
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <unsigned NCapacity>
 using UnsignedBitWidth = typename UnsignedBitWidthT<NCapacity>::Type;
@@ -1527,11 +1546,11 @@ using LowerTypes = typename LowerT<NHalf, NIndex, Ts...>::Type;
 
 template <Long NHalf, Long NIndex, typename TFirst, typename... TRest>
 struct LowerT<NHalf, NIndex, TFirst, TRest...> {
-	using Type = typename std::conditional<
+	using Type = Conditional<
 					 (NIndex < NHalf),
 					 PrependTypes<TFirst, LowerTypes<NHalf, NIndex + 1, TRest...>>,
 					 LowerTypes<NHalf, NIndex + 1, TRest...>
-				 >::type;
+				 >;
 };
 
 template <Long NHalf, Long NIndex>
@@ -1552,7 +1571,7 @@ using UpperTypes = typename UpperT<NHalf, NIndex, Ts...>::Type;
 
 template <Long NHalf, Long NIndex, typename TFirst, typename... TRest>
 struct UpperT<NHalf, NIndex, TFirst, TRest...> {
-	using Type = typename std::conditional<
+	using Type = Conditional<
 					 (NIndex < NHalf),
 					 UpperTypes<NHalf, NIndex + 1, TRest...>,
 					 TL_<TFirst, TRest...>
@@ -1628,11 +1647,11 @@ template <Long NHalf, Long NIndex, typename TFirst, typename... TRest>
 struct LowerT<NHalf, NIndex, TFirst, TRest...> {
 	using LTypeList = typename LowerT<NHalf, NIndex + 1, TRest...>::Type;
 
-	using Type = typename std::conditional<
+	using Type = Conditional<
 					 (NIndex < NHalf),
 					 PrependTypes<TFirst, LTypeList>,
 					 LTypeList
-				 >::type;
+				 >;
 };
 
 template <Long NHalf, Long NIndex>
@@ -1653,11 +1672,11 @@ using UpperTypes = typename UpperT<NHalf, NIndex, Ts...>::Type;
 
 template <Long NHalf, Long NIndex, typename TFirst, typename... TRest>
 struct UpperT<NHalf, NIndex, TFirst, TRest...> {
-	using Type = typename std::conditional<
+	using Type = Conditional<
 					 (NIndex < NHalf),
 					 UpperTypes<NHalf, NIndex + 1, TRest...>,
 					 TL_<TFirst, TRest...>
-				 >::type;
+				 >;
 };
 
 template <Long NHalf, Long NIndex>
@@ -1814,11 +1833,11 @@ template <Long NHalf, Long NIndex, Long NFirst, Long... NRest>
 struct LowerN<NHalf, NIndex, NFirst, NRest...> {
 	using LValueList = typename LowerN<NHalf, NIndex + 1, NRest...>::Type;
 
-	using Type = typename std::conditional<
+	using Type = Conditional<
 					 (NIndex < NHalf),
 					 PrependValues<NFirst, LValueList>,
 					 LValueList
-				 >::type;
+				 >;
 };
 
 template <Long NHalf, Long NIndex>
@@ -1841,11 +1860,11 @@ using UpperValues = typename UpperN<NHalf, NIndex, Ns...>::Type;
 
 template <Long NHalf, Long NIndex, Long NFirst, Long... NRest>
 struct UpperN<NHalf, NIndex, NFirst, NRest...> {
-	using Type = typename std::conditional<
+	using Type = Conditional<
 					 (NIndex < NHalf),
 					 UpperValues<NHalf, NIndex + 1, NRest...>,
 					 VL_<NFirst, NRest...>
-				 >::type;
+				 >;
 };
 
 template <Long NHalf, Long NIndex>
@@ -4574,7 +4593,7 @@ struct DynamicBox final {
 	FFSM2_INLINE void guard(GuardControlT<TArgs>& control) noexcept	{ Guard<Type>::execute(control);	}
 
 	FFSM2_INLINE void construct() noexcept;
-	FFSM2_INLINE void destruct()  noexcept;
+	FFSM2_INLINE void  destruct() noexcept;
 
 	FFSM2_INLINE	   Type& get()		 noexcept			{ FFSM2_ASSERT(initialized_); return t_;	}
 	FFSM2_INLINE const Type& get() const noexcept			{ FFSM2_ASSERT(initialized_); return t_;	}
@@ -4597,7 +4616,7 @@ struct StaticBox final {
 	FFSM2_INLINE void guard(GuardControlT<TArgs>& control) noexcept;
 
 	FFSM2_INLINE void construct() noexcept 																{}
-	FFSM2_INLINE void destruct()  noexcept 																{}
+	FFSM2_INLINE void  destruct() noexcept 																{}
 
 	FFSM2_INLINE	   Type& get()		 noexcept					{ return t_;						}
 	FFSM2_INLINE const Type& get() const noexcept					{ return t_;						}
@@ -4609,11 +4628,11 @@ struct StaticBox final {
 
 template <typename T, typename TArgs>
 struct BoxifyT final {
-	using Type = typename std::conditional<
+	using Type = Conditional<
 					 std::is_base_of<Dynamic_, T>::value,
 					 DynamicBox<T, TArgs>,
 					 StaticBox <T, TArgs>
-				 >::type;
+				 >;
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
