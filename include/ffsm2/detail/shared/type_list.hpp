@@ -125,11 +125,11 @@ using LowerTypes = typename LowerT<NHalf, NIndex, Ts...>::Type;
 
 template <Long NHalf, Long NIndex, typename TFirst, typename... TRest>
 struct LowerT<NHalf, NIndex, TFirst, TRest...> {
-	using Type = typename std::conditional<
+	using Type = Conditional<
 					 (NIndex < NHalf),
 					 PrependTypes<TFirst, LowerTypes<NHalf, NIndex + 1, TRest...>>,
 					 LowerTypes<NHalf, NIndex + 1, TRest...>
-				 >::type;
+				 >;
 };
 
 template <Long NHalf, Long NIndex>
@@ -150,7 +150,7 @@ using UpperTypes = typename UpperT<NHalf, NIndex, Ts...>::Type;
 
 template <Long NHalf, Long NIndex, typename TFirst, typename... TRest>
 struct UpperT<NHalf, NIndex, TFirst, TRest...> {
-	using Type = typename std::conditional<
+	using Type = Conditional<
 					 (NIndex < NHalf),
 					 UpperTypes<NHalf, NIndex + 1, TRest...>,
 					 TL_<TFirst, TRest...>
@@ -226,11 +226,11 @@ template <Long NHalf, Long NIndex, typename TFirst, typename... TRest>
 struct LowerT<NHalf, NIndex, TFirst, TRest...> {
 	using LTypeList = typename LowerT<NHalf, NIndex + 1, TRest...>::Type;
 
-	using Type = typename std::conditional<
+	using Type = Conditional<
 					 (NIndex < NHalf),
 					 PrependTypes<TFirst, LTypeList>,
 					 LTypeList
-				 >::type;
+				 >;
 };
 
 template <Long NHalf, Long NIndex>
@@ -251,11 +251,11 @@ using UpperTypes = typename UpperT<NHalf, NIndex, Ts...>::Type;
 
 template <Long NHalf, Long NIndex, typename TFirst, typename... TRest>
 struct UpperT<NHalf, NIndex, TFirst, TRest...> {
-	using Type = typename std::conditional<
+	using Type = Conditional<
 					 (NIndex < NHalf),
 					 UpperTypes<NHalf, NIndex + 1, TRest...>,
 					 TL_<TFirst, TRest...>
-				 >::type;
+				 >;
 };
 
 template <Long NHalf, Long NIndex>

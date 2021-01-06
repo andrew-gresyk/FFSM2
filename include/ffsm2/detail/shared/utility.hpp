@@ -22,6 +22,23 @@ namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+template <bool B, class TT, class TF>
+struct ConditionalT {
+	using Type = TT;
+};
+
+template <class TT, class TF>
+struct ConditionalT<false, TT, TF> {
+	using Type = TF;
+};
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <bool B, class TT, class TF>
+using Conditional = typename ConditionalT<B, TT, TF>::Type;
+
+////////////////////////////////////////////////////////////////////////////////
+
 template <typename T>
 FFSM2_INLINE void
 fill(T& a, const char value) noexcept {
@@ -66,10 +83,10 @@ template <unsigned NCapacity>
 struct UnsignedCapacityT {
 	static constexpr Long CAPACITY = NCapacity;
 
-	using Type = typename std::conditional<CAPACITY <= UINT8_MAX,  uint8_t,
-				 typename std::conditional<CAPACITY <= UINT16_MAX, uint16_t,
-				 typename std::conditional<CAPACITY <= UINT32_MAX, uint32_t,
-																   uint64_t>::type>::type>::type;
+	using Type = Conditional<CAPACITY <= UINT8_MAX,  uint8_t,
+				 Conditional<CAPACITY <= UINT16_MAX, uint16_t,
+				 Conditional<CAPACITY <= UINT32_MAX, uint32_t,
+													 uint64_t>>>;
 
 	static_assert(CAPACITY <= UINT64_MAX, "STATIC ASSERT");
 };
@@ -83,13 +100,15 @@ template <unsigned NBitWidth>
 struct UnsignedBitWidthT {
 	static constexpr Short BIT_WIDTH = NBitWidth;
 
-	using Type = typename std::conditional<BIT_WIDTH <= 8,  uint8_t,
-				 typename std::conditional<BIT_WIDTH <= 16, uint16_t,
-				 typename std::conditional<BIT_WIDTH <= 32, uint32_t,
-															uint64_t>::type>::type>::type;
+	using Type = Conditional<BIT_WIDTH <= 8,  uint8_t,
+				 Conditional<BIT_WIDTH <= 16, uint16_t,
+				 Conditional<BIT_WIDTH <= 32, uint32_t,
+											  uint64_t>>>;
 
 	static_assert(BIT_WIDTH <= 64, "STATIC ASSERT");
 };
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <unsigned NCapacity>
 using UnsignedBitWidth = typename UnsignedBitWidthT<NCapacity>::Type;

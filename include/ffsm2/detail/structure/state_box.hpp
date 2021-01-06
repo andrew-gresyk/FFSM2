@@ -32,7 +32,7 @@ struct DynamicBox final {
 	FFSM2_INLINE void guard(GuardControlT<TArgs>& control) noexcept	{ Guard<Type>::execute(control);	}
 
 	FFSM2_INLINE void construct() noexcept;
-	FFSM2_INLINE void destruct()  noexcept;
+	FFSM2_INLINE void  destruct() noexcept;
 
 	FFSM2_INLINE	   Type& get()		 noexcept			{ FFSM2_ASSERT(initialized_); return t_;	}
 	FFSM2_INLINE const Type& get() const noexcept			{ FFSM2_ASSERT(initialized_); return t_;	}
@@ -55,7 +55,7 @@ struct StaticBox final {
 	FFSM2_INLINE void guard(GuardControlT<TArgs>& control) noexcept;
 
 	FFSM2_INLINE void construct() noexcept 																{}
-	FFSM2_INLINE void destruct()  noexcept 																{}
+	FFSM2_INLINE void  destruct() noexcept 																{}
 
 	FFSM2_INLINE	   Type& get()		 noexcept					{ return t_;						}
 	FFSM2_INLINE const Type& get() const noexcept					{ return t_;						}
@@ -67,11 +67,11 @@ struct StaticBox final {
 
 template <typename T, typename TArgs>
 struct BoxifyT final {
-	using Type = typename std::conditional<
+	using Type = Conditional<
 					 std::is_base_of<Dynamic_, T>::value,
 					 DynamicBox<T, TArgs>,
 					 StaticBox <T, TArgs>
-				 >::type;
+				 >;
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

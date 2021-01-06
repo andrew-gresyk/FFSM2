@@ -37,11 +37,11 @@ template <Long NHalf, Long NIndex, Long NFirst, Long... NRest>
 struct LowerN<NHalf, NIndex, NFirst, NRest...> {
 	using LValueList = typename LowerN<NHalf, NIndex + 1, NRest...>::Type;
 
-	using Type = typename std::conditional<
+	using Type = Conditional<
 					 (NIndex < NHalf),
 					 PrependValues<NFirst, LValueList>,
 					 LValueList
-				 >::type;
+				 >;
 };
 
 template <Long NHalf, Long NIndex>
@@ -64,11 +64,11 @@ using UpperValues = typename UpperN<NHalf, NIndex, Ns...>::Type;
 
 template <Long NHalf, Long NIndex, Long NFirst, Long... NRest>
 struct UpperN<NHalf, NIndex, NFirst, NRest...> {
-	using Type = typename std::conditional<
+	using Type = Conditional<
 					 (NIndex < NHalf),
 					 UpperValues<NHalf, NIndex + 1, NRest...>,
 					 VL_<NFirst, NRest...>
-				 >::type;
+				 >;
 };
 
 template <Long NHalf, Long NIndex>
