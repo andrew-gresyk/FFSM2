@@ -137,6 +137,9 @@
     <ClCompile Include="..\..\test\test_shared_type_table.cpp">
       <Filter>test</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\test\test_contexts.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\include\ffsm2\detail\root.inl">

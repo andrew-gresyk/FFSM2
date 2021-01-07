@@ -205,8 +205,8 @@ R_<TG, TA FFSM2_IF_STATIC_PLANS(, TPL)>::cancelledByGuards(const TransitionSets&
 
 template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_DYNAMIC_PLANS(, Long NTC), typename TP, typename TA FFSM2_IF_STATIC_PLANS(, typename TPL)>
 void
-RP_<G_<NFT, TC, NSL FFSM2_IF_DYNAMIC_PLANS(, NTC), TP>, TA FFSM2_IF_STATIC_PLANS(, TPL)>::changeWith(const StateID  stateId,
-																									 const Payload& payload) noexcept
+RP_<GW_<NFT, TC, NSL FFSM2_IF_DYNAMIC_PLANS(, NTC), TP>, TA FFSM2_IF_STATIC_PLANS(, TPL)>::changeWith(const StateID  stateId,
+																									  const Payload& payload) noexcept
 {
 	_request = Transition{stateId, payload};
 
@@ -215,8 +215,8 @@ RP_<G_<NFT, TC, NSL FFSM2_IF_DYNAMIC_PLANS(, NTC), TP>, TA FFSM2_IF_STATIC_PLANS
 
 template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_DYNAMIC_PLANS(, Long NTC), typename TP, typename TA FFSM2_IF_STATIC_PLANS(, typename TPL)>
 void
-RP_<G_<NFT, TC, NSL FFSM2_IF_DYNAMIC_PLANS(, NTC), TP>, TA FFSM2_IF_STATIC_PLANS(, TPL)>::changeWith(const StateID  stateId,
-																										  Payload&& payload) noexcept
+RP_<GW_<NFT, TC, NSL FFSM2_IF_DYNAMIC_PLANS(, NTC), TP>, TA FFSM2_IF_STATIC_PLANS(, TPL)>::changeWith(const StateID  stateId,
+																										   Payload&& payload) noexcept
 {
 	_request = Transition{stateId, std::move(payload)};
 

@@ -1,3 +1,4 @@
+#define FFSM2_DISABLE_TYPEINDEX
 #include "tools.hpp"
 
 namespace test_transitions {

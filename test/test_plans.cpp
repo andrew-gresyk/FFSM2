@@ -1,3 +1,4 @@
+#define FFSM2_DISABLE_TYPEINDEX
 #define FFSM2_ENABLE_DYNAMIC_PLANS
 #include "tools.hpp"
 

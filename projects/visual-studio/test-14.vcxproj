@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\test\main.cpp" />
+    <ClCompile Include="..\..\test\test_contexts.cpp" />
     <ClCompile Include="..\..\test\test_mixed_plans.cpp" />
     <ClCompile Include="..\..\test\test_plans.cpp" />
     <ClCompile Include="..\..\test\test_plans_payloads.cpp" />

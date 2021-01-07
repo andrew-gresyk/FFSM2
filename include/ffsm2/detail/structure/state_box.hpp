@@ -39,7 +39,7 @@ struct DynamicBox final {
 
 	FFSM2_IF_ASSERT(bool initialized_ = false);
 
-	FFSM2_IF_DEBUG(const std::type_index TYPE = typeid(Type));
+	FFSM2_IF_ENABLE_TYPEINDEX(FFSM2_IF_DEBUG(const std::type_index TYPE = typeid(Type)));
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -60,7 +60,7 @@ struct StaticBox final {
 	FFSM2_INLINE	   Type& get()		 noexcept					{ return t_;						}
 	FFSM2_INLINE const Type& get() const noexcept					{ return t_;						}
 
-	FFSM2_IF_DEBUG(const std::type_index TYPE = isBare() ? typeid(None) : typeid(Type));
+	FFSM2_IF_ENABLE_TYPEINDEX(FFSM2_IF_DEBUG(const std::type_index TYPE = isBare() ? typeid(None) : typeid(Type)));
 };
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -36,6 +36,8 @@ enum class StatusEvent : uint8_t {
 
 //------------------------------------------------------------------------------
 
+#ifndef FFSM2_DISABLE_TYPEINDEX
+
 static inline
 const char*
 stateName(const std::type_index stateType) noexcept {
@@ -59,6 +61,8 @@ stateName(const std::type_index stateType) noexcept {
 
 	#endif
 }
+
+#endif
 
 //------------------------------------------------------------------------------
 
