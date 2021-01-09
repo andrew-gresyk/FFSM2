@@ -28,7 +28,7 @@ struct B
 
 int
 main() {
-	Context* empty;
+	Context* const empty = nullptr;
 	FSM::Instance machine{empty};
 
 	return 0;

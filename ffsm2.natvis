@@ -206,14 +206,14 @@
 		<Expand HideRawView="true" />
 	</Type>
 
-	<Type Name="ffsm2::detail::PlanBaseT&lt;*&gt;::Iterator">
+	<Type Name="ffsm2::detail::PlanT&lt;*&gt;::Iterator">
 		<DisplayString Condition="_curr == INVALID_LONG">(■)</DisplayString>
 		<DisplayString Condition="_curr != INVALID_LONG">{_plan._planData.tasks._items[_curr]}</DisplayString>
 		<DisplayString Condition="_curr != INVALID_LONG &amp;&amp; _next != INVALID_LONG">{_plan._planData.tasks._items[_curr]}, {_plan._planData.tasks._items[_next]}</DisplayString>
 		<Expand HideRawView="true" />
 	</Type>
 
-	<Type Name="ffsm2::detail::PlanBaseT&lt;*&gt;::CIterator">
+	<Type Name="ffsm2::detail::PlanT&lt;*&gt;::CIterator">
 		<DisplayString Condition="_curr == INVALID_LONG">(■)</DisplayString>
 		<DisplayString Condition="_curr != INVALID_LONG">{_plan._planData.tasks._items[_curr]}</DisplayString>
 		<DisplayString Condition="_curr != INVALID_LONG &amp;&amp; _next != INVALID_LONG">{_plan._planData.tasks._items[_curr]}, {_plan._planData.tasks._items[_next]}</DisplayString>
@@ -259,12 +259,20 @@
 		</Expand>
 	</Type>
 
+	<!-- ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ -->
+
+	<Type Name="ffsm2::StructureEntry">
+		<DisplayString Condition=" isActive">█ {prefix,sub}{name,sb}</DisplayString>
+		<DisplayString Condition="!isActive">░ {prefix,sub}{name,sb}</DisplayString>
+		<Expand HideRawView="true" />
+	</Type>
+
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 	<Type Name="Event">
-		<DisplayString Condition="target == ffsm2::INVALID_STATE_ID"		       >{type, en} [{(unsigned) origin}]</DisplayString>
-		<DisplayString Condition="origin == ffsm2::INVALID_STATE_ID">(external) {type, en} [{(unsigned) target}]</DisplayString>
-		<DisplayString									                 >[{(unsigned) origin}] {type, en} [{(unsigned) target}]</DisplayString>
+		<DisplayString Condition="target == ffsm2::INVALID_STATE_ID"		   >{type, en} [{(unsigned)origin}]</DisplayString>
+		<DisplayString Condition="origin == ffsm2::INVALID_STATE_ID">(external) {type, en} [{(unsigned)target}]</DisplayString>
+		<DisplayString									  >[{(unsigned)origin}] {type, en} [{(unsigned)target}]</DisplayString>
 		<Expand HideRawView="true" />
 	</Type>
 
