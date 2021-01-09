@@ -7,8 +7,7 @@ template <typename
 		, typename
 		, typename
 		, Long
-		FFSM2_IF_DYNAMIC_PLANS(, Long)
-		FFSM2_IF_STATIC_PLANS(, typename)
+		FFSM2_IF_PLANS(, Long)
 		, typename>
 struct ArgsT;
 

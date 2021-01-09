@@ -27,17 +27,14 @@
     <ClInclude Include="..\..\include\ffsm2\detail\root\plan_data.hpp" />
     <ClInclude Include="..\..\include\ffsm2\detail\root\registry.hpp" />
     <ClInclude Include="..\..\include\ffsm2\detail\root\state_access.hpp" />
+    <ClInclude Include="..\..\include\ffsm2\detail\root\task_list.hpp" />
     <ClInclude Include="..\..\include\ffsm2\detail\shared\array.hpp" />
     <ClInclude Include="..\..\include\ffsm2\detail\shared\bit_array.hpp" />
     <ClInclude Include="..\..\include\ffsm2\detail\shared\iterator.hpp" />
-    <ClInclude Include="..\..\include\ffsm2\detail\shared\list.hpp" />
     <ClInclude Include="..\..\include\ffsm2\detail\shared\macros_off.hpp" />
     <ClInclude Include="..\..\include\ffsm2\detail\shared\macros_on.hpp" />
     <ClInclude Include="..\..\include\ffsm2\detail\shared\type_list.hpp" />
-    <ClInclude Include="..\..\include\ffsm2\detail\shared\type_table.hpp" />
     <ClInclude Include="..\..\include\ffsm2\detail\shared\utility.hpp" />
-    <ClInclude Include="..\..\include\ffsm2\detail\shared\value_list.hpp" />
-    <ClInclude Include="..\..\include\ffsm2\detail\shared\value_table.hpp" />
     <ClInclude Include="..\..\include\ffsm2\detail\structure\composite.hpp" />
     <ClInclude Include="..\..\include\ffsm2\detail\structure\composite_sub.hpp" />
     <ClInclude Include="..\..\include\ffsm2\detail\structure\forward.hpp" />
@@ -49,12 +46,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\test\main.cpp" />
-    <ClCompile Include="..\..\test\test_mixed_plans.cpp" />
+    <ClCompile Include="..\..\test\test_contexts.cpp" />
     <ClCompile Include="..\..\test\test_plans.cpp" />
     <ClCompile Include="..\..\test\test_plans_payloads.cpp" />
     <ClCompile Include="..\..\test\test_plans_verbose.cpp" />
-    <ClCompile Include="..\..\test\test_shared_type_table.cpp" />
-    <ClCompile Include="..\..\test\test_static_plans.cpp" />
     <ClCompile Include="..\..\test\test_transitions.cpp" />
     <ClCompile Include="..\..\test\test_transitions_payloads.cpp" />
     <ClCompile Include="..\..\test\test_transitions_verbose.cpp" />
@@ -64,10 +59,10 @@
     <None Include="..\..\include\ffsm2\detail\root\control.inl" />
     <None Include="..\..\include\ffsm2\detail\root\plan.inl" />
     <None Include="..\..\include\ffsm2\detail\root\plan_data.inl" />
+    <None Include="..\..\include\ffsm2\detail\root\task_list.inl" />
     <None Include="..\..\include\ffsm2\detail\shared\array.inl" />
     <None Include="..\..\include\ffsm2\detail\shared\bit_array.inl" />
     <None Include="..\..\include\ffsm2\detail\shared\iterator.inl" />
-    <None Include="..\..\include\ffsm2\detail\shared\list.inl" />
     <None Include="..\..\include\ffsm2\detail\structure\composite.inl" />
     <None Include="..\..\include\ffsm2\detail\structure\composite_sub_1.inl" />
     <None Include="..\..\include\ffsm2\detail\structure\composite_sub_2.inl" />

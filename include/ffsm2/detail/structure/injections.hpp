@@ -16,7 +16,7 @@ protected:
 	using Control		= ControlT<TArgs>;
 	using PlanControl	= PlanControlT<TArgs>;
 
-#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
+#ifdef FFSM2_ENABLE_PLANS
 	using Plan			= PlanT<TArgs>;
 #endif
 
@@ -62,7 +62,7 @@ struct B_<TFirst, TRest...>
 	using typename TFirst::Control;
 	using typename TFirst::PlanControl;
 
-#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
+#ifdef FFSM2_ENABLE_PLANS
 	using typename TFirst::Plan;
 #endif
 
@@ -100,7 +100,7 @@ struct B_<TFirst>
 	using typename TFirst::Control;
 	using typename TFirst::PlanControl;
 
-#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
+#ifdef FFSM2_ENABLE_PLANS
 	using typename TFirst::Plan;
 #endif
 
@@ -124,7 +124,7 @@ struct B_<TFirst>
 
 	FFSM2_INLINE void exit			   (PlanControl&)		noexcept {}
 
-#ifdef FFSM2_ENABLE_ANY_PLANS
+#ifdef FFSM2_ENABLE_PLANS
 	FFSM2_INLINE void planSucceeded	   (FullControl&)		noexcept {}
 	FFSM2_INLINE void planFailed	   (FullControl&)		noexcept {}
 #endif

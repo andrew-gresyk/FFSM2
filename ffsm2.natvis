@@ -33,7 +33,6 @@
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 	<Type Name="ffsm2::detail::StaticArray&lt;*&gt;">
-		<DisplayString>&lt;{$T2}&gt;</DisplayString>
 		<Expand HideRawView="true">
 			<ArrayItems>
 				<Size>$T2</Size>
@@ -45,43 +44,30 @@
 	<!-- ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ -->
 
 	<Type Name="ffsm2::detail::BitArray&lt;*&gt;">
-		<DisplayString>&lt;{CAPACITY &amp; 0x1}&gt;</DisplayString>
 		<Expand HideRawView="true">
 			<IndexListItems>
-				<Size>(CAPACITY + 7 / 8)</Size>
-				<ValueNode>(_storage[$i / (sizeof(Unit) * 8)] &gt;&gt; ($i % (sizeof(Unit) * 8))) &amp; 0x1</ValueNode>
+				<Size>CAPACITY</Size>
+				<ValueNode>(_storage[$i / UNIT_WIDTH] &gt;&gt; ($i % UNIT_WIDTH)) &amp; 0x1</ValueNode>
 			</IndexListItems>
 		</Expand>
 	</Type>
 
 	<Type Name="ffsm2::detail::BitArray&lt;*&gt;::Bits">
-		<DisplayString>&lt;{CAPACITY &amp; 0x1}&gt;</DisplayString>
 		<Expand HideRawView="true">
-			<ExpandedItem>_storage</ExpandedItem>
-		</Expand>
-	</Type>
-
-	<Type Name="ffsm2::detail::BitArray&lt;*&gt;::ConstBits">
-		<DisplayString>&lt;{CAPACITY &amp; 0x1}&gt;</DisplayString>
-		<Expand HideRawView="true">
-			<ExpandedItem>_storage</ExpandedItem>
-		</Expand>
-	</Type>
-
-	<!-- ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ -->
-
-	<Type Name="ffsm2::detail::List&lt;*&gt;">
-		<DisplayString>{_count} / {CAPACITY}</DisplayString>
-		<Expand HideRawView="true">
-			<IndexListItems Condition="_count > 0">
+			<IndexListItems>
 				<Size>CAPACITY</Size>
-				<ValueNode>_cells[$i]</ValueNode>
+				<ValueNode>(_storage[$i / UNIT_WIDTH] &gt;&gt; ($i % UNIT_WIDTH)) &amp; 0x1</ValueNode>
 			</IndexListItems>
 		</Expand>
 	</Type>
 
-	<Type Name="ffsm2::detail::List&lt;*&gt;::Cell">
-		<DisplayString>{item}</DisplayString>
+	<Type Name="ffsm2::detail::BitArray&lt;*&gt;::CBits">
+		<Expand HideRawView="true">
+			<IndexListItems>
+				<Size>CAPACITY</Size>
+				<ValueNode>(_storage[$i / UNIT_WIDTH] &gt;&gt; ($i % UNIT_WIDTH)) &amp; 0x1</ValueNode>
+			</IndexListItems>
+		</Expand>
 	</Type>
 
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -144,46 +130,94 @@
 
 	<!-- ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ -->
 
-	<Type Name="ffsm2::detail::Task">
-		<DisplayString>{(unsigned)origin} ► {(unsigned)destination}</DisplayString>
+	<Type Name="ffsm2::detail::TaskBase">
+		<DisplayString Condition="origin == INVALID_STATE_ID">(■)</DisplayString>
+		<DisplayString>({(unsigned) origin} ► {(unsigned) destination})</DisplayString>
+		<Expand HideRawView="true" />
+	</Type>
+
+	<Type Name="ffsm2::detail::TaskListT&lt;*&gt;">
+		<Expand HideRawView="true">
+			<IndexListItems Condition="_count > 0">
+				<Size>CAPACITY</Size>
+				<ValueNode>_items[$i]</ValueNode>
+			</IndexListItems>
+		</Expand>
 	</Type>
 
 	<Type Name="ffsm2::detail::TaskLink">
-		<DisplayString>{(unsigned)prev} ◄► {(unsigned)next}</DisplayString>
+		<DisplayString Condition="prev == INVALID_STATE_ID &amp;&amp; next == INVALID_STATE_ID">[■]</DisplayString>
+		<DisplayString Condition="prev == INVALID_STATE_ID">[► {(unsigned) next}]</DisplayString>
+		<DisplayString Condition="next == INVALID_STATE_ID">[{(unsigned) prev} ◄]</DisplayString>
+		<DisplayString>[{(unsigned) prev} ◄► {(unsigned) next}]</DisplayString>
+	</Type>
+
+	<Type Name="ffsm2::detail::Bounds">
+		<DisplayString>[{(unsigned) first} .. {(unsigned) last}]</DisplayString>
+		<Expand HideRawView="true" />
 	</Type>
 
 	<!-- ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ -->
 
-	<Type Name="ffsm2::detail::PlanT&lt;*&gt;">
-		<DisplayString Condition="_bounds.first == INVALID_LONG_INDEX">&lt;Empty&gt;</DisplayString>
-		<Expand HideRawView="true">
+	<Type Name="ffsm2::detail::PlanDataT&lt;*&gt;">
+		<Expand>
 			<CustomListItems MaxItemsPerView="100">
-				<Variable Name="i" InitialValue="_bounds.first" />
+				<Variable Name="i" InitialValue="tasksBounds.first" />
 
-				<If Condition="_bounds.first != INVALID_LONG_INDEX &amp;&amp; _bounds.first != _bounds.last">
+				<If Condition="tasksBounds.first != INVALID_LONG &amp;&amp; tasksBounds.first != tasksBounds.last">
 					<Loop>
-						<Item>_planData.tasks._cells[i].item</Item>
-						<Exec>i = _planData.taskLinks[i].next</Exec>
-						<Break Condition="i == _bounds.last" />
+						<Item>tasks._items[i]</Item>
+						<Exec>i = taskLinks[i].next</Exec>
+						<Break Condition="i == tasksBounds.last" />
 					</Loop>
-					<Item>_planData.tasks._cells[_bounds.last].item</Item>
+					<Item>tasks._items[tasksBounds.last]</Item>
 				</If>
 
-				<If Condition="_bounds.first != INVALID_LONG_INDEX &amp;&amp; _bounds.first == _bounds.last">
-					<Item>_planData.tasks._cells[_bounds.last].item</Item>
+				<If Condition="tasksBounds.first != INVALID_LONG &amp;&amp; tasksBounds.first == tasksBounds.last">
+					<Item>tasks._items[tasksBounds.last]</Item>
 				</If>
+
 			</CustomListItems>
 		</Expand>
 	</Type>
 
 	<!-- ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ -->
 
-	<Type Name="ffsm2::detail::PlanT&lt;*&gt;::Iterator">
-		<DisplayString Condition="_curr == INVALID_LONG_INDEX">&lt;Empty&gt;</DisplayString>
-		<DisplayString Condition="_curr != INVALID_LONG_INDEX">{_plan._planData.tasks._cells[_curr].item}</DisplayString>
-		<Expand HideRawView="true">
-			<ExpandedItem Condition="_curr != INVALID_LONG_INDEX">_plan._planData.tasks._cells[_curr].item</ExpandedItem>
+	<Type Name="ffsm2::detail::CPlanT&lt;*&gt;">
+		<DisplayString>{_planData}</DisplayString>
+		<Expand>
+			<ExpandedItem>_planData</ExpandedItem>
 		</Expand>
+	</Type>
+
+	<Type Name="ffsm2::detail::PlanT&lt;*&gt;">
+		<DisplayString>{_planData}</DisplayString>
+		<Expand>
+			<ExpandedItem>_planData</ExpandedItem>
+		</Expand>
+	</Type>
+
+	<!-- ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ -->
+
+	<Type Name="ffsm2::detail::CPlanT&lt;*&gt;::Iterator">
+		<DisplayString Condition="_curr == INVALID_LONG">(■)</DisplayString>
+		<DisplayString Condition="_curr != INVALID_LONG">{_plan._planData.tasks._items[_curr]}</DisplayString>
+		<DisplayString Condition="_curr != INVALID_LONG &amp;&amp; _next != INVALID_LONG">{_plan._planData.tasks._items[_curr]}, {_plan._planData.tasks._items[_next]}</DisplayString>
+		<Expand HideRawView="true" />
+	</Type>
+
+	<Type Name="ffsm2::detail::PlanT&lt;*&gt;::Iterator">
+		<DisplayString Condition="_curr == INVALID_LONG">(■)</DisplayString>
+		<DisplayString Condition="_curr != INVALID_LONG">{_plan._planData.tasks._items[_curr]}</DisplayString>
+		<DisplayString Condition="_curr != INVALID_LONG &amp;&amp; _next != INVALID_LONG">{_plan._planData.tasks._items[_curr]}, {_plan._planData.tasks._items[_next]}</DisplayString>
+		<Expand HideRawView="true" />
+	</Type>
+
+	<Type Name="ffsm2::detail::PlanT&lt;*&gt;::CIterator">
+		<DisplayString Condition="_curr == INVALID_LONG">(■)</DisplayString>
+		<DisplayString Condition="_curr != INVALID_LONG">{_plan._planData.tasks._items[_curr]}</DisplayString>
+		<DisplayString Condition="_curr != INVALID_LONG &amp;&amp; _next != INVALID_LONG">{_plan._planData.tasks._items[_curr]}, {_plan._planData.tasks._items[_next]}</DisplayString>
+		<Expand HideRawView="true" />
 	</Type>
 
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -223,6 +257,14 @@
 		<Expand>
 			<ExpandedItem>_container</ExpandedItem>
 		</Expand>
+	</Type>
+
+	<!-- ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ -->
+
+	<Type Name="ffsm2::StructureEntry">
+		<DisplayString Condition=" isActive">█ {prefix,sub}{name,sb}</DisplayString>
+		<DisplayString Condition="!isActive">░ {prefix,sub}{name,sb}</DisplayString>
+		<Expand HideRawView="true" />
 	</Type>
 
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->

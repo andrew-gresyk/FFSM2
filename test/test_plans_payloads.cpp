@@ -1,4 +1,4 @@
-#define FFSM2_ENABLE_DYNAMIC_PLANS
+#define FFSM2_ENABLE_PLANS
 #include "tools.hpp"
 
 namespace test_plans_payloads {

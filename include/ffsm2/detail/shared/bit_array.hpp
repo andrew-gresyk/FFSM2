@@ -1,4 +1,4 @@
-#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
+#ifdef FFSM2_ENABLE_PLANS
 
 namespace ffsm2 {
 namespace detail {
@@ -24,7 +24,9 @@ public:
 	using Index	= TIndex;
 	using Unit	= unsigned char;
 
-	static constexpr Index CAPACITY	= NCapacity;
+	static constexpr Index CAPACITY   = NCapacity;
+	static constexpr Index UNIT_WIDTH = sizeof(Unit) * 8;
+	static constexpr Index UNIT_COUNT = contain(CAPACITY, UNIT_WIDTH);
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -34,19 +36,19 @@ public:
 
 	private:
 		FFSM2_INLINE explicit Bits(Unit* const storage,
-								   const Index width)	  noexcept
+								   const Index width)		  noexcept
 			: _storage{storage}
 			, _width{width}
 		{}
 
 	public:
-		FFSM2_INLINE explicit operator bool()		const noexcept;
+		FFSM2_INLINE explicit operator bool()			const noexcept;
 
-		FFSM2_INLINE void clear()						  noexcept;
+		FFSM2_INLINE void clear()							  noexcept;
 
-		FFSM2_INLINE bool get  (const Index index)	const noexcept;
-		FFSM2_INLINE void set  (const Index index)		  noexcept;
-		FFSM2_INLINE void clear(const Index index)		  noexcept;
+		FFSM2_INLINE bool get  (const Index index)		const noexcept;
+		FFSM2_INLINE void set  (const Index index)			  noexcept;
+		FFSM2_INLINE void clear(const Index index)			  noexcept;
 
 	private:
 		Unit* const _storage;
@@ -61,15 +63,15 @@ public:
 
 	private:
 		FFSM2_INLINE explicit CBits(const Unit* const storage,
-									const Index width)	  noexcept
+									const Index width)		  noexcept
 			: _storage{storage}
 			, _width{width}
 		{}
 
 	public:
-		FFSM2_INLINE explicit operator bool()		const noexcept;
+		FFSM2_INLINE explicit operator bool()			const noexcept;
 
-		FFSM2_INLINE bool get(const Index index)	const noexcept;
+		FFSM2_INLINE bool get(const Index index)		const noexcept;
 
 	private:
 		const Unit* const _storage;
@@ -83,23 +85,23 @@ public:
 		clear();
 	}
 
-	FFSM2_INLINE void clear()							  noexcept;
+	FFSM2_INLINE void clear()								  noexcept;
 
-	FFSM2_INLINE bool get  (const Index index)		const noexcept;
-	FFSM2_INLINE void set  (const Index index)			  noexcept;
-	FFSM2_INLINE void clear(const Index index)			  noexcept;
-
-	template <Short NUnit, Short NWidth>
-	FFSM2_INLINE  Bits bits()							  noexcept;
+	FFSM2_INLINE bool get  (const Index index)			const noexcept;
+	FFSM2_INLINE void set  (const Index index)				  noexcept;
+	FFSM2_INLINE void clear(const Index index)				  noexcept;
 
 	template <Short NUnit, Short NWidth>
-	FFSM2_INLINE CBits bits()						const noexcept;
+	FFSM2_INLINE  Bits bits()								  noexcept;
 
-	FFSM2_INLINE  Bits bits(const Units& units)			  noexcept;
-	FFSM2_INLINE CBits bits(const Units& units)		const noexcept;
+	template <Short NUnit, Short NWidth>
+	FFSM2_INLINE CBits bits()							const noexcept;
+
+	FFSM2_INLINE  Bits bits(const Units& units)				  noexcept;
+	FFSM2_INLINE CBits bits(const Units& units)			const noexcept;
 
 private:
-	Unit _storage[CAPACITY];
+	Unit _storage[UNIT_COUNT];
 };
 
 //------------------------------------------------------------------------------

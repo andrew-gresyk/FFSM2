@@ -116,7 +116,7 @@ using UnsignedBitWidth = typename UnsignedBitWidthT<NCapacity>::Type;
 //------------------------------------------------------------------------------
 
 constexpr Long
-roundUp(const Long x,
+contain(const Long x,
 		const Long to) noexcept
 {
 	return (x + (to - 1)) / to;
