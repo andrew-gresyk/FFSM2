@@ -27,7 +27,7 @@ S_<N, TA, TH>::deepConstruct(PlanControl&
 							 control
 						 #endif
 							 ) noexcept {
-	FFSM2_IF_DYNAMIC_PLANS(control._planData.verifyEmptyStatus(STATE_ID));
+	FFSM2_IF_PLANS(control._planData.verifyEmptyStatus(STATE_ID));
 
 	FFSM2_LOG_STATE_METHOD(&Head::enter,
 						   Method::CONSTRUCT);
@@ -54,7 +54,7 @@ S_<N, TA, TH>::deepEnter(PlanControl& control) noexcept {
 template <StateID N, typename TA, typename TH>
 void
 S_<N, TA, TH>::deepReenter(PlanControl& control) noexcept {
-	FFSM2_IF_DYNAMIC_PLANS(control._planData.verifyEmptyStatus(STATE_ID));
+	FFSM2_IF_PLANS(control._planData.verifyEmptyStatus(STATE_ID));
 
 	FFSM2_LOG_STATE_METHOD(&Head::reenter,
 						   Method::REENTER);
@@ -157,14 +157,14 @@ S_<N, TA, TH>::deepDestruct(PlanControl&
 
 	_headBox.destruct();
 
-#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
+#ifdef FFSM2_ENABLE_PLANS
 	control._planData.clearTaskStatus(STATE_ID);
 #endif
 }
 
 //------------------------------------------------------------------------------
 
-#ifdef FFSM2_ENABLE_ANY_PLANS
+#ifdef FFSM2_ENABLE_PLANS
 
 template <StateID N, typename TA, typename TH>
 void

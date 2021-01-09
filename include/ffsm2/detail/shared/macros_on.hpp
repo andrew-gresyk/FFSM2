@@ -61,45 +61,22 @@
 
 //------------------------------------------------------------------------------
 
+#ifndef FFSM2_DISABLE_TYPEINDEX
+	#define FFSM2_IF_TYPEINDEX(...)									  __VA_ARGS__
+	#define FFSM2_TYPEINDEX_MASK										 (1 << 0)
+#else
+	#define FFSM2_IF_TYPEINDEX(...)
+	#define FFSM2_TYPEINDEX_MASK										 (0 << 0)
+#endif
+
+//------------------------------------------------------------------------------
+
 #ifdef FFSM2_ENABLE_PLANS
-	#define FFSM2_ENABLE_DYNAMIC_PLANS
-	#define FFSM2_ENABLE_STATIC_PLANS
-#endif
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
-	#define FFSM2_ENABLE_ANY_PLANS
-
-	#define FFSM2_IF_DYNAMIC_PLANS(...)								  __VA_ARGS__
-	#define FFSM2_DYNAMIC_PLANS_MASK									 (1 << 0)
+	#define FFSM2_IF_PLANS(...)										  __VA_ARGS__
+	#define FFSM2_PLANS_MASK											 (1 << 1)
 #else
-	#define FFSM2_IF_DYNAMIC_PLANS(...)
-	#define FFSM2_DYNAMIC_PLANS_MASK									 (0 << 0)
-#endif
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-#if defined _MSC_VER && _MSC_VER < 1910
-	#undef FFSM2_ENABLE_STATIC_PLANS
-#endif
-
-#ifdef FFSM2_ENABLE_STATIC_PLANS
-	#define FFSM2_ENABLE_ANY_PLANS
-
-	#define FFSM2_IF_STATIC_PLANS(...)								  __VA_ARGS__
-	#define FFSM2_STATIC_PLANS_MASK										 (1 << 1)
-#else
-	#define FFSM2_IF_STATIC_PLANS(...)
-	#define FFSM2_STATIC_PLANS_MASK										 (0 << 1)
-#endif
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-#ifdef FFSM2_ENABLE_ANY_PLANS
-	#define FFSM2_IF_ANY_PLANS(...)									  __VA_ARGS__
-#else
-	#define FFSM2_IF_ANY_PLANS(...)
+	#define FFSM2_IF_PLANS(...)
+	#define FFSM2_PLANS_MASK											 (0 << 1)
 #endif
 
 //------------------------------------------------------------------------------
@@ -136,7 +113,6 @@
 
 #ifdef FFSM2_ENABLE_VERBOSE_DEBUG_LOG
 	#define FFSM2_ENABLE_LOG_INTERFACE
-
 	#define FFSM2_VERBOSE_DEBUG_LOG_MASK								 (1 << 5)
 #else
 	#define FFSM2_VERBOSE_DEBUG_LOG_MASK								 (0 << 5)
@@ -153,17 +129,17 @@
 		if (_logger)															\
 			_logger->recordTransition(CONTEXT, ORIGIN, DESTINATION)
 
-	#ifdef FFSM2_ENABLE_ANY_PLANS
+#ifdef FFSM2_ENABLE_PLANS
 
-		#define FFSM2_LOG_TASK_STATUS(CONTEXT, ORIGIN, STATUS)					\
-			if (_logger)														\
-				_logger->recordTaskStatus(CONTEXT, ORIGIN, STATUS)
+	#define FFSM2_LOG_TASK_STATUS(CONTEXT, ORIGIN, STATUS)						\
+		if (_logger)															\
+			_logger->recordTaskStatus(CONTEXT, ORIGIN, STATUS)
 
-		#define FFSM2_LOG_PLAN_STATUS(CONTEXT, STATUS)							\
-			if (_logger)														\
-				_logger->recordPlanStatus(CONTEXT, STATUS)
+	#define FFSM2_LOG_PLAN_STATUS(CONTEXT, STATUS)								\
+		if (_logger)															\
+			_logger->recordPlanStatus(CONTEXT, STATUS)
 
-	#endif
+#endif
 
 	#define FFSM2_LOG_CANCELLED_PENDING(CONTEXT, ORIGIN)						\
 		if (_logger)															\
@@ -176,10 +152,10 @@
 
 	#define FFSM2_LOG_TRANSITION(CONTEXT, ORIGIN, DESTINATION)
 
-	#ifdef FFSM2_ENABLE_ANY_PLANS
-		#define FFSM2_LOG_TASK_STATUS(CONTEXT, ORIGIN, STATUS)
-		#define FFSM2_LOG_PLAN_STATUS(CONTEXT, STATUS)
-	#endif
+#ifdef FFSM2_ENABLE_PLANS
+	#define FFSM2_LOG_TASK_STATUS(CONTEXT, ORIGIN, STATUS)
+	#define FFSM2_LOG_PLAN_STATUS(CONTEXT, STATUS)
+#endif
 
 	#define FFSM2_LOG_CANCELLED_PENDING(CONTEXT, ORIGIN)
 
@@ -211,8 +187,8 @@ namespace ffsm2 {
 
 using FeatureTag = uint8_t;
 
-constexpr FeatureTag FFSM2_FEATURE_TAG = FFSM2_DYNAMIC_PLANS_MASK
-									   | FFSM2_STATIC_PLANS_MASK
+constexpr FeatureTag FFSM2_FEATURE_TAG = FFSM2_TYPEINDEX_MASK
+									   | FFSM2_PLANS_MASK
 									   | FFSM2_SERIALIZATION_MASK
 									   | FFSM2_TRANSITION_HISTORY_MASK
 									   | FFSM2_STRUCTURE_REPORT_MASK
@@ -223,8 +199,8 @@ constexpr FeatureTag FFSM2_FEATURE_TAG = FFSM2_DYNAMIC_PLANS_MASK
 
 //------------------------------------------------------------------------------
 
-#undef FFSM2_DYNAMIC_PLANS_MASK
-#undef FFSM2_STATIC_PLANS_MASK
+#undef FFSM2_TYPEINDEX_MASK
+#undef FFSM2_PLANS_MASK
 #undef FFSM2_SERIALIZATION_MASK
 #undef FFSM2_TRANSITION_HISTORY_MASK
 #undef FFSM2_STRUCTURE_REPORT_MASK
@@ -232,6 +208,11 @@ constexpr FeatureTag FFSM2_FEATURE_TAG = FFSM2_DYNAMIC_PLANS_MASK
 #undef FFSM2_LOG_INTERFACE_MASK
 
 ////////////////////////////////////////////////////////////////////////////////
+
+#if _MSC_VER == 1900
+	#pragma warning(push)
+	#pragma warning(disable: 4814) // in C++14 'constexpr' will not imply 'const'; consider explicitly specifying 'const'
+#endif
 
 #ifdef __clang__
 	#pragma clang diagnostic push

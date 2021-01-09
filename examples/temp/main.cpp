@@ -1,12 +1,36 @@
-#include <iostream>
-#include <type_traits>
-
 #include <ffsm2/machine.hpp>
+
+#include <catch2/catch.hpp>
+
+//------------------------------------------------------------------------------
+
+struct Context {};
+
+using Config = ffsm2::Config::ContextT<Context*>;
+
+using M = ffsm2::MachineT<Config>;
+
+#define S(s) struct s
+
+using FSM = M::PeerRoot<S(A), S(B)>;
+
+#undef S
+
+struct A
+	: FSM::State
+{};
+
+struct B
+	: FSM::State
+{};
 
 ////////////////////////////////////////////////////////////////////////////////
 
 int
 main() {
+	Context* empty;
+	FSM::Instance machine{empty};
+
 	return 0;
 }
 

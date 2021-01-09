@@ -8,6 +8,10 @@
 	#pragma clang diagnostic pop
 #endif
 
+#if _MSC_VER == 1900
+	#pragma warning(pop)
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
 
 #undef FFSM2_INLINE
@@ -27,9 +31,8 @@
 
 #undef FFSM2_EXPLICIT_MEMBER_SPECIALIZATION
 
-#undef FFSM2_IF_DYNAMIC_PLANS
-#undef FFSM2_IF_STATIC_PLANS
-#undef FFSM2_IF_DYNAMIC_PLANS
+#undef FFSM2_IF_TYPEINDEX
+#undef FFSM2_IF_PLANS
 #undef FFSM2_IF_SERIALIZATION
 #undef FFSM2_IF_TRANSITION_HISTORY
 #undef FFSM2_IF_STRUCTURE_REPORT

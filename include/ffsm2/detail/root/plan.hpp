@@ -16,7 +16,7 @@ struct Status {
 
 	inline Status(const Result result_ = Result::NONE) noexcept;
 
-	inline explicit operator bool() const noexcept		{ return result != Result::NONE;	}
+	inline explicit operator bool()			   const	noexcept	{ return result != Result::NONE;			}
 
 	inline void clear() noexcept;
 };
@@ -35,7 +35,7 @@ combine(const Status lhs, const Status rhs) noexcept {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
+#ifdef FFSM2_ENABLE_PLANS
 
 template <typename TArgs>
 class CPlanT {
@@ -121,7 +121,7 @@ public:
 	struct Iterator {
 		FFSM2_INLINE Iterator(PlanBaseT& plan)			noexcept;
 
-		FFSM2_INLINE explicit operator bool() const		noexcept;
+		FFSM2_INLINE explicit operator bool()  const	noexcept;
 
 		FFSM2_INLINE void operator ++()					noexcept;
 
@@ -145,7 +145,7 @@ public:
 	struct CIterator {
 		FFSM2_INLINE CIterator(const PlanBaseT& plan)	noexcept;
 
-		FFSM2_INLINE explicit operator bool() const		noexcept;
+		FFSM2_INLINE explicit operator bool()  const	noexcept;
 
 		FFSM2_INLINE void operator ++()					noexcept;
 
@@ -236,21 +236,18 @@ template <typename TContext
 		, typename TStateList
 		, Long NSubstitutionLimit
 		, Long NTaskCapacity
-		FFSM2_IF_STATIC_PLANS(, typename TLinksTypeTable)
 		, typename TPayload>
 class PlanT<ArgsT<TContext
 				, TConfig
 				, TStateList
 				, NSubstitutionLimit
 				, NTaskCapacity
-				FFSM2_IF_STATIC_PLANS(, TLinksTypeTable)
 				, TPayload>> final
 	: public PlanBaseT<ArgsT<TContext
 						   , TConfig
 						   , TStateList
 						   , NSubstitutionLimit
 						   , NTaskCapacity
-						   FFSM2_IF_STATIC_PLANS(, TLinksTypeTable)
 						   , TPayload>>
 {
 	template <typename>
@@ -267,7 +264,6 @@ class PlanT<ArgsT<TContext
 					 , TStateList
 					 , NSubstitutionLimit
 					 , NTaskCapacity
-					 FFSM2_IF_STATIC_PLANS(, TLinksTypeTable)
 					 , TPayload>;
 
 	using Payload		= typename Args::Payload;
@@ -355,21 +351,18 @@ template <typename TContext
 		, typename TConfig
 		, typename TStateList
 		, Long NSubstitutionLimit
-		, Long NTaskCapacity
-		FFSM2_IF_STATIC_PLANS(, typename TLinksTypeTable)>
+		, Long NTaskCapacity>
 class PlanT<ArgsT<TContext
 				, TConfig
 				, TStateList
 				, NSubstitutionLimit
 				, NTaskCapacity
-				FFSM2_IF_STATIC_PLANS(, TLinksTypeTable)
 				, void>> final
 	: public PlanBaseT<ArgsT<TContext
 						   , TConfig
 						   , TStateList
 						   , NSubstitutionLimit
 						   , NTaskCapacity
-						   FFSM2_IF_STATIC_PLANS(, TLinksTypeTable)
 						   , void>>
 {
 	template <typename>
@@ -386,7 +379,6 @@ class PlanT<ArgsT<TContext
 					 , TStateList
 					 , NSubstitutionLimit
 					 , NTaskCapacity
-					 FFSM2_IF_STATIC_PLANS(, TLinksTypeTable)
 					 , void>;
 
 	using PlanBase = PlanBaseT<Args>;

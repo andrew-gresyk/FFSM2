@@ -1,39 +1,41 @@
+#ifdef FFSM2_ENABLE_PLANS
+
 namespace ffsm2 {
 namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename T, Long NC>
+template <typename TP, Long NC>
 template <typename... TA>
 Long
-List<T, NC>::emplace(TA... args) noexcept {
+TaskListT<TP, NC>::emplace(TA&&... args) noexcept {
 	if (_count < CAPACITY) {
 		FFSM2_ASSERT(_vacantHead < CAPACITY);
 		FFSM2_ASSERT(_vacantTail < CAPACITY);
 
 		const Index index = _vacantHead;
-		auto& cell = _cells[index];
+		auto& cell = _items[index];
 		++_count;
 
 		if (_vacantHead != _vacantTail) {
 			// recycle
-			FFSM2_ASSERT(cell.links.prev == INVALID);
-			FFSM2_ASSERT(cell.links.next != INVALID);
+			FFSM2_ASSERT(cell.prev == INVALID);
+			FFSM2_ASSERT(cell.next != INVALID);
 
-			_vacantHead = cell.links.next;
+			_vacantHead = cell.next;
 
-			auto& head = _cells[_vacantHead];
-			FFSM2_ASSERT(head.links.prev == index);
-			head.links.prev = INVALID;
+			auto& head = _items[_vacantHead];
+			FFSM2_ASSERT(head.prev == index);
+			head.prev = INVALID;
 		} else if (_last < CAPACITY - 1) {
 			// grow
 			++_last;
 			_vacantHead = _last;
 			_vacantTail = _last;
 
-			auto& vacant = _cells[_vacantHead];
-			vacant.links.prev = INVALID;
-			vacant.links.next = INVALID;
+			auto& vacant = _items[_vacantHead];
+			vacant.prev = INVALID;
+			vacant.next = INVALID;
 		} else {
 			FFSM2_ASSERT(_count == CAPACITY);
 
@@ -43,7 +45,7 @@ List<T, NC>::emplace(TA... args) noexcept {
 
 		FFSM2_IF_ASSERT(verifyStructure());
 
-		new (&cell.item) Item{std::forward<TA>(args)...};
+		new (&cell) Item{std::forward<TA>(args)...};
 
 		return index;
 	} else {
@@ -59,22 +61,22 @@ List<T, NC>::emplace(TA... args) noexcept {
 
 //------------------------------------------------------------------------------
 
-template <typename T, Long NC>
+template <typename TP, Long NC>
 void
-List<T, NC>::remove(const Index i) noexcept {
+TaskListT<TP, NC>::remove(const Index i) noexcept {
 	FFSM2_ASSERT(i < CAPACITY && _count);
 
-	auto& fresh = _cells[i];
+	auto& fresh = _items[i];
 
 	if (_count < CAPACITY) {
 		FFSM2_ASSERT(_vacantHead < CAPACITY);
 		FFSM2_ASSERT(_vacantTail < CAPACITY);
 
-		fresh.links.prev = INVALID;
-		fresh.links.next = _vacantHead;
+		fresh.prev = INVALID;
+		fresh.next = _vacantHead;
 
-		auto& head = _cells[_vacantHead];
-		head.links.prev = i;
+		auto& head = _items[_vacantHead];
+		head.prev = i;
 
 		_vacantHead = i;
 	} else {
@@ -83,8 +85,8 @@ List<T, NC>::remove(const Index i) noexcept {
 		FFSM2_ASSERT(_vacantHead == INVALID);
 		FFSM2_ASSERT(_vacantTail == INVALID);
 
-		fresh.links.prev = INVALID;
-		fresh.links.next = INVALID;
+		fresh.prev = INVALID;
+		fresh.next = INVALID;
 
 		_vacantHead = i;
 		_vacantTail = i;
@@ -97,51 +99,51 @@ List<T, NC>::remove(const Index i) noexcept {
 
 //------------------------------------------------------------------------------
 
-template <typename T, Long NC>
-T&
-List<T, NC>::operator[] (const Index i) noexcept {
+template <typename TP, Long NC>
+typename TaskListT<TP, NC>::Item&
+TaskListT<TP, NC>::operator[] (const Index i) noexcept {
 	FFSM2_IF_ASSERT(verifyStructure());
 
-	return _cells[i].item;
+	return _items[i];
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename T, Long NC>
-const T&
-List<T, NC>::operator[] (const Index i) const noexcept {
+template <typename TP, Long NC>
+const typename TaskListT<TP, NC>::Item&
+TaskListT<TP, NC>::operator[] (const Index i) const noexcept {
 	FFSM2_IF_ASSERT(verifyStructure());
 
-	return _cells[i].item;
+	return _items[i];
 }
 
 //------------------------------------------------------------------------------
 
 #ifdef FFSM2_ENABLE_ASSERT
 
-template <typename T, Long NC>
+template <typename TP, Long NC>
 void
-List<T, NC>::verifyStructure(const Index occupied) const noexcept {
+TaskListT<TP, NC>::verifyStructure(const Index occupied) const noexcept {
 	if (_count < CAPACITY) {
 		FFSM2_ASSERT(_vacantHead < CAPACITY);
 		FFSM2_ASSERT(_vacantTail < CAPACITY);
 
-		FFSM2_ASSERT(_cells[_vacantHead].links.prev == INVALID);
-		FFSM2_ASSERT(_cells[_vacantTail].links.next == INVALID);
+		FFSM2_ASSERT(_items[_vacantHead].prev == INVALID);
+		FFSM2_ASSERT(_items[_vacantTail].next == INVALID);
 
 		auto emptyCount = 1;
 
 		for (auto c = _vacantHead; c != _vacantTail; ) {
 			FFSM2_ASSERT(occupied != c);
 
-			const auto& current = _cells[c];
+			const auto& current = _items[c];
 
-			const auto f = current.links.next;
+			const auto f = current.next;
 			if (f != INVALID) {
 				// next
-				const auto& following = _cells[f];
+				const auto& following = _items[f];
 
-				FFSM2_ASSERT(following.links.prev == c);
+				FFSM2_ASSERT(following.prev == c);
 
 				c = f;
 				continue;
@@ -165,3 +167,5 @@ List<T, NC>::verifyStructure(const Index occupied) const noexcept {
 
 }
 }
+
+#endif

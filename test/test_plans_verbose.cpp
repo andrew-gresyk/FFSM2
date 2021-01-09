@@ -1,4 +1,4 @@
-#define FFSM2_ENABLE_DYNAMIC_PLANS
+#define FFSM2_ENABLE_PLANS
 #define FFSM2_ENABLE_VERBOSE_DEBUG_LOG
 #include "tools.hpp"
 

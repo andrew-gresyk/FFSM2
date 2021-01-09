@@ -6,24 +6,26 @@ namespace detail {
 /// @brief FSM Root
 /// @tparam Cfg Type configuration
 /// @tparam TApex Root region type
-template <typename TConfig
-		, typename TApex
-		FFSM2_IF_STATIC_PLANS(, typename TLinksTypeTable)>
+template <typename TConfig,
+		  typename TApex>
 class R_ {
+public:
 	static constexpr FeatureTag FEATURE_TAG = TConfig::FEATURE_TAG;
 
 	using Context				= typename TConfig::Context;
-
 	using Payload				= typename TConfig::Payload;
 
-	using Forward				= RF_<TConfig, TApex FFSM2_IF_STATIC_PLANS(, TLinksTypeTable)>;
+private:
+	using Apex					= TApex;
+
+	using Forward				= RF_<TConfig, Apex>;
 	using StateList				= typename Forward::StateList;
 	using Args					= typename Forward::Args;
 
 	static_assert(Args::STATE_COUNT <  (unsigned) -1, "Too many states in the FSM. Change 'Short' type.");
 	static_assert(Args::STATE_COUNT == (unsigned) StateList::SIZE, "STATE_COUNT != StateList::SIZE");
 
-	using MaterialApex			= Material<0, Args, TApex>;
+	using MaterialApex			= Material<0, Args, Apex>;
 
 	using Control				= ControlT	   <Args>;
 	using PlanControl			= PlanControlT <Args>;
@@ -32,7 +34,7 @@ class R_ {
 
 	static constexpr Long	SUBSTITUTION_LIMIT	= Forward::SUBSTITUTION_LIMIT;
 
-#ifdef FFSM2_ENABLE_DYNAMIC_PLANS
+#ifdef FFSM2_ENABLE_PLANS
 	using PlanData				= PlanDataT<Args>;
 
 	static constexpr Long TASK_CAPACITY = Forward::TASK_CAPACITY;
@@ -54,9 +56,19 @@ public:
 	//----------------------------------------------------------------------
 
 	FFSM2_INLINE explicit R_(Context& context
-						   FFSM2_IF_LOG_INTERFACE(, Logger* const logger = nullptr)) noexcept;
+						  FFSM2_IF_LOG_INTERFACE(, Logger* const logger = nullptr)) noexcept;
 
 	~R_() noexcept;
+
+	//----------------------------------------------------------------------
+
+	/// @brief Access context
+	/// @return context
+		  Context& context()	   { return _context; }
+
+	/// @brief Access context
+	/// @return context
+	const Context& context() const { return _context; }
 
 	//----------------------------------------------------------------------
 
@@ -132,10 +144,10 @@ private:
 						   const Transition& pendingTransition) noexcept;
 
 protected:
-	Context& _context;
+	Context _context;
 
 	Registry _registry;
-	FFSM2_IF_DYNAMIC_PLANS(PlanData _planData);
+	FFSM2_IF_PLANS(PlanData _planData);
 
 	Transition _request;
 
@@ -146,9 +158,8 @@ protected:
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename TConfig
-		, typename TApex
-		FFSM2_IF_STATIC_PLANS(, typename TLinksTypeTable)>
+template <typename TConfig,
+		  typename TApex>
 class RP_;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -156,22 +167,21 @@ class RP_;
 template <FeatureTag NFeatureTag
 		, typename TContext
 		, Long NSubstitutionLimit
-		FFSM2_IF_DYNAMIC_PLANS(, Long NTaskCapacity)
+		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload
-		, typename TApex
-		FFSM2_IF_STATIC_PLANS(, typename TLinksTypeTable)>
-class RP_		   <G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_DYNAMIC_PLANS(, NTaskCapacity), TPayload>, TApex FFSM2_IF_STATIC_PLANS(, TLinksTypeTable)>
-	: public	 R_<G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_DYNAMIC_PLANS(, NTaskCapacity), TPayload>, TApex FFSM2_IF_STATIC_PLANS(, TLinksTypeTable)>
+		, typename TApex>
+class RP_		   <GW_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
+	: public	 R_<GW_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
 {
-	using Base = R_<G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_DYNAMIC_PLANS(, NTaskCapacity), TPayload>, TApex FFSM2_IF_STATIC_PLANS(, TLinksTypeTable)>;
+	using Base = R_<GW_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
 
-	using Payload				= TPayload;
-	using Transition			= TransitionT<Payload>;
+	using Transition			= TransitionT<TPayload>;
+
+public:
+	using Payload				= typename Base::Payload;
 
 public:
 	using Base::Base;
-
-	using Base::stateId;
 
 	/// @brief Get state identifier for a state type
 	/// @tparam TState State type
@@ -207,8 +217,10 @@ public:
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-private:
+protected:
 	using Base::_context;
+
+private:
 	using Base::_request;
 
 	FFSM2_IF_LOG_INTERFACE(using Base::_logger);
@@ -219,13 +231,12 @@ private:
 template <FeatureTag NFeatureTag
 		, typename TContext
 		, Long NSubstitutionLimit
-		FFSM2_IF_DYNAMIC_PLANS(, Long NTaskCapacity)
-		, typename TApex
-		FFSM2_IF_STATIC_PLANS(, typename TLinksTypeTable)>
-class RP_		   <G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_DYNAMIC_PLANS(, NTaskCapacity), void>, TApex FFSM2_IF_STATIC_PLANS(, TLinksTypeTable)>
-	: public	 R_<G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_DYNAMIC_PLANS(, NTaskCapacity), void>, TApex FFSM2_IF_STATIC_PLANS(, TLinksTypeTable)>
+		FFSM2_IF_PLANS(, Long NTaskCapacity)
+		, typename TApex>
+class RP_		   <GW_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), void>, TApex>
+	: public	 R_<GW_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), void>, TApex>
 {
-	using Base = R_<G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_DYNAMIC_PLANS(, NTaskCapacity), void>, TApex FFSM2_IF_STATIC_PLANS(, TLinksTypeTable)>;
+	using Base = R_<GW_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), void>, TApex>;
 
 public:
 	using Base::Base;
@@ -237,38 +248,163 @@ public:
 /// @tparam Cfg Type configuration
 /// @tparam TApex Root region type
 template <typename TConfig
-		, typename TApex
-		FFSM2_IF_STATIC_PLANS(, typename TLinksTypeTable)>
-class RW_ final
-	: public	 RP_<TConfig, TApex FFSM2_IF_STATIC_PLANS(, TLinksTypeTable)>
+		, typename TApex>
+class RW_;
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+/// @brief FSM Root
+/// @tparam Cfg Type configuration
+/// @tparam TApex Root region type
+template <FeatureTag NFeatureTag
+		, typename TContext
+		, Long NSubstitutionLimit
+		FFSM2_IF_PLANS(, Long NTaskCapacity)
+		, typename TPayload
+		, typename TApex>
+class RW_		<::ffsm2::detail::GW_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
+	: public RP_<::ffsm2::detail::GW_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
 {
-	using Base = RP_<TConfig, TApex FFSM2_IF_STATIC_PLANS(, TLinksTypeTable)>;
+	using Cfg =  ::ffsm2::detail::GW_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>;
+
+	using Base		= RP_<Cfg, TApex>;
+
+#ifdef FFSM2_ENABLE_LOG_INTERFACE
+	using Logger	= typename Cfg::LoggerInterface;
+#endif
 
 public:
-	using Base::Base;
+	static constexpr FeatureTag FEATURE_TAG = Base::FEATURE_TAG;
+
+	using Context	= typename Base::Context;
+	using Payload	= typename Base::Payload;
+
+public:
+	explicit FFSM2_INLINE RW_(Context& context
+							FFSM2_IF_LOG_INTERFACE(, Logger* const logger = nullptr)) noexcept
+		: Base{context
+			 FFSM2_IF_LOG_INTERFACE(, logger)}
+	{}
+
+	void setContext(const Context&  context) { _context =			context ; }
+	void setContext(	  Context&& context) { _context = std::move(context); }
+
+private:
+	using Base::_context;
+};
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// TContext&
+
+/// @brief FSM Root
+/// @tparam Cfg Type configuration
+/// @tparam TApex Root region type
+template <FeatureTag NFeatureTag
+		, typename TContext
+		, Long NSubstitutionLimit
+		FFSM2_IF_PLANS(, Long NTaskCapacity)
+		, typename TPayload
+		, typename TApex>
+class RW_		<::ffsm2::detail::GW_<NFeatureTag, TContext&, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
+	: public RP_<::ffsm2::detail::GW_<NFeatureTag, TContext&, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
+{
+	using Cfg =  ::ffsm2::detail::GW_<NFeatureTag, TContext&, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>;
+
+	using Base		= RP_<Cfg, TApex>;
+
+#ifdef FFSM2_ENABLE_LOG_INTERFACE
+	using Logger	= typename Cfg::LoggerInterface;
+#endif
+
+public:
+	static constexpr FeatureTag FEATURE_TAG = Base::FEATURE_TAG;
+
+	using Context	= typename Base::Context;
+	using Payload	= typename Base::Payload;
+
+public:
+	explicit FFSM2_INLINE RW_(Context& context
+							FFSM2_IF_LOG_INTERFACE(, Logger* const logger = nullptr)) noexcept
+		: Base{context
+			 FFSM2_IF_LOG_INTERFACE(, logger)}
+	{}
+
+	void setContext(Context context) { _context = context; }
+
+private:
+	using Base::_context;
+};
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// TContext*
+
+/// @brief FSM Root
+/// @tparam Cfg Type configuration
+/// @tparam TApex Root region type
+template <FeatureTag NFeatureTag
+		, typename TContext
+		, Long NSubstitutionLimit
+		FFSM2_IF_PLANS(, Long NTaskCapacity)
+		, typename TPayload
+		, typename TApex>
+class RW_		<::ffsm2::detail::GW_<NFeatureTag, TContext*, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
+	: public RP_<::ffsm2::detail::GW_<NFeatureTag, TContext*, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
+{
+	using Cfg =  ::ffsm2::detail::GW_<NFeatureTag, TContext*, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>;
+
+	using Base		= RP_<Cfg, TApex>;
+
+#ifdef FFSM2_ENABLE_LOG_INTERFACE
+	using Logger	= typename Cfg::LoggerInterface;
+#endif
+
+public:
+	static constexpr FeatureTag FEATURE_TAG = Base::FEATURE_TAG;
+
+	using Context	= typename Base::Context;
+	using Payload	= typename Base::Payload;
+
+public:
+	explicit FFSM2_INLINE RW_(Context context = nullptr
+							FFSM2_IF_LOG_INTERFACE(, Logger* const logger = nullptr)) noexcept
+		: Base{context
+			 FFSM2_IF_LOG_INTERFACE(, logger)}
+	{}
+
+	void setContext(Context context) { _context = context; }
+
+private:
+	using Base::_context;
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // TContext == ::ffsm2::EmptyContext
 
-template <
-		  Long NSubstitutionLimit
-		FFSM2_IF_DYNAMIC_PLANS(, Long NTaskCapacity)
+/// @brief FSM Root
+/// @tparam Cfg Type configuration
+/// @tparam TApex Root region type
+template <FeatureTag NFeatureTag
+		, Long NSubstitutionLimit
+		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload
-		, typename TApex
-		FFSM2_IF_STATIC_PLANS(, typename TLinksTypeTable)>
-class RW_		<::ffsm2::ConfigT<::ffsm2::EmptyContext, NSubstitutionLimit FFSM2_IF_DYNAMIC_PLANS(, NTaskCapacity), TPayload>, TApex FFSM2_IF_STATIC_PLANS(, TLinksTypeTable)> final
-	: public RP_<::ffsm2::ConfigT<::ffsm2::EmptyContext, NSubstitutionLimit FFSM2_IF_DYNAMIC_PLANS(, NTaskCapacity), TPayload>, TApex FFSM2_IF_STATIC_PLANS(, TLinksTypeTable)>
+		, typename TApex>
+class RW_		<::ffsm2::detail::GW_<NFeatureTag, ::ffsm2::EmptyContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
+	: public RP_<::ffsm2::detail::GW_<NFeatureTag, ::ffsm2::EmptyContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
 	, ::ffsm2::EmptyContext
 {
-	using Cfg =  ::ffsm2::ConfigT<::ffsm2::EmptyContext, NSubstitutionLimit FFSM2_IF_DYNAMIC_PLANS(, NTaskCapacity), TPayload>;
+	using Cfg =  ::ffsm2::detail::GW_<NFeatureTag, ::ffsm2::EmptyContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>;
 
 	using Context	= typename Cfg::Context;
-	using Base		= RP_<Cfg, TApex FFSM2_IF_STATIC_PLANS(, TLinksTypeTable)>;
+	using Base		= RP_<Cfg, TApex>;
 
 #ifdef FFSM2_ENABLE_LOG_INTERFACE
 	using Logger	= typename Cfg::LoggerInterface;
 #endif
+
+public:
+	static constexpr FeatureTag FEATURE_TAG = Base::FEATURE_TAG;
+
+	using Payload	= typename Base::Payload;
 
 public:
 	explicit FFSM2_INLINE RW_(FFSM2_IF_LOG_INTERFACE(Logger* const logger = nullptr)) noexcept

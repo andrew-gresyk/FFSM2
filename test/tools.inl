@@ -46,7 +46,7 @@ LoggerT<TConfig>::recordMethod(Context& /*context*/,
 			history.emplace_back(origin, Event::Type::DESTRUCT);
 			break;
 
-	#ifdef FFSM2_ENABLE_ANY_PLANS
+	#ifdef FFSM2_ENABLE_PLANS
 
 		case Method::PLAN_SUCCEEDED:
 			history.emplace_back(origin, Event::Type::PLAN_SUCCEEDED);
@@ -76,7 +76,7 @@ LoggerT<TConfig>::recordTransition(Context& /*context*/,
 
 //------------------------------------------------------------------------------
 
-#ifdef FFSM2_ENABLE_ANY_PLANS
+#ifdef FFSM2_ENABLE_PLANS
 
 template <typename TConfig>
 void
