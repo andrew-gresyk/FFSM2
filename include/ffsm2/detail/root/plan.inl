@@ -19,7 +19,7 @@ Status::clear() noexcept {
 #ifdef FFSM2_ENABLE_PLANS
 
 template <typename TArgs>
-CPlanT<TArgs>::Iterator::Iterator(const CPlanT& plan) noexcept
+CPlanT<TArgs>::IteratorT::IteratorT(const CPlanT& plan) noexcept
 	: _plan{plan}
 	, _curr{plan._bounds.first}
 {
@@ -29,7 +29,7 @@ CPlanT<TArgs>::Iterator::Iterator(const CPlanT& plan) noexcept
 //------------------------------------------------------------------------------
 
 template <typename TArgs>
-CPlanT<TArgs>::Iterator::operator bool() const noexcept {
+CPlanT<TArgs>::IteratorT::operator bool() const noexcept {
 	FFSM2_ASSERT(_curr < CPlanT::TASK_CAPACITY || _curr == INVALID_LONG);
 
 	return _curr < CPlanT::TASK_CAPACITY;
@@ -39,7 +39,7 @@ CPlanT<TArgs>::Iterator::operator bool() const noexcept {
 
 template <typename TArgs>
 void
-CPlanT<TArgs>::Iterator::operator ++() noexcept {
+CPlanT<TArgs>::IteratorT::operator ++() noexcept {
 	_curr = _next;
 	_next = next();
 }
@@ -48,7 +48,7 @@ CPlanT<TArgs>::Iterator::operator ++() noexcept {
 
 template <typename TArgs>
 Long
-CPlanT<TArgs>::Iterator::next() const noexcept {
+CPlanT<TArgs>::IteratorT::next() const noexcept {
 	if (_curr < CPlanT::TASK_CAPACITY) {
 		const TaskLink& link = _plan._planData.taskLinks[_curr];
 
@@ -84,7 +84,7 @@ CPlanT<TArgs>::operator bool() const noexcept {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TArgs>
-PlanBaseT<TArgs>::Iterator::Iterator(PlanBaseT& plan) noexcept
+PlanBaseT<TArgs>::IteratorT::IteratorT(PlanBaseT& plan) noexcept
 	: _plan{plan}
 	, _curr{plan._bounds.first}
 {
@@ -94,7 +94,7 @@ PlanBaseT<TArgs>::Iterator::Iterator(PlanBaseT& plan) noexcept
 //------------------------------------------------------------------------------
 
 template <typename TArgs>
-PlanBaseT<TArgs>::Iterator::operator bool() const noexcept {
+PlanBaseT<TArgs>::IteratorT::operator bool() const noexcept {
 	FFSM2_ASSERT(_curr < PlanBaseT::TASK_CAPACITY || _curr == INVALID_LONG);
 
 	return _curr < PlanBaseT::TASK_CAPACITY;
@@ -104,7 +104,7 @@ PlanBaseT<TArgs>::Iterator::operator bool() const noexcept {
 
 template <typename TArgs>
 void
-PlanBaseT<TArgs>::Iterator::operator ++() noexcept {
+PlanBaseT<TArgs>::IteratorT::operator ++() noexcept {
 	_curr = _next;
 	_next = next();
 }
@@ -113,7 +113,7 @@ PlanBaseT<TArgs>::Iterator::operator ++() noexcept {
 
 template <typename TArgs>
 void
-PlanBaseT<TArgs>::Iterator::remove() noexcept {
+PlanBaseT<TArgs>::IteratorT::remove() noexcept {
 	_plan.remove(_curr);
 }
 
@@ -121,7 +121,7 @@ PlanBaseT<TArgs>::Iterator::remove() noexcept {
 
 template <typename TArgs>
 Long
-PlanBaseT<TArgs>::Iterator::next() const noexcept {
+PlanBaseT<TArgs>::IteratorT::next() const noexcept {
 	if (_curr < PlanBaseT::TASK_CAPACITY) {
 		const TaskLink& link = _plan._planData.taskLinks[_curr];
 
@@ -319,11 +319,11 @@ PlanBaseT<TArgs>::remove(const Long task) noexcept {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC, typename TTP>
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
 bool
-PlanT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::append(const StateID origin,
-												 const StateID destination,
-												 const Payload& payload) noexcept
+PlanT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::append(const StateID origin,
+																			   const StateID destination,
+																			   const Payload& payload) noexcept
 {
 	_planData.planExists = true;
 
@@ -332,11 +332,11 @@ PlanT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::append(const StateID origin,
 
 //------------------------------------------------------------------------------
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC, typename TTP>
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
 bool
-PlanT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::append(const StateID origin,
-												 const StateID destination,
-												 Payload&& payload) noexcept
+PlanT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::append(const StateID origin,
+																			   const StateID destination,
+																			   Payload&& payload) noexcept
 {
 	_planData.planExists = true;
 

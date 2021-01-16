@@ -2,6 +2,7 @@ namespace ffsm2 {
 namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
+// COMMON
 
 template <typename TArgs>
 ControlT<TArgs>::Origin::Origin(ControlT& control_,
@@ -19,6 +20,7 @@ ControlT<TArgs>::Origin::~Origin() noexcept {
 	control._originId = prevId;
 }
 
+// COMMON
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TArgs>
@@ -38,6 +40,7 @@ FullControlBaseT<TArgs>::Lock::~Lock() noexcept {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// COMMON
 
 template <typename TArgs>
 void
@@ -49,6 +52,7 @@ FullControlBaseT<TArgs>::changeTo(const StateID stateId) noexcept {
 	}
 }
 
+// COMMON
 //------------------------------------------------------------------------------
 
 #ifdef FFSM2_ENABLE_PLANS
@@ -81,11 +85,11 @@ FullControlBaseT<TArgs>::fail() noexcept {
 
 #ifdef FFSM2_ENABLE_PLANS
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC, typename TTP>
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
 template <typename TState>
 void
-FullControlT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::updatePlan(TState& headState,
-															const Status subStatus) noexcept
+FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::updatePlan(TState& headState,
+																						  const Status subStatus) noexcept
 {
 	FFSM2_ASSERT(subStatus);
 
@@ -120,11 +124,12 @@ FullControlT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::updatePlan(TState& headState,
 #endif
 
 //------------------------------------------------------------------------------
+// COMMON
 
-template <typename TC, typename TG, typename TSL, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TTP>
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL FFSM2_IF_PLANS(, Long NTC), typename TTP>
 void
-FullControlT<ArgsT<TC, TG, TSL, NSL FFSM2_IF_PLANS(, NTC), TTP>>::changeWith(const StateID  stateId,
-																			 const Payload& payload) noexcept
+FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL FFSM2_IF_PLANS(, NTC), TTP>>::changeWith(const StateID  stateId,
+																										   const Payload& payload) noexcept
 {
 	if (!_locked) {
 		_request = Transition{_originId, stateId, payload};
@@ -135,10 +140,10 @@ FullControlT<ArgsT<TC, TG, TSL, NSL FFSM2_IF_PLANS(, NTC), TTP>>::changeWith(con
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename TC, typename TG, typename TSL, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TTP>
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL FFSM2_IF_PLANS(, Long NTC), typename TTP>
 void
-FullControlT<ArgsT<TC, TG, TSL, NSL FFSM2_IF_PLANS(, NTC), TTP>>::changeWith(const StateID  stateId,
-																				  Payload&& payload) noexcept
+FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL FFSM2_IF_PLANS(, NTC), TTP>>::changeWith(const StateID  stateId,
+																										   Payload&& payload) noexcept
 {
 	if (!_locked) {
 		_request = Transition{_originId, stateId, std::move(payload)};
@@ -147,15 +152,16 @@ FullControlT<ArgsT<TC, TG, TSL, NSL FFSM2_IF_PLANS(, NTC), TTP>>::changeWith(con
 	}
 }
 
+// COMMON
 ////////////////////////////////////////////////////////////////////////////////
 
 #ifdef FFSM2_ENABLE_PLANS
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC>
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC>
 template <typename TState>
 void
-FullControlT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::updatePlan(TState& headState,
-															 const Status subStatus) noexcept
+FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::updatePlan(TState& headState,
+																						   const Status subStatus) noexcept
 {
 	FFSM2_ASSERT(subStatus);
 

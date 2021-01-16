@@ -39,6 +39,7 @@ template <typename... TS>
 using WrapInfo = typename WrapInfoT<TS...>::Type;
 
 //------------------------------------------------------------------------------
+// COMMON
 
 template <typename THead>
 struct SI_ final {
@@ -80,34 +81,52 @@ struct CI_ final {
 
 	static constexpr Short WIDTH			  = sizeof...(TSubStates);
 
+#ifdef FFSM2_ENABLE_SERIALIZATION
+	static constexpr Long  WIDTH_BITS	  = bitWidth(WIDTH);
+	static constexpr Long  ACTIVE_BITS	  = WIDTH_BITS;
+#endif
+
 	static constexpr Long  STATE_COUNT		  = StateList::SIZE;
 };
 
+// COMMON
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TContext
 		, typename TConfig
 		, typename TStateList
+		FFSM2_IF_SERIALIZATION(, Long NSerialBits)
 		, Long NSubstitutionLimit
 		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload>
 struct ArgsT final {
-	using Context			= TContext;
+	using Context		= TContext;
 
 #ifdef FFSM2_ENABLE_LOG_INTERFACE
-	using Logger			= typename TConfig::LoggerInterface;
+	using Logger		= typename TConfig::LoggerInterface;
 #endif
 
-	using StateList			= TStateList;
+	using StateList		= TStateList;
 
 	static constexpr Long  STATE_COUNT		  = StateList::SIZE;
+
+#ifdef FFSM2_ENABLE_SERIALIZATION
+	static constexpr Short SERIAL_BITS		  = NSerialBits;
+#endif
+
 	static constexpr Short SUBSTITUTION_LIMIT = NSubstitutionLimit;
 
 #ifdef FFSM2_ENABLE_PLANS
 	static constexpr Long  TASK_CAPACITY	  = NTaskCapacity;
 #endif
 
-	using Payload			= TPayload;
+	using Payload		= TPayload;
+
+#ifdef FFSM2_ENABLE_SERIALIZATION
+	using SerialBuffer	= StreamBufferT  <SERIAL_BITS>;
+	using WriteStream	= BitWriteStreamT<SERIAL_BITS>;
+	using ReadStream	= BitReadStreamT <SERIAL_BITS>;
+#endif
 };
 
 //------------------------------------------------------------------------------
@@ -122,7 +141,7 @@ template <StateID, typename, Short, typename...>
 struct CS_;
 
 template <typename, typename>
-class RW_;
+class RC_;
 
 //------------------------------------------------------------------------------
 
@@ -170,18 +189,23 @@ struct RF_ final {
 	using Task			= typename TConfig::Task;
 #endif
 
+#ifdef FFSM2_ENABLE_SERIALIZATION
+	static constexpr Long  ACTIVE_BITS			= Apex::ACTIVE_BITS;
+#endif
+
 	using StateList		= typename Apex::StateList;
 
 	using Args			= ArgsT<Context
 							  , TConfig
 							  , StateList
+							  FFSM2_IF_SERIALIZATION(, ACTIVE_BITS)
 							  , SUBSTITUTION_LIMIT
 							  FFSM2_IF_PLANS(, TASK_CAPACITY)
 							  , Payload>;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	using Instance		= RW_<TConfig, Apex>;
+	using Instance		= RC_<TConfig, Apex>;
 
 	using Control		= ControlT	   <Args>;
 	using FullControl	= FullControlT <Args>;

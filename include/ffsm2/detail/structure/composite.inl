@@ -171,6 +171,7 @@ C_<TA, TH, TS...>::deepDestruct(PlanControl& control) noexcept {
 }
 
 //------------------------------------------------------------------------------
+// COMMON
 
 template <typename TA, typename TH, typename... TS>
 void
@@ -198,6 +199,32 @@ C_<TA, TH, TS...>::deepChangeToRequested(PlanControl& control) noexcept {
 	}
 }
 
+//------------------------------------------------------------------------------
+
+#ifdef FFSM2_ENABLE_SERIALIZATION
+
+template <typename TA, typename TH, typename... TS>
+void
+C_<TA, TH, TS...>::deepSaveActive(const Registry& registry,
+								  WriteStream& stream) const noexcept
+{
+	stream.template write<WIDTH_BITS>(registry.active);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <typename TA, typename TH, typename... TS>
+void
+C_<TA, TH, TS...>::deepLoadRequested(Registry& registry,
+									 ReadStream& stream) const noexcept
+{
+	registry.requested = stream.template read<WIDTH_BITS>();
+	FFSM2_ASSERT(registry.requested < WIDTH);
+}
+
+#endif
+
+// COMMON
 ////////////////////////////////////////////////////////////////////////////////
 
 }

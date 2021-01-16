@@ -38,6 +38,7 @@
     <ClInclude Include="..\..\include\ffsm2\detail\root\task_list.hpp" />
     <ClInclude Include="..\..\include\ffsm2\detail\shared\array.hpp" />
     <ClInclude Include="..\..\include\ffsm2\detail\shared\bit_array.hpp" />
+    <ClInclude Include="..\..\include\ffsm2\detail\shared\bit_stream.hpp" />
     <ClInclude Include="..\..\include\ffsm2\detail\shared\iterator.hpp" />
     <ClInclude Include="..\..\include\ffsm2\detail\shared\macros_off.hpp" />
     <ClInclude Include="..\..\include\ffsm2\detail\shared\macros_on.hpp" />
@@ -54,10 +55,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\test\main.cpp" />
+    <ClCompile Include="..\..\test\shared\test_bit_array.cpp" />
+    <ClCompile Include="..\..\test\shared\test_bit_stream.cpp" />
+    <ClCompile Include="..\..\test\shared\test_task_list.cpp" />
     <ClCompile Include="..\..\test\test_contexts.cpp" />
     <ClCompile Include="..\..\test\test_plans.cpp" />
     <ClCompile Include="..\..\test\test_plans_payloads.cpp" />
     <ClCompile Include="..\..\test\test_plans_verbose.cpp" />
+    <ClCompile Include="..\..\test\test_serialization.cpp" />
     <ClCompile Include="..\..\test\test_transitions.cpp" />
     <ClCompile Include="..\..\test\test_transitions_payloads.cpp" />
     <ClCompile Include="..\..\test\test_transitions_verbose.cpp" />
@@ -70,6 +75,7 @@
     <None Include="..\..\include\ffsm2\detail\root\task_list.inl" />
     <None Include="..\..\include\ffsm2\detail\shared\array.inl" />
     <None Include="..\..\include\ffsm2\detail\shared\bit_array.inl" />
+    <None Include="..\..\include\ffsm2\detail\shared\bit_stream.inl" />
     <None Include="..\..\include\ffsm2\detail\shared\iterator.inl" />
     <None Include="..\..\include\ffsm2\detail\structure\composite.inl" />
     <None Include="..\..\include\ffsm2\detail\structure\composite_sub_1.inl" />

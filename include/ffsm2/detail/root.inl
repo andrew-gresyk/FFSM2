@@ -81,6 +81,62 @@ R_<TG, TA>::changeTo(const StateID stateId) noexcept {
 
 //------------------------------------------------------------------------------
 
+#ifdef FFSM2_ENABLE_SERIALIZATION
+
+template <typename TG, typename TA>
+void
+R_<TG, TA>::save(SerialBuffer& _buffer) const noexcept {
+	WriteStream stream{_buffer};
+
+	// TODO: save _registry
+	// TODO: save _requests
+	// TODO: save _rng						// FFSM2_IF_UTILITY_THEORY()
+	// TODO: save _planData					// FFSM2_IF_PLANS()
+	// TODO: save _previousTransitions		// FFSM2_IF_TRANSITION_HISTORY()
+	// TODO: save _activityHistory			// FFSM2_IF_STRUCTURE_REPORT()
+
+	_apex.deepSaveActive(_registry, stream);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <typename TG, typename TA>
+void
+R_<TG, TA>::load(const SerialBuffer& buffer) noexcept {
+	_request.clear();
+
+	PlanControl control{_context
+					  , _registry
+					  , _request
+					  FFSM2_IF_PLANS(, _planData)
+					  FFSM2_IF_LOG_INTERFACE(, _logger)};
+
+	_apex.deepExit	  (control);
+	_apex.deepDestruct(control);
+
+	_registry.clearRequests();
+	_request.clear();
+
+	ReadStream stream{buffer};
+
+	// TODO: load _registry
+	// TODO: load _requests
+	// TODO: load _rng					// FFSM2_IF_UTILITY_THEORY()
+	// TODO: load _planData				// FFSM2_IF_PLANS()
+	// TODO: load _previousTransitions	// FFSM2_IF_TRANSITION_HISTORY()
+	// TODO: load _activityHistory		// FFSM2_IF_STRUCTURE_REPORT()
+
+	_apex.deepLoadRequested(_registry, stream);
+
+	_apex.deepConstruct(control);
+	_apex.deepEnter	   (control);
+}
+
+#endif
+
+//------------------------------------------------------------------------------
+// COMMON
+
 template <typename TG, typename TA>
 void
 R_<TG, TA>::initialEnter() noexcept {
@@ -164,7 +220,9 @@ R_<TG, TA>::processTransitions(TransitionSets& currentTransitions) noexcept {
 	FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
 }
 
+// COMMON
 //------------------------------------------------------------------------------
+// COMMON
 
 template <typename TG, typename TA>
 bool
@@ -201,27 +259,37 @@ R_<TG, TA>::cancelledByGuards(const TransitionSets& currentTransitions,
 		   _apex.deepForwardEntryGuard(guardControl);
 }
 
+// COMMON
 ////////////////////////////////////////////////////////////////////////////////
+// COMMON
 
 template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
 void
-RP_<GW_<NFT, TC, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  stateId,
-																 const Payload& payload) noexcept
+RP_<G_<NFT, TC, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  stateId,
+																const Payload& payload) noexcept
 {
 	_request = Transition{stateId, payload};
 
 	FFSM2_LOG_TRANSITION(_context, INVALID_STATE_ID, stateId);
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
 void
-RP_<GW_<NFT, TC, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  stateId,
-																	  Payload&& payload) noexcept
+RP_<G_<NFT, TC, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  stateId,
+																	 Payload&& payload) noexcept
 {
 	_request = Transition{stateId, std::move(payload)};
 
 	FFSM2_LOG_TRANSITION(_context, INVALID_STATE_ID, stateId);
 }
+
+// COMMON
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+#ifdef FFSM2_ENABLE_UTILITY_THEORY
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 

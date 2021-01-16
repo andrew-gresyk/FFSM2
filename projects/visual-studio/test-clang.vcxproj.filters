@@ -22,6 +22,9 @@
     <Filter Include="ffsm2\detail\features">
       <UniqueIdentifier>{46255f99-09a1-46d9-bd29-d84ef1b2eed0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="test\shared">
+      <UniqueIdentifier>{a3df696f-53c4-4a26-b2a9-b4e6a5ff94dd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\ffsm2\machine_dev.hpp">
@@ -96,6 +99,9 @@
     <ClInclude Include="..\..\include\ffsm2\detail\root\task_list.hpp">
       <Filter>ffsm2\detail\root</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\ffsm2\detail\shared\bit_stream.hpp">
+      <Filter>ffsm2\detail\shared</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\test\main.cpp">
@@ -121,6 +127,18 @@
     </ClCompile>
     <ClCompile Include="..\..\test\test_contexts.cpp">
       <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\test_serialization.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\shared\test_bit_array.cpp">
+      <Filter>test\shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\shared\test_bit_stream.cpp">
+      <Filter>test\shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\shared\test_task_list.cpp">
+      <Filter>test\shared</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -168,6 +186,9 @@
     </None>
     <None Include="..\..\include\ffsm2\detail\root\task_list.inl">
       <Filter>ffsm2\detail\root</Filter>
+    </None>
+    <None Include="..\..\include\ffsm2\detail\shared\bit_stream.inl">
+      <Filter>ffsm2\detail\shared</Filter>
     </None>
   </ItemGroup>
 </Project>

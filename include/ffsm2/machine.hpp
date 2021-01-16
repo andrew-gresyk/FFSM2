@@ -1,5 +1,5 @@
 ﻿// FFSM2 (flat state machine for games and interactive applications)
-// 0.4.0 (2021-01-09)
+// 0.5.0 (2021-01-16)
 //
 // Created by Andrew Gresyk
 //
@@ -32,7 +32,7 @@
 #pragma once
 
 #define FFSM2_VERSION_MAJOR 0
-#define FFSM2_VERSION_MINOR 4
+#define FFSM2_VERSION_MINOR 5
 #define FFSM2_VERSION_PATCH 0
 
 #include <stdint.h>			// uint32_t, uint64_t
@@ -395,11 +395,10 @@ using UnsignedBitWidth = typename UnsignedBitWidthT<NCapacity>::Type;
 
 //------------------------------------------------------------------------------
 
-constexpr Long
-contain(const Long x,
-		const Long to) noexcept
-{
-	return (x + (to - 1)) / to;
+template <typename T1, typename T2>
+constexpr T1
+contain(const T1 x, const T2 to) noexcept {
+	return (x + ((T1) to - 1)) / (T1) to;
 }
 
 //------------------------------------------------------------------------------
@@ -468,25 +467,25 @@ namespace detail {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TContainer>
-class Iterator {
+class IteratorT {
 public:
 	using Container = TContainer;
 	using Item		= typename Container::Item;
 
 	template <typename T, Long NCapacity>
-	friend class Array;
+	friend class ArrayT;
 
 private:
-	FFSM2_INLINE Iterator(Container& container,
+	FFSM2_INLINE IteratorT(Container& container,
 						  const Long cursor)	  noexcept
 		: _container{container}
 		, _cursor{cursor}
 	{}
 
 public:
-	FFSM2_INLINE bool operator != (const Iterator<Container>& dummy) const noexcept;
+	FFSM2_INLINE bool operator != (const IteratorT<Container>& other) const noexcept;
 
-	FFSM2_INLINE Iterator& operator ++()		  noexcept;
+	FFSM2_INLINE IteratorT& operator ++()		  noexcept;
 
 	FFSM2_INLINE	   Item& operator *()		  noexcept	{ return  _container[_cursor];	}
 	FFSM2_INLINE const Item& operator *()	const noexcept	{ return  _container[_cursor];	}
@@ -503,25 +502,25 @@ private:
 //------------------------------------------------------------------------------
 
 template <typename TContainer>
-class Iterator<const TContainer> {
+class IteratorT<const TContainer> {
 public:
 	using Container = TContainer;
 	using Item = typename Container::Item;
 
 	template <typename T, Long NCapacity>
-	friend class Array;
+	friend class ArrayT;
 
 private:
-	FFSM2_INLINE Iterator(const Container& container,
+	FFSM2_INLINE IteratorT(const Container& container,
 						  const Long cursor)	  noexcept
 		: _container{container}
 		, _cursor{cursor}
 	{}
 
 public:
-	FFSM2_INLINE bool operator != (const Iterator<const Container>& dummy) const noexcept;
+	FFSM2_INLINE bool operator != (const IteratorT<const Container>& other) const noexcept;
 
-	FFSM2_INLINE Iterator& operator ++()		  noexcept;
+	FFSM2_INLINE IteratorT& operator ++()		  noexcept;
 
 	FFSM2_INLINE const Item& operator *()	const noexcept	{ return _container[_cursor];	}
 
@@ -545,8 +544,8 @@ namespace detail {
 
 template <typename T>
 bool
-Iterator<T>::operator != (const Iterator<T>& FFSM2_IF_ASSERT(dummy)) const noexcept {
-	FFSM2_ASSERT(&_container == &dummy._container);
+IteratorT<T>::operator != (const IteratorT<T>& FFSM2_IF_ASSERT(other)) const noexcept {
+	FFSM2_ASSERT(&_container == &other._container);
 
 	return _cursor != _container.limit();
 }
@@ -554,8 +553,8 @@ Iterator<T>::operator != (const Iterator<T>& FFSM2_IF_ASSERT(dummy)) const noexc
 //------------------------------------------------------------------------------
 
 template <typename T>
-Iterator<T>&
-Iterator<T>::operator ++() noexcept {
+IteratorT<T>&
+IteratorT<T>::operator ++() noexcept {
 	_cursor = _container.next(_cursor);
 
 	return *this;
@@ -565,8 +564,8 @@ Iterator<T>::operator ++() noexcept {
 
 template <typename T>
 bool
-Iterator<const T>::operator != (const Iterator<const T>& FFSM2_IF_ASSERT(dummy)) const noexcept {
-	FFSM2_ASSERT(&_container == &dummy._container);
+IteratorT<const T>::operator != (const IteratorT<const T>& FFSM2_IF_ASSERT(other)) const noexcept {
+	FFSM2_ASSERT(&_container == &other._container);
 
 	return _cursor != _container.limit();
 }
@@ -574,8 +573,8 @@ Iterator<const T>::operator != (const Iterator<const T>& FFSM2_IF_ASSERT(dummy))
 //------------------------------------------------------------------------------
 
 template <typename T>
-Iterator<const T>&
-Iterator<const T>::operator ++() noexcept {
+IteratorT<const T>&
+IteratorT<const T>::operator ++() noexcept {
 	_cursor = _container.next(_cursor);
 
 	return *this;
@@ -591,7 +590,7 @@ namespace detail {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename T, Long NCapacity>
-class StaticArray {
+class StaticArrayT {
 public:
 	static constexpr Long CAPACITY = NCapacity;
 	static constexpr Long DUMMY	   = INVALID_LONG;
@@ -600,27 +599,27 @@ public:
 	using Index = UnsignedCapacity<CAPACITY>;
 
 public:
-	FFSM2_INLINE StaticArray() = default;
-	FFSM2_INLINE StaticArray(const Item filler)					  noexcept;
+	FFSM2_INLINE StaticArrayT() = default;
+	FFSM2_INLINE StaticArrayT(const Item filler)					  noexcept;
 
 	template <typename N>
-	FFSM2_INLINE	   Item& operator[] (const N i)				  noexcept;
+	FFSM2_INLINE	   Item& operator[] (const N i)					  noexcept;
 
 	template <typename N>
-	FFSM2_INLINE const Item& operator[] (const N i)			const noexcept;
+	FFSM2_INLINE const Item& operator[] (const N i)				const noexcept;
 
-	FFSM2_INLINE Long count() const								  noexcept	{ return CAPACITY;									}
+	FFSM2_INLINE Long count() const									  noexcept	{ return CAPACITY;										}
 
-	FFSM2_INLINE void fill(const Item filler)					  noexcept;
-	FFSM2_INLINE void clear()									  noexcept	{ fill(INVALID_SHORT);								}
+	FFSM2_INLINE void fill(const Item filler)						  noexcept;
+	FFSM2_INLINE void clear()										  noexcept	{ fill(INVALID_SHORT);									}
 
-	FFSM2_INLINE Iterator<      StaticArray>  begin()			  noexcept	{ return Iterator<      StaticArray>(*this,     0); }
-	FFSM2_INLINE Iterator<const StaticArray>  begin()		const noexcept	{ return Iterator<const StaticArray>(*this,     0); }
-	FFSM2_INLINE Iterator<const StaticArray> cbegin()		const noexcept	{ return Iterator<const StaticArray>(*this,     0); }
+	FFSM2_INLINE IteratorT<      StaticArrayT>  begin()				  noexcept	{ return IteratorT<      StaticArrayT>(*this,     0);	}
+	FFSM2_INLINE IteratorT<const StaticArrayT>  begin()			const noexcept	{ return IteratorT<const StaticArrayT>(*this,     0);	}
+	FFSM2_INLINE IteratorT<const StaticArrayT> cbegin()			const noexcept	{ return IteratorT<const StaticArrayT>(*this,     0);	}
 
-	FFSM2_INLINE Iterator<      StaticArray>    end()			  noexcept	{ return Iterator<      StaticArray>(*this, DUMMY);	}
-	FFSM2_INLINE Iterator<const StaticArray>    end()		const noexcept	{ return Iterator<const StaticArray>(*this, DUMMY);	}
-	FFSM2_INLINE Iterator<const StaticArray>   cend()		const noexcept	{ return Iterator<const StaticArray>(*this, DUMMY);	}
+	FFSM2_INLINE IteratorT<      StaticArrayT>    end()				  noexcept	{ return IteratorT<      StaticArrayT>(*this, DUMMY);	}
+	FFSM2_INLINE IteratorT<const StaticArrayT>    end()			const noexcept	{ return IteratorT<const StaticArrayT>(*this, DUMMY);	}
+	FFSM2_INLINE IteratorT<const StaticArrayT>   cend()			const noexcept	{ return IteratorT<const StaticArrayT>(*this, DUMMY);	}
 
 private:
 	Item _items[CAPACITY];
@@ -629,19 +628,19 @@ private:
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename T>
-struct StaticArray<T, 0> {
+struct StaticArrayT<T, 0> {
 	using Item  = T;
 
-	FFSM2_INLINE StaticArray() = default;
-	FFSM2_INLINE StaticArray(const Item) noexcept {}
+	FFSM2_INLINE StaticArrayT() = default;
+	FFSM2_INLINE StaticArrayT(const Item) noexcept {}
 };
 
 //------------------------------------------------------------------------------
 
 template <typename T, Long NCapacity>
-class Array {
+class ArrayT {
 	template <typename>
-	friend class Iterator;
+	friend class IteratorT;
 
 public:
 	static constexpr Long CAPACITY = NCapacity;
@@ -651,40 +650,40 @@ public:
 	using Index = UnsignedCapacity<CAPACITY>;
 
 public:
-	FFSM2_INLINE void clear()									  noexcept	{ _count = 0;		}
+	FFSM2_INLINE void clear()										  noexcept	{ _count = 0;									}
 
 	// TODO: replace with 'emplace<>()'?
 	template <typename TValue>
-	FFSM2_INLINE Long append(const TValue& value)				  noexcept;
+	FFSM2_INLINE Long append(const TValue& value)					  noexcept;
 
 	template <typename TValue>
-	FFSM2_INLINE Long append(	  TValue&& value)				  noexcept;
+	FFSM2_INLINE Long append(	  TValue&& value)					  noexcept;
 
 	template <typename N>
-	FFSM2_INLINE	   Item& operator[] (const N i)				  noexcept;
+	FFSM2_INLINE	   Item& operator[] (const N i)					  noexcept;
 
 	template <typename N>
-	FFSM2_INLINE const Item& operator[] (const N i)			const noexcept;
+	FFSM2_INLINE const Item& operator[] (const N i)				const noexcept;
 
-	FFSM2_INLINE Long count()								const noexcept	{ return _count;	}
+	FFSM2_INLINE Long count()									const noexcept	{ return _count;								}
 
-	FFSM2_INLINE Array& operator += (const Item& item)			  noexcept;
-	FFSM2_INLINE Array& operator += (	  Item&& item)			  noexcept;
+	FFSM2_INLINE ArrayT& operator += (const Item& item)				  noexcept;
+	FFSM2_INLINE ArrayT& operator += (	  Item&& item)				  noexcept;
 
 	template <Long N>
-	FFSM2_INLINE Array& operator += (const Array<Item, N>& other) noexcept;
+	FFSM2_INLINE ArrayT& operator += (const ArrayT<Item, N>& other)	  noexcept;
 
-	FFSM2_INLINE Iterator<      Array>  begin()					  noexcept	{ return Iterator<		Array>(*this,     0);	}
-	FFSM2_INLINE Iterator<const Array>  begin()				const noexcept	{ return Iterator<const Array>(*this,     0);	}
-	FFSM2_INLINE Iterator<const Array> cbegin()				const noexcept	{ return Iterator<const Array>(*this,     0);	}
+	FFSM2_INLINE IteratorT<      ArrayT>  begin()					  noexcept	{ return IteratorT<		 ArrayT>(*this,     0);	}
+	FFSM2_INLINE IteratorT<const ArrayT>  begin()				const noexcept	{ return IteratorT<const ArrayT>(*this,     0);	}
+	FFSM2_INLINE IteratorT<const ArrayT> cbegin()				const noexcept	{ return IteratorT<const ArrayT>(*this,     0);	}
 
-	FFSM2_INLINE Iterator<      Array>	  end()					  noexcept	{ return Iterator<		Array>(*this, DUMMY);	}
-	FFSM2_INLINE Iterator<const Array>	  end()				const noexcept	{ return Iterator<const Array>(*this, DUMMY);	}
-	FFSM2_INLINE Iterator<const Array>   cend()				const noexcept	{ return Iterator<const Array>(*this, DUMMY);	}
+	FFSM2_INLINE IteratorT<      ArrayT>	  end()					  noexcept	{ return IteratorT<		 ArrayT>(*this, DUMMY);	}
+	FFSM2_INLINE IteratorT<const ArrayT>	  end()				const noexcept	{ return IteratorT<const ArrayT>(*this, DUMMY);	}
+	FFSM2_INLINE IteratorT<const ArrayT>   cend()				const noexcept	{ return IteratorT<const ArrayT>(*this, DUMMY);	}
 
 private:
-	FFSM2_INLINE Long next(const Long i)					const noexcept	{ return i + 1;		}
-	FFSM2_INLINE Long limit()								const noexcept	{ return _count;	}
+	FFSM2_INLINE Long next(const Long i)						const noexcept	{ return i + 1;									}
+	FFSM2_INLINE Long limit()									const noexcept	{ return _count;								}
 
 private:
 	Long _count = 0;
@@ -704,7 +703,7 @@ private:
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename T>
-class Array<T, 0> {
+class ArrayT<T, 0> {
 public:
 	static constexpr Long CAPACITY = 0;
 	static constexpr Long DUMMY	   = INVALID_LONG;
@@ -724,7 +723,7 @@ namespace detail {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename T, Long NC>
-StaticArray<T, NC>::StaticArray(const Item filler) noexcept {
+StaticArrayT<T, NC>::StaticArrayT(const Item filler) noexcept {
 	fill(filler);
 }
 
@@ -733,7 +732,7 @@ StaticArray<T, NC>::StaticArray(const Item filler) noexcept {
 template <typename T, Long NC>
 template <typename N>
 T&
-StaticArray<T, NC>::operator[] (const N i) noexcept {
+StaticArrayT<T, NC>::operator[] (const N i) noexcept {
 	FFSM2_ASSERT(0 <= i && i < CAPACITY);
 
 	return _items[(Index) i];
@@ -744,7 +743,7 @@ StaticArray<T, NC>::operator[] (const N i) noexcept {
 template <typename T, Long NC>
 template <typename N>
 const T&
-StaticArray<T, NC>::operator[] (const N i) const noexcept {
+StaticArrayT<T, NC>::operator[] (const N i) const noexcept {
 	FFSM2_ASSERT(0 <= i && i < CAPACITY);
 
 	return _items[(Index) i];
@@ -754,7 +753,7 @@ StaticArray<T, NC>::operator[] (const N i) const noexcept {
 
 template <typename T, Long NC>
 void
-StaticArray<T, NC>::fill(const Item filler) noexcept {
+StaticArrayT<T, NC>::fill(const Item filler) noexcept {
 	for (Long i = 0; i < CAPACITY; ++i)
 		_items[i] = filler;
 }
@@ -764,7 +763,7 @@ StaticArray<T, NC>::fill(const Item filler) noexcept {
 template <typename T, Long NC>
 template <typename TValue>
 Long
-Array<T, NC>::append(const TValue& value) noexcept {
+ArrayT<T, NC>::append(const TValue& value) noexcept {
 	FFSM2_ASSERT(_count < CAPACITY);
 
 	new (&_items[_count]) Item{value};
@@ -777,7 +776,7 @@ Array<T, NC>::append(const TValue& value) noexcept {
 template <typename T, Long NC>
 template <typename TValue>
 Long
-Array<T, NC>::append(TValue&& value) noexcept {
+ArrayT<T, NC>::append(TValue&& value) noexcept {
 	FFSM2_ASSERT(_count < CAPACITY);
 
 	new (&_items[_count]) Item{std::move(value)};
@@ -790,7 +789,7 @@ Array<T, NC>::append(TValue&& value) noexcept {
 template <typename T, Long NC>
 template <typename N>
 T&
-Array<T, NC>::operator[] (const N i) noexcept {
+ArrayT<T, NC>::operator[] (const N i) noexcept {
 	FFSM2_ASSERT(0 <= i && i < CAPACITY);
 
 	return _items[(Index) i];
@@ -801,7 +800,7 @@ Array<T, NC>::operator[] (const N i) noexcept {
 template <typename T, Long NC>
 template <typename N>
 const T&
-Array<T, NC>::operator[] (const N i) const noexcept {
+ArrayT<T, NC>::operator[] (const N i) const noexcept {
 	FFSM2_ASSERT(0 <= i && i < CAPACITY);
 
 	return _items[(Index) i];
@@ -810,8 +809,8 @@ Array<T, NC>::operator[] (const N i) const noexcept {
 //------------------------------------------------------------------------------
 
 template <typename T, Long NC>
-Array<T, NC>&
-Array<T, NC>::operator += (const Item& item) noexcept {
+ArrayT<T, NC>&
+ArrayT<T, NC>::operator += (const Item& item) noexcept {
 	append(item);
 
 	return *this;
@@ -820,8 +819,8 @@ Array<T, NC>::operator += (const Item& item) noexcept {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename T, Long NC>
-Array<T, NC>&
-Array<T, NC>::operator += (Item&& item) noexcept {
+ArrayT<T, NC>&
+ArrayT<T, NC>::operator += (Item&& item) noexcept {
 	append(std::move(item));
 
 	return *this;
@@ -831,8 +830,8 @@ Array<T, NC>::operator += (Item&& item) noexcept {
 
 template <typename T, Long NC>
 template <Long N>
-Array<T, NC>&
-Array<T, NC>::operator += (const Array<T, N>& other) noexcept {
+ArrayT<T, NC>&
+ArrayT<T, NC>::operator += (const ArrayT<T, N>& other) noexcept {
 	for (const auto& item : other)
 		append(item);
 
@@ -864,7 +863,7 @@ struct Units {
 //------------------------------------------------------------------------------
 
 template <typename TIndex, Short NCapacity>
-class BitArray final {
+class BitArrayT final {
 public:
 	using Index	= TIndex;
 	using Unit	= unsigned char;
@@ -873,60 +872,8 @@ public:
 	static constexpr Index UNIT_WIDTH = sizeof(Unit) * 8;
 	static constexpr Index UNIT_COUNT = contain(CAPACITY, UNIT_WIDTH);
 
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	class Bits {
-		template <typename, Short>
-		friend class BitArray;
-
-	private:
-		FFSM2_INLINE explicit Bits(Unit* const storage,
-								   const Index width)		  noexcept
-			: _storage{storage}
-			, _width{width}
-		{}
-
-	public:
-		FFSM2_INLINE explicit operator bool()			const noexcept;
-
-		FFSM2_INLINE void clear()							  noexcept;
-
-		FFSM2_INLINE bool get  (const Index index)		const noexcept;
-		FFSM2_INLINE void set  (const Index index)			  noexcept;
-		FFSM2_INLINE void clear(const Index index)			  noexcept;
-
-	private:
-		Unit* const _storage;
-		const Index _width;
-	};
-
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	class CBits {
-		template <typename, Short>
-		friend class BitArray;
-
-	private:
-		FFSM2_INLINE explicit CBits(const Unit* const storage,
-									const Index width)		  noexcept
-			: _storage{storage}
-			, _width{width}
-		{}
-
-	public:
-		FFSM2_INLINE explicit operator bool()			const noexcept;
-
-		FFSM2_INLINE bool get(const Index index)		const noexcept;
-
-	private:
-		const Unit* const _storage;
-		const Index _width;
-	};
-
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 public:
-	BitArray() noexcept {
+	BitArrayT() noexcept {
 		clear();
 	}
 
@@ -936,15 +883,6 @@ public:
 	FFSM2_INLINE void set  (const Index index)				  noexcept;
 	FFSM2_INLINE void clear(const Index index)				  noexcept;
 
-	template <Short NUnit, Short NWidth>
-	FFSM2_INLINE  Bits bits()								  noexcept;
-
-	template <Short NUnit, Short NWidth>
-	FFSM2_INLINE CBits bits()							const noexcept;
-
-	FFSM2_INLINE  Bits bits(const Units& units)				  noexcept;
-	FFSM2_INLINE CBits bits(const Units& units)			const noexcept;
-
 private:
 	Unit _storage[UNIT_COUNT];
 };
@@ -952,7 +890,7 @@ private:
 //------------------------------------------------------------------------------
 
 template <typename TIndex>
-class BitArray<TIndex, 0> final {
+class BitArrayT<TIndex, 0> final {
 public:
 	FFSM2_INLINE void clear() noexcept {}
 };
@@ -970,110 +908,8 @@ namespace detail {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TI, Short NC>
-BitArray<TI, NC>::Bits::operator bool() const noexcept {
-	const Short fullUnits = _width / UNIT_WIDTH;
-
-	// TODO: cover this case
-	for (Index i = 0; i < fullUnits; ++i)
-		if (_storage[i])
-			return true;
-
-	const Short bit = _width % UNIT_WIDTH;
-	const Unit mask = (1 << bit) - 1;
-	const Unit& u = _storage[fullUnits];
-
-	return (u & mask) != 0;
-}
-
-//------------------------------------------------------------------------------
-
-template <typename TI, Short NC>
 void
-BitArray<TI, NC>::Bits::clear() noexcept {
-	const Index count = (_width + 7) / UNIT_WIDTH;
-
-	for (Index i = 0; i < count; ++i)
-		_storage[i] = Unit{0};
-}
-
-//------------------------------------------------------------------------------
-
-template <typename TI, Short NC>
-bool
-BitArray<TI, NC>::Bits::get(const Index index) const noexcept {
-	FFSM2_ASSERT(index < _width);
-
-	const Index unit = index / UNIT_WIDTH;
-	const Index bit  = index % UNIT_WIDTH;
-	const Unit mask = 1 << bit;
-
-	return (_storage[unit] & mask) != 0;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-template <typename TI, Short NC>
-void
-BitArray<TI, NC>::Bits::set(const Index index) noexcept {
-	FFSM2_ASSERT(index < _width);
-
-	const Index unit = index / UNIT_WIDTH;
-	const Index bit  = index % UNIT_WIDTH;
-	const Unit mask = 1 << bit;
-
-	_storage[unit] |= mask;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-template <typename TI, Short NC>
-void
-BitArray<TI, NC>::Bits::clear(const Index index) noexcept {
-	FFSM2_ASSERT(index < _width);
-
-	const Index unit = index / UNIT_WIDTH;
-	const Index bit  = index % UNIT_WIDTH;
-	const Unit mask = 1 << bit;
-
-	_storage[unit] &= ~mask;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-template <typename TI, Short NC>
-BitArray<TI, NC>::CBits::operator bool() const noexcept {
-	const Short fullUnits = _width / UNIT_WIDTH;
-
-	for (Index i = 0; i < fullUnits; ++i)
-		if (_storage[i])
-			return true;
-
-	const Short bit = _width % UNIT_WIDTH;
-	const Unit mask = (1 << bit) - 1;
-	const Unit& u = _storage[fullUnits];
-
-	return (u & mask) != 0;
-}
-
-//------------------------------------------------------------------------------
-
-template <typename TI, Short NC>
-bool
-BitArray<TI, NC>::CBits::get(const Index index) const noexcept {
-	FFSM2_ASSERT(index < _width);
-
-	const Index unit = index / UNIT_WIDTH;
-	const Index bit  = index % UNIT_WIDTH;
-	const Unit mask = 1 << bit;
-
-	return (_storage[unit] & mask) != 0;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-template <typename TI, Short NC>
-void
-BitArray<TI, NC>::clear() noexcept {
+BitArrayT<TI, NC>::clear() noexcept {
 	for (Unit& unit: _storage)
 		unit = Unit{0};
 }
@@ -1082,7 +918,7 @@ BitArray<TI, NC>::clear() noexcept {
 
 template <typename TI, Short NC>
 bool
-BitArray<TI, NC>::get(const Index index) const noexcept {
+BitArrayT<TI, NC>::get(const Index index) const noexcept {
 	FFSM2_ASSERT(index < CAPACITY);
 
 	const Index unit = index / UNIT_WIDTH;
@@ -1096,7 +932,7 @@ BitArray<TI, NC>::get(const Index index) const noexcept {
 
 template <typename TI, Short NC>
 void
-BitArray<TI, NC>::set(const Index index) noexcept {
+BitArrayT<TI, NC>::set(const Index index) noexcept {
 	FFSM2_ASSERT(index < CAPACITY);
 
 	const Index unit = index / UNIT_WIDTH;
@@ -1110,7 +946,7 @@ BitArray<TI, NC>::set(const Index index) noexcept {
 
 template <typename TI, Short NC>
 void
-BitArray<TI, NC>::clear(const Index index) noexcept {
+BitArrayT<TI, NC>::clear(const Index index) noexcept {
 	FFSM2_ASSERT(index < CAPACITY);
 
 	const Index unit = index / UNIT_WIDTH;
@@ -1120,50 +956,176 @@ BitArray<TI, NC>::clear(const Index index) noexcept {
 	_storage[unit] &= ~mask;
 }
 
-//------------------------------------------------------------------------------
+////////////////////////////////////////////////////////////////////////////////
 
-template <typename TI, Short NC>
-template <Short NUnit, Short NWidth>
-typename BitArray<TI, NC>::Bits
-BitArray<TI, NC>::bits() noexcept {
-	constexpr Short UNIT  = NUnit;
-	constexpr Short WIDTH = NWidth;
-	static_assert(UNIT + (WIDTH + 7) / UNIT_WIDTH <= CAPACITY, "");
-
-	return Bits{_storage + UNIT, WIDTH};
+}
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#endif
 
-template <typename TI, Short NC>
-template <Short NUnit, Short NWidth>
-typename BitArray<TI, NC>::CBits
-BitArray<TI, NC>::bits() const noexcept {
-	constexpr Short UNIT  = NUnit;
-	constexpr Short WIDTH = NWidth;
-	static_assert(UNIT + (WIDTH + 7) / UNIT_WIDTH <= CAPACITY, "");
+#endif
+#ifdef FFSM2_ENABLE_SERIALIZATION
 
-	return CBits{_storage + UNIT, WIDTH};
-}
+namespace ffsm2 {
+namespace detail {
 
 //------------------------------------------------------------------------------
 
-template <typename TI, Short NC>
-typename BitArray<TI, NC>::Bits
-BitArray<TI, NC>::bits(const Units& units) noexcept {
-	FFSM2_ASSERT(units.unit + (units.width + 7) / UNIT_WIDTH <= CAPACITY);
+template <Long NBitCapacity>
+struct StreamBufferT {
+	static constexpr Long BIT_CAPACITY	= NBitCapacity;
+	static constexpr Long BYTE_COUNT	= contain(BIT_CAPACITY, 8u);
 
-	return Bits{_storage + units.unit, units.width};
+	using Size = UnsignedCapacity<BIT_CAPACITY>;
+	using Data = uint8_t[BYTE_COUNT];
+
+	void clear()										  noexcept;
+
+	//Size write(const uint8_t byte)					  noexcept;
+
+	Size bitSize;
+	Data payload;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+template <Long NBitCapacity>
+class BitWriteStreamT final {
+public:
+	static constexpr Long BIT_CAPACITY = NBitCapacity;
+
+	using Buffer = StreamBufferT<BIT_CAPACITY>;
+
+public:
+	BitWriteStreamT(Buffer& _buffer)					  noexcept;
+
+	template <Short NBitWidth>
+	void write(const UnsignedBitWidth<NBitWidth> item)	  noexcept;
+
+private:
+	Buffer& _buffer;
+};
+
+//------------------------------------------------------------------------------
+
+template <Long NBitCapacity>
+class BitReadStreamT final {
+public:
+	static constexpr Long BIT_CAPACITY = NBitCapacity;
+
+	using Buffer = StreamBufferT<BIT_CAPACITY>;
+
+public:
+	BitReadStreamT(const Buffer& buffer)				  noexcept
+		: _buffer{buffer}
+	{}
+
+	template <Short NBitWidth>
+	UnsignedBitWidth<NBitWidth> read()					  noexcept;
+
+	Long cursor()									const noexcept	{ return _cursor;	}
+
+private:
+	const Buffer& _buffer;
+
+	Long _cursor = 0;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+}
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#ifdef FFSM2_ENABLE_SERIALIZATION
 
-template <typename TI, Short NC>
-typename BitArray<TI, NC>::CBits
-BitArray<TI, NC>::bits(const Units& units) const noexcept {
-	FFSM2_ASSERT(units.unit + (units.width + 7) / UNIT_WIDTH <= CAPACITY);
+namespace ffsm2 {
+namespace detail {
 
-	return CBits{_storage + units.unit, units.width};
+////////////////////////////////////////////////////////////////////////////////
+
+template <Long NBC>
+void
+StreamBufferT<NBC>::clear() noexcept {
+	bitSize = 0;
+	fill(payload, 0);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+template <Long NBC>
+BitWriteStreamT<NBC>::BitWriteStreamT(Buffer& buffer) noexcept
+	: _buffer{buffer}
+{
+	_buffer.clear();
+}
+
+//------------------------------------------------------------------------------
+
+template <Long NBC>
+template <Short NBitWidth>
+void
+BitWriteStreamT<NBC>::write(const UnsignedBitWidth<NBitWidth> item) noexcept {
+	constexpr Short BIT_WIDTH = NBitWidth;
+	static_assert(BIT_WIDTH > 0, "STATIC ASSERT");
+
+	FFSM2_ASSERT(_buffer.bitSize + BIT_WIDTH <= BIT_CAPACITY);
+
+	using Item = UnsignedBitWidth<BIT_WIDTH>;
+
+	Item itemBits = item;
+
+	for (Short itemWidth = BIT_WIDTH; itemWidth; ) {
+		const Long	byteIndex		= _buffer.bitSize >> 3;
+		uint8_t&	byte			= _buffer.payload[byteIndex];
+
+		const Short byteChunkStart	= _buffer.bitSize & 0x7;
+		const Short byteDataWidth	= 8 - byteChunkStart;
+		const Short byteChunkWidth	= detail::min(byteDataWidth, itemWidth);
+		const Item	byteChunk		= itemBits << byteChunkStart;
+		byte |= byteChunk;
+
+		itemBits	>>= byteChunkWidth;
+		itemWidth	 -= byteChunkWidth;
+		_buffer.bitSize += byteChunkWidth;
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+template <Long NBC>
+template <Short NBitWidth>
+UnsignedBitWidth<NBitWidth>
+BitReadStreamT<NBC>::read() noexcept {
+	constexpr Short BIT_WIDTH = NBitWidth;
+	static_assert(BIT_WIDTH > 0, "STATIC ASSERT");
+
+	FFSM2_ASSERT(_buffer.bitSize <= BIT_CAPACITY);
+
+	using Item = UnsignedBitWidth<BIT_WIDTH>;
+
+	Item item = 0;
+	Short itemCursor = 0;
+
+	for (Short itemWidth = BIT_WIDTH; itemWidth; )
+		if (FFSM2_CHECKED(_cursor + itemWidth <= _buffer.bitSize)) {
+			const Long	byteIndex		= _cursor >> 3;
+			const uint8_t& byte			= _buffer.payload[byteIndex];
+
+			const Short byteChunkStart	= _cursor & 0x7;
+			const Short byteDataWidth	= 8 - byteChunkStart;
+			const Short byteChunkWidth	= detail::min(byteDataWidth, itemWidth);
+			const Short byteChunkMask	= (1 << byteChunkWidth) - 1;
+			const Item	byteChunk		= (byte >> byteChunkStart) & byteChunkMask;
+
+			const Item	itemChunk		= byteChunk << itemCursor;
+			item |= itemChunk;
+
+			_cursor	   += byteChunkWidth;
+			itemCursor += byteChunkWidth;
+			itemWidth  -= byteChunkWidth;
+		}
+
+	return item;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1728,17 +1690,17 @@ private:
 
 public:
 	template <typename... TArgs>
-	Index emplace(TArgs&&... args) noexcept;
+	Index emplace(TArgs&&... args)												  noexcept;
 
-	void remove(const Index i) noexcept;
+	void remove(const Index i)													  noexcept;
 
-	FFSM2_INLINE	   Item& operator[] (const Index i)		  noexcept;
-	FFSM2_INLINE const Item& operator[] (const Index i) const noexcept;
+	FFSM2_INLINE	   Item& operator[] (const Index i)							  noexcept;
+	FFSM2_INLINE const Item& operator[] (const Index i)						const noexcept;
 
-	FFSM2_INLINE Index count() const noexcept						{ return _count;	}
+	FFSM2_INLINE Index count()												const noexcept	{ return _count;	}
 
 private:
-	FFSM2_IF_ASSERT(void verifyStructure(const Index occupied = INVALID) const noexcept);
+	FFSM2_IF_ASSERT(void verifyStructure(const Index occupied = INVALID)	const noexcept);
 
 private:
 	Item _items[CAPACITY];
@@ -1959,6 +1921,7 @@ struct Bounds {
 template <typename
 		, typename
 		, typename
+		FFSM2_IF_SERIALIZATION(, Long)
 		, Long
 		, Long
 		, typename>
@@ -1972,12 +1935,14 @@ struct PlanDataT;
 template <typename TContext
 		, typename TConfig
 		, typename TStateList
+		FFSM2_IF_SERIALIZATION(, Long NSerialBits)
 		, Long NSubstitutionLimit
 		, Long NTaskCapacity
 		, typename TPayload>
 struct PlanDataT<ArgsT<TContext
 					 , TConfig
 					 , TStateList
+					 FFSM2_IF_SERIALIZATION(, NSerialBits)
 					 , NSubstitutionLimit
 					 , NTaskCapacity
 					 , TPayload>>
@@ -1989,10 +1954,10 @@ struct PlanDataT<ArgsT<TContext
 
 	using Task			= TaskT<Payload>;
 	using Tasks			= TaskListT<Payload, TASK_CAPACITY>;
-	using TaskLinks		= StaticArray<TaskLink, TASK_CAPACITY>;
-	using Payloads		= StaticArray<Payload, TASK_CAPACITY>;
+	using TaskLinks		= StaticArrayT<TaskLink, TASK_CAPACITY>;
+	using Payloads		= StaticArrayT<Payload,  TASK_CAPACITY>;
 
-	using TasksBits		= BitArray<StateID, StateList::SIZE>;
+	using TasksBits		= BitArrayT<StateID, StateList::SIZE>;
 
 	Tasks tasks;
 	TaskLinks taskLinks;
@@ -2005,7 +1970,6 @@ struct PlanDataT<ArgsT<TContext
 	bool planExists;
 
 	void clearTaskStatus(const StateID stateId) noexcept;
-
 	void verifyEmptyStatus(const StateID stateId) const noexcept;
 
 #ifdef FFSM2_ENABLE_ASSERT
@@ -2019,11 +1983,13 @@ struct PlanDataT<ArgsT<TContext
 template <typename TContext
 		, typename TConfig
 		, typename TStateList
+		FFSM2_IF_SERIALIZATION(, Long NSerialBits)
 		, Long NSubstitutionLimit
 		, Long NTaskCapacity>
 struct PlanDataT<ArgsT<TContext
 					 , TConfig
 					 , TStateList
+					 FFSM2_IF_SERIALIZATION(, NSerialBits)
 					 , NSubstitutionLimit
 					 , NTaskCapacity
 					 , void>>
@@ -2034,9 +2000,9 @@ struct PlanDataT<ArgsT<TContext
 
 	using Task			= TaskT<void>;
 	using Tasks			= TaskListT<void, TASK_CAPACITY>;
-	using TaskLinks		= StaticArray<TaskLink, TASK_CAPACITY>;
+	using TaskLinks		= StaticArrayT<TaskLink, TASK_CAPACITY>;
 
-	using TasksBits		= BitArray<StateID, StateList::SIZE>;
+	using TasksBits		= BitArrayT<StateID, StateList::SIZE>;
 
 	Tasks tasks;
 	TaskLinks taskLinks;
@@ -2047,7 +2013,6 @@ struct PlanDataT<ArgsT<TContext
 	bool planExists;
 
 	void clearTaskStatus(const StateID stateId) noexcept;
-
 	void verifyEmptyStatus(const StateID stateId) const noexcept;
 
 #ifdef FFSM2_ENABLE_ASSERT
@@ -2068,9 +2033,9 @@ namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC, typename TTP>
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
 void
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::clearTaskStatus(const StateID stateId) noexcept {
+PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::clearTaskStatus(const StateID stateId) noexcept {
 	if (stateId != INVALID_STATE_ID) {
 		tasksSuccesses.clear(stateId);
 		tasksFailures .clear(stateId);
@@ -2079,9 +2044,9 @@ PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::clearTaskStatus(const StateID stat
 
 //------------------------------------------------------------------------------
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC, typename TTP>
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
 void
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::verifyEmptyStatus(const StateID FFSM2_IF_ASSERT(stateId)) const noexcept {
+PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::verifyEmptyStatus(const StateID FFSM2_IF_ASSERT(stateId)) const noexcept {
 #ifdef FFSM2_ENABLE_ASSERT
 
 	if (stateId != INVALID_STATE_ID) {
@@ -2096,17 +2061,17 @@ PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::verifyEmptyStatus(const StateID FF
 
 #ifdef FFSM2_ENABLE_ASSERT
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC, typename TTP>
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
 void
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::verifyPlans() const noexcept {
+PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::verifyPlans() const noexcept {
 	FFSM2_ASSERT(tasks.count() == verifyPlan());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC, typename TTP>
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
 Long
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::verifyPlan() const noexcept {
+PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::verifyPlan() const noexcept {
 	Long length = 0;
 	const Bounds& bounds = tasksBounds;
 
@@ -2125,9 +2090,8 @@ PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::verifyPlan() const noexcept {
 				if (fast != INVALID_LONG) {
 					fast = taskLinks[fast].next;
 
-					if (fast != INVALID_LONG) {
+					if (fast != INVALID_LONG)
 						fast = taskLinks[fast].next;
-					}
 
 					FFSM2_ASSERT(fast == INVALID_LONG || slow != fast);
 				}
@@ -2147,9 +2111,9 @@ PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::verifyPlan() const noexcept {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC>
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC>
 void
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::clearTaskStatus(const StateID stateId) noexcept {
+PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::clearTaskStatus(const StateID stateId) noexcept {
 	if (stateId != INVALID_STATE_ID) {
 		tasksSuccesses.clear(stateId);
 		tasksFailures .clear(stateId);
@@ -2158,9 +2122,9 @@ PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::clearTaskStatus(const StateID sta
 
 //------------------------------------------------------------------------------
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC>
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC>
 void
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::verifyEmptyStatus(const StateID FFSM2_IF_ASSERT(stateId)) const noexcept {
+PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::verifyEmptyStatus(const StateID FFSM2_IF_ASSERT(stateId)) const noexcept {
 #ifdef FFSM2_ENABLE_ASSERT
 
 	if (stateId != INVALID_STATE_ID) {
@@ -2175,17 +2139,17 @@ PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::verifyEmptyStatus(const StateID F
 
 #ifdef FFSM2_ENABLE_ASSERT
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC>
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC>
 void
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::verifyPlans() const noexcept {
+PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::verifyPlans() const noexcept {
 	FFSM2_ASSERT(tasks.count() == verifyPlan());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC>
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC>
 Long
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::verifyPlan() const noexcept {
+PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::verifyPlan() const noexcept {
 	Long length = 0;
 	const Bounds& bounds = tasksBounds;
 
@@ -2204,9 +2168,8 @@ PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::verifyPlan() const noexcept {
 				if (fast != INVALID_LONG) {
 					fast = taskLinks[fast].next;
 
-					if (fast != INVALID_LONG) {
+					if (fast != INVALID_LONG)
 						fast = taskLinks[fast].next;
-					}
 
 					FFSM2_ASSERT(fast == INVALID_LONG || slow != fast);
 				}
@@ -2250,7 +2213,7 @@ struct Status {
 
 	inline Status(const Result result_ = Result::NONE) noexcept;
 
-	inline explicit operator bool()			   const	noexcept	{ return result != Result::NONE;			}
+	inline explicit operator bool()					const noexcept	{ return result != Result::NONE;			}
 
 	inline void clear() noexcept;
 };
@@ -2298,17 +2261,17 @@ public:
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	struct Iterator {
-		FFSM2_INLINE Iterator(const CPlanT& plan)		noexcept;
+	struct IteratorT {
+		FFSM2_INLINE IteratorT(const CPlanT& plan)		  noexcept;
 
-		FFSM2_INLINE explicit operator bool() const		noexcept;
+		FFSM2_INLINE explicit operator bool()		const noexcept;
 
-		FFSM2_INLINE void operator ++()					noexcept;
+		FFSM2_INLINE void operator ++()					  noexcept;
 
-		FFSM2_INLINE const Task& operator  *() const	noexcept	{ return  _plan._planData.tasks[_curr];		}
-		FFSM2_INLINE const Task* operator ->() const	noexcept	{ return &_plan._planData.tasks[_curr];		}
+		FFSM2_INLINE const Task& operator  *()		const noexcept	{ return  _plan._planData.tasks[_curr];		}
+		FFSM2_INLINE const Task* operator ->()		const noexcept	{ return &_plan._planData.tasks[_curr];		}
 
-		FFSM2_INLINE Long next() const					noexcept;
+		FFSM2_INLINE Long next()					const noexcept;
 
 		const CPlanT& _plan;
 		Long _curr;
@@ -2318,15 +2281,15 @@ public:
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 private:
-	FFSM2_INLINE CPlanT(const PlanData& planData)		noexcept;
+	FFSM2_INLINE CPlanT(const PlanData& planData)		  noexcept;
 
 	template <typename T>
-	static constexpr StateID  stateId()					noexcept	{ return			index<StateList , T>();	}
+	static constexpr StateID  stateId()					  noexcept	{ return			index<StateList , T>();	}
 
 public:
-	FFSM2_INLINE explicit operator bool() const			noexcept;
+	FFSM2_INLINE explicit operator bool()			const noexcept;
 
-	FFSM2_INLINE Iterator first()						noexcept	{ return Iterator{*this};					}
+	FFSM2_INLINE IteratorT first()						  noexcept	{ return IteratorT{*this};					}
 
 private:
 	const PlanData& _planData;
@@ -2352,22 +2315,22 @@ public:
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	struct Iterator {
-		FFSM2_INLINE Iterator(PlanBaseT& plan)			noexcept;
+	struct IteratorT {
+		FFSM2_INLINE IteratorT(PlanBaseT& plan)			  noexcept;
 
-		FFSM2_INLINE explicit operator bool()  const	noexcept;
+		FFSM2_INLINE explicit operator bool()		const noexcept;
 
-		FFSM2_INLINE void operator ++()					noexcept;
+		FFSM2_INLINE void operator ++()					  noexcept;
 
-		FFSM2_INLINE	   Task& operator  *()			noexcept	{ return  _plan._planData.tasks[_curr];		}
-		FFSM2_INLINE const Task& operator  *() const	noexcept	{ return  _plan._planData.tasks[_curr];		}
+		FFSM2_INLINE	   Task& operator  *()			  noexcept	{ return  _plan._planData.tasks[_curr];		}
+		FFSM2_INLINE const Task& operator  *()		const noexcept	{ return  _plan._planData.tasks[_curr];		}
 
-		FFSM2_INLINE	   Task* operator ->()			noexcept	{ return &_plan._planData.tasks[_curr];		}
-		FFSM2_INLINE const Task* operator ->() const	noexcept	{ return &_plan._planData.tasks[_curr];		}
+		FFSM2_INLINE	   Task* operator ->()			  noexcept	{ return &_plan._planData.tasks[_curr];		}
+		FFSM2_INLINE const Task* operator ->()		const noexcept	{ return &_plan._planData.tasks[_curr];		}
 
-		FFSM2_INLINE void remove()						noexcept;
+		FFSM2_INLINE void remove()						  noexcept;
 
-		FFSM2_INLINE Long next() const					noexcept;
+		FFSM2_INLINE Long next()					const noexcept;
 
 		PlanBaseT& _plan;
 		Long _curr;
@@ -2377,19 +2340,19 @@ public:
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	struct CIterator {
-		FFSM2_INLINE CIterator(const PlanBaseT& plan)	noexcept;
+		FFSM2_INLINE CIterator(const PlanBaseT& plan)	  noexcept;
 
-		FFSM2_INLINE explicit operator bool()  const	noexcept;
+		FFSM2_INLINE explicit operator bool()		const noexcept;
 
-		FFSM2_INLINE void operator ++()					noexcept;
+		FFSM2_INLINE void operator ++()					  noexcept;
 
-		FFSM2_INLINE	   Task& operator  *()			noexcept	{ return  _plan._planData.tasks[_curr];		}
-		FFSM2_INLINE const Task& operator  *() const	noexcept	{ return  _plan._planData.tasks[_curr];		}
+		FFSM2_INLINE	   Task& operator  *()			  noexcept	{ return  _plan._planData.tasks[_curr];		}
+		FFSM2_INLINE const Task& operator  *()		const noexcept	{ return  _plan._planData.tasks[_curr];		}
 
-		FFSM2_INLINE	   Task* operator ->()			noexcept	{ return &_plan._planData.tasks[_curr];		}
-		FFSM2_INLINE const Task* operator ->() const	noexcept	{ return &_plan._planData.tasks[_curr];		}
+		FFSM2_INLINE	   Task* operator ->()			  noexcept	{ return &_plan._planData.tasks[_curr];		}
+		FFSM2_INLINE const Task* operator ->()		const noexcept	{ return &_plan._planData.tasks[_curr];		}
 
-		FFSM2_INLINE Long next() const					noexcept;
+		FFSM2_INLINE Long next()					const noexcept;
 
 		const PlanBaseT& _plan;
 		Long _curr;
@@ -2399,21 +2362,21 @@ public:
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 protected:
-	FFSM2_INLINE PlanBaseT(PlanData& planData)			noexcept;
+	FFSM2_INLINE PlanBaseT(PlanData& planData)			  noexcept;
 
 	template <typename T>
-	static constexpr StateID  stateId()					noexcept	{ return			index<StateList , T>();	}
+	static constexpr StateID  stateId()					  noexcept	{ return			index<StateList , T>();	}
 
 	FFSM2_INLINE bool append(const StateID origin,
-							 const StateID destination)	noexcept;
+							 const StateID destination)	  noexcept;
 
-	FFSM2_INLINE bool linkTask(const Long index)		noexcept;
+	FFSM2_INLINE bool linkTask(const Long index)		  noexcept;
 
 public:
-	FFSM2_INLINE explicit operator bool() const			noexcept;
+	FFSM2_INLINE explicit operator bool()			const noexcept;
 
 	/// @brief Clear all tasks from the plan
-	FFSM2_INLINE void clear()							noexcept;
+	FFSM2_INLINE void clear()							  noexcept;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -2422,7 +2385,7 @@ public:
 	/// @param destination Destination state identifier
 	/// @return Seccess if FSM total number of tasks is below task capacity
 	/// @note use 'Config::TaskCapacityN<>' to increase task capacity if necessary
-	FFSM2_INLINE bool change(const StateID origin, const StateID destination)	noexcept	{ return append(origin, destination);							}
+	FFSM2_INLINE bool change(const StateID origin, const StateID destination)	  noexcept	{ return append(origin, destination);							}
 
 	/// @brief Add a task to transition from 'origin' to 'destination' if 'origin' completes with 'success()'
 	/// @tparam TOrigin Origin state type
@@ -2430,7 +2393,7 @@ public:
 	/// @return Seccess if FSM total number of tasks is below task capacity
 	/// @note use 'Config::TaskCapacityN<>' to increase task capacity if necessary
 	template <typename TOrigin>
-	FFSM2_INLINE bool change(const StateID destination)							noexcept	{ return change(stateId<TOrigin>(), destination);				}
+	FFSM2_INLINE bool change(const StateID destination)							  noexcept	{ return change(stateId<TOrigin>(), destination);				}
 
 	/// @brief Add a task to transition from 'origin' to 'destination' if 'origin' completes with 'success()'
 	/// @tparam TOrigin Origin state type
@@ -2438,20 +2401,20 @@ public:
 	/// @return Seccess if FSM total number of tasks is below task capacity
 	/// @note use 'Config::TaskCapacityN<>' to increase task capacity if necessary
 	template <typename TOrigin, typename TDestination>
-	FFSM2_INLINE bool change()													noexcept	{ return change(stateId<TOrigin>(), stateId<TDestination>());	}
+	FFSM2_INLINE bool change()													  noexcept	{ return change(stateId<TOrigin>(), stateId<TDestination>());	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	/// @brief Begin iteration over plan tasks
-	/// @return Iterator to the first task
-	FFSM2_INLINE  Iterator first()												noexcept	{ return  Iterator{*this};										}
+	/// @return IteratorT to the first task
+	FFSM2_INLINE  IteratorT first()						  noexcept	{ return  IteratorT{*this};										}
 
 	/// @brief Begin iteration over plan tasks
 	/// @return CIterator to the first task
-	FFSM2_INLINE CIterator first() const										noexcept	{ return CIterator{*this};										}
+	FFSM2_INLINE CIterator first()					const noexcept { return CIterator{*this};										}
 
 private:
-	void remove(const Long task)												noexcept;
+	void remove(const Long task)						  noexcept;
 
 protected:
 	PlanData& _planData;
@@ -2468,18 +2431,21 @@ class PlanT;
 template <typename TContext
 		, typename TConfig
 		, typename TStateList
+		FFSM2_IF_SERIALIZATION(, Long NSerialBits)
 		, Long NSubstitutionLimit
 		, Long NTaskCapacity
 		, typename TPayload>
 class PlanT<ArgsT<TContext
 				, TConfig
 				, TStateList
+				FFSM2_IF_SERIALIZATION(, NSerialBits)
 				, NSubstitutionLimit
 				, NTaskCapacity
 				, TPayload>> final
 	: public PlanBaseT<ArgsT<TContext
 						   , TConfig
 						   , TStateList
+						   FFSM2_IF_SERIALIZATION(, NSerialBits)
 						   , NSubstitutionLimit
 						   , NTaskCapacity
 						   , TPayload>>
@@ -2496,6 +2462,7 @@ class PlanT<ArgsT<TContext
 	using Args = ArgsT<TContext
 					 , TConfig
 					 , TStateList
+					 FFSM2_IF_SERIALIZATION(, NSerialBits)
 					 , NSubstitutionLimit
 					 , NTaskCapacity
 					 , TPayload>;
@@ -2584,17 +2551,20 @@ private:
 template <typename TContext
 		, typename TConfig
 		, typename TStateList
+		FFSM2_IF_SERIALIZATION(, Long NSerialBits)
 		, Long NSubstitutionLimit
 		, Long NTaskCapacity>
 class PlanT<ArgsT<TContext
 				, TConfig
 				, TStateList
+				FFSM2_IF_SERIALIZATION(, NSerialBits)
 				, NSubstitutionLimit
 				, NTaskCapacity
 				, void>> final
 	: public PlanBaseT<ArgsT<TContext
 						   , TConfig
 						   , TStateList
+						   FFSM2_IF_SERIALIZATION(, NSerialBits)
 						   , NSubstitutionLimit
 						   , NTaskCapacity
 						   , void>>
@@ -2611,6 +2581,7 @@ class PlanT<ArgsT<TContext
 	using Args = ArgsT<TContext
 					 , TConfig
 					 , TStateList
+					 FFSM2_IF_SERIALIZATION(, NSerialBits)
 					 , NSubstitutionLimit
 					 , NTaskCapacity
 					 , void>;
@@ -2648,7 +2619,7 @@ Status::clear() noexcept {
 #ifdef FFSM2_ENABLE_PLANS
 
 template <typename TArgs>
-CPlanT<TArgs>::Iterator::Iterator(const CPlanT& plan) noexcept
+CPlanT<TArgs>::IteratorT::IteratorT(const CPlanT& plan) noexcept
 	: _plan{plan}
 	, _curr{plan._bounds.first}
 {
@@ -2658,7 +2629,7 @@ CPlanT<TArgs>::Iterator::Iterator(const CPlanT& plan) noexcept
 //------------------------------------------------------------------------------
 
 template <typename TArgs>
-CPlanT<TArgs>::Iterator::operator bool() const noexcept {
+CPlanT<TArgs>::IteratorT::operator bool() const noexcept {
 	FFSM2_ASSERT(_curr < CPlanT::TASK_CAPACITY || _curr == INVALID_LONG);
 
 	return _curr < CPlanT::TASK_CAPACITY;
@@ -2668,7 +2639,7 @@ CPlanT<TArgs>::Iterator::operator bool() const noexcept {
 
 template <typename TArgs>
 void
-CPlanT<TArgs>::Iterator::operator ++() noexcept {
+CPlanT<TArgs>::IteratorT::operator ++() noexcept {
 	_curr = _next;
 	_next = next();
 }
@@ -2677,7 +2648,7 @@ CPlanT<TArgs>::Iterator::operator ++() noexcept {
 
 template <typename TArgs>
 Long
-CPlanT<TArgs>::Iterator::next() const noexcept {
+CPlanT<TArgs>::IteratorT::next() const noexcept {
 	if (_curr < CPlanT::TASK_CAPACITY) {
 		const TaskLink& link = _plan._planData.taskLinks[_curr];
 
@@ -2713,7 +2684,7 @@ CPlanT<TArgs>::operator bool() const noexcept {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TArgs>
-PlanBaseT<TArgs>::Iterator::Iterator(PlanBaseT& plan) noexcept
+PlanBaseT<TArgs>::IteratorT::IteratorT(PlanBaseT& plan) noexcept
 	: _plan{plan}
 	, _curr{plan._bounds.first}
 {
@@ -2723,7 +2694,7 @@ PlanBaseT<TArgs>::Iterator::Iterator(PlanBaseT& plan) noexcept
 //------------------------------------------------------------------------------
 
 template <typename TArgs>
-PlanBaseT<TArgs>::Iterator::operator bool() const noexcept {
+PlanBaseT<TArgs>::IteratorT::operator bool() const noexcept {
 	FFSM2_ASSERT(_curr < PlanBaseT::TASK_CAPACITY || _curr == INVALID_LONG);
 
 	return _curr < PlanBaseT::TASK_CAPACITY;
@@ -2733,7 +2704,7 @@ PlanBaseT<TArgs>::Iterator::operator bool() const noexcept {
 
 template <typename TArgs>
 void
-PlanBaseT<TArgs>::Iterator::operator ++() noexcept {
+PlanBaseT<TArgs>::IteratorT::operator ++() noexcept {
 	_curr = _next;
 	_next = next();
 }
@@ -2742,7 +2713,7 @@ PlanBaseT<TArgs>::Iterator::operator ++() noexcept {
 
 template <typename TArgs>
 void
-PlanBaseT<TArgs>::Iterator::remove() noexcept {
+PlanBaseT<TArgs>::IteratorT::remove() noexcept {
 	_plan.remove(_curr);
 }
 
@@ -2750,7 +2721,7 @@ PlanBaseT<TArgs>::Iterator::remove() noexcept {
 
 template <typename TArgs>
 Long
-PlanBaseT<TArgs>::Iterator::next() const noexcept {
+PlanBaseT<TArgs>::IteratorT::next() const noexcept {
 	if (_curr < PlanBaseT::TASK_CAPACITY) {
 		const TaskLink& link = _plan._planData.taskLinks[_curr];
 
@@ -2948,11 +2919,11 @@ PlanBaseT<TArgs>::remove(const Long task) noexcept {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC, typename TTP>
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
 bool
-PlanT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::append(const StateID origin,
-												 const StateID destination,
-												 const Payload& payload) noexcept
+PlanT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::append(const StateID origin,
+																			   const StateID destination,
+																			   const Payload& payload) noexcept
 {
 	_planData.planExists = true;
 
@@ -2961,11 +2932,11 @@ PlanT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::append(const StateID origin,
 
 //------------------------------------------------------------------------------
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC, typename TTP>
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
 bool
-PlanT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::append(const StateID origin,
-												 const StateID destination,
-												 Payload&& payload) noexcept
+PlanT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::append(const StateID origin,
+																			   const StateID destination,
+																			   Payload&& payload) noexcept
 {
 	_planData.planExists = true;
 
@@ -2986,6 +2957,7 @@ namespace detail {
 template <typename
 		, typename
 		, typename
+		FFSM2_IF_SERIALIZATION(, Long)
 		, Long
 		FFSM2_IF_PLANS(, Long)
 		, typename>
@@ -3029,7 +3001,7 @@ protected:
 
 	using Payload			= typename TArgs::Payload;
 	using Transition		= TransitionT<Payload>;
-	using TransitionSets	= Array<Transition, TArgs::SUBSTITUTION_LIMIT>;
+	using TransitionSets	= ArrayT<Transition, TArgs::SUBSTITUTION_LIMIT>;
 
 #ifdef FFSM2_ENABLE_PLANS
 	using PlanData			= PlanDataT<TArgs>;
@@ -3072,33 +3044,33 @@ public:
 	/// @tparam TState State type
 	/// @return Numeric state identifier
 	template <typename TState>
-	static constexpr StateID stateId()			   noexcept	{ return index<StateList, TState>();	}
+	static constexpr StateID stateId()							  noexcept	{ return index<StateList, TState>();	}
 
 	/// @brief Access FSM context (data shared between states and/or data interface between FSM and external code)
 	/// @return context
 	/// @see Control::context()
-	FFSM2_INLINE	   Context& _()				   noexcept	{ return _context;						}
+	FFSM2_INLINE	   Context& _()								  noexcept	{ return _context;						}
 
 	/// @brief Access FSM context (data shared between states and/or data interface between FSM and external code)
 	/// @return context
 	/// @see Control::context()
-	FFSM2_INLINE const Context& _()			 const noexcept	{ return _context;						}
+	FFSM2_INLINE const Context& _()							const noexcept	{ return _context;						}
 
 	/// @brief Access FSM context (data shared between states and/or data interface between FSM and external code)
 	/// @return context
 	/// @see Control::_()
-	FFSM2_INLINE	   Context& context()		   noexcept	{ return _context;						}
+	FFSM2_INLINE	   Context& context()						  noexcept	{ return _context;						}
 
 	/// @brief Access FSM context (data shared between states and/or data interface between FSM and external code)
 	/// @return context
 	/// @see Control::_()
-	FFSM2_INLINE const Context& context()	 const noexcept	{ return _context;						}
+	FFSM2_INLINE const Context& context()					const noexcept	{ return _context;						}
 
 	//----------------------------------------------------------------------
 
 	/// @brief Inspect current transition requests
 	/// @return Array of transition requests
-	FFSM2_INLINE const Transition& request() const noexcept	{ return _request;						}
+	FFSM2_INLINE const Transition& request()				const noexcept	{ return _request;						}
 
 	//----------------------------------------------------------------------
 
@@ -3106,7 +3078,7 @@ public:
 
 	/// @brief Access read-only plan
 	/// @return Plan
-	FFSM2_INLINE CPlan plan()				 const noexcept	{ return CPlan{_planData};				}
+	FFSM2_INLINE CPlan plan()								const noexcept	{ return CPlan{_planData};				}
 
 #endif
 
@@ -3114,7 +3086,7 @@ public:
 
 protected:
 #ifdef FFSM2_ENABLE_LOG_INTERFACE
-	FFSM2_INLINE Logger* logger()				   noexcept	{ return _logger;						}
+	FFSM2_INLINE Logger* logger()								  noexcept	{ return _logger;						}
 #endif
 
 protected:
@@ -3159,15 +3131,20 @@ public:
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #ifdef FFSM2_ENABLE_PLANS
+// COMMON
 
 	/// @brief Access plan
 	/// @return Plan
-	FFSM2_INLINE  Plan plan()						noexcept	{ return  Plan{_planData};				}
+	FFSM2_INLINE  Plan plan()									  noexcept	{ return  Plan{_planData};				}
+
+// COMMON
+// COMMON
 
 	/// @brief Access read-only plan
 	/// @return Read-only plan
-	FFSM2_INLINE CPlan plan() const					noexcept	{ return CPlan{_planData};				}
+	FFSM2_INLINE CPlan plan()								const noexcept	{ return CPlan{_planData};				}
 
+// COMMON
 #endif
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -3202,14 +3179,14 @@ protected:
 	using typename PlanControl::Transition;
 
 #ifdef FFSM2_ENABLE_PLANS
-	using TasksBits		= BitArray<StateID, StateList::SIZE>;
+	using TasksBits		= BitArrayT<StateID, StateList::SIZE>;
 #endif
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	struct Lock {
-		FFSM2_INLINE Lock(FullControlBaseT& control_) noexcept;
-		FFSM2_INLINE ~Lock() noexcept;
+		FFSM2_INLINE Lock(FullControlBaseT& control_)			  noexcept;
+		FFSM2_INLINE ~Lock()									  noexcept;
 
 		FullControlBaseT* const control;
 	};
@@ -3222,26 +3199,27 @@ public:
 	using PlanControl::context;
 
 	//----------------------------------------------------------------------
-	// Clang trips over 'stateId<>()', so give it a hint it comes from PlanControl
+	// COMMON
 
 	/// @brief Transition into a state
 	/// @param stateId State identifier
-	FFSM2_INLINE void changeTo(const StateID stateId) noexcept;
+	FFSM2_INLINE void changeTo(const StateID stateId)			  noexcept;
 
 	/// @brief Transition into a state
 	/// @tparam TState State type
 	template <typename TState>
-	FFSM2_INLINE void changeTo() noexcept		{ changeTo (PlanControl::template stateId<TState>());	}
+	FFSM2_INLINE void changeTo()								  noexcept		{ changeTo (PlanControl::template stateId<TState>());	}
 
+	// COMMON
 	//----------------------------------------------------------------------
 
 #ifdef FFSM2_ENABLE_PLANS
 
 	/// @brief Succeed a plan task for the current state
-	FFSM2_INLINE void succeed() noexcept;
+	FFSM2_INLINE void succeed()									  noexcept;
 
 	/// @brief Fail a plan task for the current state
-	FFSM2_INLINE void fail()	noexcept;
+	FFSM2_INLINE void fail()									  noexcept;
 
 #endif
 
@@ -3268,18 +3246,21 @@ class FullControlT;
 template <typename TContext
 		, typename TConfig
 		, typename TStateList
+		FFSM2_IF_SERIALIZATION(, Long NSerialBits)
 		, Long NSubstitutionLimit
 		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload>
 class FullControlT<ArgsT<TContext
 					   , TConfig
 					   , TStateList
+					   FFSM2_IF_SERIALIZATION(, NSerialBits)
 					   , NSubstitutionLimit
 					   FFSM2_IF_PLANS(, NTaskCapacity)
 					   , TPayload>>
 	: public FullControlBaseT<ArgsT<TContext
 								  , TConfig
 								  , TStateList
+								  FFSM2_IF_SERIALIZATION(, NSerialBits)
 								  , NSubstitutionLimit
 								  FFSM2_IF_PLANS(, NTaskCapacity)
 								  , TPayload>>
@@ -3296,6 +3277,7 @@ class FullControlT<ArgsT<TContext
 	using Args = ArgsT<TContext
 					 , TConfig
 					 , TStateList
+					 FFSM2_IF_SERIALIZATION(, NSerialBits)
 					 , NSubstitutionLimit
 					 FFSM2_IF_PLANS(, NTaskCapacity)
 					 , TPayload>;
@@ -3320,7 +3302,7 @@ protected:
 #ifdef FFSM2_ENABLE_PLANS
 
 	template <typename TState>
-	void updatePlan(TState& headState, const Status subStatus) noexcept;
+	void updatePlan(TState& headState, const Status subStatus)	  noexcept;
 
 #endif
 
@@ -3332,30 +3314,37 @@ public:
 	FFSM2_IF_PLANS(using FullControlBase::plan);
 
 	//------------------------------------------------------------------------------
+	// COMMON
 
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
 	FFSM2_INLINE void changeWith(const StateID  stateId,
-								 const Payload& payload) noexcept;
+								 const Payload& payload)		  noexcept;
 
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
 	FFSM2_INLINE void changeWith(const StateID  stateId,
-									  Payload&& payload) noexcept;
+									  Payload&& payload)		  noexcept;
 
 	/// @brief Transition into a state
 	/// @tparam TState Destination state type
 	/// @param payload Payload
 	template <typename TState>
-	FFSM2_INLINE void changeWith(const Payload& payload) noexcept	{ changeWith(FullControlBase::template stateId<TState>(),		   payload );	}
+	FFSM2_INLINE void changeWith(const Payload& payload)		  noexcept	{ changeWith(FullControlBase::template stateId<TState>(),		   payload );	}
 
 	/// @brief Transition into a state
 	/// @tparam TState Destination state type
 	/// @param payload Payload
 	template <typename TState>
-	FFSM2_INLINE void changeWith(	  Payload&& payload) noexcept	{ changeWith(FullControlBase::template stateId<TState>(), std::move(payload));	}
+	FFSM2_INLINE void changeWith(	  Payload&& payload)		  noexcept	{ changeWith(FullControlBase::template stateId<TState>(), std::move(payload));	}
+
+	// COMMON
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+#ifdef FFSM2_ENABLE_UTILITY_THEORY
+#endif
 
 	//------------------------------------------------------------------------------
 
@@ -3376,17 +3365,20 @@ protected:
 template <typename TContext
 		, typename TConfig
 		, typename TStateList
+		FFSM2_IF_SERIALIZATION(, Long NSerialBits)
 		, Long NSubstitutionLimit
 		FFSM2_IF_PLANS(, Long NTaskCapacity)>
 class FullControlT<ArgsT<TContext
 					   , TConfig
 					   , TStateList
+					   FFSM2_IF_SERIALIZATION(, NSerialBits)
 					   , NSubstitutionLimit
 					   FFSM2_IF_PLANS(, NTaskCapacity)
 					   , void>>
 	: public FullControlBaseT<ArgsT<TContext
 								  , TConfig
 								  , TStateList
+								  FFSM2_IF_SERIALIZATION(, NSerialBits)
 								  , NSubstitutionLimit
 								  FFSM2_IF_PLANS(, NTaskCapacity)
 								  , void>>
@@ -3403,6 +3395,7 @@ class FullControlT<ArgsT<TContext
 	using Args = ArgsT<TContext
 					 , TConfig
 					 , TStateList
+					 FFSM2_IF_SERIALIZATION(, NSerialBits)
 					 , NSubstitutionLimit
 					 FFSM2_IF_PLANS(, NTaskCapacity)
 					 , void>;
@@ -3495,15 +3488,15 @@ public:
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_INLINE const TransitionSets& currentTransitions() const	noexcept	{ return _currentTransitions;	}
+	FFSM2_INLINE const TransitionSets& currentTransitions()	const noexcept	{ return _currentTransitions;	}
 
 	/// @brief Get pending transition requests
-	/// @return Array of pending transition requests
-	FFSM2_INLINE Transition& pendingTransition() const				noexcept	{ return _pendingTransition;	}
+	/// @return ArrayT of pending transition requests
+	FFSM2_INLINE Transition& pendingTransition()			const noexcept	{ return _pendingTransition;	}
 
 	/// @brief Cancel pending transition requests
 	///		(can be used to substitute a transition into the current state with a different one)
-	FFSM2_INLINE void cancelPendingTransition()						noexcept;
+	FFSM2_INLINE void cancelPendingTransition()					  noexcept;
 
 private:
 	using FullControl::_registry;
@@ -3525,6 +3518,7 @@ namespace ffsm2 {
 namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
+// COMMON
 
 template <typename TArgs>
 ControlT<TArgs>::Origin::Origin(ControlT& control_,
@@ -3542,6 +3536,7 @@ ControlT<TArgs>::Origin::~Origin() noexcept {
 	control._originId = prevId;
 }
 
+// COMMON
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TArgs>
@@ -3561,6 +3556,7 @@ FullControlBaseT<TArgs>::Lock::~Lock() noexcept {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// COMMON
 
 template <typename TArgs>
 void
@@ -3572,6 +3568,7 @@ FullControlBaseT<TArgs>::changeTo(const StateID stateId) noexcept {
 	}
 }
 
+// COMMON
 //------------------------------------------------------------------------------
 
 #ifdef FFSM2_ENABLE_PLANS
@@ -3604,11 +3601,11 @@ FullControlBaseT<TArgs>::fail() noexcept {
 
 #ifdef FFSM2_ENABLE_PLANS
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC, typename TTP>
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
 template <typename TState>
 void
-FullControlT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::updatePlan(TState& headState,
-															const Status subStatus) noexcept
+FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::updatePlan(TState& headState,
+																						  const Status subStatus) noexcept
 {
 	FFSM2_ASSERT(subStatus);
 
@@ -3643,11 +3640,12 @@ FullControlT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::updatePlan(TState& headState,
 #endif
 
 //------------------------------------------------------------------------------
+// COMMON
 
-template <typename TC, typename TG, typename TSL, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TTP>
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL FFSM2_IF_PLANS(, Long NTC), typename TTP>
 void
-FullControlT<ArgsT<TC, TG, TSL, NSL FFSM2_IF_PLANS(, NTC), TTP>>::changeWith(const StateID  stateId,
-																			 const Payload& payload) noexcept
+FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL FFSM2_IF_PLANS(, NTC), TTP>>::changeWith(const StateID  stateId,
+																										   const Payload& payload) noexcept
 {
 	if (!_locked) {
 		_request = Transition{_originId, stateId, payload};
@@ -3658,10 +3656,10 @@ FullControlT<ArgsT<TC, TG, TSL, NSL FFSM2_IF_PLANS(, NTC), TTP>>::changeWith(con
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename TC, typename TG, typename TSL, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TTP>
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL FFSM2_IF_PLANS(, Long NTC), typename TTP>
 void
-FullControlT<ArgsT<TC, TG, TSL, NSL FFSM2_IF_PLANS(, NTC), TTP>>::changeWith(const StateID  stateId,
-																				  Payload&& payload) noexcept
+FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL FFSM2_IF_PLANS(, NTC), TTP>>::changeWith(const StateID  stateId,
+																										   Payload&& payload) noexcept
 {
 	if (!_locked) {
 		_request = Transition{_originId, stateId, std::move(payload)};
@@ -3670,15 +3668,16 @@ FullControlT<ArgsT<TC, TG, TSL, NSL FFSM2_IF_PLANS(, NTC), TTP>>::changeWith(con
 	}
 }
 
+// COMMON
 ////////////////////////////////////////////////////////////////////////////////
 
 #ifdef FFSM2_ENABLE_PLANS
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC>
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC>
 template <typename TState>
 void
-FullControlT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::updatePlan(TState& headState,
-															 const Status subStatus) noexcept
+FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::updatePlan(TState& headState,
+																						   const Status subStatus) noexcept
 {
 	FFSM2_ASSERT(subStatus);
 
@@ -3753,23 +3752,23 @@ protected:
 	using GuardControl	= GuardControlT<TArgs>;
 
 public:
-	FFSM2_INLINE void preEntryGuard(Context&) noexcept {}
+	FFSM2_INLINE void preEntryGuard(Context&)		  noexcept {}
 
-	FFSM2_INLINE void preEnter	   (Context&) noexcept {}
-	FFSM2_INLINE void preReenter   (Context&) noexcept {}
+	FFSM2_INLINE void preEnter	   (Context&)		  noexcept {}
+	FFSM2_INLINE void preReenter   (Context&)		  noexcept {}
 
-	FFSM2_INLINE void preUpdate	   (Context&) noexcept {}
+	FFSM2_INLINE void preUpdate	   (Context&)		  noexcept {}
 
 	template <typename TEvent>
 	FFSM2_INLINE void preReact	   (const TEvent&,
-									Context&) noexcept {}
+									Context&)		  noexcept {}
 
-	FFSM2_INLINE void preExitGuard (Context&) noexcept {}
+	FFSM2_INLINE void preExitGuard (Context&)		  noexcept {}
 
-	FFSM2_INLINE void postExit	   (Context&) noexcept {}
+	FFSM2_INLINE void postExit	   (Context&)		  noexcept {}
 
 	template <typename T>
-	static constexpr StateID  stateId() noexcept { return index<StateList, T>();	}
+	static constexpr StateID  stateId()				  noexcept { return index<StateList, T>();	}
 };
 
 //------------------------------------------------------------------------------
@@ -3800,20 +3799,20 @@ struct B_<TFirst, TRest...>
 
 	using TFirst::stateId;
 
-	FFSM2_INLINE void widePreEntryGuard(Context& context) noexcept;
+	FFSM2_INLINE void widePreEntryGuard(Context& context)		 noexcept;
 
-	FFSM2_INLINE void widePreEnter	   (Context& context) noexcept;
-	FFSM2_INLINE void widePreReenter   (Context& context) noexcept;
+	FFSM2_INLINE void widePreEnter	   (Context& context)		 noexcept;
+	FFSM2_INLINE void widePreReenter   (Context& context)		 noexcept;
 
-	FFSM2_INLINE void widePreUpdate	   (Context& context) noexcept;
+	FFSM2_INLINE void widePreUpdate	   (Context& context)		 noexcept;
 
 	template <typename TEvent>
 	FFSM2_INLINE void widePreReact	   (const TEvent& event,
-										Context& context) noexcept;
+										Context& context)		 noexcept;
 
-	FFSM2_INLINE void widePreExitGuard (Context& context) noexcept;
+	FFSM2_INLINE void widePreExitGuard (Context& context)		 noexcept;
 
-	FFSM2_INLINE void widePostExit	   (Context& context) noexcept;
+	FFSM2_INLINE void widePostExit	   (Context& context)		 noexcept;
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -3838,40 +3837,40 @@ struct B_<TFirst>
 
 	using TFirst::stateId;
 
-	FFSM2_INLINE void entryGuard	   (GuardControl&)		noexcept {}
+	FFSM2_INLINE void entryGuard	   (GuardControl&)			  noexcept {}
 
-	FFSM2_INLINE void enter			   (PlanControl&)		noexcept {}
-	FFSM2_INLINE void reenter		   (PlanControl&)		noexcept {}
+	FFSM2_INLINE void enter			   (PlanControl&)			  noexcept {}
+	FFSM2_INLINE void reenter		   (PlanControl&)			  noexcept {}
 
-	FFSM2_INLINE void update		   (FullControl&)		noexcept {}
+	FFSM2_INLINE void update		   (FullControl&)			  noexcept {}
 
 	template <typename TEvent>
 	FFSM2_INLINE void react			   (const TEvent&,
-										FullControl&)		noexcept {}
+										FullControl&)			  noexcept {}
 
-	FFSM2_INLINE void exitGuard		   (GuardControl&)		noexcept {}
+	FFSM2_INLINE void exitGuard		   (GuardControl&)			  noexcept {}
 
-	FFSM2_INLINE void exit			   (PlanControl&)		noexcept {}
+	FFSM2_INLINE void exit			   (PlanControl&)			  noexcept {}
 
 #ifdef FFSM2_ENABLE_PLANS
-	FFSM2_INLINE void planSucceeded	   (FullControl&)		noexcept {}
-	FFSM2_INLINE void planFailed	   (FullControl&)		noexcept {}
+	FFSM2_INLINE void planSucceeded	   (FullControl&)			  noexcept {}
+	FFSM2_INLINE void planFailed	   (FullControl&)			  noexcept {}
 #endif
 
-	FFSM2_INLINE void widePreEntryGuard(Context& context)	noexcept;
+	FFSM2_INLINE void widePreEntryGuard(Context& context)		  noexcept;
 
-	FFSM2_INLINE void widePreEnter	   (Context& context)	noexcept;
-	FFSM2_INLINE void widePreReenter   (Context& context)	noexcept;
+	FFSM2_INLINE void widePreEnter	   (Context& context)		  noexcept;
+	FFSM2_INLINE void widePreReenter   (Context& context)		  noexcept;
 
-	FFSM2_INLINE void widePreUpdate	   (Context& context)	noexcept;
+	FFSM2_INLINE void widePreUpdate	   (Context& context)		  noexcept;
 
 	template <typename TEvent>
 	FFSM2_INLINE void widePreReact	   (const TEvent& event,
-										Context& context)	noexcept;
+										Context& context)		  noexcept;
 
-	FFSM2_INLINE void widePreExitGuard (Context& context)	noexcept;
+	FFSM2_INLINE void widePreExitGuard (Context& context)		  noexcept;
 
-	FFSM2_INLINE void widePostExit	   (Context& context)	noexcept;
+	FFSM2_INLINE void widePostExit	   (Context& context)		  noexcept;
 };
 
 //------------------------------------------------------------------------------
@@ -4064,22 +4063,22 @@ template <typename T, typename TArgs>
 struct DynamicBox final {
 	using Type = T;
 
-	static constexpr bool isBare() noexcept							{ return false;						}
+	static constexpr bool isBare()							  noexcept	{ return false;								}
 
 	union {
 		Type t_;
 	};
 
-	FFSM2_INLINE  DynamicBox() noexcept {}
-	FFSM2_INLINE ~DynamicBox() noexcept {}
+	FFSM2_INLINE  DynamicBox()								  noexcept	{}
+	FFSM2_INLINE ~DynamicBox()								  noexcept	{}
 
-	FFSM2_INLINE void guard(GuardControlT<TArgs>& control) noexcept	{ Guard<Type>::execute(control);	}
+	FFSM2_INLINE void guard(GuardControlT<TArgs>& control)	  noexcept	{ Guard<Type>::execute(control);			}
 
-	FFSM2_INLINE void construct() noexcept;
-	FFSM2_INLINE void  destruct() noexcept;
+	FFSM2_INLINE void construct()							  noexcept;
+	FFSM2_INLINE void  destruct()							  noexcept;
 
-	FFSM2_INLINE	   Type& get()		 noexcept			{ FFSM2_ASSERT(initialized_); return t_;	}
-	FFSM2_INLINE const Type& get() const noexcept			{ FFSM2_ASSERT(initialized_); return t_;	}
+	FFSM2_INLINE	   Type& get()							  noexcept	{ FFSM2_ASSERT(initialized_); return t_;	}
+	FFSM2_INLINE const Type& get()						const noexcept	{ FFSM2_ASSERT(initialized_); return t_;	}
 
 	FFSM2_IF_ASSERT(bool initialized_ = false);
 
@@ -4096,13 +4095,13 @@ struct StaticBox final {
 
 	Type t_;
 
-	FFSM2_INLINE void guard(GuardControlT<TArgs>& control) noexcept;
+	FFSM2_INLINE void guard(GuardControlT<TArgs>& control)	  noexcept;
 
-	FFSM2_INLINE void construct() noexcept 																{}
-	FFSM2_INLINE void  destruct() noexcept 																{}
+	FFSM2_INLINE void construct()							  noexcept	{}
+	FFSM2_INLINE void  destruct()							  noexcept	{}
 
-	FFSM2_INLINE	   Type& get()		 noexcept					{ return t_;						}
-	FFSM2_INLINE const Type& get() const noexcept					{ return t_;						}
+	FFSM2_INLINE	   Type& get()							  noexcept	{ return t_;								}
+	FFSM2_INLINE const Type& get()						const noexcept	{ return t_;								}
 
 	FFSM2_IF_TYPEINDEX(FFSM2_IF_DEBUG(const std::type_index TYPE = isBare() ? typeid(None) : typeid(Type)));
 };
@@ -4287,6 +4286,7 @@ namespace ffsm2 {
 namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
+// COMMON
 
 template <StateID N, typename TA, typename TH>
 bool
@@ -4522,6 +4522,7 @@ template <typename... TS>
 using WrapInfo = typename WrapInfoT<TS...>::Type;
 
 //------------------------------------------------------------------------------
+// COMMON
 
 template <typename THead>
 struct SI_ final {
@@ -4563,34 +4564,52 @@ struct CI_ final {
 
 	static constexpr Short WIDTH			  = sizeof...(TSubStates);
 
+#ifdef FFSM2_ENABLE_SERIALIZATION
+	static constexpr Long  WIDTH_BITS	  = bitWidth(WIDTH);
+	static constexpr Long  ACTIVE_BITS	  = WIDTH_BITS;
+#endif
+
 	static constexpr Long  STATE_COUNT		  = StateList::SIZE;
 };
 
+// COMMON
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TContext
 		, typename TConfig
 		, typename TStateList
+		FFSM2_IF_SERIALIZATION(, Long NSerialBits)
 		, Long NSubstitutionLimit
 		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload>
 struct ArgsT final {
-	using Context			= TContext;
+	using Context		= TContext;
 
 #ifdef FFSM2_ENABLE_LOG_INTERFACE
-	using Logger			= typename TConfig::LoggerInterface;
+	using Logger		= typename TConfig::LoggerInterface;
 #endif
 
-	using StateList			= TStateList;
+	using StateList		= TStateList;
 
 	static constexpr Long  STATE_COUNT		  = StateList::SIZE;
+
+#ifdef FFSM2_ENABLE_SERIALIZATION
+	static constexpr Short SERIAL_BITS		  = NSerialBits;
+#endif
+
 	static constexpr Short SUBSTITUTION_LIMIT = NSubstitutionLimit;
 
 #ifdef FFSM2_ENABLE_PLANS
 	static constexpr Long  TASK_CAPACITY	  = NTaskCapacity;
 #endif
 
-	using Payload			= TPayload;
+	using Payload		= TPayload;
+
+#ifdef FFSM2_ENABLE_SERIALIZATION
+	using SerialBuffer	= StreamBufferT  <SERIAL_BITS>;
+	using WriteStream	= BitWriteStreamT<SERIAL_BITS>;
+	using ReadStream	= BitReadStreamT <SERIAL_BITS>;
+#endif
 };
 
 //------------------------------------------------------------------------------
@@ -4605,7 +4624,7 @@ template <StateID, typename, Short, typename...>
 struct CS_;
 
 template <typename, typename>
-class RW_;
+class RC_;
 
 //------------------------------------------------------------------------------
 
@@ -4653,18 +4672,23 @@ struct RF_ final {
 	using Task			= typename TConfig::Task;
 #endif
 
+#ifdef FFSM2_ENABLE_SERIALIZATION
+	static constexpr Long  ACTIVE_BITS			= Apex::ACTIVE_BITS;
+#endif
+
 	using StateList		= typename Apex::StateList;
 
 	using Args			= ArgsT<Context
 							  , TConfig
 							  , StateList
+							  FFSM2_IF_SERIALIZATION(, ACTIVE_BITS)
 							  , SUBSTITUTION_LIMIT
 							  FFSM2_IF_PLANS(, TASK_CAPACITY)
 							  , Payload>;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	using Instance		= RW_<TConfig, Apex>;
+	using Instance		= RC_<TConfig, Apex>;
 
 	using Control		= ControlT	   <Args>;
 	using FullControl	= FullControlT <Args>;
@@ -4798,7 +4822,6 @@ struct CS_ final {
 	FFSM2_INLINE void	wideChangeToRequested(PlanControl&  control, const Short prong) noexcept;
 
 	//----------------------------------------------------------------------
-
 	LMaterial lHalf;
 	RMaterial rHalf;
 };
@@ -4851,7 +4874,6 @@ struct CS_<NStateId, TArgs, NIndex, TState> final {
 	FFSM2_INLINE void	wideChangeToRequested(PlanControl&  control, const Short prong) noexcept;
 
 	//----------------------------------------------------------------------
-
 	State state;
 };
 
@@ -4864,6 +4886,7 @@ namespace ffsm2 {
 namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
+// COMMON
 
 template <StateID N, typename TA, Short NI, typename... TS>
 bool
@@ -4955,6 +4978,9 @@ CS_<N, TA, NI, TS...>::wideReact(FullControl& control,
 
 //------------------------------------------------------------------------------
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// COMMON
+
 template <StateID N, typename TA, Short NI, typename... TS>
 bool
 CS_<N, TA, NI, TS...>::wideExitGuard(GuardControl& control,
@@ -4999,6 +5025,7 @@ CS_<N, TA, NI, TS...>::wideDestruct(PlanControl& control,
 }
 
 //------------------------------------------------------------------------------
+// COMMON
 
 template <StateID N, typename TA, Short NI, typename... TS>
 void
@@ -5021,6 +5048,7 @@ namespace ffsm2 {
 namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
+// COMMON
 
 template <StateID N, typename TA, Short NI, typename T>
 bool
@@ -5095,6 +5123,7 @@ CS_<N, TA, NI, T>::wideReact(FullControl& control,
 }
 
 //------------------------------------------------------------------------------
+// COMMON
 
 template <StateID N, typename TA, Short NI, typename T>
 bool
@@ -5162,6 +5191,13 @@ struct C_ final {
 
 	using SubStates		= CS_<0, Args, 0, TSubStates...>;
 
+#ifdef FFSM2_ENABLE_SERIALIZATION
+	using Info			= CI_<Head, TSubStates...>;
+
+	static constexpr Short WIDTH		  = Info::WIDTH;
+	static constexpr Short WIDTH_BITS	  = Info::WIDTH_BITS;
+#endif
+
 	//----------------------------------------------------------------------
 
 	FFSM2_INLINE bool deepForwardEntryGuard(GuardControl& control) noexcept;
@@ -5189,6 +5225,16 @@ struct C_ final {
 	FFSM2_INLINE void deepChangeToRequested(PlanControl&  control) noexcept;
 
 	//----------------------------------------------------------------------
+
+#ifdef FFSM2_ENABLE_SERIALIZATION
+	using WriteStream	= typename Args::WriteStream;
+	using ReadStream	= typename Args::ReadStream;
+
+	FFSM2_INLINE void	 deepSaveActive	   (const Registry& registry, WriteStream& stream) const noexcept;
+	FFSM2_INLINE void	 deepLoadRequested (	  Registry& registry, ReadStream&  stream) const noexcept;
+#endif
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	HeadState _headState;
 	SubStates _subStates;
@@ -5372,6 +5418,7 @@ C_<TA, TH, TS...>::deepDestruct(PlanControl& control) noexcept {
 }
 
 //------------------------------------------------------------------------------
+// COMMON
 
 template <typename TA, typename TH, typename... TS>
 void
@@ -5399,34 +5446,55 @@ C_<TA, TH, TS...>::deepChangeToRequested(PlanControl& control) noexcept {
 	}
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
-}
-}
-namespace ffsm2 {
-namespace detail {
-
-////////////////////////////////////////////////////////////////////////////////
-
-}
-}
-
-namespace ffsm2 {
-namespace detail {
-
-////////////////////////////////////////////////////////////////////////////////
-
-template <FeatureTag, typename, Long FFSM2_IF_PLANS(, Long), typename>
-struct GW_;
-
 //------------------------------------------------------------------------------
+
+#ifdef FFSM2_ENABLE_SERIALIZATION
+
+template <typename TA, typename TH, typename... TS>
+void
+C_<TA, TH, TS...>::deepSaveActive(const Registry& registry,
+								  WriteStream& stream) const noexcept
+{
+	stream.template write<WIDTH_BITS>(registry.active);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <typename TA, typename TH, typename... TS>
+void
+C_<TA, TH, TS...>::deepLoadRequested(Registry& registry,
+									 ReadStream& stream) const noexcept
+{
+	registry.requested = stream.template read<WIDTH_BITS>();
+	FFSM2_ASSERT(registry.requested < WIDTH);
+}
+
+#endif
+
+// COMMON
+////////////////////////////////////////////////////////////////////////////////
+
+}
+}
+namespace ffsm2 {
+namespace detail {
+
+////////////////////////////////////////////////////////////////////////////////
+
+}
+}
+
+namespace ffsm2 {
+namespace detail {
+
+////////////////////////////////////////////////////////////////////////////////
 
 template <FeatureTag NFeatureTag
 		, typename TContext
 		, Long NSubstitutionLimit
 		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload>
-struct G_ {
+struct G_ final {
 	static constexpr FeatureTag FEATURE_TAG = NFeatureTag;
 
 	using Context			 = TContext;
@@ -5438,7 +5506,7 @@ struct G_ {
 	static constexpr Long SUBSTITUTION_LIMIT = NSubstitutionLimit;
 
 #ifdef FFSM2_ENABLE_PLANS
-	static constexpr Long TASK_CAPACITY	  = NTaskCapacity;
+	static constexpr Long TASK_CAPACITY		 = NTaskCapacity;
 #endif
 
 	using Payload			 = TPayload;
@@ -5451,56 +5519,30 @@ struct G_ {
 	/// @brief Set Context type
 	/// @tparam T Context type for data shared between states and/or data interface between FSM and external code
 	template <typename T>
-	using ContextT			 = GW_<FEATURE_TAG, T	   , SUBSTITUTION_LIMIT FFSM2_IF_PLANS(, TASK_CAPACITY), Payload>;
+	using ContextT			 = G_<FEATURE_TAG, T	  , SUBSTITUTION_LIMIT FFSM2_IF_PLANS(, TASK_CAPACITY), Payload>;
+
+#ifdef FFSM2_ENABLE_UTILITY_THEORY
+#endif
 
 	/// @brief Set Substitution limit
 	/// @tparam N Maximum number times 'guard()' methods can substitute their states for others
 	template <Long N>
-	using SubstitutionLimitN = GW_<FEATURE_TAG, Context, N					FFSM2_IF_PLANS(, TASK_CAPACITY), Payload>;
+	using SubstitutionLimitN = G_<FEATURE_TAG, Context, N				   FFSM2_IF_PLANS(, TASK_CAPACITY), Payload>;
 
 #ifdef FFSM2_ENABLE_PLANS
 
 	/// @brief Set Task capacity
 	/// @tparam N Maximum number of tasks across all plans
 	template <Long N>
-	using TaskCapacityN		 = GW_<FEATURE_TAG, Context, SUBSTITUTION_LIMIT				   , N             , Payload>;
+	using TaskCapacityN		 = G_<FEATURE_TAG, Context, SUBSTITUTION_LIMIT				  , N             , Payload>;
 
 #endif
 
 	/// @brief Set Transition Payload type
 	/// @tparam T Utility type for 'TUtility State::utility() const' method
 	template <typename T>
-	using PayloadT			 = GW_<FEATURE_TAG, Context, SUBSTITUTION_LIMIT FFSM2_IF_PLANS(, TASK_CAPACITY), T      >;
+	using PayloadT			 = G_<FEATURE_TAG, Context, SUBSTITUTION_LIMIT FFSM2_IF_PLANS(, TASK_CAPACITY), T      >;
 };
-
-//------------------------------------------------------------------------------
-
-template <FeatureTag NFeatureTag
-		, typename TContext
-		, Long NSubstitutionLimit
-		FFSM2_IF_PLANS(, Long NTaskCapacity)
-		, typename TPayload>
-struct GW_
-	: G_  <NFeatureTag, TContext , NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>
-{};
-
-template <FeatureTag NFeatureTag
-		, typename TContext
-		, Long NSubstitutionLimit
-		FFSM2_IF_PLANS(, Long NTaskCapacity)
-		, typename TPayload>
-struct GW_<NFeatureTag, TContext&, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>
-	: G_  <NFeatureTag, TContext&, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>
-{};
-
-template <FeatureTag NFeatureTag
-		, typename TContext
-		, Long NSubstitutionLimit
-		FFSM2_IF_PLANS(, Long NTaskCapacity)
-		, typename TPayload>
-struct GW_<NFeatureTag, TContext*, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>
-	: G_  <NFeatureTag, TContext*, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>
-{};
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -5512,8 +5554,8 @@ template <FeatureTag NFeatureTag
 		, Long NSubstitutionLimit
 		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload>
-struct M_	   <GW_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>> {
-	using Cfg = GW_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>;
+struct M_	   <G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>> {
+	using Cfg = G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>;
 
 	static constexpr FeatureTag FEATURE_TAG = NFeatureTag;
 
@@ -5526,7 +5568,11 @@ struct M_	   <GW_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTa
 	using LoggerInterface	= typename Cfg::LoggerInterface;
 #endif
 
+#ifdef FFSM2_ENABLE_UTILITY_THEORY
+#endif
+
 	//----------------------------------------------------------------------
+	// COMMON
 
 	/// @brief Root
 	/// @tparam THead Head state
@@ -5539,7 +5585,11 @@ struct M_	   <GW_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTa
 	template <				  typename... TSubStates>
 	using PeerRoot		 = RF_<Cfg, CI_<void,  TSubStates...>>;
 
-	//----------------------------------------------------------------------
+	// COMMON
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+#ifdef FFSM2_ENABLE_UTILITY_THEORY
+#endif
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -5555,7 +5605,7 @@ template <typename TContext = EmptyContext
 		, Long NSubstitutionLimit = 4
 		FFSM2_IF_PLANS(, Long NTaskCapacity = INVALID_LONG)
 		, typename TPayload = void>
-using ConfigT = detail::GW_<FFSM2_FEATURE_TAG, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>;
+using ConfigT = detail::G_<FFSM2_FEATURE_TAG, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>;
 
 /// @brief Type configuration for MachineT<>
 using Config = ConfigT<>;
@@ -5615,6 +5665,11 @@ private:
 	static constexpr Long TASK_CAPACITY = Forward::TASK_CAPACITY;
 #endif
 
+#ifdef FFSM2_ENABLE_SERIALIZATION
+	using WriteStream			= typename Args::WriteStream;
+	using ReadStream			= typename Args::ReadStream;
+#endif
+
 public:
 	/// @brief Transition
 	using Transition			= typename Control::Transition;
@@ -5633,17 +5688,17 @@ public:
 	FFSM2_INLINE explicit R_(Context& context
 						  FFSM2_IF_LOG_INTERFACE(, Logger* const logger = nullptr)) noexcept;
 
-	~R_() noexcept;
+	FFSM2_INLINE ~R_() noexcept;
 
 	//----------------------------------------------------------------------
 
 	/// @brief Access context
 	/// @return context
-		  Context& context()	   { return _context; }
+	FFSM2_INLINE	   Context& context()					  noexcept { return _context; }
 
 	/// @brief Access context
 	/// @return context
-	const Context& context() const { return _context; }
+	FFSM2_INLINE const Context& context()				const noexcept { return _context; }
 
 	//----------------------------------------------------------------------
 
@@ -5651,7 +5706,7 @@ public:
 	/// @tparam TState State type
 	/// @return Numeric state identifier
 	template <typename TState>
-	static constexpr StateID stateId()						noexcept	{ return index<StateList, TState>();			}
+	static constexpr StateID stateId()						  noexcept	{ return index<StateList, TState>();			}
 
 	//----------------------------------------------------------------------
 
@@ -5662,37 +5717,60 @@ public:
 	/// @tparam TEvent Event type
 	/// @param event Event to react to
 	template <typename TEvent>
-	FFSM2_INLINE void react(const TEvent& event)			noexcept;
+	FFSM2_INLINE void react(const TEvent& event)			  noexcept;
 
 	//----------------------------------------------------------------------
 
 	/// @brief Get current active state ID
 	/// @return Current active state ID
-	FFSM2_INLINE StateID activeStateId()			  const	noexcept	{ return _registry.active;						}
+	FFSM2_INLINE StateID activeStateId()				const noexcept	{ return _registry.active;						}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	/// @brief Check if a state is active
 	/// @param stateId Destination state identifier
 	/// @return State active status
-	FFSM2_INLINE bool isActive(const StateID stateId) const	noexcept	{ return _registry.active == stateId;			}
+	FFSM2_INLINE bool isActive(const StateID stateId)	const noexcept	{ return _registry.active == stateId;			}
 
 	/// @brief Check if a state is active
 	/// @tparam TState Destination state type
 	/// @return State active status
 	template <typename TState>
-	FFSM2_INLINE bool isActive()					  const	noexcept	{ return _registry.active == stateId<TState>();	}
+	FFSM2_INLINE bool isActive()						const noexcept	{ return _registry.active == stateId<TState>();	}
 
 	//------------------------------------------------------------------------------
+	// COMMON
 
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
-	FFSM2_INLINE void changeTo(const StateID stateId)		noexcept;
+	FFSM2_INLINE void changeTo(const StateID stateId)		  noexcept;
 
 	/// @brief Transition into a state
 	/// @tparam TState Destination state type
 	template <typename TState>
-	FFSM2_INLINE void changeTo()							noexcept	{ changeTo (stateId<TState>());					}
+	FFSM2_INLINE void changeTo()							  noexcept	{ changeTo (stateId<TState>());					}
+
+	// COMMON
+	//------------------------------------------------------------------------------
+
+#ifdef FFSM2_ENABLE_SERIALIZATION
+
+	/// @brief Buffer for serialization
+	/// @see https://doc.hfsm.dev/user-guide/debugging-and-tools/serialization
+	/// @see FFSM2_ENABLE_SERIALIZATION
+	using SerialBuffer			= typename Args::SerialBuffer;
+
+	/// @brief Serialize FSM into 'buffer'
+	/// @param buffer 'SerialBuffer' to serialize to
+	/// @see FFSM2_ENABLE_SERIALIZATION
+	void save(		SerialBuffer& buffer)				const noexcept;
+
+	/// @brief De-serialize FSM from 'buffer'
+	/// @param buffer 'SerialBuffer' to de-serialize from
+	/// @see FFSM2_ENABLE_SERIALIZATION
+	void load(const SerialBuffer& buffer)					  noexcept;
+
+#endif
 
 	//------------------------------------------------------------------------------
 
@@ -5701,14 +5779,14 @@ public:
 	/// @brief Attach logger
 	/// @param logger A logger implementing 'ffsm2::LoggerInterfaceT<>' interface
 	/// @see FFSM2_ENABLE_LOG_INTERFACE
-	inline void attachLogger(Logger* const logger)			noexcept	{ _logger = logger;								}
+	FFSM2_INLINE void attachLogger(Logger* const logger)	  noexcept	{ _logger = logger;								}
 
 #endif
 
 	//----------------------------------------------------------------------
 
 private:
-	void initialEnter() noexcept;
+	void initialEnter()										  noexcept;
 
 	void processTransitions(TransitionSets& currentTransitions) noexcept;
 
@@ -5745,10 +5823,10 @@ template <FeatureTag NFeatureTag
 		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload
 		, typename TApex>
-class RP_		   <GW_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
-	: public	 R_<GW_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
+class RP_		   <G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
+	: public	 R_<G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
 {
-	using Base = R_<GW_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
+	using Base = R_<G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
 
 	using Transition			= TransitionT<TPayload>;
 
@@ -5762,35 +5840,40 @@ public:
 	/// @tparam TState State type
 	/// @return Numeric state identifier
 	template <typename TState>
-	static constexpr StateID stateId()					 noexcept	{ return Base::template stateId<TState>();				}
+	static constexpr StateID stateId()					 	  noexcept	{ return Base::template stateId<TState>();				}
 
 	//------------------------------------------------------------------------------
+	// COMMON
 
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
 	FFSM2_INLINE void changeWith(const StateID  stateId,
-								 const Payload& payload) noexcept;
+								 const Payload& payload)	  noexcept;
 
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
 	FFSM2_INLINE void changeWith(const StateID  stateId,
-									  Payload&& payload) noexcept;
+									  Payload&& payload)	  noexcept;
 
 	/// @brief Transition into a state
 	/// @tparam TState Destination state type
 	/// @param payload Payload
 	template <typename TState>
-	FFSM2_INLINE void changeWith(const Payload& payload) noexcept	{ changeWith(stateId<TState>(),			  payload );	}
+	FFSM2_INLINE void changeWith(const Payload& payload)	  noexcept	{ changeWith(stateId<TState>(),			  payload );	}
 
 	/// @brief Transition into a state
 	/// @tparam TState Destination state type
 	/// @param payload Payload
 	template <typename TState>
-	FFSM2_INLINE void changeWith(	  Payload&& payload) noexcept	{ changeWith(stateId<TState>(), std::move(payload));	}
+	FFSM2_INLINE void changeWith(	  Payload&& payload)	  noexcept	{ changeWith(stateId<TState>(), std::move(payload));	}
 
+	// COMMON
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+#ifdef FFSM2_ENABLE_UTILITY_THEORY
+#endif
 
 protected:
 	using Base::_context;
@@ -5801,17 +5884,17 @@ private:
 	FFSM2_IF_LOG_INTERFACE(using Base::_logger);
 };
 
-//------------------------------------------------------------------------------
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <FeatureTag NFeatureTag
 		, typename TContext
 		, Long NSubstitutionLimit
 		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TApex>
-class RP_		   <GW_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), void>, TApex>
-	: public	 R_<GW_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), void>, TApex>
+class RP_		   <G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), void>, TApex>
+	: public	 R_<G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), void>, TApex>
 {
-	using Base = R_<GW_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), void>, TApex>;
+	using Base = R_<G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), void>, TApex>;
 
 public:
 	using Base::Base;
@@ -5822,11 +5905,11 @@ public:
 /// @brief FSM Root
 /// @tparam Cfg Type configuration
 /// @tparam TApex Root region type
-template <typename TConfig
-		, typename TApex>
-class RW_;
+template <typename, typename>
+class RC_;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// TContext
 
 /// @brief FSM Root
 /// @tparam Cfg Type configuration
@@ -5837,32 +5920,30 @@ template <FeatureTag NFeatureTag
 		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload
 		, typename TApex>
-class RW_		<::ffsm2::detail::GW_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
-	: public RP_<::ffsm2::detail::GW_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
+class RC_			<G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
+	: public	 RP_<G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
 {
-	using Cfg =  ::ffsm2::detail::GW_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>;
-
-	using Base		= RP_<Cfg, TApex>;
-
-#ifdef FFSM2_ENABLE_LOG_INTERFACE
-	using Logger	= typename Cfg::LoggerInterface;
-#endif
+	using Base = RP_<G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
 
 public:
 	static constexpr FeatureTag FEATURE_TAG = Base::FEATURE_TAG;
 
-	using Context	= typename Base::Context;
+	using Context	= TContext;
 	using Payload	= typename Base::Payload;
 
+#ifdef FFSM2_ENABLE_LOG_INTERFACE
+	using Logger	= typename Base::Logger;
+#endif
+
 public:
-	explicit FFSM2_INLINE RW_(Context& context
+	FFSM2_INLINE explicit RC_(Context& context
 							FFSM2_IF_LOG_INTERFACE(, Logger* const logger = nullptr)) noexcept
 		: Base{context
 			 FFSM2_IF_LOG_INTERFACE(, logger)}
 	{}
 
-	void setContext(const Context&  context) { _context =			context ; }
-	void setContext(	  Context&& context) { _context = std::move(context); }
+	FFSM2_INLINE void setContext(const Context&  context)	  noexcept { _context =			  context ; }
+	FFSM2_INLINE void setContext(	   Context&& context)	  noexcept { _context = std::move(context); }
 
 private:
 	using Base::_context;
@@ -5880,16 +5961,10 @@ template <FeatureTag NFeatureTag
 		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload
 		, typename TApex>
-class RW_		<::ffsm2::detail::GW_<NFeatureTag, TContext&, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
-	: public RP_<::ffsm2::detail::GW_<NFeatureTag, TContext&, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
+class RC_			<G_<NFeatureTag, TContext&, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
+	: public	 RP_<G_<NFeatureTag, TContext&, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
 {
-	using Cfg =  ::ffsm2::detail::GW_<NFeatureTag, TContext&, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>;
-
-	using Base		= RP_<Cfg, TApex>;
-
-#ifdef FFSM2_ENABLE_LOG_INTERFACE
-	using Logger	= typename Cfg::LoggerInterface;
-#endif
+	using Base = RP_<G_<NFeatureTag, TContext&, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
 
 public:
 	static constexpr FeatureTag FEATURE_TAG = Base::FEATURE_TAG;
@@ -5897,14 +5972,18 @@ public:
 	using Context	= typename Base::Context;
 	using Payload	= typename Base::Payload;
 
+#ifdef FFSM2_ENABLE_LOG_INTERFACE
+	using Logger	= typename Base::Logger;
+#endif
+
 public:
-	explicit FFSM2_INLINE RW_(Context& context
+	FFSM2_INLINE explicit RC_(Context context
 							FFSM2_IF_LOG_INTERFACE(, Logger* const logger = nullptr)) noexcept
 		: Base{context
 			 FFSM2_IF_LOG_INTERFACE(, logger)}
 	{}
 
-	void setContext(Context context) { _context = context; }
+	FFSM2_INLINE void setContext(Context context)			  noexcept { _context = context; }
 
 private:
 	using Base::_context;
@@ -5922,16 +6001,10 @@ template <FeatureTag NFeatureTag
 		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload
 		, typename TApex>
-class RW_		<::ffsm2::detail::GW_<NFeatureTag, TContext*, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
-	: public RP_<::ffsm2::detail::GW_<NFeatureTag, TContext*, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
+class RC_			<G_<NFeatureTag, TContext*, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
+	: public	 RP_<G_<NFeatureTag, TContext*, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
 {
-	using Cfg =  ::ffsm2::detail::GW_<NFeatureTag, TContext*, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>;
-
-	using Base		= RP_<Cfg, TApex>;
-
-#ifdef FFSM2_ENABLE_LOG_INTERFACE
-	using Logger	= typename Cfg::LoggerInterface;
-#endif
+	using Base = RP_<G_<NFeatureTag, TContext*, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
 
 public:
 	static constexpr FeatureTag FEATURE_TAG = Base::FEATURE_TAG;
@@ -5939,21 +6012,25 @@ public:
 	using Context	= typename Base::Context;
 	using Payload	= typename Base::Payload;
 
+#ifdef FFSM2_ENABLE_LOG_INTERFACE
+	using Logger	= typename Base::Logger;
+#endif
+
 public:
-	explicit FFSM2_INLINE RW_(Context context = nullptr
+	FFSM2_INLINE explicit RC_(Context context = nullptr
 							FFSM2_IF_LOG_INTERFACE(, Logger* const logger = nullptr)) noexcept
 		: Base{context
 			 FFSM2_IF_LOG_INTERFACE(, logger)}
 	{}
 
-	void setContext(Context context) { _context = context; }
+	FFSM2_INLINE void setContext(Context context)			  noexcept { _context = context; }
 
 private:
 	using Base::_context;
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// TContext == ::ffsm2::EmptyContext
+// TContext == EmptyContext
 
 /// @brief FSM Root
 /// @tparam Cfg Type configuration
@@ -5963,26 +6040,24 @@ template <FeatureTag NFeatureTag
 		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload
 		, typename TApex>
-class RW_		<::ffsm2::detail::GW_<NFeatureTag, ::ffsm2::EmptyContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
-	: public RP_<::ffsm2::detail::GW_<NFeatureTag, ::ffsm2::EmptyContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
-	, ::ffsm2::EmptyContext
+class RC_			<G_<NFeatureTag, EmptyContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
+	: public	 RP_<G_<NFeatureTag, EmptyContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
+	, EmptyContext
 {
-	using Cfg =  ::ffsm2::detail::GW_<NFeatureTag, ::ffsm2::EmptyContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>;
-
-	using Context	= typename Cfg::Context;
-	using Base		= RP_<Cfg, TApex>;
-
-#ifdef FFSM2_ENABLE_LOG_INTERFACE
-	using Logger	= typename Cfg::LoggerInterface;
-#endif
+	using Base = RP_<G_<NFeatureTag, EmptyContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
 
 public:
 	static constexpr FeatureTag FEATURE_TAG = Base::FEATURE_TAG;
 
+	using Context	= typename Base::Context;
 	using Payload	= typename Base::Payload;
 
+#ifdef FFSM2_ENABLE_LOG_INTERFACE
+	using Logger	= typename Base::Logger;
+#endif
+
 public:
-	explicit FFSM2_INLINE RW_(FFSM2_IF_LOG_INTERFACE(Logger* const logger = nullptr)) noexcept
+	explicit FFSM2_INLINE RC_(FFSM2_IF_LOG_INTERFACE(Logger* const logger = nullptr)) noexcept
 		: Base{static_cast<Context&>(*this)
 			 FFSM2_IF_LOG_INTERFACE(, logger)}
 	{}
@@ -6076,6 +6151,62 @@ R_<TG, TA>::changeTo(const StateID stateId) noexcept {
 
 //------------------------------------------------------------------------------
 
+#ifdef FFSM2_ENABLE_SERIALIZATION
+
+template <typename TG, typename TA>
+void
+R_<TG, TA>::save(SerialBuffer& _buffer) const noexcept {
+	WriteStream stream{_buffer};
+
+	// TODO: save _registry
+	// TODO: save _requests
+	// TODO: save _rng						// FFSM2_IF_UTILITY_THEORY()
+	// TODO: save _planData					// FFSM2_IF_PLANS()
+	// TODO: save _previousTransitions		// FFSM2_IF_TRANSITION_HISTORY()
+	// TODO: save _activityHistory			// FFSM2_IF_STRUCTURE_REPORT()
+
+	_apex.deepSaveActive(_registry, stream);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <typename TG, typename TA>
+void
+R_<TG, TA>::load(const SerialBuffer& buffer) noexcept {
+	_request.clear();
+
+	PlanControl control{_context
+					  , _registry
+					  , _request
+					  FFSM2_IF_PLANS(, _planData)
+					  FFSM2_IF_LOG_INTERFACE(, _logger)};
+
+	_apex.deepExit	  (control);
+	_apex.deepDestruct(control);
+
+	_registry.clearRequests();
+	_request.clear();
+
+	ReadStream stream{buffer};
+
+	// TODO: load _registry
+	// TODO: load _requests
+	// TODO: load _rng					// FFSM2_IF_UTILITY_THEORY()
+	// TODO: load _planData				// FFSM2_IF_PLANS()
+	// TODO: load _previousTransitions	// FFSM2_IF_TRANSITION_HISTORY()
+	// TODO: load _activityHistory		// FFSM2_IF_STRUCTURE_REPORT()
+
+	_apex.deepLoadRequested(_registry, stream);
+
+	_apex.deepConstruct(control);
+	_apex.deepEnter	   (control);
+}
+
+#endif
+
+//------------------------------------------------------------------------------
+// COMMON
+
 template <typename TG, typename TA>
 void
 R_<TG, TA>::initialEnter() noexcept {
@@ -6159,7 +6290,9 @@ R_<TG, TA>::processTransitions(TransitionSets& currentTransitions) noexcept {
 	FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
 }
 
+// COMMON
 //------------------------------------------------------------------------------
+// COMMON
 
 template <typename TG, typename TA>
 bool
@@ -6196,27 +6329,37 @@ R_<TG, TA>::cancelledByGuards(const TransitionSets& currentTransitions,
 		   _apex.deepForwardEntryGuard(guardControl);
 }
 
+// COMMON
 ////////////////////////////////////////////////////////////////////////////////
+// COMMON
 
 template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
 void
-RP_<GW_<NFT, TC, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  stateId,
-																 const Payload& payload) noexcept
+RP_<G_<NFT, TC, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  stateId,
+																const Payload& payload) noexcept
 {
 	_request = Transition{stateId, payload};
 
 	FFSM2_LOG_TRANSITION(_context, INVALID_STATE_ID, stateId);
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
 void
-RP_<GW_<NFT, TC, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  stateId,
-																	  Payload&& payload) noexcept
+RP_<G_<NFT, TC, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  stateId,
+																	 Payload&& payload) noexcept
 {
 	_request = Transition{stateId, std::move(payload)};
 
 	FFSM2_LOG_TRANSITION(_context, INVALID_STATE_ID, stateId);
 }
+
+// COMMON
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+#ifdef FFSM2_ENABLE_UTILITY_THEORY
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -6,6 +6,7 @@ namespace detail {
 template <typename
 		, typename
 		, typename
+		FFSM2_IF_SERIALIZATION(, Long)
 		, Long
 		FFSM2_IF_PLANS(, Long)
 		, typename>
