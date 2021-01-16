@@ -115,11 +115,10 @@ using UnsignedBitWidth = typename UnsignedBitWidthT<NCapacity>::Type;
 
 //------------------------------------------------------------------------------
 
-constexpr Long
-contain(const Long x,
-		const Long to) noexcept
-{
-	return (x + (to - 1)) / to;
+template <typename T1, typename T2>
+constexpr T1
+contain(const T1 x, const T2 to) noexcept {
+	return (x + ((T1) to - 1)) / (T1) to;
 }
 
 //------------------------------------------------------------------------------

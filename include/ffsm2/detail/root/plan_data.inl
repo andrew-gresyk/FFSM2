@@ -5,9 +5,9 @@ namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC, typename TTP>
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
 void
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::clearTaskStatus(const StateID stateId) noexcept {
+PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::clearTaskStatus(const StateID stateId) noexcept {
 	if (stateId != INVALID_STATE_ID) {
 		tasksSuccesses.clear(stateId);
 		tasksFailures .clear(stateId);
@@ -16,9 +16,9 @@ PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::clearTaskStatus(const StateID stat
 
 //------------------------------------------------------------------------------
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC, typename TTP>
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
 void
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::verifyEmptyStatus(const StateID FFSM2_IF_ASSERT(stateId)) const noexcept {
+PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::verifyEmptyStatus(const StateID FFSM2_IF_ASSERT(stateId)) const noexcept {
 #ifdef FFSM2_ENABLE_ASSERT
 
 	if (stateId != INVALID_STATE_ID) {
@@ -33,17 +33,17 @@ PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::verifyEmptyStatus(const StateID FF
 
 #ifdef FFSM2_ENABLE_ASSERT
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC, typename TTP>
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
 void
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::verifyPlans() const noexcept {
+PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::verifyPlans() const noexcept {
 	FFSM2_ASSERT(tasks.count() == verifyPlan());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC, typename TTP>
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
 Long
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::verifyPlan() const noexcept {
+PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::verifyPlan() const noexcept {
 	Long length = 0;
 	const Bounds& bounds = tasksBounds;
 
@@ -62,9 +62,8 @@ PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::verifyPlan() const noexcept {
 				if (fast != INVALID_LONG) {
 					fast = taskLinks[fast].next;
 
-					if (fast != INVALID_LONG) {
+					if (fast != INVALID_LONG)
 						fast = taskLinks[fast].next;
-					}
 
 					FFSM2_ASSERT(fast == INVALID_LONG || slow != fast);
 				}
@@ -84,9 +83,9 @@ PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, TTP>>::verifyPlan() const noexcept {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC>
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC>
 void
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::clearTaskStatus(const StateID stateId) noexcept {
+PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::clearTaskStatus(const StateID stateId) noexcept {
 	if (stateId != INVALID_STATE_ID) {
 		tasksSuccesses.clear(stateId);
 		tasksFailures .clear(stateId);
@@ -95,9 +94,9 @@ PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::clearTaskStatus(const StateID sta
 
 //------------------------------------------------------------------------------
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC>
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC>
 void
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::verifyEmptyStatus(const StateID FFSM2_IF_ASSERT(stateId)) const noexcept {
+PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::verifyEmptyStatus(const StateID FFSM2_IF_ASSERT(stateId)) const noexcept {
 #ifdef FFSM2_ENABLE_ASSERT
 
 	if (stateId != INVALID_STATE_ID) {
@@ -112,17 +111,17 @@ PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::verifyEmptyStatus(const StateID F
 
 #ifdef FFSM2_ENABLE_ASSERT
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC>
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC>
 void
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::verifyPlans() const noexcept {
+PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::verifyPlans() const noexcept {
 	FFSM2_ASSERT(tasks.count() == verifyPlan());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename TC, typename TG, typename TSL, Long NSL, Long NTC>
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC>
 Long
-PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::verifyPlan() const noexcept {
+PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::verifyPlan() const noexcept {
 	Long length = 0;
 	const Bounds& bounds = tasksBounds;
 
@@ -141,9 +140,8 @@ PlanDataT<ArgsT<TC, TG, TSL, NSL, NTC, void>>::verifyPlan() const noexcept {
 				if (fast != INVALID_LONG) {
 					fast = taskLinks[fast].next;
 
-					if (fast != INVALID_LONG) {
+					if (fast != INVALID_LONG)
 						fast = taskLinks[fast].next;
-					}
 
 					FFSM2_ASSERT(fast == INVALID_LONG || slow != fast);
 				}

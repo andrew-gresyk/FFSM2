@@ -26,6 +26,13 @@ struct C_ final {
 
 	using SubStates		= CS_<0, Args, 0, TSubStates...>;
 
+#ifdef FFSM2_ENABLE_SERIALIZATION
+	using Info			= CI_<Head, TSubStates...>;
+
+	static constexpr Short WIDTH		  = Info::WIDTH;
+	static constexpr Short WIDTH_BITS	  = Info::WIDTH_BITS;
+#endif
+
 	//----------------------------------------------------------------------
 
 	FFSM2_INLINE bool deepForwardEntryGuard(GuardControl& control) noexcept;
@@ -53,6 +60,16 @@ struct C_ final {
 	FFSM2_INLINE void deepChangeToRequested(PlanControl&  control) noexcept;
 
 	//----------------------------------------------------------------------
+
+#ifdef FFSM2_ENABLE_SERIALIZATION
+	using WriteStream	= typename Args::WriteStream;
+	using ReadStream	= typename Args::ReadStream;
+
+	FFSM2_INLINE void	 deepSaveActive	   (const Registry& registry, WriteStream& stream) const noexcept;
+	FFSM2_INLINE void	 deepLoadRequested (	  Registry& registry, ReadStream&  stream) const noexcept;
+#endif
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	HeadState _headState;
 	SubStates _subStates;

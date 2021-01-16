@@ -26,6 +26,7 @@ struct Bounds {
 template <typename
 		, typename
 		, typename
+		FFSM2_IF_SERIALIZATION(, Long)
 		, Long
 		, Long
 		, typename>
@@ -39,12 +40,14 @@ struct PlanDataT;
 template <typename TContext
 		, typename TConfig
 		, typename TStateList
+		FFSM2_IF_SERIALIZATION(, Long NSerialBits)
 		, Long NSubstitutionLimit
 		, Long NTaskCapacity
 		, typename TPayload>
 struct PlanDataT<ArgsT<TContext
 					 , TConfig
 					 , TStateList
+					 FFSM2_IF_SERIALIZATION(, NSerialBits)
 					 , NSubstitutionLimit
 					 , NTaskCapacity
 					 , TPayload>>
@@ -56,10 +59,10 @@ struct PlanDataT<ArgsT<TContext
 
 	using Task			= TaskT<Payload>;
 	using Tasks			= TaskListT<Payload, TASK_CAPACITY>;
-	using TaskLinks		= StaticArray<TaskLink, TASK_CAPACITY>;
-	using Payloads		= StaticArray<Payload, TASK_CAPACITY>;
+	using TaskLinks		= StaticArrayT<TaskLink, TASK_CAPACITY>;
+	using Payloads		= StaticArrayT<Payload,  TASK_CAPACITY>;
 
-	using TasksBits		= BitArray<StateID, StateList::SIZE>;
+	using TasksBits		= BitArrayT<StateID, StateList::SIZE>;
 
 	Tasks tasks;
 	TaskLinks taskLinks;
@@ -72,7 +75,6 @@ struct PlanDataT<ArgsT<TContext
 	bool planExists;
 
 	void clearTaskStatus(const StateID stateId) noexcept;
-
 	void verifyEmptyStatus(const StateID stateId) const noexcept;
 
 #ifdef FFSM2_ENABLE_ASSERT
@@ -86,11 +88,13 @@ struct PlanDataT<ArgsT<TContext
 template <typename TContext
 		, typename TConfig
 		, typename TStateList
+		FFSM2_IF_SERIALIZATION(, Long NSerialBits)
 		, Long NSubstitutionLimit
 		, Long NTaskCapacity>
 struct PlanDataT<ArgsT<TContext
 					 , TConfig
 					 , TStateList
+					 FFSM2_IF_SERIALIZATION(, NSerialBits)
 					 , NSubstitutionLimit
 					 , NTaskCapacity
 					 , void>>
@@ -101,9 +105,9 @@ struct PlanDataT<ArgsT<TContext
 
 	using Task			= TaskT<void>;
 	using Tasks			= TaskListT<void, TASK_CAPACITY>;
-	using TaskLinks		= StaticArray<TaskLink, TASK_CAPACITY>;
+	using TaskLinks		= StaticArrayT<TaskLink, TASK_CAPACITY>;
 
-	using TasksBits		= BitArray<StateID, StateList::SIZE>;
+	using TasksBits		= BitArrayT<StateID, StateList::SIZE>;
 
 	Tasks tasks;
 	TaskLinks taskLinks;
@@ -114,7 +118,6 @@ struct PlanDataT<ArgsT<TContext
 	bool planExists;
 
 	void clearTaskStatus(const StateID stateId) noexcept;
-
 	void verifyEmptyStatus(const StateID stateId) const noexcept;
 
 #ifdef FFSM2_ENABLE_ASSERT
