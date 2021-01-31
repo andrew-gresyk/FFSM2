@@ -3,14 +3,14 @@ namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename T, Long NCapacity>
+template <typename T, unsigned NCapacity>
 class StaticArrayT {
 public:
-	static constexpr Long CAPACITY = NCapacity;
-	static constexpr Long DUMMY	   = INVALID_LONG;
-
 	using Item  = T;
-	using Index = UnsignedCapacity<CAPACITY>;
+	using Index = UnsignedCapacity<NCapacity>;
+
+	static constexpr Index CAPACITY	= NCapacity;
+	static constexpr Index DUMMY	= (Index) -1;
 
 public:
 	FFSM2_INLINE StaticArrayT() = default;
@@ -22,7 +22,7 @@ public:
 	template <typename N>
 	FFSM2_INLINE const Item& operator[] (const N i)				const noexcept;
 
-	FFSM2_INLINE Long count() const									  noexcept	{ return CAPACITY;										}
+	FFSM2_INLINE Index count()									const noexcept	{ return CAPACITY;										}
 
 	FFSM2_INLINE void fill(const Item filler)						  noexcept;
 	FFSM2_INLINE void clear()										  noexcept	{ fill(INVALID_SHORT);									}
@@ -51,27 +51,27 @@ struct StaticArrayT<T, 0> {
 
 //------------------------------------------------------------------------------
 
-template <typename T, Long NCapacity>
+template <typename T, unsigned NCapacity>
 class ArrayT {
 	template <typename>
 	friend class IteratorT;
 
 public:
-	static constexpr Long CAPACITY = NCapacity;
-	static constexpr Long DUMMY	   = INVALID_LONG;
+	using Item	= T;
+	using Index = UnsignedCapacity<NCapacity>;
 
-	using Item = T;
-	using Index = UnsignedCapacity<CAPACITY>;
+	static constexpr Index CAPACITY	= NCapacity;
+	static constexpr Index DUMMY	= (Index) -1;
 
 public:
 	FFSM2_INLINE void clear()										  noexcept	{ _count = 0;									}
 
 	// TODO: replace with 'emplace<>()'?
 	template <typename TValue>
-	FFSM2_INLINE Long append(const TValue& value)					  noexcept;
+	FFSM2_INLINE Index append(const TValue&  value)					  noexcept;
 
 	template <typename TValue>
-	FFSM2_INLINE Long append(	  TValue&& value)					  noexcept;
+	FFSM2_INLINE Index append(		TValue&& value)					  noexcept;
 
 	template <typename N>
 	FFSM2_INLINE	   Item& operator[] (const N i)					  noexcept;
@@ -79,7 +79,7 @@ public:
 	template <typename N>
 	FFSM2_INLINE const Item& operator[] (const N i)				const noexcept;
 
-	FFSM2_INLINE Long count()									const noexcept	{ return _count;								}
+	FFSM2_INLINE Index count()									const noexcept	{ return _count;	}
 
 	FFSM2_INLINE ArrayT& operator += (const Item& item)				  noexcept;
 	FFSM2_INLINE ArrayT& operator += (	  Item&& item)				  noexcept;
@@ -91,16 +91,16 @@ public:
 	FFSM2_INLINE IteratorT<const ArrayT>  begin()				const noexcept	{ return IteratorT<const ArrayT>(*this,     0);	}
 	FFSM2_INLINE IteratorT<const ArrayT> cbegin()				const noexcept	{ return IteratorT<const ArrayT>(*this,     0);	}
 
-	FFSM2_INLINE IteratorT<      ArrayT>	  end()					  noexcept	{ return IteratorT<		 ArrayT>(*this, DUMMY);	}
-	FFSM2_INLINE IteratorT<const ArrayT>	  end()				const noexcept	{ return IteratorT<const ArrayT>(*this, DUMMY);	}
+	FFSM2_INLINE IteratorT<      ArrayT>	end()					  noexcept	{ return IteratorT<		 ArrayT>(*this, DUMMY);	}
+	FFSM2_INLINE IteratorT<const ArrayT>	end()				const noexcept	{ return IteratorT<const ArrayT>(*this, DUMMY);	}
 	FFSM2_INLINE IteratorT<const ArrayT>   cend()				const noexcept	{ return IteratorT<const ArrayT>(*this, DUMMY);	}
 
 private:
-	FFSM2_INLINE Long next(const Long i)						const noexcept	{ return i + 1;									}
-	FFSM2_INLINE Long limit()									const noexcept	{ return _count;								}
+	FFSM2_INLINE Index next(const Index i)						const noexcept	{ return i + 1;		}
+	FFSM2_INLINE Index limit()									const noexcept	{ return _count;	}
 
 private:
-	Long _count = 0;
+	Index _count = 0;
 
 #ifdef _MSC_VER
 	#pragma warning(push)
@@ -119,11 +119,10 @@ private:
 template <typename T>
 class ArrayT<T, 0> {
 public:
-	static constexpr Long CAPACITY = 0;
-	static constexpr Long DUMMY	   = INVALID_LONG;
-
-	using Item = T;
+	using Item	= T;
 	using Index = UnsignedCapacity<0>;
+
+	static constexpr Index CAPACITY = 0;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -2,6 +2,7 @@
 namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
+// COMMON
 
 template <StateID N, typename TA, Short NI, typename T>
 bool
@@ -76,6 +77,7 @@ CS_<N, TA, NI, T>::wideReact(FullControl& control,
 }
 
 //------------------------------------------------------------------------------
+// COMMON
 
 template <StateID N, typename TA, Short NI, typename T>
 bool

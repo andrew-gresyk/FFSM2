@@ -2,6 +2,7 @@
 namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
+// COMMON
 
 template <StateID N, typename TA, Short NI, typename... TS>
 bool
@@ -93,6 +94,9 @@ CS_<N, TA, NI, TS...>::wideReact(FullControl& control,
 
 //------------------------------------------------------------------------------
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// COMMON
+
 template <StateID N, typename TA, Short NI, typename... TS>
 bool
 CS_<N, TA, NI, TS...>::wideExitGuard(GuardControl& control,
@@ -137,6 +141,7 @@ CS_<N, TA, NI, TS...>::wideDestruct(PlanControl& control,
 }
 
 //------------------------------------------------------------------------------
+// COMMON
 
 template <StateID N, typename TA, Short NI, typename... TS>
 void

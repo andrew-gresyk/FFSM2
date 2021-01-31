@@ -1,6 +1,7 @@
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Build status](https://ci.appveyor.com/api/projects/status/io1x70fd52l04wad?svg=true)](https://ci.appveyor.com/project/andrew-gresyk/FFSM2)
 [![Build Status](https://travis-ci.org/andrew-gresyk/FFSM2.svg?branch=master)](https://travis-ci.org/andrew-gresyk/FFSM2)
+[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/andrew-gresyk/FFSM2.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/andrew-gresyk/FFSM2/context:cpp)
 [![Gitter](https://badges.gitter.im/andrew-gresyk/FFSM2.svg)](https://gitter.im/andrew-gresyk/FFSM2)
 
 ---
@@ -42,7 +43,7 @@ Header-only flat FSM framework in C++11, with fully statically-defined structure
 
 ## Feature Highlights
 
-- Permissive **[MIT License](https://github.com/andrew-gresyk/FFSM2/blob/master/LICENSE)**
+- Permissive **[MIT License](LICENSE)**
 - Written in widely-supported modern(ish) C++11
 - Header-only
 - Convenient, minimal boilerplate

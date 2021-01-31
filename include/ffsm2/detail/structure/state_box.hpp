@@ -20,22 +20,22 @@ template <typename T, typename TArgs>
 struct DynamicBox final {
 	using Type = T;
 
-	static constexpr bool isBare() noexcept							{ return false;						}
+	static constexpr bool isBare()							  noexcept	{ return false;								}
 
 	union {
 		Type t_;
 	};
 
-	FFSM2_INLINE  DynamicBox() noexcept {}
-	FFSM2_INLINE ~DynamicBox() noexcept {}
+	FFSM2_INLINE  DynamicBox()								  noexcept	{}
+	FFSM2_INLINE ~DynamicBox()								  noexcept	{}
 
-	FFSM2_INLINE void guard(GuardControlT<TArgs>& control) noexcept	{ Guard<Type>::execute(control);	}
+	FFSM2_INLINE void guard(GuardControlT<TArgs>& control)	  noexcept	{ Guard<Type>::execute(control);			}
 
-	FFSM2_INLINE void construct() noexcept;
-	FFSM2_INLINE void  destruct() noexcept;
+	FFSM2_INLINE void construct()							  noexcept;
+	FFSM2_INLINE void  destruct()							  noexcept;
 
-	FFSM2_INLINE	   Type& get()		 noexcept			{ FFSM2_ASSERT(initialized_); return t_;	}
-	FFSM2_INLINE const Type& get() const noexcept			{ FFSM2_ASSERT(initialized_); return t_;	}
+	FFSM2_INLINE	   Type& get()							  noexcept	{ FFSM2_ASSERT(initialized_); return t_;	}
+	FFSM2_INLINE const Type& get()						const noexcept	{ FFSM2_ASSERT(initialized_); return t_;	}
 
 	FFSM2_IF_ASSERT(bool initialized_ = false);
 
@@ -52,13 +52,13 @@ struct StaticBox final {
 
 	Type t_;
 
-	FFSM2_INLINE void guard(GuardControlT<TArgs>& control) noexcept;
+	FFSM2_INLINE void guard(GuardControlT<TArgs>& control)	  noexcept;
 
-	FFSM2_INLINE void construct() noexcept 																{}
-	FFSM2_INLINE void  destruct() noexcept 																{}
+	FFSM2_INLINE void construct()							  noexcept	{}
+	FFSM2_INLINE void  destruct()							  noexcept	{}
 
-	FFSM2_INLINE	   Type& get()		 noexcept					{ return t_;						}
-	FFSM2_INLINE const Type& get() const noexcept					{ return t_;						}
+	FFSM2_INLINE	   Type& get()							  noexcept	{ return t_;								}
+	FFSM2_INLINE const Type& get()						const noexcept	{ return t_;								}
 
 	FFSM2_IF_TYPEINDEX(FFSM2_IF_DEBUG(const std::type_index TYPE = isBare() ? typeid(None) : typeid(Type)));
 };

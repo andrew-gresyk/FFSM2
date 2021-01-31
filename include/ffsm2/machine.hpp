@@ -1,5 +1,5 @@
 ﻿// FFSM2 (flat state machine for games and interactive applications)
-// 0.5.0 (2021-01-16)
+// 0.5.1 (2021-01-07)
 //
 // Created by Andrew Gresyk
 //
@@ -33,8 +33,10 @@
 
 #define FFSM2_VERSION_MAJOR 0
 #define FFSM2_VERSION_MINOR 5
-#define FFSM2_VERSION_PATCH 0
+#define FFSM2_VERSION_PATCH 1
 
+#define FFSM2_VERSION (10000 * FFSM2_VERSION_MAJOR + 100 * FFSM2_VERSION_MINOR + FFSM2_VERSION_PATCH)
+	
 #include <stdint.h>			// uint32_t, uint64_t
 #include <string.h>			// memcpy_s()
 
@@ -327,9 +329,9 @@ fill(T& a, const char value) noexcept {
 
 //------------------------------------------------------------------------------
 
-template <typename T, unsigned NCount>
-constexpr unsigned
-count(const T(&)[NCount]) noexcept {
+template <typename TIndex, typename TElement, TIndex NCount>
+constexpr TIndex
+count(const TElement(&)[NCount]) noexcept {
 	return NCount;
 }
 
@@ -359,16 +361,14 @@ min(const T t1, const T t2) noexcept {
 
 //------------------------------------------------------------------------------
 
-template <unsigned NCapacity>
+template <uint64_t NCapacity>
 struct UnsignedCapacityT {
-	static constexpr Long CAPACITY = NCapacity;
+	static constexpr uint64_t CAPACITY = NCapacity;
 
 	using Type = Conditional<CAPACITY <= UINT8_MAX,  uint8_t,
 				 Conditional<CAPACITY <= UINT16_MAX, uint16_t,
 				 Conditional<CAPACITY <= UINT32_MAX, uint32_t,
 													 uint64_t>>>;
-
-	static_assert(CAPACITY <= UINT64_MAX, "STATIC ASSERT");
 };
 
 template <unsigned NCapacity>
@@ -398,7 +398,7 @@ using UnsignedBitWidth = typename UnsignedBitWidthT<NCapacity>::Type;
 template <typename T1, typename T2>
 constexpr T1
 contain(const T1 x, const T2 to) noexcept {
-	return (x + ((T1) to - 1)) / (T1) to;
+	return (x + (T1) to - 1) / (T1) to;
 }
 
 //------------------------------------------------------------------------------
@@ -471,13 +471,14 @@ class IteratorT {
 public:
 	using Container = TContainer;
 	using Item		= typename Container::Item;
+	using Index		= typename Container::Index;
 
-	template <typename T, Long NCapacity>
+	template <typename, unsigned>
 	friend class ArrayT;
 
 private:
 	FFSM2_INLINE IteratorT(Container& container,
-						  const Long cursor)	  noexcept
+						   const Index cursor)	  noexcept
 		: _container{container}
 		, _cursor{cursor}
 	{}
@@ -505,14 +506,15 @@ template <typename TContainer>
 class IteratorT<const TContainer> {
 public:
 	using Container = TContainer;
-	using Item = typename Container::Item;
+	using Item		= typename Container::Item;
+	using Index		= typename Container::Index;
 
-	template <typename T, Long NCapacity>
+	template <typename, unsigned>
 	friend class ArrayT;
 
 private:
 	FFSM2_INLINE IteratorT(const Container& container,
-						  const Long cursor)	  noexcept
+						   const Index cursor)	  noexcept
 		: _container{container}
 		, _cursor{cursor}
 	{}
@@ -529,7 +531,7 @@ public:
 private:
 	const Container& _container;
 
-	Long _cursor;
+	Index _cursor;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -589,14 +591,14 @@ namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename T, Long NCapacity>
+template <typename T, unsigned NCapacity>
 class StaticArrayT {
 public:
-	static constexpr Long CAPACITY = NCapacity;
-	static constexpr Long DUMMY	   = INVALID_LONG;
-
 	using Item  = T;
-	using Index = UnsignedCapacity<CAPACITY>;
+	using Index = UnsignedCapacity<NCapacity>;
+
+	static constexpr Index CAPACITY	= NCapacity;
+	static constexpr Index DUMMY	= (Index) -1;
 
 public:
 	FFSM2_INLINE StaticArrayT() = default;
@@ -608,7 +610,7 @@ public:
 	template <typename N>
 	FFSM2_INLINE const Item& operator[] (const N i)				const noexcept;
 
-	FFSM2_INLINE Long count() const									  noexcept	{ return CAPACITY;										}
+	FFSM2_INLINE Index count()									const noexcept	{ return CAPACITY;										}
 
 	FFSM2_INLINE void fill(const Item filler)						  noexcept;
 	FFSM2_INLINE void clear()										  noexcept	{ fill(INVALID_SHORT);									}
@@ -637,27 +639,27 @@ struct StaticArrayT<T, 0> {
 
 //------------------------------------------------------------------------------
 
-template <typename T, Long NCapacity>
+template <typename T, unsigned NCapacity>
 class ArrayT {
 	template <typename>
 	friend class IteratorT;
 
 public:
-	static constexpr Long CAPACITY = NCapacity;
-	static constexpr Long DUMMY	   = INVALID_LONG;
+	using Item	= T;
+	using Index = UnsignedCapacity<NCapacity>;
 
-	using Item = T;
-	using Index = UnsignedCapacity<CAPACITY>;
+	static constexpr Index CAPACITY	= NCapacity;
+	static constexpr Index DUMMY	= (Index) -1;
 
 public:
 	FFSM2_INLINE void clear()										  noexcept	{ _count = 0;									}
 
 	// TODO: replace with 'emplace<>()'?
 	template <typename TValue>
-	FFSM2_INLINE Long append(const TValue& value)					  noexcept;
+	FFSM2_INLINE Index append(const TValue&  value)					  noexcept;
 
 	template <typename TValue>
-	FFSM2_INLINE Long append(	  TValue&& value)					  noexcept;
+	FFSM2_INLINE Index append(		TValue&& value)					  noexcept;
 
 	template <typename N>
 	FFSM2_INLINE	   Item& operator[] (const N i)					  noexcept;
@@ -665,7 +667,7 @@ public:
 	template <typename N>
 	FFSM2_INLINE const Item& operator[] (const N i)				const noexcept;
 
-	FFSM2_INLINE Long count()									const noexcept	{ return _count;								}
+	FFSM2_INLINE Index count()									const noexcept	{ return _count;	}
 
 	FFSM2_INLINE ArrayT& operator += (const Item& item)				  noexcept;
 	FFSM2_INLINE ArrayT& operator += (	  Item&& item)				  noexcept;
@@ -677,16 +679,16 @@ public:
 	FFSM2_INLINE IteratorT<const ArrayT>  begin()				const noexcept	{ return IteratorT<const ArrayT>(*this,     0);	}
 	FFSM2_INLINE IteratorT<const ArrayT> cbegin()				const noexcept	{ return IteratorT<const ArrayT>(*this,     0);	}
 
-	FFSM2_INLINE IteratorT<      ArrayT>	  end()					  noexcept	{ return IteratorT<		 ArrayT>(*this, DUMMY);	}
-	FFSM2_INLINE IteratorT<const ArrayT>	  end()				const noexcept	{ return IteratorT<const ArrayT>(*this, DUMMY);	}
+	FFSM2_INLINE IteratorT<      ArrayT>	end()					  noexcept	{ return IteratorT<		 ArrayT>(*this, DUMMY);	}
+	FFSM2_INLINE IteratorT<const ArrayT>	end()				const noexcept	{ return IteratorT<const ArrayT>(*this, DUMMY);	}
 	FFSM2_INLINE IteratorT<const ArrayT>   cend()				const noexcept	{ return IteratorT<const ArrayT>(*this, DUMMY);	}
 
 private:
-	FFSM2_INLINE Long next(const Long i)						const noexcept	{ return i + 1;									}
-	FFSM2_INLINE Long limit()									const noexcept	{ return _count;								}
+	FFSM2_INLINE Index next(const Index i)						const noexcept	{ return i + 1;		}
+	FFSM2_INLINE Index limit()									const noexcept	{ return _count;	}
 
 private:
-	Long _count = 0;
+	Index _count = 0;
 
 #ifdef _MSC_VER
 	#pragma warning(push)
@@ -705,11 +707,10 @@ private:
 template <typename T>
 class ArrayT<T, 0> {
 public:
-	static constexpr Long CAPACITY = 0;
-	static constexpr Long DUMMY	   = INVALID_LONG;
-
-	using Item = T;
+	using Item	= T;
 	using Index = UnsignedCapacity<0>;
+
+	static constexpr Index CAPACITY = 0;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -722,14 +723,14 @@ namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename T, Long NC>
+template <typename T, unsigned NC>
 StaticArrayT<T, NC>::StaticArrayT(const Item filler) noexcept {
 	fill(filler);
 }
 
 //------------------------------------------------------------------------------
 
-template <typename T, Long NC>
+template <typename T, unsigned NC>
 template <typename N>
 T&
 StaticArrayT<T, NC>::operator[] (const N i) noexcept {
@@ -740,7 +741,7 @@ StaticArrayT<T, NC>::operator[] (const N i) noexcept {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename T, Long NC>
+template <typename T, unsigned NC>
 template <typename N>
 const T&
 StaticArrayT<T, NC>::operator[] (const N i) const noexcept {
@@ -751,7 +752,7 @@ StaticArrayT<T, NC>::operator[] (const N i) const noexcept {
 
 //------------------------------------------------------------------------------
 
-template <typename T, Long NC>
+template <typename T, unsigned NC>
 void
 StaticArrayT<T, NC>::fill(const Item filler) noexcept {
 	for (Long i = 0; i < CAPACITY; ++i)
@@ -760,9 +761,9 @@ StaticArrayT<T, NC>::fill(const Item filler) noexcept {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename T, Long NC>
+template <typename T, unsigned NC>
 template <typename TValue>
-Long
+typename ArrayT<T, NC>::Index
 ArrayT<T, NC>::append(const TValue& value) noexcept {
 	FFSM2_ASSERT(_count < CAPACITY);
 
@@ -773,9 +774,9 @@ ArrayT<T, NC>::append(const TValue& value) noexcept {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename T, Long NC>
+template <typename T, unsigned NC>
 template <typename TValue>
-Long
+typename ArrayT<T, NC>::Index
 ArrayT<T, NC>::append(TValue&& value) noexcept {
 	FFSM2_ASSERT(_count < CAPACITY);
 
@@ -786,7 +787,7 @@ ArrayT<T, NC>::append(TValue&& value) noexcept {
 
 //------------------------------------------------------------------------------
 
-template <typename T, Long NC>
+template <typename T, unsigned NC>
 template <typename N>
 T&
 ArrayT<T, NC>::operator[] (const N i) noexcept {
@@ -797,7 +798,7 @@ ArrayT<T, NC>::operator[] (const N i) noexcept {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename T, Long NC>
+template <typename T, unsigned NC>
 template <typename N>
 const T&
 ArrayT<T, NC>::operator[] (const N i) const noexcept {
@@ -807,8 +808,9 @@ ArrayT<T, NC>::operator[] (const N i) const noexcept {
 }
 
 //------------------------------------------------------------------------------
+// SPECIFIC
 
-template <typename T, Long NC>
+template <typename T, unsigned NC>
 ArrayT<T, NC>&
 ArrayT<T, NC>::operator += (const Item& item) noexcept {
 	append(item);
@@ -818,7 +820,7 @@ ArrayT<T, NC>::operator += (const Item& item) noexcept {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename T, Long NC>
+template <typename T, unsigned NC>
 ArrayT<T, NC>&
 ArrayT<T, NC>::operator += (Item&& item) noexcept {
 	append(std::move(item));
@@ -826,9 +828,10 @@ ArrayT<T, NC>::operator += (Item&& item) noexcept {
 	return *this;
 }
 
+// SPECIFIC
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename T, Long NC>
+template <typename T, unsigned NC>
 template <Long N>
 ArrayT<T, NC>&
 ArrayT<T, NC>::operator += (const ArrayT<T, N>& other) noexcept {
@@ -971,20 +974,35 @@ namespace detail {
 
 //------------------------------------------------------------------------------
 
+template <Long>
+class BitWriteStreamT;
+
+template <Long>
+class BitReadStreamT;
+
+////////////////////////////////////////////////////////////////////////////////
+
 template <Long NBitCapacity>
-struct StreamBufferT {
+class StreamBufferT {
+	template <Long>
+	friend class BitWriteStreamT;
+
+	template <Long>
+	friend class BitReadStreamT;
+
+public:
 	static constexpr Long BIT_CAPACITY	= NBitCapacity;
 	static constexpr Long BYTE_COUNT	= contain(BIT_CAPACITY, 8u);
 
-	using Size = UnsignedCapacity<BIT_CAPACITY>;
 	using Data = uint8_t[BYTE_COUNT];
 
-	void clear()										  noexcept;
+	FFSM2_INLINE void clear()										  noexcept;
 
-	//Size write(const uint8_t byte)					  noexcept;
+	FFSM2_INLINE	   Data& data()									  noexcept	{ return _data;		}
+	FFSM2_INLINE const Data& data()								const noexcept	{ return _data;		}
 
-	Size bitSize;
-	Data payload;
+private:
+	Data _data;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -997,13 +1015,18 @@ public:
 	using Buffer = StreamBufferT<BIT_CAPACITY>;
 
 public:
-	BitWriteStreamT(Buffer& _buffer)					  noexcept;
+	FFSM2_INLINE explicit BitWriteStreamT(Buffer& buffer,
+										  const Long cursor = 0)	  noexcept;
 
 	template <Short NBitWidth>
-	void write(const UnsignedBitWidth<NBitWidth> item)	  noexcept;
+	FFSM2_INLINE void write(const UnsignedBitWidth<NBitWidth> item)	  noexcept;
+
+	FFSM2_INLINE Long cursor()									const noexcept	{ return _cursor;	}
 
 private:
 	Buffer& _buffer;
+
+	Long _cursor = 0;
 };
 
 //------------------------------------------------------------------------------
@@ -1016,19 +1039,18 @@ public:
 	using Buffer = StreamBufferT<BIT_CAPACITY>;
 
 public:
-	BitReadStreamT(const Buffer& buffer)				  noexcept
-		: _buffer{buffer}
-	{}
+	FFSM2_INLINE explicit BitReadStreamT(const Buffer& buffer,
+										 const Long cursor = 0)		  noexcept;
 
 	template <Short NBitWidth>
-	UnsignedBitWidth<NBitWidth> read()					  noexcept;
+	FFSM2_INLINE UnsignedBitWidth<NBitWidth> read()					  noexcept;
 
-	Long cursor()									const noexcept	{ return _cursor;	}
+	FFSM2_INLINE Long cursor()									const noexcept	{ return _cursor;	}
 
 private:
 	const Buffer& _buffer;
 
-	Long _cursor = 0;
+	Long _cursor;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1046,15 +1068,16 @@ namespace detail {
 template <Long NBC>
 void
 StreamBufferT<NBC>::clear() noexcept {
-	bitSize = 0;
-	fill(payload, 0);
+	fill(_data, 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 template <Long NBC>
-BitWriteStreamT<NBC>::BitWriteStreamT(Buffer& buffer) noexcept
+BitWriteStreamT<NBC>::BitWriteStreamT(Buffer& buffer,
+									  const Long cursor) noexcept
 	: _buffer{buffer}
+	, _cursor{cursor}
 {
 	_buffer.clear();
 }
@@ -1068,29 +1091,38 @@ BitWriteStreamT<NBC>::write(const UnsignedBitWidth<NBitWidth> item) noexcept {
 	constexpr Short BIT_WIDTH = NBitWidth;
 	static_assert(BIT_WIDTH > 0, "STATIC ASSERT");
 
-	FFSM2_ASSERT(_buffer.bitSize + BIT_WIDTH <= BIT_CAPACITY);
+	FFSM2_ASSERT(_cursor + BIT_WIDTH <= BIT_CAPACITY);
 
 	using Item = UnsignedBitWidth<BIT_WIDTH>;
 
 	Item itemBits = item;
 
 	for (Short itemWidth = BIT_WIDTH; itemWidth; ) {
-		const Long	byteIndex		= _buffer.bitSize >> 3;
-		uint8_t&	byte			= _buffer.payload[byteIndex];
+		const Long	byteIndex		= _cursor >> 3;
+		uint8_t&	byte			= _buffer._data[byteIndex];
 
-		const Short byteChunkStart	= _buffer.bitSize & 0x7;
+		const Short byteChunkStart	= _cursor & 0x7;
 		const Short byteDataWidth	= 8 - byteChunkStart;
 		const Short byteChunkWidth	= detail::min(byteDataWidth, itemWidth);
 		const Item	byteChunk		= itemBits << byteChunkStart;
-		byte |= byteChunk;
 
-		itemBits	>>= byteChunkWidth;
-		itemWidth	 -= byteChunkWidth;
-		_buffer.bitSize += byteChunkWidth;
+		byte		|= byteChunk;
+		itemBits   >>= byteChunkWidth;
+		itemWidth	-= byteChunkWidth;
+		_cursor		+= byteChunkWidth;
 	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+template <Long NBC>
+BitReadStreamT<NBC>::BitReadStreamT(const Buffer& buffer,
+									const Long cursor) noexcept
+	: _buffer{buffer}
+	, _cursor{cursor}
+{}
+
+//------------------------------------------------------------------------------
 
 template <Long NBC>
 template <Short NBitWidth>
@@ -1099,7 +1131,7 @@ BitReadStreamT<NBC>::read() noexcept {
 	constexpr Short BIT_WIDTH = NBitWidth;
 	static_assert(BIT_WIDTH > 0, "STATIC ASSERT");
 
-	FFSM2_ASSERT(_buffer.bitSize <= BIT_CAPACITY);
+	FFSM2_ASSERT(_cursor <= BIT_CAPACITY);
 
 	using Item = UnsignedBitWidth<BIT_WIDTH>;
 
@@ -1107,22 +1139,21 @@ BitReadStreamT<NBC>::read() noexcept {
 	Short itemCursor = 0;
 
 	for (Short itemWidth = BIT_WIDTH; itemWidth; )
-		if (FFSM2_CHECKED(_cursor + itemWidth <= _buffer.bitSize)) {
+		if (FFSM2_CHECKED(_cursor + itemWidth <= BIT_CAPACITY)) {
 			const Long	byteIndex		= _cursor >> 3;
-			const uint8_t& byte			= _buffer.payload[byteIndex];
+			const uint8_t& byte			= _buffer._data[byteIndex];
 
 			const Short byteChunkStart	= _cursor & 0x7;
 			const Short byteDataWidth	= 8 - byteChunkStart;
 			const Short byteChunkWidth	= detail::min(byteDataWidth, itemWidth);
 			const Short byteChunkMask	= (1 << byteChunkWidth) - 1;
 			const Item	byteChunk		= (byte >> byteChunkStart) & byteChunkMask;
-
 			const Item	itemChunk		= byteChunk << itemCursor;
-			item |= itemChunk;
 
-			_cursor	   += byteChunkWidth;
-			itemCursor += byteChunkWidth;
-			itemWidth  -= byteChunkWidth;
+			item		|= itemChunk;
+			itemCursor	+= byteChunkWidth;
+			itemWidth	-= byteChunkWidth;
+			_cursor		+= byteChunkWidth;
 		}
 
 	return item;
@@ -1140,6 +1171,7 @@ namespace ffsm2 {
 namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
+// SPECIFIC
 
 template <typename>
 struct Type {};
@@ -1153,6 +1185,7 @@ struct TL_
 	static constexpr Long SIZE = sizeof...(Ts);
 };
 
+// SPECIFIC
 //------------------------------------------------------------------------------
 
 template <Long N>
@@ -1275,6 +1308,7 @@ constexpr Long index   () noexcept { return detail::Find<TList, T>::VALUE;					}
 template <typename TList, typename T>
 constexpr bool contains() noexcept { return std::is_base_of<detail::Type<T>, TList>::value;	}
 
+// SPECIFIC
 //------------------------------------------------------------------------------
 
 }
@@ -1371,6 +1405,9 @@ methodName(const Method method) noexcept {
 		return nullptr;
 	}
 }
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 namespace detail {
 
@@ -3073,6 +3110,7 @@ public:
 	FFSM2_INLINE const Transition& request()				const noexcept	{ return _request;						}
 
 	//----------------------------------------------------------------------
+	//----------------------------------------------------------------------
 
 #ifdef FFSM2_ENABLE_PLANS
 
@@ -3487,6 +3525,7 @@ public:
 	using FullControl::context;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	// COMMON
 
 	FFSM2_INLINE const TransitionSets& currentTransitions()	const noexcept	{ return _currentTransitions;	}
 
@@ -5230,8 +5269,8 @@ struct C_ final {
 	using WriteStream	= typename Args::WriteStream;
 	using ReadStream	= typename Args::ReadStream;
 
-	FFSM2_INLINE void	 deepSaveActive	   (const Registry& registry, WriteStream& stream) const noexcept;
-	FFSM2_INLINE void	 deepLoadRequested (	  Registry& registry, ReadStream&  stream) const noexcept;
+	FFSM2_INLINE void deepSaveActive	   (const Registry& registry, WriteStream& stream) const noexcept;
+	FFSM2_INLINE void deepLoadRequested	   (	  Registry& registry, ReadStream&  stream) const noexcept;
 #endif
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

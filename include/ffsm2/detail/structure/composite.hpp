@@ -65,8 +65,8 @@ struct C_ final {
 	using WriteStream	= typename Args::WriteStream;
 	using ReadStream	= typename Args::ReadStream;
 
-	FFSM2_INLINE void	 deepSaveActive	   (const Registry& registry, WriteStream& stream) const noexcept;
-	FFSM2_INLINE void	 deepLoadRequested (	  Registry& registry, ReadStream&  stream) const noexcept;
+	FFSM2_INLINE void deepSaveActive	   (const Registry& registry, WriteStream& stream) const noexcept;
+	FFSM2_INLINE void deepLoadRequested	   (	  Registry& registry, ReadStream&  stream) const noexcept;
 #endif
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

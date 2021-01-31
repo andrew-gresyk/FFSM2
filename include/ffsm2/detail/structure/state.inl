@@ -2,6 +2,7 @@ namespace ffsm2 {
 namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
+// COMMON
 
 template <StateID N, typename TA, typename TH>
 bool

@@ -47,9 +47,9 @@ fill(T& a, const char value) noexcept {
 
 //------------------------------------------------------------------------------
 
-template <typename T, unsigned NCount>
-constexpr unsigned
-count(const T(&)[NCount]) noexcept {
+template <typename TIndex, typename TElement, TIndex NCount>
+constexpr TIndex
+count(const TElement(&)[NCount]) noexcept {
 	return NCount;
 }
 
@@ -79,16 +79,14 @@ min(const T t1, const T t2) noexcept {
 
 //------------------------------------------------------------------------------
 
-template <unsigned NCapacity>
+template <uint64_t NCapacity>
 struct UnsignedCapacityT {
-	static constexpr Long CAPACITY = NCapacity;
+	static constexpr uint64_t CAPACITY = NCapacity;
 
 	using Type = Conditional<CAPACITY <= UINT8_MAX,  uint8_t,
 				 Conditional<CAPACITY <= UINT16_MAX, uint16_t,
 				 Conditional<CAPACITY <= UINT32_MAX, uint32_t,
 													 uint64_t>>>;
-
-	static_assert(CAPACITY <= UINT64_MAX, "STATIC ASSERT");
 };
 
 template <unsigned NCapacity>
@@ -118,7 +116,7 @@ using UnsignedBitWidth = typename UnsignedBitWidthT<NCapacity>::Type;
 template <typename T1, typename T2>
 constexpr T1
 contain(const T1 x, const T2 to) noexcept {
-	return (x + ((T1) to - 1)) / (T1) to;
+	return (x + (T1) to - 1) / (T1) to;
 }
 
 //------------------------------------------------------------------------------

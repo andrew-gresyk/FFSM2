@@ -107,17 +107,17 @@ private:
 
 public:
 	template <typename... TArgs>
-	Index emplace(TArgs&&... args) noexcept;
+	Index emplace(TArgs&&... args)												  noexcept;
 
-	void remove(const Index i) noexcept;
+	void remove(const Index i)													  noexcept;
 
-	FFSM2_INLINE	   Item& operator[] (const Index i)		  noexcept;
-	FFSM2_INLINE const Item& operator[] (const Index i) const noexcept;
+	FFSM2_INLINE	   Item& operator[] (const Index i)							  noexcept;
+	FFSM2_INLINE const Item& operator[] (const Index i)						const noexcept;
 
-	FFSM2_INLINE Index count() const noexcept						{ return _count;	}
+	FFSM2_INLINE Index count()												const noexcept	{ return _count;	}
 
 private:
-	FFSM2_IF_ASSERT(void verifyStructure(const Index occupied = INVALID) const noexcept);
+	FFSM2_IF_ASSERT(void verifyStructure(const Index occupied = INVALID)	const noexcept);
 
 private:
 	Item _items[CAPACITY];

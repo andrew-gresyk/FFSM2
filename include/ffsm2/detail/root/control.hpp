@@ -93,6 +93,7 @@ public:
 	FFSM2_INLINE const Transition& request()				const noexcept	{ return _request;						}
 
 	//----------------------------------------------------------------------
+	//----------------------------------------------------------------------
 
 #ifdef FFSM2_ENABLE_PLANS
 
@@ -507,6 +508,7 @@ public:
 	using FullControl::context;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	// COMMON
 
 	FFSM2_INLINE const TransitionSets& currentTransitions()	const noexcept	{ return _currentTransitions;	}
 

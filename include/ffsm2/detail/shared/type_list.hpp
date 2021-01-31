@@ -2,6 +2,7 @@ namespace ffsm2 {
 namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
+// SPECIFIC
 
 template <typename>
 struct Type {};
@@ -15,6 +16,7 @@ struct TL_
 	static constexpr Long SIZE = sizeof...(Ts);
 };
 
+// SPECIFIC
 //------------------------------------------------------------------------------
 
 template <Long N>
@@ -137,6 +139,7 @@ constexpr Long index   () noexcept { return detail::Find<TList, T>::VALUE;					}
 template <typename TList, typename T>
 constexpr bool contains() noexcept { return std::is_base_of<detail::Type<T>, TList>::value;	}
 
+// SPECIFIC
 //------------------------------------------------------------------------------
 
 }
