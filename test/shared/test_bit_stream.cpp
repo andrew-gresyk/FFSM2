@@ -1,3 +1,6 @@
+// FFSM2 (flat state machine for games and interactive applications)
+// Created by Andrew Gresyk
+
 #define FFSM2_ENABLE_SERIALIZATION
 #include "../tools.hpp"
 
@@ -11,7 +14,7 @@ using StreamBuffer = typename WriteStream::Buffer;
 
 //------------------------------------------------------------------------------
 
-TEST_CASE("Shared.BitStream<>", "[shared]") {
+TEST_CASE("Shared.BitStream<>") {
 	StreamBuffer buffer;
 
 	WriteStream writeStream{buffer};

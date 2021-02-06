@@ -1,3 +1,6 @@
+// FFSM2 (flat state machine for games and interactive applications)
+// Created by Andrew Gresyk
+
 #define FFSM2_ENABLE_PLANS
 #include "../tools.hpp"
 
@@ -9,7 +12,7 @@ using List = ffsm2::detail::TaskListT<void, 16>;
 
 //------------------------------------------------------------------------------
 
-TEST_CASE("Shared.List<>", "[shared]") {
+TEST_CASE("Shared.List<>") {
 	List list;
 	constexpr auto CAPACITY = List::CAPACITY;
 

@@ -1,7 +1,5 @@
 #include <ffsm2/machine.hpp>
 
-#include <catch2/catch.hpp>
-
 //------------------------------------------------------------------------------
 
 struct Context {};

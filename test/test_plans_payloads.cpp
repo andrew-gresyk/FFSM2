@@ -1,3 +1,6 @@
+// FFSM2 (flat state machine for games and interactive applications)
+// Created by Andrew Gresyk
+
 #define FFSM2_ENABLE_PLANS
 #include "tools.hpp"
 
@@ -284,7 +287,7 @@ void step7(FSM::Instance& machine, Logger& logger) {
 
 //------------------------------------------------------------------------------
 
-TEST_CASE("FSM.Plans Payloads", "[machine]") {
+TEST_CASE("FSM.Plans Payloads") {
 	Context _;
 	LoggerT<Config> logger;
 

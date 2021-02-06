@@ -1,3 +1,6 @@
+// FFSM2 (flat state machine for games and interactive applications)
+// Created by Andrew Gresyk
+
 #include "tools.hpp"
 
 namespace test_transitions_payloads {
@@ -223,7 +226,7 @@ void step5(FSM::Instance& machine, Logger& logger) {
 
 //------------------------------------------------------------------------------
 
-TEST_CASE("FSM.Transition Payloads", "[machine]") {
+TEST_CASE("FSM.Transition Payloads") {
 	Context _;
 	LoggerT<Config> logger;
 

@@ -1,3 +1,6 @@
+// FFSM2 (flat state machine for games and interactive applications)
+// Created by Andrew Gresyk
+
 #define FFSM2_DISABLE_TYPEINDEX
 #include "tools.hpp"
 
@@ -227,7 +230,7 @@ void step5(FSM::Instance& machine, Logger& logger) {
 
 //------------------------------------------------------------------------------
 
-TEST_CASE("FSM.Transitions", "[machine]") {
+TEST_CASE("FSM.Transitions") {
 	Context _;
 	LoggerT<Config> logger;
 

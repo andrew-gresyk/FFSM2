@@ -24,7 +24,7 @@ Header-only flat FSM framework in C++11, with fully statically-defined structure
 
 ## Quick Start
 
-- **[Tutorial](https://github.com/andrew-gresyk/FFSM2/blob/master/examples/snippets/wiki_tutorial.cpp)**
+- **[Tutorial](examples/snippets/wiki_tutorial.cpp)**
 
 ---
 
@@ -61,7 +61,7 @@ Header-only flat FSM framework in C++11, with fully statically-defined structure
 
 ## 3rd Party Libraries
 
-- **[Catch2](https://github.com/catchorg/Catch2)** unit testing framework
+- **[doctest](https://github.com/onqtam/doctest)** unit testing framework
 
 ---
 

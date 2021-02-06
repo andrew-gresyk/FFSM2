@@ -1,12 +1,16 @@
+// FFSM2 (flat state machine for games and interactive applications)
+// Created by Andrew Gresyk
+
 #pragma once
 
 #define FFSM2_ENABLE_LOG_INTERFACE
 #define FFSM2_ENABLE_ASSERT
 #include <ffsm2/machine.hpp>
 
-#include <catch2/catch.hpp>
+#include <doctest/doctest.h>
 
-//#include <vector> // already included in catch.hpp
+#include <algorithm> // std::max()
+#include <vector>
 
 ////////////////////////////////////////////////////////////////////////////////
 

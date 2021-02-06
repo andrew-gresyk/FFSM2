@@ -1,3 +1,6 @@
+// FFSM2 (flat state machine for games and interactive applications)
+// Created by Andrew Gresyk
+
 #define FFSM2_ENABLE_VERBOSE_DEBUG_LOG
 #include "tools.hpp"
 
@@ -248,7 +251,7 @@ void step5(FSM::Instance& machine, Logger& logger) {
 
 //------------------------------------------------------------------------------
 
-TEST_CASE("FSM.Transitions Verbose", "[machine]") {
+TEST_CASE("FSM.Transitions Verbose") {
 	Context _;
 	LoggerT<Config> logger;
 
