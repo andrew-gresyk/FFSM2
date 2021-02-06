@@ -1,3 +1,6 @@
+// FFSM2 (flat state machine for games and interactive applications)
+// Created by Andrew Gresyk
+
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TConfig>

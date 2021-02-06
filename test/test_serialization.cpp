@@ -1,3 +1,6 @@
+// FFSM2 (flat state machine for games and interactive applications)
+// Created by Andrew Gresyk
+
 #define FFSM2_ENABLE_SERIALIZATION
 #define FFSM2_ENABLE_VERBOSE_DEBUG_LOG
 #include "tools.hpp"
@@ -102,7 +105,7 @@ struct I : FSM::State {};
 
 ////////////////////////////////////////////////////////////////////////////////
 
-TEST_CASE("FSM.Serialization", "[machine]") {
+TEST_CASE("FSM.Serialization") {
 	Logger logger;
 
 	server::FSM::Instance::SerialBuffer buffer;
