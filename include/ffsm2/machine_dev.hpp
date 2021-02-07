@@ -1,5 +1,5 @@
 // FFSM2 (flat state machine for games and interactive applications)
-// 0.5.2 (2021-02-06)
+// 0.5.3 (2021-02-07)
 //
 // Created by Andrew Gresyk
 //
@@ -33,7 +33,7 @@
 
 #define FFSM2_VERSION_MAJOR 0
 #define FFSM2_VERSION_MINOR 5
-#define FFSM2_VERSION_PATCH 1
+#define FFSM2_VERSION_PATCH 3
 
 #define FFSM2_VERSION (10000 * FFSM2_VERSION_MAJOR + 100 * FFSM2_VERSION_MINOR + FFSM2_VERSION_PATCH)
 

@@ -1,5 +1,5 @@
 ﻿// FFSM2 (flat state machine for games and interactive applications)
-// 0.5.2 (2021-02-06)
+// 0.5.3 (2021-02-07)
 //
 // Created by Andrew Gresyk
 //
@@ -33,7 +33,7 @@
 
 #define FFSM2_VERSION_MAJOR 0
 #define FFSM2_VERSION_MINOR 5
-#define FFSM2_VERSION_PATCH 1
+#define FFSM2_VERSION_PATCH 3
 
 #define FFSM2_VERSION (10000 * FFSM2_VERSION_MAJOR + 100 * FFSM2_VERSION_MINOR + FFSM2_VERSION_PATCH)
 
@@ -371,12 +371,12 @@ struct UnsignedCapacityT {
 													 uint64_t>>>;
 };
 
-template <unsigned NCapacity>
+template <uint64_t NCapacity>
 using UnsignedCapacity = typename UnsignedCapacityT<NCapacity>::Type;
 
 //------------------------------------------------------------------------------
 
-template <unsigned NBitWidth>
+template <uint64_t NBitWidth>
 struct UnsignedBitWidthT {
 	static constexpr Short BIT_WIDTH = NBitWidth;
 
@@ -388,9 +388,7 @@ struct UnsignedBitWidthT {
 	static_assert(BIT_WIDTH <= 64, "STATIC ASSERT");
 };
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-template <unsigned NCapacity>
+template <uint64_t NCapacity>
 using UnsignedBitWidth = typename UnsignedBitWidthT<NCapacity>::Type;
 
 //------------------------------------------------------------------------------
@@ -449,14 +447,6 @@ struct StaticPrintConst;
 template <typename>
 struct StaticPrintType;
 
-//------------------------------------------------------------------------------
-
-template <unsigned V1, unsigned V2>
-struct StaticAssertEquality;
-
-template <unsigned V1>
-struct StaticAssertEquality<V1, V1> {};
-
 ////////////////////////////////////////////////////////////////////////////////
 
 }
@@ -473,7 +463,7 @@ public:
 	using Item		= typename Container::Item;
 	using Index		= typename Container::Index;
 
-	template <typename, unsigned>
+	template <typename, Long>
 	friend class ArrayT;
 
 private:
@@ -497,7 +487,7 @@ public:
 private:
 	Container& _container;
 
-	Long _cursor;
+	Index _cursor;
 };
 
 //------------------------------------------------------------------------------
@@ -509,7 +499,7 @@ public:
 	using Item		= typename Container::Item;
 	using Index		= typename Container::Index;
 
-	template <typename, unsigned>
+	template <typename, Long>
 	friend class ArrayT;
 
 private:
@@ -591,7 +581,7 @@ namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename T, unsigned NCapacity>
+template <typename T, Long NCapacity>
 class StaticArrayT {
 public:
 	using Item  = T;
@@ -639,7 +629,7 @@ struct StaticArrayT<T, 0> {
 
 //------------------------------------------------------------------------------
 
-template <typename T, unsigned NCapacity>
+template <typename T, Long NCapacity>
 class ArrayT {
 	template <typename>
 	friend class IteratorT;
@@ -670,7 +660,7 @@ public:
 	FFSM2_INLINE Index count()									const noexcept	{ return _count;	}
 
 	FFSM2_INLINE ArrayT& operator += (const Item& item)				  noexcept;
-	FFSM2_INLINE ArrayT& operator += (	  Item&& item)				  noexcept;
+	FFSM2_INLINE ArrayT& operator += (	   Item&& item)				  noexcept;
 
 	template <Long N>
 	FFSM2_INLINE ArrayT& operator += (const ArrayT<Item, N>& other)	  noexcept;
@@ -723,14 +713,14 @@ namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename T, unsigned NC>
+template <typename T, Long NC>
 StaticArrayT<T, NC>::StaticArrayT(const Item filler) noexcept {
 	fill(filler);
 }
 
 //------------------------------------------------------------------------------
 
-template <typename T, unsigned NC>
+template <typename T, Long NC>
 template <typename N>
 T&
 StaticArrayT<T, NC>::operator[] (const N i) noexcept {
@@ -741,7 +731,7 @@ StaticArrayT<T, NC>::operator[] (const N i) noexcept {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename T, unsigned NC>
+template <typename T, Long NC>
 template <typename N>
 const T&
 StaticArrayT<T, NC>::operator[] (const N i) const noexcept {
@@ -752,16 +742,16 @@ StaticArrayT<T, NC>::operator[] (const N i) const noexcept {
 
 //------------------------------------------------------------------------------
 
-template <typename T, unsigned NC>
+template <typename T, Long NC>
 void
 StaticArrayT<T, NC>::fill(const Item filler) noexcept {
-	for (Long i = 0; i < CAPACITY; ++i)
+	for (Index i = 0; i < CAPACITY; ++i)
 		_items[i] = filler;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename T, unsigned NC>
+template <typename T, Long NC>
 template <typename TValue>
 typename ArrayT<T, NC>::Index
 ArrayT<T, NC>::append(const TValue& value) noexcept {
@@ -774,7 +764,7 @@ ArrayT<T, NC>::append(const TValue& value) noexcept {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename T, unsigned NC>
+template <typename T, Long NC>
 template <typename TValue>
 typename ArrayT<T, NC>::Index
 ArrayT<T, NC>::append(TValue&& value) noexcept {
@@ -787,7 +777,7 @@ ArrayT<T, NC>::append(TValue&& value) noexcept {
 
 //------------------------------------------------------------------------------
 
-template <typename T, unsigned NC>
+template <typename T, Long NC>
 template <typename N>
 T&
 ArrayT<T, NC>::operator[] (const N i) noexcept {
@@ -798,7 +788,7 @@ ArrayT<T, NC>::operator[] (const N i) noexcept {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename T, unsigned NC>
+template <typename T, Long NC>
 template <typename N>
 const T&
 ArrayT<T, NC>::operator[] (const N i) const noexcept {
@@ -810,7 +800,7 @@ ArrayT<T, NC>::operator[] (const N i) const noexcept {
 //------------------------------------------------------------------------------
 // SPECIFIC
 
-template <typename T, unsigned NC>
+template <typename T, Long NC>
 ArrayT<T, NC>&
 ArrayT<T, NC>::operator += (const Item& item) noexcept {
 	append(item);
@@ -820,7 +810,7 @@ ArrayT<T, NC>::operator += (const Item& item) noexcept {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename T, unsigned NC>
+template <typename T, Long NC>
 ArrayT<T, NC>&
 ArrayT<T, NC>::operator += (Item&& item) noexcept {
 	append(std::move(item));
@@ -831,7 +821,7 @@ ArrayT<T, NC>::operator += (Item&& item) noexcept {
 // SPECIFIC
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename T, unsigned NC>
+template <typename T, Long NC>
 template <Long N>
 ArrayT<T, NC>&
 ArrayT<T, NC>::operator += (const ArrayT<T, N>& other) noexcept {
@@ -1299,6 +1289,7 @@ struct Find<TL_<Ts...>, T>
 {};
 
 ////////////////////////////////////////////////////////////////////////////////
+// SPECIFIC
 
 }
 
