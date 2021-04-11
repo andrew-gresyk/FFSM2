@@ -166,13 +166,13 @@
 #ifdef FFSM2_ENABLE_VERBOSE_DEBUG_LOG
 
 	#define FFSM2_LOG_STATE_METHOD(METHOD, METHOD_ID)							\
-		if (auto* const logger = control.logger())								\
+		if (auto* const logger = control._logger)								\
 			logger->recordMethod(control.context(), STATE_ID, METHOD_ID)
 
 #elif defined FFSM2_ENABLE_LOG_INTERFACE
 
 	#define FFSM2_LOG_STATE_METHOD(METHOD, METHOD_ID)							\
-		if (auto* const logger = control.logger())								\
+		if (auto* const logger = control._logger)								\
 			log(METHOD, *logger, control.context(), METHOD_ID)
 
 #else

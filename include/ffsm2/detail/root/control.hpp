@@ -21,7 +21,6 @@ protected:
 
 	using Payload			= typename TArgs::Payload;
 	using Transition		= TransitionT<Payload>;
-	using TransitionSets	= ArrayT<Transition, TArgs::SUBSTITUTION_LIMIT>;
 
 #ifdef FFSM2_ENABLE_PLANS
 	using PlanData			= PlanDataT<TArgs>;
@@ -36,9 +35,9 @@ protected:
 
 	struct Origin {
 		FFSM2_INLINE Origin(ControlT& control_,
-							const StateID stateId) noexcept;
+							const StateID stateId)					  noexcept;
 
-		FFSM2_INLINE ~Origin() noexcept;
+		FFSM2_INLINE ~Origin()										  noexcept;
 
 		ControlT& control;
 		const StateID prevId;
@@ -50,11 +49,13 @@ protected:
 						, Registry& registry
 						, Transition& request
 						FFSM2_IF_PLANS(, PlanData& planData)
+						FFSM2_IF_TRANSITION_HISTORY(, const Transition& previousTransition)
 						FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
 		: _context{context}
 		, _registry{registry}
 		, _request{request}
 		FFSM2_IF_PLANS(, _planData{planData})
+		FFSM2_IF_TRANSITION_HISTORY(, _previousTransition{previousTransition})
 		FFSM2_IF_LOG_INTERFACE(, _logger{logger})
 	{}
 
@@ -64,33 +65,33 @@ public:
 	/// @tparam TState State type
 	/// @return Numeric state identifier
 	template <typename TState>
-	static constexpr StateID stateId()							  noexcept	{ return index<StateList, TState>();	}
+	static constexpr StateID stateId()								  noexcept	{ return index<StateList, TState>();			}
 
 	/// @brief Access FSM context (data shared between states and/or data interface between FSM and external code)
 	/// @return context
 	/// @see Control::context()
-	FFSM2_INLINE	   Context& _()								  noexcept	{ return _context;						}
+	FFSM2_INLINE	   Context& _()									  noexcept	{ return _context;								}
 
 	/// @brief Access FSM context (data shared between states and/or data interface between FSM and external code)
 	/// @return context
 	/// @see Control::context()
-	FFSM2_INLINE const Context& _()							const noexcept	{ return _context;						}
+	FFSM2_INLINE const Context& _()								const noexcept	{ return _context;								}
 
 	/// @brief Access FSM context (data shared between states and/or data interface between FSM and external code)
 	/// @return context
 	/// @see Control::_()
-	FFSM2_INLINE	   Context& context()						  noexcept	{ return _context;						}
+	FFSM2_INLINE	   Context& context()							  noexcept	{ return _context;								}
 
 	/// @brief Access FSM context (data shared between states and/or data interface between FSM and external code)
 	/// @return context
 	/// @see Control::_()
-	FFSM2_INLINE const Context& context()					const noexcept	{ return _context;						}
+	FFSM2_INLINE const Context& context()						const noexcept	{ return _context;								}
 
 	//----------------------------------------------------------------------
 
 	/// @brief Inspect current transition requests
 	/// @return Array of transition requests
-	FFSM2_INLINE const Transition& request()				const noexcept	{ return _request;						}
+	FFSM2_INLINE const Transition& request()					const noexcept	{ return _request;								}
 
 	//----------------------------------------------------------------------
 	//----------------------------------------------------------------------
@@ -99,16 +100,21 @@ public:
 
 	/// @brief Access read-only plan
 	/// @return Plan
-	FFSM2_INLINE CPlan plan()								const noexcept	{ return CPlan{_planData};				}
+	FFSM2_INLINE CPlan plan()									const noexcept	{ return CPlan{_planData};						}
 
 #endif
 
 	//----------------------------------------------------------------------
 
-protected:
-#ifdef FFSM2_ENABLE_LOG_INTERFACE
-	FFSM2_INLINE Logger* logger()								  noexcept	{ return _logger;						}
+#ifdef FFSM2_ENABLE_TRANSITION_HISTORY
+
+	/// @brief Get transitions processed during last 'update()', 'react()' or 'replayTransition()'
+	/// @return Array of last transition requests
+	FFSM2_INLINE const Transition& previousTransition()			const noexcept	{ return _previousTransition;					}
+
 #endif
+
+	//----------------------------------------------------------------------
 
 protected:
 	Context& _context;
@@ -116,6 +122,7 @@ protected:
 	Transition& _request;
 	StateID _originId = INVALID_STATE_ID;
 	FFSM2_IF_PLANS(PlanData& _planData);
+	FFSM2_IF_TRANSITION_HISTORY(const Transition& _previousTransition);
 	FFSM2_IF_LOG_INTERFACE(Logger* _logger);
 };
 
@@ -133,6 +140,9 @@ class PlanControlT
 
 	template <typename, typename>
 	friend class R_;
+
+	template <typename, typename>
+	friend class RV_;
 
 protected:
 	using Control		= ControlT<TArgs>;
@@ -156,14 +166,14 @@ public:
 
 	/// @brief Access plan
 	/// @return Plan
-	FFSM2_INLINE  Plan plan()									  noexcept	{ return  Plan{_planData};				}
+	FFSM2_INLINE  Plan plan()										  noexcept	{ return  Plan{_planData};	}
 
 // COMMON
 // COMMON
 
 	/// @brief Access read-only plan
 	/// @return Read-only plan
-	FFSM2_INLINE CPlan plan()								const noexcept	{ return CPlan{_planData};				}
+	FFSM2_INLINE CPlan plan()									const noexcept	{ return CPlan{_planData};	}
 
 // COMMON
 #endif
@@ -206,8 +216,8 @@ protected:
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	struct Lock {
-		FFSM2_INLINE Lock(FullControlBaseT& control_)			  noexcept;
-		FFSM2_INLINE ~Lock()									  noexcept;
+		FFSM2_INLINE Lock(FullControlBaseT& control_)				  noexcept;
+		FFSM2_INLINE ~Lock()										  noexcept;
 
 		FullControlBaseT* const control;
 	};
@@ -224,12 +234,12 @@ public:
 
 	/// @brief Transition into a state
 	/// @param stateId State identifier
-	FFSM2_INLINE void changeTo(const StateID stateId)			  noexcept;
+	FFSM2_INLINE void changeTo(const StateID stateId)				  noexcept;
 
 	/// @brief Transition into a state
 	/// @tparam TState State type
 	template <typename TState>
-	FFSM2_INLINE void changeTo()								  noexcept		{ changeTo (PlanControl::template stateId<TState>());	}
+	FFSM2_INLINE void changeTo()									  noexcept	{ changeTo (PlanControl::template stateId<TState>());	}
 
 	// COMMON
 	//----------------------------------------------------------------------
@@ -237,10 +247,10 @@ public:
 #ifdef FFSM2_ENABLE_PLANS
 
 	/// @brief Succeed a plan task for the current state
-	FFSM2_INLINE void succeed()									  noexcept;
+	FFSM2_INLINE void succeed()										  noexcept;
 
 	/// @brief Fail a plan task for the current state
-	FFSM2_INLINE void fail()									  noexcept;
+	FFSM2_INLINE void fail()										  noexcept;
 
 #endif
 
@@ -323,7 +333,7 @@ protected:
 #ifdef FFSM2_ENABLE_PLANS
 
 	template <typename TState>
-	void updatePlan(TState& headState, const Status subStatus)	  noexcept;
+	void updatePlan(TState& headState, const Status subStatus)		  noexcept;
 
 #endif
 
@@ -341,25 +351,25 @@ public:
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
 	FFSM2_INLINE void changeWith(const StateID  stateId,
-								 const Payload& payload)		  noexcept;
+								 const Payload& payload)	  noexcept;
 
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
 	FFSM2_INLINE void changeWith(const StateID  stateId,
-									  Payload&& payload)		  noexcept;
+									  Payload&& payload)	  noexcept;
 
 	/// @brief Transition into a state
 	/// @tparam TState Destination state type
 	/// @param payload Payload
 	template <typename TState>
-	FFSM2_INLINE void changeWith(const Payload& payload)		  noexcept	{ changeWith(FullControlBase::template stateId<TState>(),		   payload );	}
+	FFSM2_INLINE void changeWith(const Payload& payload)	  noexcept	{ changeWith(FullControlBase::template stateId<TState>(),		   payload );	}
 
 	/// @brief Transition into a state
 	/// @tparam TState Destination state type
 	/// @param payload Payload
 	template <typename TState>
-	FFSM2_INLINE void changeWith(	  Payload&& payload)		  noexcept	{ changeWith(FullControlBase::template stateId<TState>(), std::move(payload));	}
+	FFSM2_INLINE void changeWith(	  Payload&& payload)	  noexcept	{ changeWith(FullControlBase::template stateId<TState>(), std::move(payload));	}
 
 	// COMMON
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -438,7 +448,7 @@ protected:
 #ifdef FFSM2_ENABLE_PLANS
 
 	template <typename TState>
-	void updatePlan(TState& headState, const Status subStatus) noexcept;
+	void updatePlan(TState& headState, const Status subStatus)		  noexcept;
 
 #endif
 
@@ -474,7 +484,6 @@ class GuardControlT final
 	using typename FullControl::Context;
 
 	using typename FullControl::Transition;
-	using typename FullControl::TransitionSets;
 
 #ifdef FFSM2_ENABLE_PLANS
 	using typename FullControl::PlanData;
@@ -489,16 +498,18 @@ class GuardControlT final
 	FFSM2_INLINE GuardControlT(Context& context
 						  , Registry& registry
 						  , Transition& request
-						  , const TransitionSets& currentTransitions
+						  , const Transition& currentTransition
 						  , const Transition& pendingTransition
 						  FFSM2_IF_PLANS(, PlanData& planData)
+						  FFSM2_IF_TRANSITION_HISTORY(, const Transition& previousTransition)
 						  FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
 		: FullControl{context
 					, registry
 					, request
 					FFSM2_IF_PLANS(, planData)
+					FFSM2_IF_TRANSITION_HISTORY(, previousTransition)
 					FFSM2_IF_LOG_INTERFACE(, logger)}
-		, _currentTransitions{currentTransitions}
+		, _currentTransition{currentTransition}
 		, _pendingTransition{pendingTransition}
 	{}
 
@@ -510,15 +521,15 @@ public:
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	// COMMON
 
-	FFSM2_INLINE const TransitionSets& currentTransitions()	const noexcept	{ return _currentTransitions;	}
+	FFSM2_INLINE Transition currentTransition()			const noexcept	{ return _currentTransition;	}
 
 	/// @brief Get pending transition requests
 	/// @return ArrayT of pending transition requests
-	FFSM2_INLINE Transition& pendingTransition()			const noexcept	{ return _pendingTransition;	}
+	FFSM2_INLINE Transition& pendingTransition()		const noexcept	{ return _pendingTransition;	}
 
 	/// @brief Cancel pending transition requests
 	///		(can be used to substitute a transition into the current state with a different one)
-	FFSM2_INLINE void cancelPendingTransition()					  noexcept;
+	FFSM2_INLINE void cancelPendingTransition()				  noexcept;
 
 private:
 	using FullControl::_registry;
@@ -526,7 +537,7 @@ private:
 
 	FFSM2_IF_LOG_INTERFACE(using FullControl::_logger);
 
-	const TransitionSets& _currentTransitions;
+	const Transition& _currentTransition;
 	const Transition& _pendingTransition;
 	bool _cancelled = false;
 };

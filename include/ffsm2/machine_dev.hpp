@@ -1,5 +1,5 @@
 // FFSM2 (flat state machine for games and interactive applications)
-// 0.5.3 (2021-02-07)
+// 0.6.0 (2021-04-11)
 //
 // Created by Andrew Gresyk
 //
@@ -32,8 +32,8 @@
 #pragma once
 
 #define FFSM2_VERSION_MAJOR 0
-#define FFSM2_VERSION_MINOR 5
-#define FFSM2_VERSION_PATCH 3
+#define FFSM2_VERSION_MINOR 6
+#define FFSM2_VERSION_PATCH 0
 
 #define FFSM2_VERSION (10000 * FFSM2_VERSION_MAJOR + 100 * FFSM2_VERSION_MINOR + FFSM2_VERSION_PATCH)
 
@@ -79,12 +79,19 @@
 #include "detail/root/state_access.hpp"
 
 namespace ffsm2 {
+
+//------------------------------------------------------------------------------
+
+struct AutomaticActivation;
+struct ManualActivation;
+
 namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
 template <FeatureTag NFeatureTag
 		, typename TContext
+		, typename TActivation
 		, Long NSubstitutionLimit
 		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload>
@@ -92,6 +99,7 @@ struct G_ final {
 	static constexpr FeatureTag FEATURE_TAG = NFeatureTag;
 
 	using Context			 = TContext;
+	using Activation		 = TActivation;
 
 #ifdef FFSM2_ENABLE_LOG_INTERFACE
 	using LoggerInterface	 = LoggerInterfaceT<FEATURE_TAG, Context>;
@@ -113,7 +121,10 @@ struct G_ final {
 	/// @brief Set Context type
 	/// @tparam T Context type for data shared between states and/or data interface between FSM and external code
 	template <typename T>
-	using ContextT			 = G_<FEATURE_TAG, T	  , SUBSTITUTION_LIMIT FFSM2_IF_PLANS(, TASK_CAPACITY), Payload>;
+	using ContextT			 = G_<FEATURE_TAG, T	  , Activation		, SUBSTITUTION_LIMIT FFSM2_IF_PLANS(, TASK_CAPACITY), Payload>;
+
+	/// @brief Select manual activation strategy
+	using ManualActivation	 = G_<FEATURE_TAG, Context, ManualActivation, SUBSTITUTION_LIMIT FFSM2_IF_PLANS(, TASK_CAPACITY), Payload>;
 
 #ifdef FFSM2_ENABLE_UTILITY_THEORY
 #endif
@@ -121,21 +132,21 @@ struct G_ final {
 	/// @brief Set Substitution limit
 	/// @tparam N Maximum number times 'guard()' methods can substitute their states for others
 	template <Long N>
-	using SubstitutionLimitN = G_<FEATURE_TAG, Context, N				   FFSM2_IF_PLANS(, TASK_CAPACITY), Payload>;
+	using SubstitutionLimitN = G_<FEATURE_TAG, Context, Activation		, N					 FFSM2_IF_PLANS(, TASK_CAPACITY), Payload>;
 
 #ifdef FFSM2_ENABLE_PLANS
 
 	/// @brief Set Task capacity
 	/// @tparam N Maximum number of tasks across all plans
 	template <Long N>
-	using TaskCapacityN		 = G_<FEATURE_TAG, Context, SUBSTITUTION_LIMIT				  , N             , Payload>;
+	using TaskCapacityN		 = G_<FEATURE_TAG, Context, Activation		, SUBSTITUTION_LIMIT				, N             , Payload>;
 
 #endif
 
 	/// @brief Set Transition Payload type
 	/// @tparam T Utility type for 'TUtility State::utility() const' method
 	template <typename T>
-	using PayloadT			 = G_<FEATURE_TAG, Context, SUBSTITUTION_LIMIT FFSM2_IF_PLANS(, TASK_CAPACITY), T      >;
+	using PayloadT			 = G_<FEATURE_TAG, Context, Activation		, SUBSTITUTION_LIMIT FFSM2_IF_PLANS(, TASK_CAPACITY), T      >;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -145,11 +156,12 @@ struct M_;
 
 template <FeatureTag NFeatureTag
 		, typename TContext
+		, typename TActivation
 		, Long NSubstitutionLimit
 		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload>
-struct M_	   <G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>> {
-	using Cfg = G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>;
+struct M_	   <G_<NFeatureTag, TContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>> {
+	using Cfg = G_<NFeatureTag, TContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>;
 
 	static constexpr FeatureTag FEATURE_TAG = NFeatureTag;
 
@@ -191,18 +203,7 @@ struct M_	   <G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTas
 }
 
 /// @brief Type configuration for MachineT<>
-/// @tparam TContext Context type for data shared between states and/or data interface between FSM and external code
-/// @tparam NSubstitutionLimit Maximum number times 'guard()' methods can substitute their states for others
-/// @tparam NTaskCapacity Maximum number of tasks across all plans
-/// @tparam TPayload Payload type
-template <typename TContext = EmptyContext
-		, Long NSubstitutionLimit = 4
-		FFSM2_IF_PLANS(, Long NTaskCapacity = INVALID_LONG)
-		, typename TPayload = void>
-using ConfigT = detail::G_<FFSM2_FEATURE_TAG, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>;
-
-/// @brief Type configuration for MachineT<>
-using Config = ConfigT<>;
+using Config = detail::G_<FFSM2_FEATURE_TAG, EmptyContext, AutomaticActivation, 4 FFSM2_IF_PLANS(, INVALID_LONG), void>;
 
 /// @brief 'Template namespace' for FSM classes
 /// @tparam TConfig 'ConfigT<>' type configuration for MachineT<>

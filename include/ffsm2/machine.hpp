@@ -1,5 +1,5 @@
 ﻿// FFSM2 (flat state machine for games and interactive applications)
-// 0.5.3 (2021-02-07)
+// 0.6.0 (2021-04-11)
 //
 // Created by Andrew Gresyk
 //
@@ -32,8 +32,8 @@
 #pragma once
 
 #define FFSM2_VERSION_MAJOR 0
-#define FFSM2_VERSION_MINOR 5
-#define FFSM2_VERSION_PATCH 3
+#define FFSM2_VERSION_MINOR 6
+#define FFSM2_VERSION_PATCH 0
 
 #define FFSM2_VERSION (10000 * FFSM2_VERSION_MAJOR + 100 * FFSM2_VERSION_MINOR + FFSM2_VERSION_PATCH)
 
@@ -220,13 +220,13 @@
 #ifdef FFSM2_ENABLE_VERBOSE_DEBUG_LOG
 
 	#define FFSM2_LOG_STATE_METHOD(METHOD, METHOD_ID)							\
-		if (auto* const logger = control.logger())								\
+		if (auto* const logger = control._logger)								\
 			logger->recordMethod(control.context(), STATE_ID, METHOD_ID)
 
 #elif defined FFSM2_ENABLE_LOG_INTERFACE
 
 	#define FFSM2_LOG_STATE_METHOD(METHOD, METHOD_ID)							\
-		if (auto* const logger = control.logger())								\
+		if (auto* const logger = control._logger)								\
 			log(METHOD, *logger, control.context(), METHOD_ID)
 
 #else
@@ -1416,21 +1416,21 @@ struct alignas(4) TransitionBase {
 
 	//----------------------------------------------------------------------
 
-	FFSM2_INLINE TransitionBase(const StateID destination_) noexcept
+	inline TransitionBase(const StateID destination_) noexcept
 		: destination{destination_}
 	{}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_INLINE TransitionBase(const StateID origin_,
-								const StateID destination_) noexcept
+	inline TransitionBase(const StateID origin_,
+						  const StateID destination_) noexcept
 		: origin	 {origin_}
 		, destination{destination_}
 	{}
 
 	//----------------------------------------------------------------------
 
-	FFSM2_INLINE bool operator == (const TransitionBase& other) const noexcept {
+	inline bool operator == (const TransitionBase& other) const noexcept {
 		return origin	   == other.origin &&
 			   destination == other.destination &&
 			   method	   == other.method;
@@ -1438,7 +1438,13 @@ struct alignas(4) TransitionBase {
 
 	//----------------------------------------------------------------------
 
-	FFSM2_INLINE void clear() noexcept {
+	inline explicit operator bool() const noexcept {
+		return destination != INVALID_STATE_ID;
+	}
+
+	//----------------------------------------------------------------------
+
+	inline void clear() noexcept {
 		destination	= INVALID_STATE_ID;
 	}
 
@@ -2395,10 +2401,10 @@ protected:
 	template <typename T>
 	static constexpr StateID  stateId()					  noexcept	{ return			index<StateList , T>();	}
 
-	FFSM2_INLINE bool append(const StateID origin,
-							 const StateID destination)	  noexcept;
+	bool append(const StateID origin,
+				const StateID destination)				  noexcept;
 
-	FFSM2_INLINE bool linkTask(const Long index)		  noexcept;
+	bool linkTask(const Long index)						  noexcept;
 
 public:
 	FFSM2_INLINE explicit operator bool()			const noexcept;
@@ -2522,7 +2528,7 @@ public:
 	/// @param payload Payload
 	/// @return Seccess if FSM total number of tasks is below task capacity
 	/// @note use 'Config::TaskCapacityN<>' to increase task capacity if necessary
-	FFSM2_INLINE bool changeWith(const StateID origin, const StateID destination, const Payload& payload) noexcept	{ return append	   (origin								 , destination								 ,  		 payload );	}
+	FFSM2_INLINE bool changeWith(const StateID origin, const StateID destination, const Payload& payload) noexcept	{ return append(origin								 , destination								 ,  		 payload );	}
 
 	/// @brief Add a task to transition from 'origin' to 'destination' if 'origin' completes with 'success()'
 	/// @param origin Origin state identifier
@@ -2530,7 +2536,7 @@ public:
 	/// @param payload Payload
 	/// @return Seccess if FSM total number of tasks is below task capacity
 	/// @note use 'Config::TaskCapacityN<>' to increase task capacity if necessary
-	FFSM2_INLINE bool changeWith(const StateID origin, const StateID destination,	   Payload&& payload) noexcept	{ return append	   (origin								 , destination								 , std::move(payload));	}
+	FFSM2_INLINE bool changeWith(const StateID origin, const StateID destination,	   Payload&& payload) noexcept	{ return append(origin								 , destination								 , std::move(payload));	}
 
 	/// @brief Add a task to transition from 'origin' to 'destination' if 'origin' completes with 'success()'
 	/// @tparam TOrigin Origin state type
@@ -2539,7 +2545,7 @@ public:
 	/// @return Seccess if FSM total number of tasks is below task capacity
 	/// @note use 'Config::TaskCapacityN<>' to increase task capacity if necessary
 	template <typename TOrigin>
-	FFSM2_INLINE bool changeWith(					   const StateID destination, const Payload& payload) noexcept	{ return changeWith(PlanBase::template stateId<TOrigin>(), destination								 , 			 payload );	}
+	FFSM2_INLINE bool changeWith(					   const StateID destination, const Payload& payload) noexcept	{ return append(PlanBase::template stateId<TOrigin>(), destination								 , 			 payload );	}
 
 	/// @brief Add a task to transition from 'origin' to 'destination' if 'origin' completes with 'success()'
 	/// @tparam TOrigin Origin state type
@@ -2548,7 +2554,7 @@ public:
 	/// @return Seccess if FSM total number of tasks is below task capacity
 	/// @note use 'Config::TaskCapacityN<>' to increase task capacity if necessary
 	template <typename TOrigin>
-	FFSM2_INLINE bool changeWith(					   const StateID destination,	   Payload&& payload) noexcept	{ return changeWith(PlanBase::template stateId<TOrigin>(), destination								 , std::move(payload));	}
+	FFSM2_INLINE bool changeWith(					   const StateID destination,	   Payload&& payload) noexcept	{ return append(PlanBase::template stateId<TOrigin>(), destination								 , std::move(payload));	}
 
 	/// @brief Add a task to transition from 'origin' to 'destination' if 'origin' completes with 'success()'
 	/// @tparam TOrigin Origin state type
@@ -2557,7 +2563,7 @@ public:
 	/// @return Seccess if FSM total number of tasks is below task capacity
 	/// @note use 'Config::TaskCapacityN<>' to increase task capacity if necessary
 	template <typename TOrigin, typename TDestination>
-	FFSM2_INLINE bool changeWith(												  const Payload& payload) noexcept	{ return changeWith(PlanBase::template stateId<TOrigin>(), PlanBase::template stateId<TDestination>(), 			 payload );	}
+	FFSM2_INLINE bool changeWith(												  const Payload& payload) noexcept	{ return append(PlanBase::template stateId<TOrigin>(), PlanBase::template stateId<TDestination>(), 			 payload );	}
 
 	/// @brief Add a task to transition from 'origin' to 'destination' if 'origin' completes with 'success()'
 	/// @tparam TOrigin Origin state type
@@ -2566,7 +2572,7 @@ public:
 	/// @return Seccess if FSM total number of tasks is below task capacity
 	/// @note use 'Config::TaskCapacityN<>' to increase task capacity if necessary
 	template <typename TOrigin, typename TDestination>
-	FFSM2_INLINE bool changeWith(													   Payload&& payload) noexcept	{ return changeWith(PlanBase::template stateId<TOrigin>(), PlanBase::template stateId<TDestination>(), std::move(payload));	}
+	FFSM2_INLINE bool changeWith(													   Payload&& payload) noexcept	{ return append(PlanBase::template stateId<TOrigin>(), PlanBase::template stateId<TDestination>(), std::move(payload));	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -2994,6 +3000,10 @@ struct ArgsT;
 //------------------------------------------------------------------------------
 
 struct Registry {
+	FFSM2_INLINE bool isActive() const noexcept {
+		return active != INVALID_SHORT;
+	}
+
 	FFSM2_INLINE void clearRequests() noexcept {
 		requested = INVALID_SHORT;
 	}
@@ -3029,7 +3039,6 @@ protected:
 
 	using Payload			= typename TArgs::Payload;
 	using Transition		= TransitionT<Payload>;
-	using TransitionSets	= ArrayT<Transition, TArgs::SUBSTITUTION_LIMIT>;
 
 #ifdef FFSM2_ENABLE_PLANS
 	using PlanData			= PlanDataT<TArgs>;
@@ -3044,9 +3053,9 @@ protected:
 
 	struct Origin {
 		FFSM2_INLINE Origin(ControlT& control_,
-							const StateID stateId) noexcept;
+							const StateID stateId)					  noexcept;
 
-		FFSM2_INLINE ~Origin() noexcept;
+		FFSM2_INLINE ~Origin()										  noexcept;
 
 		ControlT& control;
 		const StateID prevId;
@@ -3058,11 +3067,13 @@ protected:
 						, Registry& registry
 						, Transition& request
 						FFSM2_IF_PLANS(, PlanData& planData)
+						FFSM2_IF_TRANSITION_HISTORY(, const Transition& previousTransition)
 						FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
 		: _context{context}
 		, _registry{registry}
 		, _request{request}
 		FFSM2_IF_PLANS(, _planData{planData})
+		FFSM2_IF_TRANSITION_HISTORY(, _previousTransition{previousTransition})
 		FFSM2_IF_LOG_INTERFACE(, _logger{logger})
 	{}
 
@@ -3072,33 +3083,33 @@ public:
 	/// @tparam TState State type
 	/// @return Numeric state identifier
 	template <typename TState>
-	static constexpr StateID stateId()							  noexcept	{ return index<StateList, TState>();	}
+	static constexpr StateID stateId()								  noexcept	{ return index<StateList, TState>();			}
 
 	/// @brief Access FSM context (data shared between states and/or data interface between FSM and external code)
 	/// @return context
 	/// @see Control::context()
-	FFSM2_INLINE	   Context& _()								  noexcept	{ return _context;						}
+	FFSM2_INLINE	   Context& _()									  noexcept	{ return _context;								}
 
 	/// @brief Access FSM context (data shared between states and/or data interface between FSM and external code)
 	/// @return context
 	/// @see Control::context()
-	FFSM2_INLINE const Context& _()							const noexcept	{ return _context;						}
+	FFSM2_INLINE const Context& _()								const noexcept	{ return _context;								}
 
 	/// @brief Access FSM context (data shared between states and/or data interface between FSM and external code)
 	/// @return context
 	/// @see Control::_()
-	FFSM2_INLINE	   Context& context()						  noexcept	{ return _context;						}
+	FFSM2_INLINE	   Context& context()							  noexcept	{ return _context;								}
 
 	/// @brief Access FSM context (data shared between states and/or data interface between FSM and external code)
 	/// @return context
 	/// @see Control::_()
-	FFSM2_INLINE const Context& context()					const noexcept	{ return _context;						}
+	FFSM2_INLINE const Context& context()						const noexcept	{ return _context;								}
 
 	//----------------------------------------------------------------------
 
 	/// @brief Inspect current transition requests
 	/// @return Array of transition requests
-	FFSM2_INLINE const Transition& request()				const noexcept	{ return _request;						}
+	FFSM2_INLINE const Transition& request()					const noexcept	{ return _request;								}
 
 	//----------------------------------------------------------------------
 	//----------------------------------------------------------------------
@@ -3107,16 +3118,21 @@ public:
 
 	/// @brief Access read-only plan
 	/// @return Plan
-	FFSM2_INLINE CPlan plan()								const noexcept	{ return CPlan{_planData};				}
+	FFSM2_INLINE CPlan plan()									const noexcept	{ return CPlan{_planData};						}
 
 #endif
 
 	//----------------------------------------------------------------------
 
-protected:
-#ifdef FFSM2_ENABLE_LOG_INTERFACE
-	FFSM2_INLINE Logger* logger()								  noexcept	{ return _logger;						}
+#ifdef FFSM2_ENABLE_TRANSITION_HISTORY
+
+	/// @brief Get transitions processed during last 'update()', 'react()' or 'replayTransition()'
+	/// @return Array of last transition requests
+	FFSM2_INLINE const Transition& previousTransition()			const noexcept	{ return _previousTransition;					}
+
 #endif
+
+	//----------------------------------------------------------------------
 
 protected:
 	Context& _context;
@@ -3124,6 +3140,7 @@ protected:
 	Transition& _request;
 	StateID _originId = INVALID_STATE_ID;
 	FFSM2_IF_PLANS(PlanData& _planData);
+	FFSM2_IF_TRANSITION_HISTORY(const Transition& _previousTransition);
 	FFSM2_IF_LOG_INTERFACE(Logger* _logger);
 };
 
@@ -3141,6 +3158,9 @@ class PlanControlT
 
 	template <typename, typename>
 	friend class R_;
+
+	template <typename, typename>
+	friend class RV_;
 
 protected:
 	using Control		= ControlT<TArgs>;
@@ -3164,14 +3184,14 @@ public:
 
 	/// @brief Access plan
 	/// @return Plan
-	FFSM2_INLINE  Plan plan()									  noexcept	{ return  Plan{_planData};				}
+	FFSM2_INLINE  Plan plan()										  noexcept	{ return  Plan{_planData};	}
 
 // COMMON
 // COMMON
 
 	/// @brief Access read-only plan
 	/// @return Read-only plan
-	FFSM2_INLINE CPlan plan()								const noexcept	{ return CPlan{_planData};				}
+	FFSM2_INLINE CPlan plan()									const noexcept	{ return CPlan{_planData};	}
 
 // COMMON
 #endif
@@ -3214,8 +3234,8 @@ protected:
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	struct Lock {
-		FFSM2_INLINE Lock(FullControlBaseT& control_)			  noexcept;
-		FFSM2_INLINE ~Lock()									  noexcept;
+		FFSM2_INLINE Lock(FullControlBaseT& control_)				  noexcept;
+		FFSM2_INLINE ~Lock()										  noexcept;
 
 		FullControlBaseT* const control;
 	};
@@ -3232,12 +3252,12 @@ public:
 
 	/// @brief Transition into a state
 	/// @param stateId State identifier
-	FFSM2_INLINE void changeTo(const StateID stateId)			  noexcept;
+	FFSM2_INLINE void changeTo(const StateID stateId)				  noexcept;
 
 	/// @brief Transition into a state
 	/// @tparam TState State type
 	template <typename TState>
-	FFSM2_INLINE void changeTo()								  noexcept		{ changeTo (PlanControl::template stateId<TState>());	}
+	FFSM2_INLINE void changeTo()									  noexcept	{ changeTo (PlanControl::template stateId<TState>());	}
 
 	// COMMON
 	//----------------------------------------------------------------------
@@ -3245,10 +3265,10 @@ public:
 #ifdef FFSM2_ENABLE_PLANS
 
 	/// @brief Succeed a plan task for the current state
-	FFSM2_INLINE void succeed()									  noexcept;
+	FFSM2_INLINE void succeed()										  noexcept;
 
 	/// @brief Fail a plan task for the current state
-	FFSM2_INLINE void fail()									  noexcept;
+	FFSM2_INLINE void fail()										  noexcept;
 
 #endif
 
@@ -3331,7 +3351,7 @@ protected:
 #ifdef FFSM2_ENABLE_PLANS
 
 	template <typename TState>
-	void updatePlan(TState& headState, const Status subStatus)	  noexcept;
+	void updatePlan(TState& headState, const Status subStatus)		  noexcept;
 
 #endif
 
@@ -3349,25 +3369,25 @@ public:
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
 	FFSM2_INLINE void changeWith(const StateID  stateId,
-								 const Payload& payload)		  noexcept;
+								 const Payload& payload)	  noexcept;
 
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
 	FFSM2_INLINE void changeWith(const StateID  stateId,
-									  Payload&& payload)		  noexcept;
+									  Payload&& payload)	  noexcept;
 
 	/// @brief Transition into a state
 	/// @tparam TState Destination state type
 	/// @param payload Payload
 	template <typename TState>
-	FFSM2_INLINE void changeWith(const Payload& payload)		  noexcept	{ changeWith(FullControlBase::template stateId<TState>(),		   payload );	}
+	FFSM2_INLINE void changeWith(const Payload& payload)	  noexcept	{ changeWith(FullControlBase::template stateId<TState>(),		   payload );	}
 
 	/// @brief Transition into a state
 	/// @tparam TState Destination state type
 	/// @param payload Payload
 	template <typename TState>
-	FFSM2_INLINE void changeWith(	  Payload&& payload)		  noexcept	{ changeWith(FullControlBase::template stateId<TState>(), std::move(payload));	}
+	FFSM2_INLINE void changeWith(	  Payload&& payload)	  noexcept	{ changeWith(FullControlBase::template stateId<TState>(), std::move(payload));	}
 
 	// COMMON
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -3446,7 +3466,7 @@ protected:
 #ifdef FFSM2_ENABLE_PLANS
 
 	template <typename TState>
-	void updatePlan(TState& headState, const Status subStatus) noexcept;
+	void updatePlan(TState& headState, const Status subStatus)		  noexcept;
 
 #endif
 
@@ -3482,7 +3502,6 @@ class GuardControlT final
 	using typename FullControl::Context;
 
 	using typename FullControl::Transition;
-	using typename FullControl::TransitionSets;
 
 #ifdef FFSM2_ENABLE_PLANS
 	using typename FullControl::PlanData;
@@ -3497,16 +3516,18 @@ class GuardControlT final
 	FFSM2_INLINE GuardControlT(Context& context
 						  , Registry& registry
 						  , Transition& request
-						  , const TransitionSets& currentTransitions
+						  , const Transition& currentTransition
 						  , const Transition& pendingTransition
 						  FFSM2_IF_PLANS(, PlanData& planData)
+						  FFSM2_IF_TRANSITION_HISTORY(, const Transition& previousTransition)
 						  FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
 		: FullControl{context
 					, registry
 					, request
 					FFSM2_IF_PLANS(, planData)
+					FFSM2_IF_TRANSITION_HISTORY(, previousTransition)
 					FFSM2_IF_LOG_INTERFACE(, logger)}
-		, _currentTransitions{currentTransitions}
+		, _currentTransition{currentTransition}
 		, _pendingTransition{pendingTransition}
 	{}
 
@@ -3518,15 +3539,15 @@ public:
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	// COMMON
 
-	FFSM2_INLINE const TransitionSets& currentTransitions()	const noexcept	{ return _currentTransitions;	}
+	FFSM2_INLINE Transition currentTransition()			const noexcept	{ return _currentTransition;	}
 
 	/// @brief Get pending transition requests
 	/// @return ArrayT of pending transition requests
-	FFSM2_INLINE Transition& pendingTransition()			const noexcept	{ return _pendingTransition;	}
+	FFSM2_INLINE Transition& pendingTransition()		const noexcept	{ return _pendingTransition;	}
 
 	/// @brief Cancel pending transition requests
 	///		(can be used to substitute a transition into the current state with a different one)
-	FFSM2_INLINE void cancelPendingTransition()					  noexcept;
+	FFSM2_INLINE void cancelPendingTransition()				  noexcept;
 
 private:
 	using FullControl::_registry;
@@ -3534,7 +3555,7 @@ private:
 
 	FFSM2_IF_LOG_INTERFACE(using FullControl::_logger);
 
-	const TransitionSets& _currentTransitions;
+	const Transition& _currentTransition;
 	const Transition& _pendingTransition;
 	bool _cancelled = false;
 };
@@ -4697,6 +4718,7 @@ struct RF_ final {
 #endif
 
 	using Payload		= typename TConfig::Payload;
+	using Transition	= TransitionT<Payload>;
 
 #ifdef FFSM2_ENABLE_PLANS
 	using Task			= typename TConfig::Task;
@@ -5517,12 +5539,19 @@ namespace detail {
 }
 
 namespace ffsm2 {
+
+//------------------------------------------------------------------------------
+
+struct AutomaticActivation;
+struct ManualActivation;
+
 namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
 template <FeatureTag NFeatureTag
 		, typename TContext
+		, typename TActivation
 		, Long NSubstitutionLimit
 		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload>
@@ -5530,6 +5559,7 @@ struct G_ final {
 	static constexpr FeatureTag FEATURE_TAG = NFeatureTag;
 
 	using Context			 = TContext;
+	using Activation		 = TActivation;
 
 #ifdef FFSM2_ENABLE_LOG_INTERFACE
 	using LoggerInterface	 = LoggerInterfaceT<FEATURE_TAG, Context>;
@@ -5551,7 +5581,10 @@ struct G_ final {
 	/// @brief Set Context type
 	/// @tparam T Context type for data shared between states and/or data interface between FSM and external code
 	template <typename T>
-	using ContextT			 = G_<FEATURE_TAG, T	  , SUBSTITUTION_LIMIT FFSM2_IF_PLANS(, TASK_CAPACITY), Payload>;
+	using ContextT			 = G_<FEATURE_TAG, T	  , Activation		, SUBSTITUTION_LIMIT FFSM2_IF_PLANS(, TASK_CAPACITY), Payload>;
+
+	/// @brief Select manual activation strategy
+	using ManualActivation	 = G_<FEATURE_TAG, Context, ManualActivation, SUBSTITUTION_LIMIT FFSM2_IF_PLANS(, TASK_CAPACITY), Payload>;
 
 #ifdef FFSM2_ENABLE_UTILITY_THEORY
 #endif
@@ -5559,21 +5592,21 @@ struct G_ final {
 	/// @brief Set Substitution limit
 	/// @tparam N Maximum number times 'guard()' methods can substitute their states for others
 	template <Long N>
-	using SubstitutionLimitN = G_<FEATURE_TAG, Context, N				   FFSM2_IF_PLANS(, TASK_CAPACITY), Payload>;
+	using SubstitutionLimitN = G_<FEATURE_TAG, Context, Activation		, N					 FFSM2_IF_PLANS(, TASK_CAPACITY), Payload>;
 
 #ifdef FFSM2_ENABLE_PLANS
 
 	/// @brief Set Task capacity
 	/// @tparam N Maximum number of tasks across all plans
 	template <Long N>
-	using TaskCapacityN		 = G_<FEATURE_TAG, Context, SUBSTITUTION_LIMIT				  , N             , Payload>;
+	using TaskCapacityN		 = G_<FEATURE_TAG, Context, Activation		, SUBSTITUTION_LIMIT				, N             , Payload>;
 
 #endif
 
 	/// @brief Set Transition Payload type
 	/// @tparam T Utility type for 'TUtility State::utility() const' method
 	template <typename T>
-	using PayloadT			 = G_<FEATURE_TAG, Context, SUBSTITUTION_LIMIT FFSM2_IF_PLANS(, TASK_CAPACITY), T      >;
+	using PayloadT			 = G_<FEATURE_TAG, Context, Activation		, SUBSTITUTION_LIMIT FFSM2_IF_PLANS(, TASK_CAPACITY), T      >;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -5583,11 +5616,12 @@ struct M_;
 
 template <FeatureTag NFeatureTag
 		, typename TContext
+		, typename TActivation
 		, Long NSubstitutionLimit
 		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload>
-struct M_	   <G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>> {
-	using Cfg = G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>;
+struct M_	   <G_<NFeatureTag, TContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>> {
+	using Cfg = G_<NFeatureTag, TContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>;
 
 	static constexpr FeatureTag FEATURE_TAG = NFeatureTag;
 
@@ -5629,18 +5663,7 @@ struct M_	   <G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTas
 }
 
 /// @brief Type configuration for MachineT<>
-/// @tparam TContext Context type for data shared between states and/or data interface between FSM and external code
-/// @tparam NSubstitutionLimit Maximum number times 'guard()' methods can substitute their states for others
-/// @tparam NTaskCapacity Maximum number of tasks across all plans
-/// @tparam TPayload Payload type
-template <typename TContext = EmptyContext
-		, Long NSubstitutionLimit = 4
-		FFSM2_IF_PLANS(, Long NTaskCapacity = INVALID_LONG)
-		, typename TPayload = void>
-using ConfigT = detail::G_<FFSM2_FEATURE_TAG, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>;
-
-/// @brief Type configuration for MachineT<>
-using Config = ConfigT<>;
+using Config = detail::G_<FFSM2_FEATURE_TAG, EmptyContext, AutomaticActivation, 4 FFSM2_IF_PLANS(, INVALID_LONG), void>;
 
 /// @brief 'Template namespace' for FSM classes
 /// @tparam TConfig 'ConfigT<>' type configuration for MachineT<>
@@ -5672,7 +5695,7 @@ public:
 	using Context				= typename TConfig::Context;
 	using Payload				= typename TConfig::Payload;
 
-private:
+protected:
 	using Apex					= TApex;
 
 	using Forward				= RF_<TConfig, Apex>;
@@ -5693,8 +5716,6 @@ private:
 
 #ifdef FFSM2_ENABLE_PLANS
 	using PlanData				= PlanDataT<Args>;
-
-	static constexpr Long TASK_CAPACITY = Forward::TASK_CAPACITY;
 #endif
 
 #ifdef FFSM2_ENABLE_SERIALIZATION
@@ -5706,9 +5727,6 @@ public:
 	/// @brief Transition
 	using Transition			= typename Control::Transition;
 
-	/// @brief Array of transitions
-	using TransitionSets		= typename Control::TransitionSets;
-
 #ifdef FFSM2_ENABLE_LOG_INTERFACE
 	using Logger				= typename TConfig::LoggerInterface;
 #endif
@@ -5718,7 +5736,7 @@ public:
 	//----------------------------------------------------------------------
 
 	FFSM2_INLINE explicit R_(Context& context
-						  FFSM2_IF_LOG_INTERFACE(, Logger* const logger = nullptr)) noexcept;
+						   FFSM2_IF_LOG_INTERFACE(, Logger* const logger = nullptr)) noexcept;
 
 	FFSM2_INLINE ~R_() noexcept;
 
@@ -5726,11 +5744,11 @@ public:
 
 	/// @brief Access context
 	/// @return context
-	FFSM2_INLINE	   Context& context()					  noexcept { return _context; }
+	FFSM2_INLINE	   Context& context()								  noexcept	{ return _context;								}
 
 	/// @brief Access context
 	/// @return context
-	FFSM2_INLINE const Context& context()				const noexcept { return _context; }
+	FFSM2_INLINE const Context& context()							const noexcept	{ return _context;								}
 
 	//----------------------------------------------------------------------
 
@@ -5738,7 +5756,7 @@ public:
 	/// @tparam TState State type
 	/// @return Numeric state identifier
 	template <typename TState>
-	static constexpr StateID stateId()						  noexcept	{ return index<StateList, TState>();			}
+	static constexpr StateID stateId()									  noexcept	{ return index<StateList, TState>();			}
 
 	//----------------------------------------------------------------------
 
@@ -5749,38 +5767,38 @@ public:
 	/// @tparam TEvent Event type
 	/// @param event Event to react to
 	template <typename TEvent>
-	FFSM2_INLINE void react(const TEvent& event)			  noexcept;
+	FFSM2_INLINE void react(const TEvent& event)						  noexcept;
 
 	//----------------------------------------------------------------------
 
 	/// @brief Get current active state ID
 	/// @return Current active state ID
-	FFSM2_INLINE StateID activeStateId()				const noexcept	{ return _registry.active;						}
+	FFSM2_INLINE StateID activeStateId()							const noexcept	{ return _registry.active;						}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	/// @brief Check if a state is active
 	/// @param stateId Destination state identifier
 	/// @return State active status
-	FFSM2_INLINE bool isActive(const StateID stateId)	const noexcept	{ return _registry.active == stateId;			}
+	FFSM2_INLINE bool isActive(const StateID stateId)				const noexcept	{ return _registry.active == stateId;			}
 
 	/// @brief Check if a state is active
 	/// @tparam TState Destination state type
 	/// @return State active status
 	template <typename TState>
-	FFSM2_INLINE bool isActive()						const noexcept	{ return _registry.active == stateId<TState>();	}
+	FFSM2_INLINE bool isActive()									const noexcept	{ return _registry.active == stateId<TState>();	}
 
 	//------------------------------------------------------------------------------
 	// COMMON
 
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
-	FFSM2_INLINE void changeTo(const StateID stateId)		  noexcept;
+	FFSM2_INLINE void changeTo(const StateID stateId)					  noexcept;
 
 	/// @brief Transition into a state
 	/// @tparam TState Destination state type
 	template <typename TState>
-	FFSM2_INLINE void changeTo()							  noexcept	{ changeTo (stateId<TState>());					}
+	FFSM2_INLINE void changeTo()										  noexcept	{ changeTo (stateId<TState>());					}
 
 	// COMMON
 	//------------------------------------------------------------------------------
@@ -5795,12 +5813,32 @@ public:
 	/// @brief Serialize FSM into 'buffer'
 	/// @param buffer 'SerialBuffer' to serialize to
 	/// @see FFSM2_ENABLE_SERIALIZATION
-	void save(		SerialBuffer& buffer)				const noexcept;
+	void save(		SerialBuffer& buffer)							const noexcept;
 
 	/// @brief De-serialize FSM from 'buffer'
 	/// @param buffer 'SerialBuffer' to de-serialize from
 	/// @see FFSM2_ENABLE_SERIALIZATION
-	void load(const SerialBuffer& buffer)					  noexcept;
+	void load(const SerialBuffer& buffer)								  noexcept;
+
+#endif
+
+	//------------------------------------------------------------------------------
+
+#ifdef FFSM2_ENABLE_TRANSITION_HISTORY
+
+	/// @brief Get the transition recorded during last 'update()' / 'react()'
+	/// @return Array of last recorded transitions
+	/// @see FFSM2_ENABLE_TRANSITION_HISTORY
+	const Transition previousTransition()							const noexcept	{ return _previousTransition;					}
+
+	/// @brief Force process a transition (skips 'guard()' calls)
+	///   Can be used to synchronize multiple FSMs
+	/// @param destination Transition destination
+	/// @return Success status
+	/// @see FFSM2_ENABLE_TRANSITION_HISTORY
+	bool replayTransition(const StateID destination)					  noexcept;
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #endif
 
@@ -5811,24 +5849,30 @@ public:
 	/// @brief Attach logger
 	/// @param logger A logger implementing 'ffsm2::LoggerInterfaceT<>' interface
 	/// @see FFSM2_ENABLE_LOG_INTERFACE
-	FFSM2_INLINE void attachLogger(Logger* const logger)	  noexcept	{ _logger = logger;								}
+	FFSM2_INLINE void attachLogger(Logger* const logger)				  noexcept	{ _logger = logger;								}
 
 #endif
 
 	//----------------------------------------------------------------------
 
-private:
-	void initialEnter()										  noexcept;
-
-	void processTransitions(TransitionSets& currentTransitions) noexcept;
-
-	bool cancelledByEntryGuards(const TransitionSets& currentTransitions,
-								const Transition& pendingTransition) noexcept;
-
-	bool cancelledByGuards(const TransitionSets& currentTransitions,
-						   const Transition& pendingTransition) noexcept;
-
 protected:
+	void initialEnter()													  noexcept;
+	void finalExit()													  noexcept;
+
+	void processTransitions(Transition& currentTransition) noexcept;
+
+	void applyRequest(const StateID destination)						  noexcept;
+
+	bool cancelledByEntryGuards(const Transition& currentTransition,
+								const Transition& pendingTransition)	  noexcept;
+
+	bool cancelledByGuards(const Transition& currentTransition,
+						   const Transition& pendingTransition)			  noexcept;
+
+#ifdef FFSM2_ENABLE_TRANSITION_HISTORY
+	Transition _previousTransition;
+#endif
+
 	Context _context;
 
 	Registry _registry;
@@ -5843,11 +5887,47 @@ protected:
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename TConfig,
-		  typename TApex>
-class RP_;
+// Automatic / manual [de]activation
+
+template <typename, typename>
+class RV_;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// Automatic enter() / exit()
+
+template <FeatureTag NFeatureTag
+		, typename TContext
+		, typename TActivation
+		, Long NSubstitutionLimit
+		FFSM2_IF_PLANS(, Long NTaskCapacity)
+		, typename TPayload
+		, typename TApex>
+class RV_		   <G_<NFeatureTag, TContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
+	: public	 R_<G_<NFeatureTag, TContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
+{
+	using Base = R_<G_<NFeatureTag, TContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
+
+protected:
+public:
+	using typename Base::Context;
+
+#ifdef FFSM2_ENABLE_LOG_INTERFACE
+	using typename Base::Logger;
+#endif
+
+public:
+	FFSM2_INLINE explicit RV_(Context& context
+							FFSM2_IF_LOG_INTERFACE(, Logger* const logger = nullptr)) noexcept;
+
+	FFSM2_INLINE ~RV_() noexcept;
+
+private:
+	using Base::initialEnter;
+	using Base::finalExit;
+};
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// Manual enter() / exit()
 
 template <FeatureTag NFeatureTag
 		, typename TContext
@@ -5855,15 +5935,87 @@ template <FeatureTag NFeatureTag
 		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload
 		, typename TApex>
-class RP_		   <G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
-	: public	 R_<G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
+class RV_		   <G_<NFeatureTag, TContext, ManualActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
+	: public	 R_<G_<NFeatureTag, TContext, ManualActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
 {
-	using Base = R_<G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
+	using Base = R_<G_<NFeatureTag, TContext, ManualActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
+
+protected:
+	using Base::Payload;
+
+#ifdef FFSM2_ENABLE_TRANSITION_HISTORY
+	using Base::PlanControl;
+	using Base::Transition;
+#endif
+
+public:
+	using Base::Base;
+
+	/// @brief Manually start the FSM
+	///   Can be used with UE4 to start / stop the FSM in BeginPlay() / EndPlay()
+	FFSM2_INLINE void enter()								  noexcept;
+
+	/// @brief Manually stop the FSM
+	///   Can be used with UE4 to start / stop the FSM in BeginPlay() / EndPlay()
+	FFSM2_INLINE void exit()								  noexcept;
+
+#ifdef FFSM2_ENABLE_TRANSITION_HISTORY
+
+	/// @brief Start the FSM from a specific state
+	///   Can be used with UE4 USTRUCT() NetSerialize() to load replicated FSM from FArchive
+	/// @param destination Transition destination
+	/// @see FFSM2_ENABLE_TRANSITION_HISTORY
+	FFSM2_INLINE void replayEnter(const StateID destination)  noexcept;
+
+#endif
+
+private:
+	using Base::initialEnter;
+	using Base::finalExit;
+
+#ifdef FFSM2_ENABLE_TRANSITION_HISTORY
+	using Base::applyRequest;
+
+	using Base::_previousTransition;
+
+	using Base::_context;
+	using Base::_registry;
+	#ifdef FFSM2_ENABLE_PLANS
+		using Base::_planData;
+	#endif
+	using Base::_request;
+	using Base::_apex;
+	#ifdef FFSM2_ENABLE_LOG_INTERFACE
+		using Base::_logger;
+	#endif
+#endif
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+template <typename TConfig,
+		  typename TApex>
+class RP_;
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// Non-'void' payloads
+
+template <FeatureTag NFeatureTag
+		, typename TContext
+		, typename TActivation
+		, Long NSubstitutionLimit
+		FFSM2_IF_PLANS(, Long NTaskCapacity)
+		, typename TPayload
+		, typename TApex>
+class RP_			<G_<NFeatureTag, TContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
+	: public	 RV_<G_<NFeatureTag, TContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
+{
+	using Base = RV_<G_<NFeatureTag, TContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
 
 	using Transition			= TransitionT<TPayload>;
 
 public:
-	using Payload				= typename Base::Payload;
+	using typename Base::Payload;
 
 public:
 	using Base::Base;
@@ -5909,24 +6061,28 @@ public:
 
 protected:
 	using Base::_context;
+	using Base::_registry;
 
 private:
 	using Base::_request;
 
-	FFSM2_IF_LOG_INTERFACE(using Base::_logger);
+#ifdef FFSM2_ENABLE_LOG_INTERFACE
+	using Base::_logger;
+#endif
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <FeatureTag NFeatureTag
 		, typename TContext
+		, typename TActivation
 		, Long NSubstitutionLimit
 		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TApex>
-class RP_		   <G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), void>, TApex>
-	: public	 R_<G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), void>, TApex>
+class RP_			<G_<NFeatureTag, TContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), void>, TApex>
+	: public	 RV_<G_<NFeatureTag, TContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), void>, TApex>
 {
-	using Base = R_<G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), void>, TApex>;
+	using Base = RV_<G_<NFeatureTag, TContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), void>, TApex>;
 
 public:
 	using Base::Base;
@@ -5948,23 +6104,23 @@ class RC_;
 /// @tparam TApex Root region type
 template <FeatureTag NFeatureTag
 		, typename TContext
+		, typename TActivation
 		, Long NSubstitutionLimit
 		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload
 		, typename TApex>
-class RC_			<G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
-	: public	 RP_<G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
+class RC_			<G_<NFeatureTag, TContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
+	: public	 RP_<G_<NFeatureTag, TContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
 {
-	using Base = RP_<G_<NFeatureTag, TContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
+	using Base = RP_<G_<NFeatureTag, TContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
 
 public:
 	static constexpr FeatureTag FEATURE_TAG = Base::FEATURE_TAG;
 
-	using Context	= TContext;
-	using Payload	= typename Base::Payload;
+	using typename Base::Context;
 
 #ifdef FFSM2_ENABLE_LOG_INTERFACE
-	using Logger	= typename Base::Logger;
+	using typename Base::Logger;
 #endif
 
 public:
@@ -5989,23 +6145,23 @@ private:
 /// @tparam TApex Root region type
 template <FeatureTag NFeatureTag
 		, typename TContext
+		, typename TActivation
 		, Long NSubstitutionLimit
 		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload
 		, typename TApex>
-class RC_			<G_<NFeatureTag, TContext&, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
-	: public	 RP_<G_<NFeatureTag, TContext&, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
+class RC_			<G_<NFeatureTag, TContext&, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
+	: public	 RP_<G_<NFeatureTag, TContext&, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
 {
-	using Base = RP_<G_<NFeatureTag, TContext&, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
+	using Base = RP_<G_<NFeatureTag, TContext&, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
 
 public:
 	static constexpr FeatureTag FEATURE_TAG = Base::FEATURE_TAG;
 
-	using Context	= typename Base::Context;
-	using Payload	= typename Base::Payload;
+	using typename Base::Context;
 
 #ifdef FFSM2_ENABLE_LOG_INTERFACE
-	using Logger	= typename Base::Logger;
+	using typename Base::Logger;
 #endif
 
 public:
@@ -6029,23 +6185,23 @@ private:
 /// @tparam TApex Root region type
 template <FeatureTag NFeatureTag
 		, typename TContext
+		, typename TActivation
 		, Long NSubstitutionLimit
 		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload
 		, typename TApex>
-class RC_			<G_<NFeatureTag, TContext*, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
-	: public	 RP_<G_<NFeatureTag, TContext*, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
+class RC_			<G_<NFeatureTag, TContext*, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
+	: public	 RP_<G_<NFeatureTag, TContext*, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
 {
-	using Base = RP_<G_<NFeatureTag, TContext*, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
+	using Base = RP_<G_<NFeatureTag, TContext*, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
 
 public:
 	static constexpr FeatureTag FEATURE_TAG = Base::FEATURE_TAG;
 
-	using Context	= typename Base::Context;
-	using Payload	= typename Base::Payload;
+	using typename Base::Context;
 
 #ifdef FFSM2_ENABLE_LOG_INTERFACE
-	using Logger	= typename Base::Logger;
+	using typename Base::Logger;
 #endif
 
 public:
@@ -6068,29 +6224,27 @@ private:
 /// @tparam Cfg Type configuration
 /// @tparam TApex Root region type
 template <FeatureTag NFeatureTag
+		, typename TActivation
 		, Long NSubstitutionLimit
 		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload
 		, typename TApex>
-class RC_			<G_<NFeatureTag, EmptyContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
-	: public	 RP_<G_<NFeatureTag, EmptyContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
+class RC_			<G_<NFeatureTag, EmptyContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
+	: public	 RP_<G_<NFeatureTag, EmptyContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
 	, EmptyContext
 {
-	using Base = RP_<G_<NFeatureTag, EmptyContext, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
+	using Base = RP_<G_<NFeatureTag, EmptyContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
 
 public:
 	static constexpr FeatureTag FEATURE_TAG = Base::FEATURE_TAG;
 
-	using Context	= typename Base::Context;
-	using Payload	= typename Base::Payload;
-
 #ifdef FFSM2_ENABLE_LOG_INTERFACE
-	using Logger	= typename Base::Logger;
+	using typename Base::Logger;
 #endif
 
 public:
 	explicit FFSM2_INLINE RC_(FFSM2_IF_LOG_INTERFACE(Logger* const logger = nullptr)) noexcept
-		: Base{static_cast<Context&>(*this)
+		: Base{static_cast<EmptyContext&>(*this)
 			 FFSM2_IF_LOG_INTERFACE(, logger)}
 	{}
 };
@@ -6107,26 +6261,15 @@ namespace detail {
 
 template <typename TG, typename TA>
 R_<TG, TA>::R_(Context& context
-			   FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
+			 FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
 	: _context{context}
 	FFSM2_IF_LOG_INTERFACE(, _logger{logger})
-{
-	initialEnter();
-}
+{}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename TG, typename TA>
 R_<TG, TA>::~R_() noexcept {
-	PlanControl control{_context
-					  , _registry
-					  , _request
-					  FFSM2_IF_PLANS(, _planData)
-					  FFSM2_IF_LOG_INTERFACE(, _logger)};
-
-	_apex.deepExit	  (control);
-	_apex.deepDestruct(control);
-
 	FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
 }
 
@@ -6135,20 +6278,25 @@ R_<TG, TA>::~R_() noexcept {
 template <typename TG, typename TA>
 void
 R_<TG, TA>::update() noexcept {
+	FFSM2_ASSERT(_registry.isActive());
+
 	FullControl control{_context
 					  , _registry
 					  , _request
 					  FFSM2_IF_PLANS(, _planData)
+					  FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
 					  FFSM2_IF_LOG_INTERFACE(, _logger)};
 
 	_apex.deepUpdate(control);
 
 	FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
 
-	TransitionSets currentTransitions;
+	Transition currentTransition;
 
-	if (_request.destination != INVALID_SHORT)
-		processTransitions(currentTransitions);
+	if (_request)
+		processTransitions(currentTransition);
+
+	FFSM2_IF_TRANSITION_HISTORY(_previousTransition = currentTransition);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -6157,18 +6305,25 @@ template <typename TG, typename TA>
 template <typename TEvent>
 void
 R_<TG, TA>::react(const TEvent& event) noexcept {
+	FFSM2_ASSERT(_registry.isActive());
+
 	FullControl control{_context
 					  , _registry
 					  , _request
 					  FFSM2_IF_PLANS(, _planData)
+					  FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
 					  FFSM2_IF_LOG_INTERFACE(, _logger)};
 
 	_apex.deepReact(control, event);
 
-	TransitionSets currentTransitions;
+	FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
 
-	if (_request.destination != INVALID_SHORT)
-		processTransitions(currentTransitions);
+	Transition currentTransition;
+
+	if (_request)
+		processTransitions(currentTransition);
+
+	FFSM2_IF_TRANSITION_HISTORY(_previousTransition = currentTransition);
 }
 
 //------------------------------------------------------------------------------
@@ -6176,6 +6331,8 @@ R_<TG, TA>::react(const TEvent& event) noexcept {
 template <typename TG, typename TA>
 void
 R_<TG, TA>::changeTo(const StateID stateId) noexcept {
+	FFSM2_ASSERT(_registry.isActive());
+
 	_request = Transition{stateId};
 
 	FFSM2_LOG_TRANSITION(_context, INVALID_STATE_ID, stateId);
@@ -6188,13 +6345,15 @@ R_<TG, TA>::changeTo(const StateID stateId) noexcept {
 template <typename TG, typename TA>
 void
 R_<TG, TA>::save(SerialBuffer& _buffer) const noexcept {
+	FFSM2_ASSERT(_registry.isActive());
+
 	WriteStream stream{_buffer};
 
 	// TODO: save _registry
 	// TODO: save _requests
 	// TODO: save _rng						// FFSM2_IF_UTILITY_THEORY()
 	// TODO: save _planData					// FFSM2_IF_PLANS()
-	// TODO: save _previousTransitions		// FFSM2_IF_TRANSITION_HISTORY()
+	// TODO: save _previousTransition		// FFSM2_IF_TRANSITION_HISTORY()
 	// TODO: save _activityHistory			// FFSM2_IF_STRUCTURE_REPORT()
 
 	_apex.deepSaveActive(_registry, stream);
@@ -6205,16 +6364,21 @@ R_<TG, TA>::save(SerialBuffer& _buffer) const noexcept {
 template <typename TG, typename TA>
 void
 R_<TG, TA>::load(const SerialBuffer& buffer) noexcept {
+	FFSM2_ASSERT(_registry.isActive());
+
 	_request.clear();
 
 	PlanControl control{_context
 					  , _registry
 					  , _request
 					  FFSM2_IF_PLANS(, _planData)
+					  FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
 					  FFSM2_IF_LOG_INTERFACE(, _logger)};
 
 	_apex.deepExit	  (control);
 	_apex.deepDestruct(control);
+
+	FFSM2_IF_TRANSITION_HISTORY(_previousTransition.clear());
 
 	_registry.clearRequests();
 	_request.clear();
@@ -6225,7 +6389,7 @@ R_<TG, TA>::load(const SerialBuffer& buffer) noexcept {
 	// TODO: load _requests
 	// TODO: load _rng					// FFSM2_IF_UTILITY_THEORY()
 	// TODO: load _planData				// FFSM2_IF_PLANS()
-	// TODO: load _previousTransitions	// FFSM2_IF_TRANSITION_HISTORY()
+	// TODO: load _previousTransition	// FFSM2_IF_TRANSITION_HISTORY()
 	// TODO: load _activityHistory		// FFSM2_IF_STRUCTURE_REPORT()
 
 	_apex.deepLoadRequested(_registry, stream);
@@ -6237,43 +6401,85 @@ R_<TG, TA>::load(const SerialBuffer& buffer) noexcept {
 #endif
 
 //------------------------------------------------------------------------------
-// COMMON
+
+#ifdef FFSM2_ENABLE_TRANSITION_HISTORY
+
+template <typename TG, typename TA>
+bool
+R_<TG, TA>::replayTransition(const StateID destination) noexcept {
+	FFSM2_ASSERT(_registry.isActive());
+
+	_previousTransition.clear();
+
+	if (FFSM2_CHECKED(destination != INVALID_SHORT)) {
+		PlanControl control{_context
+						  , _registry
+						  , _request
+						  FFSM2_IF_PLANS(, _planData)
+						  , _previousTransition
+						  FFSM2_IF_LOG_INTERFACE(, _logger)};
+
+		applyRequest(destination);
+		_previousTransition = Transition{destination};
+
+		_apex.deepChangeToRequested(control);
+
+		_registry.clearRequests();
+
+		FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
+		FFSM2_IF_STRUCTURE_REPORT(udpateActivity());
+
+		return true;
+	}
+
+	return false;
+}
+
+#endif
+
+//------------------------------------------------------------------------------
 
 template <typename TG, typename TA>
 void
 R_<TG, TA>::initialEnter() noexcept {
-	FFSM2_ASSERT(_request.destination == INVALID_SHORT);
+	FFSM2_ASSERT(!_registry.isActive());
+	FFSM2_ASSERT(!_request);
+	FFSM2_IF_TRANSITION_HISTORY(FFSM2_ASSERT(!_previousTransition));
 
 	PlanControl control{_context
 					  , _registry
 					  , _request
 					  FFSM2_IF_PLANS(, _planData)
+					  FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
 					  FFSM2_IF_LOG_INTERFACE(, _logger)};
 
-	_registry.requested = 0;
+	applyRequest(0);
 
-	TransitionSets currentTransitions;
+	Transition currentTransition;
 	Transition pendingTransition;
 
-	cancelledByEntryGuards(currentTransitions,
+	cancelledByEntryGuards(currentTransition,
 						   pendingTransition);
 
 	for (Long i = 0;
-		 i < SUBSTITUTION_LIMIT && _request.destination != INVALID_SHORT;
+		 i < SUBSTITUTION_LIMIT && _request;
 		 ++i)
 	{
-		_registry.requested = _request.destination;
+		//backup();
+
+		applyRequest(_request.destination);
 		pendingTransition = _request;
 		_request.clear();
 
-		if (cancelledByEntryGuards(currentTransitions,
+		if (cancelledByEntryGuards(currentTransition,
 								   pendingTransition))
 			FFSM2_BREAK();
 		else
-			currentTransitions += pendingTransition;
+			currentTransition = pendingTransition;
 
 		pendingTransition.clear();
 	}
+	FFSM2_IF_TRANSITION_HISTORY(_previousTransition = currentTransition);
 
 	_apex.deepConstruct(control);
 	_apex.deepEnter	   (control);
@@ -6287,34 +6493,56 @@ R_<TG, TA>::initialEnter() noexcept {
 
 template <typename TG, typename TA>
 void
-R_<TG, TA>::processTransitions(TransitionSets& currentTransitions) noexcept {
-	FFSM2_ASSERT(_request.destination != INVALID_SHORT);
+R_<TG, TA>::finalExit() noexcept {
+	FFSM2_ASSERT(_registry.isActive());
+	FFSM2_ASSERT(!_request);
 
 	PlanControl control{_context
 					  , _registry
 					  , _request
 					  FFSM2_IF_PLANS(, _planData)
+					  FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
+					  FFSM2_IF_LOG_INTERFACE(, _logger)};
+
+	_apex.deepExit	  (control);
+	_apex.deepDestruct(control);
+}
+
+//------------------------------------------------------------------------------
+
+template <typename TG, typename TA>
+void
+R_<TG, TA>::processTransitions(Transition& currentTransition) noexcept {
+	FFSM2_ASSERT(_request);
+
+	PlanControl control{_context
+					  , _registry
+					  , _request
+					  FFSM2_IF_PLANS(, _planData)
+					  FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
 					  FFSM2_IF_LOG_INTERFACE(, _logger)};
 
 	Transition pendingTransition;
 
 	for (Long i = 0;
-		i < SUBSTITUTION_LIMIT && _request.destination != INVALID_SHORT;
+		i < SUBSTITUTION_LIMIT && _request;
 		++i)
 	{
-		_registry.requested = _request.destination;
+		//backup();
+
+		applyRequest(_request.destination);
 		pendingTransition = _request;
 		_request.clear();
 
-		if (cancelledByGuards(currentTransitions, pendingTransition))
+		if (cancelledByGuards(currentTransition, pendingTransition))
 			;
 		else
-			currentTransitions += pendingTransition;
+			currentTransition = pendingTransition;
 
 		pendingTransition.clear();
 	}
 
-	if (currentTransitions.count())
+	if (currentTransition)
 		_apex.deepChangeToRequested(control);
 
 	_registry.clearRequests();
@@ -6324,19 +6552,28 @@ R_<TG, TA>::processTransitions(TransitionSets& currentTransitions) noexcept {
 
 // COMMON
 //------------------------------------------------------------------------------
+
+template <typename TG, typename TA>
+void
+R_<TG, TA>::applyRequest(const StateID destination) noexcept {
+	_registry.requested = destination;
+}
+
+//------------------------------------------------------------------------------
 // COMMON
 
 template <typename TG, typename TA>
 bool
-R_<TG, TA>::cancelledByEntryGuards(const TransitionSets& currentTransitions,
+R_<TG, TA>::cancelledByEntryGuards(const Transition& currentTransition,
 								   const Transition& pendingTransition) noexcept
 {
 	GuardControl guardControl{_context
 							, _registry
 							, _request
-							, currentTransitions
+							, currentTransition
 							, pendingTransition
 							FFSM2_IF_PLANS(, _planData)
+							FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
 							FFSM2_IF_LOG_INTERFACE(, _logger)};
 
 	return _apex.deepEntryGuard(guardControl);
@@ -6346,30 +6583,98 @@ R_<TG, TA>::cancelledByEntryGuards(const TransitionSets& currentTransitions,
 
 template <typename TG, typename TA>
 bool
-R_<TG, TA>::cancelledByGuards(const TransitionSets& currentTransitions,
+R_<TG, TA>::cancelledByGuards(const Transition& currentTransition,
 							  const Transition& pendingTransition) noexcept
 {
 	GuardControl guardControl{_context
 							, _registry
 							, _request
-							, currentTransitions
+							, currentTransition
 							, pendingTransition
 							FFSM2_IF_PLANS(, _planData)
+							FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
 							FFSM2_IF_LOG_INTERFACE(, _logger)};
 
 	return _apex.deepForwardExitGuard(guardControl) ||
 		   _apex.deepForwardEntryGuard(guardControl);
 }
 
-// COMMON
 ////////////////////////////////////////////////////////////////////////////////
-// COMMON
+
+template <FeatureTag NFT, typename TC, typename TV, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
+RV_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::RV_(Context& context
+														   FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
+	: Base{context
+		 FFSM2_IF_LOG_INTERFACE(, logger)}
+{
+	initialEnter();
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <FeatureTag NFT, typename TC, typename TV, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
+RV_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::~RV_() noexcept {
+	finalExit();
+}
+
+//------------------------------------------------------------------------------
 
 template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
 void
-RP_<G_<NFT, TC, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  stateId,
-																const Payload& payload) noexcept
+RV_<G_<NFT, TC, ManualActivation, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::enter() noexcept {
+	initialEnter();
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
+void
+RV_<G_<NFT, TC, ManualActivation, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::exit() noexcept {
+	finalExit();
+}
+
+//------------------------------------------------------------------------------
+
+#ifdef FFSM2_ENABLE_TRANSITION_HISTORY
+
+template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
+void
+RV_<G_<NFT, TC, ManualActivation, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::replayEnter(const StateID destination) noexcept {
+	FFSM2_ASSERT(_registry.active == INVALID_SHORT);
+	FFSM2_ASSERT(!_request);
+	FFSM2_IF_TRANSITION_HISTORY(FFSM2_ASSERT(!_previousTransition));
+
+	PlanControl control{_context
+					  , _registry
+					  , _request
+					  FFSM2_IF_PLANS(, _planData)
+					  FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
+					  FFSM2_IF_LOG_INTERFACE(, _logger)};
+
+	applyRequest(destination);
+
+	FFSM2_IF_TRANSITION_HISTORY(_previousTransition = Transition{destination});
+
+	_apex.deepConstruct(control);
+	_apex.deepEnter	   (control);
+
+	_registry.clearRequests();
+
+	FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
+}
+
+#endif
+
+////////////////////////////////////////////////////////////////////////////////
+// COMMON
+
+template <FeatureTag NFT, typename TC, typename TV, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
+void
+RP_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  stateId,
+																	const Payload& payload) noexcept
 {
+	FFSM2_ASSERT(_registry.isActive());
+
 	_request = Transition{stateId, payload};
 
 	FFSM2_LOG_TRANSITION(_context, INVALID_STATE_ID, stateId);
@@ -6377,18 +6682,20 @@ RP_<G_<NFT, TC, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  s
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
+template <FeatureTag NFT, typename TC, typename TV, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
 void
-RP_<G_<NFT, TC, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  stateId,
-																	 Payload&& payload) noexcept
+RP_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  stateId,
+																		 Payload&& payload) noexcept
 {
+	FFSM2_ASSERT(_registry.isActive());
+
 	_request = Transition{stateId, std::move(payload)};
 
 	FFSM2_LOG_TRANSITION(_context, INVALID_STATE_ID, stateId);
 }
 
 // COMMON
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//------------------------------------------------------------------------------
 
 #ifdef FFSM2_ENABLE_UTILITY_THEORY
 #endif

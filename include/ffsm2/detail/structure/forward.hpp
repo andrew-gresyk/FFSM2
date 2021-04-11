@@ -184,6 +184,7 @@ struct RF_ final {
 #endif
 
 	using Payload		= typename TConfig::Payload;
+	using Transition	= TransitionT<Payload>;
 
 #ifdef FFSM2_ENABLE_PLANS
 	using Task			= typename TConfig::Task;
