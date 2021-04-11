@@ -365,7 +365,7 @@ RV_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::~RV_() noexcept {
 
 template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
 void
-RV_<G_<NFT, TC, ManualActivation, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::enter() noexcept {
+RV_<G_<NFT, TC, Manual, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::enter() noexcept {
 	initialEnter();
 }
 
@@ -373,7 +373,7 @@ RV_<G_<NFT, TC, ManualActivation, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::enter() n
 
 template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
 void
-RV_<G_<NFT, TC, ManualActivation, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::exit() noexcept {
+RV_<G_<NFT, TC, Manual, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::exit() noexcept {
 	finalExit();
 }
 
@@ -383,7 +383,7 @@ RV_<G_<NFT, TC, ManualActivation, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::exit() no
 
 template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
 void
-RV_<G_<NFT, TC, ManualActivation, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::replayEnter(const StateID destination) noexcept {
+RV_<G_<NFT, TC, Manual, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::replayEnter(const StateID destination) noexcept {
 	FFSM2_ASSERT(_registry.active == INVALID_SHORT);
 	FFSM2_ASSERT(!_request);
 	FFSM2_IF_TRANSITION_HISTORY(FFSM2_ASSERT(!_previousTransition));
