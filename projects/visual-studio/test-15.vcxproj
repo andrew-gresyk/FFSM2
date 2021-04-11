@@ -51,9 +51,11 @@
     <ClCompile Include="..\..\test\shared\test_bit_stream.cpp" />
     <ClCompile Include="..\..\test\shared\test_task_list.cpp" />
     <ClCompile Include="..\..\test\test_contexts.cpp" />
+    <ClCompile Include="..\..\test\test_manual_activation.cpp" />
     <ClCompile Include="..\..\test\test_plans.cpp" />
     <ClCompile Include="..\..\test\test_plans_payloads.cpp" />
     <ClCompile Include="..\..\test\test_plans_verbose.cpp" />
+    <ClCompile Include="..\..\test\test_replication.cpp" />
     <ClCompile Include="..\..\test\test_serialization.cpp" />
     <ClCompile Include="..\..\test\test_transitions.cpp" />
     <ClCompile Include="..\..\test\test_transitions_payloads.cpp" />

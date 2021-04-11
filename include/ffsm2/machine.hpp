@@ -5908,7 +5908,6 @@ class RV_		   <G_<NFeatureTag, TContext, TActivation, NSubstitutionLimit FFSM2_I
 	using Base = R_<G_<NFeatureTag, TContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
 
 protected:
-public:
 	using typename Base::Context;
 
 #ifdef FFSM2_ENABLE_LOG_INTERFACE
@@ -5941,11 +5940,11 @@ class RV_		   <G_<NFeatureTag, TContext, ManualActivation, NSubstitutionLimit FF
 	using Base = R_<G_<NFeatureTag, TContext, ManualActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
 
 protected:
-	using Base::Payload;
+	using typename Base::Payload;
 
 #ifdef FFSM2_ENABLE_TRANSITION_HISTORY
-	using Base::PlanControl;
-	using Base::Transition;
+	using typename Base::PlanControl;
+	using typename Base::Transition;
 #endif
 
 public:
