@@ -10,12 +10,13 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <WarningLevel>Level4</WarningLevel>
-      <TreatWarningAsError>true</TreatWarningAsError>
-      <PreprocessorDefinitions>_UNICODE;UNICODE;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>/permissive-</AdditionalOptions>
       <DiagnosticsFormat>Column</DiagnosticsFormat>
       <LanguageStandard>stdcpp14</LanguageStandard>
+      <PreprocessorDefinitions>_UNICODE;UNICODE;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <WarningLevel>Level4</WarningLevel>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

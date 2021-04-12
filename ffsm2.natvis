@@ -20,7 +20,7 @@
 
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-	<Type Name="ffsm2::detail::Array&lt;*&gt;">
+	<Type Name="ffsm2::detail::ArrayT&lt;*&gt;">
 		<DisplayString>&lt;{(unsigned) _count &amp; 0xFF}&gt;</DisplayString>
 		<Expand HideRawView="true">
 			<ArrayItems>
@@ -32,7 +32,7 @@
 
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-	<Type Name="ffsm2::detail::StaticArray&lt;*&gt;">
+	<Type Name="ffsm2::detail::StaticArrayT&lt;*&gt;">
 		<Expand HideRawView="true">
 			<ArrayItems>
 				<Size>$T2</Size>
@@ -43,7 +43,7 @@
 
 	<!-- ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ -->
 
-	<Type Name="ffsm2::detail::BitArray&lt;*&gt;">
+	<Type Name="ffsm2::detail::BitArrayT&lt;*&gt;">
 		<Expand HideRawView="true">
 			<IndexListItems>
 				<Size>CAPACITY</Size>
@@ -52,7 +52,7 @@
 		</Expand>
 	</Type>
 
-	<Type Name="ffsm2::detail::BitArray&lt;*&gt;::Bits">
+	<Type Name="ffsm2::detail::BitArrayT&lt;*&gt;::Bits">
 		<Expand HideRawView="true">
 			<IndexListItems>
 				<Size>CAPACITY</Size>
@@ -61,7 +61,7 @@
 		</Expand>
 	</Type>
 
-	<Type Name="ffsm2::detail::BitArray&lt;*&gt;::CBits">
+	<Type Name="ffsm2::detail::BitArrayT&lt;*&gt;::CBits">
 		<Expand HideRawView="true">
 			<IndexListItems>
 				<Size>CAPACITY</Size>
@@ -70,6 +70,7 @@
 		</Expand>
 	</Type>
 
+	<!-- ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ -->
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 	<Type Name="ffsm2::detail::Registry">
@@ -160,7 +161,7 @@
 	<!-- ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ -->
 
 	<Type Name="ffsm2::detail::PlanDataT&lt;*&gt;">
-		<Expand>
+		<Expand HideRawView="true">
 			<CustomListItems MaxItemsPerView="100">
 				<Variable Name="i" InitialValue="tasksBounds.first" />
 
@@ -185,14 +186,14 @@
 
 	<Type Name="ffsm2::detail::CPlanT&lt;*&gt;">
 		<DisplayString>{_planData}</DisplayString>
-		<Expand>
+		<Expand HideRawView="true">
 			<ExpandedItem>_planData</ExpandedItem>
 		</Expand>
 	</Type>
 
 	<Type Name="ffsm2::detail::PlanT&lt;*&gt;">
 		<DisplayString>{_planData}</DisplayString>
-		<Expand>
+		<Expand HideRawView="true">
 			<ExpandedItem>_planData</ExpandedItem>
 		</Expand>
 	</Type>

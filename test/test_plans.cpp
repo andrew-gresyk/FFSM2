@@ -9,18 +9,11 @@ namespace test_plans {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-struct Context {};
-
-using Config = ffsm2::Config
-					::ContextT<Context>;
-
-using M = ffsm2::MachineT<Config>;
+using M = ffsm2::Machine;
 
 struct Interruption {};
 
-using Logger = LoggerT<Config>;
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//------------------------------------------------------------------------------
 
 #define S(s) struct s
 
@@ -33,14 +26,14 @@ using FSM = M::Root<S(Apex),
 
 #undef S
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//------------------------------------------------------------------------------
 
 static_assert(FSM::stateId<A>() == 0, "");
 static_assert(FSM::stateId<B>() == 1, "");
 static_assert(FSM::stateId<C>() == 2, "");
 static_assert(FSM::stateId<D>() == 3, "");
 
-//------------------------------------------------------------------------------
+////////////////////////////////////////////////////////////////////////////////
 
 class Tracked
 	: public FSM::Injection
@@ -287,11 +280,10 @@ void step7(FSM::Instance& machine, Logger& logger) {
 //------------------------------------------------------------------------------
 
 TEST_CASE("FSM.Plans") {
-	Context _;
-	LoggerT<Config> logger;
+	Logger logger;
 
 	{
-		FSM::Instance machine{_, &logger};
+		FSM::Instance machine{&logger};
 
 		step1(machine, logger);
 		step2(machine, logger);

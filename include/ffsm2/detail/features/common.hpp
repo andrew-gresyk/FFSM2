@@ -110,21 +110,21 @@ struct alignas(4) TransitionBase {
 
 	//----------------------------------------------------------------------
 
-	FFSM2_INLINE TransitionBase(const StateID destination_) noexcept
+	inline TransitionBase(const StateID destination_) noexcept
 		: destination{destination_}
 	{}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_INLINE TransitionBase(const StateID origin_,
-								const StateID destination_) noexcept
+	inline TransitionBase(const StateID origin_,
+						  const StateID destination_) noexcept
 		: origin	 {origin_}
 		, destination{destination_}
 	{}
 
 	//----------------------------------------------------------------------
 
-	FFSM2_INLINE bool operator == (const TransitionBase& other) const noexcept {
+	inline bool operator == (const TransitionBase& other) const noexcept {
 		return origin	   == other.origin &&
 			   destination == other.destination &&
 			   method	   == other.method;
@@ -132,7 +132,13 @@ struct alignas(4) TransitionBase {
 
 	//----------------------------------------------------------------------
 
-	FFSM2_INLINE void clear() noexcept {
+	inline explicit operator bool() const noexcept {
+		return destination != INVALID_STATE_ID;
+	}
+
+	//----------------------------------------------------------------------
+
+	inline void clear() noexcept {
 		destination	= INVALID_STATE_ID;
 	}
 

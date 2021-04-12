@@ -20,7 +20,7 @@ struct Reaction {};
 
 using Logger = LoggerT<Config>;
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//------------------------------------------------------------------------------
 
 #define S(s) struct s
 
@@ -34,7 +34,7 @@ using FSM = M::PeerRoot<
 
 #undef S
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//------------------------------------------------------------------------------
 
 static_assert(FSM::stateId<A>() == 0, "");
 static_assert(FSM::stateId<B>() == 1, "");
@@ -42,7 +42,7 @@ static_assert(FSM::stateId<C>() == 2, "");
 static_assert(FSM::stateId<D>() == 3, "");
 static_assert(FSM::stateId<E>() == 4, "");
 
-//------------------------------------------------------------------------------
+////////////////////////////////////////////////////////////////////////////////
 
 class Tracked
 	: public FSM::Injection
@@ -58,9 +58,9 @@ public:
 		++_totalUpdateCount;
 	}
 
-	unsigned entryAttemptCount() const			{ return _entryAttemptCount;	}
+	unsigned entryAttemptCount()  const			{ return _entryAttemptCount;	}
 	unsigned currentUpdateCount() const			{ return _currentUpdateCount;	}
-	unsigned totalUpdateCount() const			{ return _totalUpdateCount;		}
+	unsigned totalUpdateCount()	  const			{ return _totalUpdateCount;		}
 
 private:
 	unsigned _entryAttemptCount	 = 0;
@@ -253,7 +253,7 @@ void step5(FSM::Instance& machine, Logger& logger) {
 
 TEST_CASE("FSM.Transitions Verbose") {
 	Context _;
-	LoggerT<Config> logger;
+	Logger logger;
 
 	{
 		FSM::Instance machine{_, &logger};

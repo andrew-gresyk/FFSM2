@@ -1,6 +1,7 @@
 // FFSM2 (flat state machine for games and interactive applications)
 // Created by Andrew Gresyk
 
+#define FFSM2_ENABLE_TRANSITION_HISTORY
 #define FFSM2_DISABLE_TYPEINDEX
 #include "tools.hpp"
 
@@ -20,7 +21,7 @@ struct Reaction {};
 
 using Logger = LoggerT<Config>;
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//------------------------------------------------------------------------------
 
 #define S(s) struct s
 
@@ -34,7 +35,7 @@ using FSM = M::PeerRoot<
 
 #undef S
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//------------------------------------------------------------------------------
 
 static_assert(FSM::stateId<A>() == 0, "");
 static_assert(FSM::stateId<B>() == 1, "");
@@ -42,7 +43,7 @@ static_assert(FSM::stateId<C>() == 2, "");
 static_assert(FSM::stateId<D>() == 3, "");
 static_assert(FSM::stateId<E>() == 4, "");
 
-//------------------------------------------------------------------------------
+////////////////////////////////////////////////////////////////////////////////
 
 class Tracked
 	: public FSM::Injection
@@ -147,6 +148,16 @@ struct E
 
 ////////////////////////////////////////////////////////////////////////////////
 
+const Types all = {
+	FSM::stateId<A>(),
+	FSM::stateId<B>(),
+	FSM::stateId<C>(),
+	FSM::stateId<D>(),
+	FSM::stateId<E>(),
+};
+
+//------------------------------------------------------------------------------
+
 void step1(FSM::Instance& machine, Logger& logger) {
 	logger.assertSequence({
 		{ FSM::stateId<A>(),		Event::Type::CONSTRUCT },
@@ -154,6 +165,8 @@ void step1(FSM::Instance& machine, Logger& logger) {
 	});
 
 	REQUIRE(machine.activeStateId() == FSM::stateId<A>());
+
+	REQUIRE(!machine.previousTransition());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -171,6 +184,8 @@ void step2(FSM::Instance& machine, Logger& logger) {
 	});
 
 	REQUIRE(machine.activeStateId() == FSM::stateId<A>());
+
+	REQUIRE(machine.previousTransition() == M::Transition{FSM::stateId<A>()});
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -189,6 +204,8 @@ void step3(FSM::Instance& machine, Logger& logger) {
 	});
 
 	REQUIRE(machine.activeStateId() == FSM::stateId<B>());
+
+	REQUIRE(machine.previousTransition() == M::Transition{FSM::stateId<B>()});
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -206,6 +223,8 @@ void step4(FSM::Instance& machine, Logger& logger) {
 	});
 
 	REQUIRE(machine.activeStateId() == FSM::stateId<B>());
+
+	REQUIRE(!machine.previousTransition());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -226,13 +245,15 @@ void step5(FSM::Instance& machine, Logger& logger) {
 	});
 
 	REQUIRE(machine.activeStateId() == FSM::stateId<D>());
+
+	REQUIRE(machine.previousTransition() == M::Transition{FSM::stateId<C>(), FSM::stateId<D>()});
 }
 
 //------------------------------------------------------------------------------
 
 TEST_CASE("FSM.Transitions") {
 	Context _;
-	LoggerT<Config> logger;
+	Logger logger;
 
 	{
 		FSM::Instance machine{_, &logger};

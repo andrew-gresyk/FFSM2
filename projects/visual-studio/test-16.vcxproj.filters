@@ -140,6 +140,12 @@
     <ClCompile Include="..\..\test\shared\test_task_list.cpp">
       <Filter>test\shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\test\test_manual_activation.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\test_replication.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\include\ffsm2\detail\root.inl">

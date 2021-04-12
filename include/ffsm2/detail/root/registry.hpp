@@ -15,6 +15,10 @@ struct ArgsT;
 //------------------------------------------------------------------------------
 
 struct Registry {
+	FFSM2_INLINE bool isActive() const noexcept {
+		return active != INVALID_SHORT;
+	}
+
 	FFSM2_INLINE void clearRequests() noexcept {
 		requested = INVALID_SHORT;
 	}
