@@ -31,7 +31,7 @@ FFSM2_CONSTEXPR(14)
 Status
 combine(const Status lhs, const Status rhs)							  noexcept	{
 	const Status::Result result = lhs.result > rhs.result ?
-		lhs.result : rhs.result;
+									  lhs.result : rhs.result;
 
 	return {result};
 }
@@ -125,18 +125,18 @@ public:
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	struct IteratorT {
-		FFSM2_CONSTEXPR(14)	IteratorT(PlanBaseT& plan)				  noexcept;
+		FFSM2_CONSTEXPR(14)	IteratorT(PlanBaseT& plan)			  noexcept;
 
-		FFSM2_CONSTEXPR(14)	explicit operator bool()			const noexcept;
+		FFSM2_CONSTEXPR(14)	explicit operator bool()		const noexcept;
 
-		FFSM2_CONSTEXPR(14)	void operator ++()						  noexcept;
+		FFSM2_CONSTEXPR(14)	void operator ++()					  noexcept;
 
-		FFSM2_CONSTEXPR(14) Task& operator  *()						  noexcept	{ return  _plan._planData.tasks[_curr];	}
-		FFSM2_CONSTEXPR(14) Task* operator ->()						  noexcept	{ return &_plan._planData.tasks[_curr];	}
+		FFSM2_CONSTEXPR(14) Task& operator  *()					  noexcept	{ return  _plan._planData.tasks[_curr];	}
+		FFSM2_CONSTEXPR(14) Task* operator ->()					  noexcept	{ return &_plan._planData.tasks[_curr];	}
 
-		FFSM2_CONSTEXPR(14) void remove()							  noexcept	{ _plan.remove(_curr);					}
+		FFSM2_CONSTEXPR(14) void remove()						  noexcept	{ _plan.remove(_curr);					}
 
-		FFSM2_CONSTEXPR(14) Long next()							const noexcept;
+		FFSM2_CONSTEXPR(14) Long next()						const noexcept;
 
 		PlanBaseT& _plan;
 		Long _curr;
@@ -146,16 +146,16 @@ public:
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	struct CIterator {
-		FFSM2_CONSTEXPR(14)	CIterator(const PlanBaseT& plan)		  noexcept;
+		FFSM2_CONSTEXPR(14)	CIterator(const PlanBaseT& plan)	  noexcept;
 
-		FFSM2_CONSTEXPR(14)	explicit operator bool()			const noexcept;
+		FFSM2_CONSTEXPR(14)	explicit operator bool()		const noexcept;
 
-		FFSM2_CONSTEXPR(14)	void operator ++()						  noexcept;
+		FFSM2_CONSTEXPR(14)	void operator ++()					  noexcept;
 
-		FFSM2_CONSTEXPR(14) const Task& operator  *()			const noexcept	{ return  _plan._planData.tasks[_curr];	}
-		FFSM2_CONSTEXPR(11) const Task* operator ->()			const noexcept	{ return &_plan._planData.tasks[_curr];	}
+		FFSM2_CONSTEXPR(14) const Task& operator  *()		const noexcept	{ return  _plan._planData.tasks[_curr];	}
+		FFSM2_CONSTEXPR(11) const Task* operator ->()		const noexcept	{ return &_plan._planData.tasks[_curr];	}
 
-		FFSM2_CONSTEXPR(14) Long next()							const noexcept;
+		FFSM2_CONSTEXPR(14) Long next()						const noexcept;
 
 		const PlanBaseT& _plan;
 		Long _curr;
@@ -165,21 +165,21 @@ public:
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 protected:
-	FFSM2_CONSTEXPR(11)	PlanBaseT(PlanData& planData)				  noexcept;
+	FFSM2_CONSTEXPR(11)	PlanBaseT(PlanData& planData)			  noexcept;
 
 	template <typename T>
-	static constexpr StateID  stateId()								  noexcept	{ return		index<StateList , T>();	}
+	static constexpr StateID  stateId()							  noexcept	{ return		index<StateList , T>();	}
 
 	FFSM2_CONSTEXPR(14)	bool append(const StateID origin,
-									const StateID destination)		  noexcept;
+									const StateID destination)	  noexcept;
 
-	FFSM2_CONSTEXPR(14)	bool linkTask(const Long index)				  noexcept;
+	FFSM2_CONSTEXPR(14)	bool linkTask(const Long index)			  noexcept;
 
 public:
-	FFSM2_CONSTEXPR(14)	explicit operator bool()				const noexcept;
+	FFSM2_CONSTEXPR(14)	explicit operator bool()			const noexcept;
 
 	/// @brief Clear all tasks from the plan
-	FFSM2_CONSTEXPR(14)	void clear()								  noexcept;
+	FFSM2_CONSTEXPR(14)	void clear()							  noexcept;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

@@ -1,9 +1,9 @@
 namespace ffsm2 {
 namespace detail {
 
-#if FFSM2_PLANS_AVAILABLE()
-
 ////////////////////////////////////////////////////////////////////////////////
+
+#if FFSM2_PLANS_AVAILABLE()
 
 template <typename TArgs>
 FFSM2_CONSTEXPR(14)
@@ -222,7 +222,6 @@ PlanBaseT<TArgs>::linkTask(const Long index) noexcept	{
 
 			auto& currLink = _planData.taskLinks[index];
 			FFSM2_ASSERT(currLink.prev == INVALID_LONG);
-			FFSM2_ASSERT(lastLink.prev == INVALID_LONG);
 
 			currLink.prev  = _bounds.last;
 
@@ -332,7 +331,10 @@ PlanT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::append(c
 
 	return linkTask(_planData.tasks.emplace(origin, destination, move(payload)));
 }
+
 #endif
+
+////////////////////////////////////////////////////////////////////////////////
 
 }
 }
