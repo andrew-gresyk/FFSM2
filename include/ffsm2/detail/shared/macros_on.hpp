@@ -71,13 +71,13 @@
 #define FFSM2_ARCHITECTURE(A)							FFSM2_ARCHITECTURE_##A()
 
 #if INTPTR_MAX == INT64_MAX
-	#define FFSM2_ARCHITECTURE_64BIT()										true
-	#define FFSM2_ARCHITECTURE_32BIT()									   false
+	#define FFSM2_ARCHITECTURE_64()											true
+	#define FFSM2_ARCHITECTURE_32()										   false
 
 	#define FFSM2_64BIT_OR_32BIT(p64, p32)									 p64
 #elif INTPTR_MAX == INT32_MAX
-	#define FFSM2_ARCHITECTURE_64BIT()									   false
-	#define FFSM2_ARCHITECTURE_32BIT()										true
+	#define FFSM2_ARCHITECTURE_64()										   false
+	#define FFSM2_ARCHITECTURE_32()											true
 
 	#define FFSM2_64BIT_OR_32BIT(p64, p32)									 p32
 #else

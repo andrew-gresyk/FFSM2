@@ -125,13 +125,13 @@
 #define FFSM2_ARCHITECTURE(A)							FFSM2_ARCHITECTURE_##A()
 
 #if INTPTR_MAX == INT64_MAX
-	#define FFSM2_ARCHITECTURE_64BIT()										true
-	#define FFSM2_ARCHITECTURE_32BIT()									   false
+	#define FFSM2_ARCHITECTURE_64()											true
+	#define FFSM2_ARCHITECTURE_32()										   false
 
 	#define FFSM2_64BIT_OR_32BIT(p64, p32)									 p64
 #elif INTPTR_MAX == INT32_MAX
-	#define FFSM2_ARCHITECTURE_64BIT()									   false
-	#define FFSM2_ARCHITECTURE_32BIT()										true
+	#define FFSM2_ARCHITECTURE_64()										   false
+	#define FFSM2_ARCHITECTURE_32()											true
 
 	#define FFSM2_64BIT_OR_32BIT(p64, p32)									 p32
 #else
@@ -2222,43 +2222,13 @@ struct PlanDataT<ArgsT<TContext
 	TasksBits tasksFailures;
 	bool planExists;
 
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	FFSM2_CONSTEXPR(14)	void clearTaskStatus(const StateID stateId)							  noexcept	{
-		if (stateId != INVALID_STATE_ID) {
-			tasksSuccesses.clear(stateId);
-			tasksFailures .clear(stateId);
-		}
-	}
-
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	FFSM2_CONSTEXPR(14)	void verifyEmptyStatus(const StateID FFSM2_IF_ASSERT(stateId))	const noexcept	{
-	#if FFSM2_ASSERT_AVAILABLE()
-
-		if (stateId != INVALID_STATE_ID) {
-			FFSM2_ASSERT(!tasksSuccesses.get(stateId));
-			FFSM2_ASSERT(!tasksFailures .get(stateId));
-		}
-
-	#endif
-	}
-
-
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	FFSM2_CONSTEXPR(14)	void clearTaskStatus(const StateID stateId)			  noexcept;
+	FFSM2_CONSTEXPR(14)	void verifyEmptyStatus(const StateID stateId)	const noexcept;
 
 #if FFSM2_ASSERT_AVAILABLE()
-
-	FFSM2_CONSTEXPR(14)	void verifyPlans()												const noexcept	{ FFSM2_ASSERT(tasks.count() == verifyPlan());	}
-
-
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	FFSM2_CONSTEXPR(14)	Long verifyPlan()												const noexcept;
-
+	FFSM2_CONSTEXPR(14)	void verifyPlans()								const noexcept	{ FFSM2_ASSERT(tasks.count() == verifyPlan());	}
+	FFSM2_CONSTEXPR(14)	Long verifyPlan()								const noexcept;
 #endif
-
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 };
 
 //------------------------------------------------------------------------------
@@ -2295,55 +2265,59 @@ struct PlanDataT<ArgsT<TContext
 	TasksBits tasksFailures;
 	bool planExists;
 
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	FFSM2_CONSTEXPR(14)	void clearTaskStatus(const StateID stateId)							  noexcept	{
-		if (stateId != INVALID_STATE_ID) {
-			tasksSuccesses.clear(stateId);
-			tasksFailures .clear(stateId);
-		}
-	}
-
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	FFSM2_CONSTEXPR(14)	void verifyEmptyStatus(const StateID FFSM2_IF_ASSERT(stateId))	const noexcept	{
-	#if FFSM2_ASSERT_AVAILABLE()
-
-		if (stateId != INVALID_STATE_ID) {
-			FFSM2_ASSERT(!tasksSuccesses.get(stateId));
-			FFSM2_ASSERT(!tasksFailures .get(stateId));
-		}
-
-	#endif
-	}
-
-
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	FFSM2_CONSTEXPR(14)	void clearTaskStatus(const StateID stateId)			  noexcept;
+	FFSM2_CONSTEXPR(14)	void verifyEmptyStatus(const StateID stateId)	const noexcept;
 
 #if FFSM2_ASSERT_AVAILABLE()
-
-	FFSM2_CONSTEXPR(14)	void verifyPlans()												const noexcept	{ FFSM2_ASSERT(tasks.count() == verifyPlan());	}
-
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	FFSM2_CONSTEXPR(14)	Long verifyPlan()												const noexcept;
-
+	FFSM2_CONSTEXPR(14)	void verifyPlans()								const noexcept	{ FFSM2_ASSERT(tasks.count() == verifyPlan());	}
+	FFSM2_CONSTEXPR(14)	Long verifyPlan()								const noexcept;
 #endif
-
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 };
 
+//------------------------------------------------------------------------------
 ////////////////////////////////////////////////////////////////////////////////
 
 }
 }
 
-#if FFSM2_PLANS_AVAILABLE() && FFSM2_ASSERT_AVAILABLE()
+#if FFSM2_PLANS_AVAILABLE()
 
 namespace ffsm2 {
 namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
+
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
+FFSM2_CONSTEXPR(14)
+void
+PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::clearTaskStatus(const StateID stateId) noexcept {
+	if (stateId != INVALID_STATE_ID) {
+		tasksSuccesses.clear(stateId);
+		tasksFailures .clear(stateId);
+	}
+}
+
+//------------------------------------------------------------------------------
+
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
+FFSM2_CONSTEXPR(14)
+void
+PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::verifyEmptyStatus(const StateID FFSM2_IF_ASSERT(stateId)) const noexcept {
+#if FFSM2_ASSERT_AVAILABLE()
+
+	if (stateId != INVALID_STATE_ID) {
+		FFSM2_ASSERT(!tasksSuccesses.get(stateId));
+		FFSM2_ASSERT(!tasksFailures .get(stateId));
+	}
+
+#endif
+}
+
+//------------------------------------------------------------------------------
+
+#if FFSM2_ASSERT_AVAILABLE()
+
+//------------------------------------------------------------------------------
 
 template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
 FFSM2_CONSTEXPR(14)
@@ -2384,7 +2358,41 @@ PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::veri
 	return length;
 }
 
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
+
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC>
+FFSM2_CONSTEXPR(14)
+void
+PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::clearTaskStatus(const StateID stateId) noexcept {
+	if (stateId != INVALID_STATE_ID) {
+		tasksSuccesses.clear(stateId);
+		tasksFailures .clear(stateId);
+	}
+}
+
+//------------------------------------------------------------------------------
+
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC>
+FFSM2_CONSTEXPR(14)
+void
+PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::verifyEmptyStatus(const StateID FFSM2_IF_ASSERT(stateId)) const noexcept {
+#if FFSM2_ASSERT_AVAILABLE()
+
+	if (stateId != INVALID_STATE_ID) {
+		FFSM2_ASSERT(!tasksSuccesses.get(stateId));
+		FFSM2_ASSERT(!tasksFailures .get(stateId));
+	}
+
+#endif
+}
+
+//------------------------------------------------------------------------------
+
+#if FFSM2_ASSERT_AVAILABLE()
+
+//------------------------------------------------------------------------------
 
 template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC>
 FFSM2_CONSTEXPR(14)
@@ -2424,6 +2432,8 @@ PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::ver
 
 	return length;
 }
+
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -5199,6 +5209,12 @@ namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+#if FFSM2_UTILITY_THEORY_AVAILABLE()
+#endif
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+
 template <typename TA, typename TH, typename... TS>
 FFSM2_CONSTEXPR(14)
 bool
@@ -5243,7 +5259,10 @@ C_<TA, TH, TS...>::deepEnter(PlanControl& control) noexcept {
 	_subStates.wideEnter(control, active);
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 //------------------------------------------------------------------------------
+// COMMON
 
 template <typename TA, typename TH, typename... TS>
 FFSM2_CONSTEXPR(14)
@@ -5347,6 +5366,7 @@ C_<TA, TH, TS...>::deepExit(PlanControl& control) noexcept {
 #endif
 }
 
+// COMMON
 //------------------------------------------------------------------------------
 // COMMON
 
@@ -5389,6 +5409,7 @@ C_<TA, TH, TS...>::deepSaveActive(const Registry& registry,
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename TA, typename TH, typename... TS>
 FFSM2_CONSTEXPR(14)
@@ -5402,7 +5423,6 @@ C_<TA, TH, TS...>::deepLoadRequested(Registry& registry,
 
 #endif
 
-// COMMON
 ////////////////////////////////////////////////////////////////////////////////
 
 }
@@ -6564,9 +6584,9 @@ RP_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateI
 #undef FFSM2_CONSTEXPR_14
 #undef FFSM2_CONSTEXPR_17
 
-#undef FFSM2_ARCHITECTURE
-#undef FFSM2_ARCHITECTURE_64BIT
-#undef FFSM2_ARCHITECTURE_32BIT
+//#undef FFSM2_ARCHITECTURE
+//#undef FFSM2_ARCHITECTURE_64
+//#undef FFSM2_ARCHITECTURE_32
 #undef FFSM2_64BIT_OR_32BIT
 
 //#undef FFSM2_BREAK

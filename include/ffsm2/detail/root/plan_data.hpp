@@ -74,43 +74,13 @@ struct PlanDataT<ArgsT<TContext
 	TasksBits tasksFailures;
 	bool planExists;
 
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	FFSM2_CONSTEXPR(14)	void clearTaskStatus(const StateID stateId)							  noexcept	{
-		if (stateId != INVALID_STATE_ID) {
-			tasksSuccesses.clear(stateId);
-			tasksFailures .clear(stateId);
-		}
-	}
-
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	FFSM2_CONSTEXPR(14)	void verifyEmptyStatus(const StateID FFSM2_IF_ASSERT(stateId))	const noexcept	{
-	#if FFSM2_ASSERT_AVAILABLE()
-
-		if (stateId != INVALID_STATE_ID) {
-			FFSM2_ASSERT(!tasksSuccesses.get(stateId));
-			FFSM2_ASSERT(!tasksFailures .get(stateId));
-		}
-
-	#endif
-	}
-
-
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	FFSM2_CONSTEXPR(14)	void clearTaskStatus(const StateID stateId)			  noexcept;
+	FFSM2_CONSTEXPR(14)	void verifyEmptyStatus(const StateID stateId)	const noexcept;
 
 #if FFSM2_ASSERT_AVAILABLE()
-
-	FFSM2_CONSTEXPR(14)	void verifyPlans()												const noexcept	{ FFSM2_ASSERT(tasks.count() == verifyPlan());	}
-
-
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	FFSM2_CONSTEXPR(14)	Long verifyPlan()												const noexcept;
-
+	FFSM2_CONSTEXPR(14)	void verifyPlans()								const noexcept	{ FFSM2_ASSERT(tasks.count() == verifyPlan());	}
+	FFSM2_CONSTEXPR(14)	Long verifyPlan()								const noexcept;
 #endif
-
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 };
 
 //------------------------------------------------------------------------------
@@ -147,44 +117,16 @@ struct PlanDataT<ArgsT<TContext
 	TasksBits tasksFailures;
 	bool planExists;
 
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	FFSM2_CONSTEXPR(14)	void clearTaskStatus(const StateID stateId)							  noexcept	{
-		if (stateId != INVALID_STATE_ID) {
-			tasksSuccesses.clear(stateId);
-			tasksFailures .clear(stateId);
-		}
-	}
-
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	FFSM2_CONSTEXPR(14)	void verifyEmptyStatus(const StateID FFSM2_IF_ASSERT(stateId))	const noexcept	{
-	#if FFSM2_ASSERT_AVAILABLE()
-
-		if (stateId != INVALID_STATE_ID) {
-			FFSM2_ASSERT(!tasksSuccesses.get(stateId));
-			FFSM2_ASSERT(!tasksFailures .get(stateId));
-		}
-
-	#endif
-	}
-
-
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	FFSM2_CONSTEXPR(14)	void clearTaskStatus(const StateID stateId)			  noexcept;
+	FFSM2_CONSTEXPR(14)	void verifyEmptyStatus(const StateID stateId)	const noexcept;
 
 #if FFSM2_ASSERT_AVAILABLE()
-
-	FFSM2_CONSTEXPR(14)	void verifyPlans()												const noexcept	{ FFSM2_ASSERT(tasks.count() == verifyPlan());	}
-
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	FFSM2_CONSTEXPR(14)	Long verifyPlan()												const noexcept;
-
+	FFSM2_CONSTEXPR(14)	void verifyPlans()								const noexcept	{ FFSM2_ASSERT(tasks.count() == verifyPlan());	}
+	FFSM2_CONSTEXPR(14)	Long verifyPlan()								const noexcept;
 #endif
-
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 };
 
+//------------------------------------------------------------------------------
 ////////////////////////////////////////////////////////////////////////////////
 
 }

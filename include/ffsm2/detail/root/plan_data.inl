@@ -1,9 +1,41 @@
-#if FFSM2_PLANS_AVAILABLE() && FFSM2_ASSERT_AVAILABLE()
+#if FFSM2_PLANS_AVAILABLE()
 
 namespace ffsm2 {
 namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
+
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
+FFSM2_CONSTEXPR(14)
+void
+PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::clearTaskStatus(const StateID stateId) noexcept {
+	if (stateId != INVALID_STATE_ID) {
+		tasksSuccesses.clear(stateId);
+		tasksFailures .clear(stateId);
+	}
+}
+
+//------------------------------------------------------------------------------
+
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
+FFSM2_CONSTEXPR(14)
+void
+PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::verifyEmptyStatus(const StateID FFSM2_IF_ASSERT(stateId)) const noexcept {
+#if FFSM2_ASSERT_AVAILABLE()
+
+	if (stateId != INVALID_STATE_ID) {
+		FFSM2_ASSERT(!tasksSuccesses.get(stateId));
+		FFSM2_ASSERT(!tasksFailures .get(stateId));
+	}
+
+#endif
+}
+
+//------------------------------------------------------------------------------
+
+#if FFSM2_ASSERT_AVAILABLE()
+
+//------------------------------------------------------------------------------
 
 template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
 FFSM2_CONSTEXPR(14)
@@ -44,7 +76,41 @@ PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::veri
 	return length;
 }
 
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
+
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC>
+FFSM2_CONSTEXPR(14)
+void
+PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::clearTaskStatus(const StateID stateId) noexcept {
+	if (stateId != INVALID_STATE_ID) {
+		tasksSuccesses.clear(stateId);
+		tasksFailures .clear(stateId);
+	}
+}
+
+//------------------------------------------------------------------------------
+
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC>
+FFSM2_CONSTEXPR(14)
+void
+PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::verifyEmptyStatus(const StateID FFSM2_IF_ASSERT(stateId)) const noexcept {
+#if FFSM2_ASSERT_AVAILABLE()
+
+	if (stateId != INVALID_STATE_ID) {
+		FFSM2_ASSERT(!tasksSuccesses.get(stateId));
+		FFSM2_ASSERT(!tasksFailures .get(stateId));
+	}
+
+#endif
+}
+
+//------------------------------------------------------------------------------
+
+#if FFSM2_ASSERT_AVAILABLE()
+
+//------------------------------------------------------------------------------
 
 template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC>
 FFSM2_CONSTEXPR(14)
@@ -84,6 +150,8 @@ PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::ver
 
 	return length;
 }
+
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 

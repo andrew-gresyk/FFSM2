@@ -3,6 +3,12 @@ namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+#if FFSM2_UTILITY_THEORY_AVAILABLE()
+#endif
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+
 template <typename TA, typename TH, typename... TS>
 FFSM2_CONSTEXPR(14)
 bool
@@ -47,7 +53,10 @@ C_<TA, TH, TS...>::deepEnter(PlanControl& control) noexcept {
 	_subStates.wideEnter(control, active);
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 //------------------------------------------------------------------------------
+// COMMON
 
 template <typename TA, typename TH, typename... TS>
 FFSM2_CONSTEXPR(14)
@@ -151,6 +160,7 @@ C_<TA, TH, TS...>::deepExit(PlanControl& control) noexcept {
 #endif
 }
 
+// COMMON
 //------------------------------------------------------------------------------
 // COMMON
 
@@ -193,6 +203,7 @@ C_<TA, TH, TS...>::deepSaveActive(const Registry& registry,
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename TA, typename TH, typename... TS>
 FFSM2_CONSTEXPR(14)
@@ -206,7 +217,6 @@ C_<TA, TH, TS...>::deepLoadRequested(Registry& registry,
 
 #endif
 
-// COMMON
 ////////////////////////////////////////////////////////////////////////////////
 
 }
