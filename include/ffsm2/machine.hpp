@@ -746,7 +746,7 @@ private:
 	{}
 
 public:
-	FFSM2_CONSTEXPR(11)	bool operator != (const IteratorT& FFSM2_IF_ASSERT(other))	const noexcept	{
+	FFSM2_CONSTEXPR(14)	bool operator != (const IteratorT& FFSM2_IF_ASSERT(other))	const noexcept	{
 		FFSM2_ASSERT(&_container == &other._container);
 
 		return _cursor != _container.limit();
@@ -2505,7 +2505,7 @@ public:
 	struct IteratorT {
 		FFSM2_CONSTEXPR(14)	IteratorT(const CPlanT& plan)		  noexcept;
 
-		FFSM2_CONSTEXPR(11)	explicit operator bool()		const noexcept;
+		FFSM2_CONSTEXPR(14)	explicit operator bool()		const noexcept;
 
 		FFSM2_CONSTEXPR(14)	void operator ++()					  noexcept;
 
@@ -2531,7 +2531,7 @@ private:
 	static constexpr StateID  stateId()							  noexcept	{ return			index<StateList , T>();	}
 
 public:
-	FFSM2_CONSTEXPR(11)	explicit operator bool()			const noexcept;
+	FFSM2_CONSTEXPR(14)	explicit operator bool()			const noexcept;
 
 	FFSM2_CONSTEXPR(11)	IteratorT first()						  noexcept	{ return IteratorT{*this};					}
 
@@ -2855,7 +2855,7 @@ CPlanT<TArgs>::IteratorT::IteratorT(const CPlanT& plan) noexcept
 //------------------------------------------------------------------------------
 
 template <typename TArgs>
-FFSM2_CONSTEXPR(11)
+FFSM2_CONSTEXPR(14)
 CPlanT<TArgs>::IteratorT::operator bool() const noexcept {
 	FFSM2_ASSERT(_curr < CPlanT::TASK_CAPACITY ||
 				 _curr == INVALID_LONG);
@@ -2893,7 +2893,7 @@ CPlanT<TArgs>::IteratorT::next() const noexcept {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TArgs>
-FFSM2_CONSTEXPR(11)
+FFSM2_CONSTEXPR(14)
 CPlanT<TArgs>::operator bool() const noexcept {
 	FFSM2_ASSERT(_bounds.first < TASK_CAPACITY &&
 				 _bounds.last  < TASK_CAPACITY ||
@@ -3937,20 +3937,20 @@ protected:
 	using GuardControl	= GuardControlT<TArgs>;
 
 public:
-	FFSM2_CONSTEXPR(11) void preEntryGuard(Context&)	  noexcept {}
+	FFSM2_CONSTEXPR(14) void preEntryGuard(Context&)	  noexcept {}
 
-	FFSM2_CONSTEXPR(11) void preEnter	  (Context&)	  noexcept {}
-	FFSM2_CONSTEXPR(11) void preReenter	  (Context&)	  noexcept {}
+	FFSM2_CONSTEXPR(14) void preEnter	  (Context&)	  noexcept {}
+	FFSM2_CONSTEXPR(14) void preReenter	  (Context&)	  noexcept {}
 
-	FFSM2_CONSTEXPR(11) void preUpdate	  (Context&)	  noexcept {}
+	FFSM2_CONSTEXPR(14) void preUpdate	  (Context&)	  noexcept {}
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(11) void preReact	  (const TEvent&,
+	FFSM2_CONSTEXPR(14) void preReact	  (const TEvent&,
 										   Context&)	  noexcept {}
 
-	FFSM2_CONSTEXPR(11) void preExitGuard (Context&)	  noexcept {}
+	FFSM2_CONSTEXPR(14) void preExitGuard (Context&)	  noexcept {}
 
-	FFSM2_CONSTEXPR(11) void postExit	  (Context&)	  noexcept {}
+	FFSM2_CONSTEXPR(14) void postExit	  (Context&)	  noexcept {}
 
 	template <typename T>
 	static constexpr StateID  stateId()					  noexcept { return index<StateList, T>();				}

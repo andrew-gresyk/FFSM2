@@ -70,7 +70,7 @@ public:
 	struct IteratorT {
 		FFSM2_CONSTEXPR(14)	IteratorT(const CPlanT& plan)		  noexcept;
 
-		FFSM2_CONSTEXPR(11)	explicit operator bool()		const noexcept;
+		FFSM2_CONSTEXPR(14)	explicit operator bool()		const noexcept;
 
 		FFSM2_CONSTEXPR(14)	void operator ++()					  noexcept;
 
@@ -96,7 +96,7 @@ private:
 	static constexpr StateID  stateId()							  noexcept	{ return			index<StateList , T>();	}
 
 public:
-	FFSM2_CONSTEXPR(11)	explicit operator bool()			const noexcept;
+	FFSM2_CONSTEXPR(14)	explicit operator bool()			const noexcept;
 
 	FFSM2_CONSTEXPR(11)	IteratorT first()						  noexcept	{ return IteratorT{*this};					}
 
