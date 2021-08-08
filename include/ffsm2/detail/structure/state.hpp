@@ -82,7 +82,7 @@ struct S_ final
 #if FFSM2_LOG_INTERFACE_AVAILABLE()
 
 	template <typename TReturn, typename THost, typename... TParams>
-	FFSM2_CONSTEXPR(11)
+	FFSM2_CONSTEXPR(14)
 	void log(TReturn (THost::*)(TParams...),
 			 Logger& logger,
 			 Context& context,
@@ -94,7 +94,7 @@ struct S_ final
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	template <typename TReturn, typename... TParams>
-	FFSM2_CONSTEXPR(11)
+	FFSM2_CONSTEXPR(14)
 	void log(TReturn (Empty::*)(TParams...),
 			 Logger&,
 			 Context&,
