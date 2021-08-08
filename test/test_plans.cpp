@@ -158,7 +158,6 @@ struct D
 void step1(FSM::Instance& machine, Logger& logger) {
 	logger.assertSequence({
 		{ ffsm2::INVALID_STATE_ID,	Event::Type::ENTRY_GUARD },
-		{ FSM::stateId<A>(),		Event::Type::CONSTRUCT },
 		{ FSM::stateId<A>(),		Event::Type::ENTER },
 	});
 
@@ -215,7 +214,6 @@ void step4(FSM::Instance& machine, Logger& logger) {
 		{ FSM::stateId<B>(),		Event::Type::EXIT_GUARD },
 		{ FSM::stateId<C>(),		Event::Type::ENTRY_GUARD },
 
-		{ FSM::stateId<C>(),		Event::Type::CONSTRUCT },
 		{ FSM::stateId<C>(),		Event::Type::ENTER },
 	});
 
@@ -256,7 +254,6 @@ void step6(FSM::Instance& machine, Logger& logger) {
 		{ FSM::stateId<C>(),		Event::Type::EXIT_GUARD },
 
 		{ FSM::stateId<C>(),		Event::Type::EXIT },
-		{ FSM::stateId<C>(),		Event::Type::DESTRUCT },
 	});
 
 	REQUIRE(machine.activeStateId() == FSM::stateId<D>());

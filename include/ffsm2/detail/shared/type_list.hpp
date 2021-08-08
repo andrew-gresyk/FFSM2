@@ -5,13 +5,13 @@ namespace detail {
 // SPECIFIC
 
 template <typename>
-struct Type {};
+struct TypeT {};
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename... Ts>
-struct TL_
-	: Type<Ts>...
+struct TL_ final
+	: TypeT<Ts>...
 {
 	static constexpr Long SIZE = sizeof...(Ts);
 };
@@ -30,7 +30,7 @@ template <typename, typename>
 struct PrependT;
 
 template <typename T, typename... Ts>
-struct PrependT<T, TL_<Ts...>> {
+struct PrependT<T, TL_<Ts...>> final {
 	using Type = TL_<T, Ts...>;
 };
 
@@ -43,7 +43,7 @@ template <typename, typename>
 struct MergeT;
 
 template <typename... Ts1, typename... Ts2>
-struct MergeT<TL_<Ts1...>, TL_<Ts2...>> {
+struct MergeT<TL_<Ts1...>, TL_<Ts2...>> final {
 	using Type = TL_<Ts1..., Ts2...>;
 };
 
@@ -59,7 +59,7 @@ template <Long NHalf, Long NIndex, typename... Ts>
 using LowerTypes = typename LowerT<NHalf, NIndex, Ts...>::Type;
 
 template <Long NHalf, Long NIndex, typename TFirst, typename... TRest>
-struct LowerT<NHalf, NIndex, TFirst, TRest...> {
+struct LowerT<NHalf, NIndex, TFirst, TRest...> final {
 	using LTypeList = typename LowerT<NHalf, NIndex + 1, TRest...>::Type;
 
 	using Type = Conditional<
@@ -70,7 +70,7 @@ struct LowerT<NHalf, NIndex, TFirst, TRest...> {
 };
 
 template <Long NHalf, Long NIndex>
-struct LowerT<NHalf, NIndex> {
+struct LowerT<NHalf, NIndex> final {
 	using Type = TL_<>;
 };
 
@@ -86,7 +86,7 @@ template <Long NHalf, Long NIndex, typename... Ts>
 using UpperTypes = typename UpperT<NHalf, NIndex, Ts...>::Type;
 
 template <Long NHalf, Long NIndex, typename TFirst, typename... TRest>
-struct UpperT<NHalf, NIndex, TFirst, TRest...> {
+struct UpperT<NHalf, NIndex, TFirst, TRest...> final {
 	using Type = Conditional<
 					 (NIndex < NHalf),
 					 UpperTypes<NHalf, NIndex + 1, TRest...>,
@@ -95,7 +95,7 @@ struct UpperT<NHalf, NIndex, TFirst, TRest...> {
 };
 
 template <Long NHalf, Long NIndex>
-struct UpperT<NHalf, NIndex> {
+struct UpperT<NHalf, NIndex> final {
 	using Type = TL_<>;
 };
 
@@ -125,7 +125,7 @@ template <typename, typename>
 struct Find;
 
 template <typename T, typename... Ts>
-struct Find<TL_<Ts...>, T>
+struct Find<TL_<Ts...>, T> final
 	: FindImpl<0, T, Ts...>
 {};
 
@@ -135,10 +135,10 @@ struct Find<TL_<Ts...>, T>
 }
 
 template <typename TList, typename T>
-constexpr Long index   () noexcept { return detail::Find<TList, T>::VALUE;					}
+constexpr Long index   () noexcept { return detail::Find<TList, T>::VALUE;						}
 
 template <typename TList, typename T>
-constexpr bool contains() noexcept { return std::is_base_of<detail::Type<T>, TList>::value;	}
+constexpr bool contains() noexcept { return std::is_base_of<detail::TypeT<T>, TList>::value;	}
 
 // SPECIFIC
 //------------------------------------------------------------------------------

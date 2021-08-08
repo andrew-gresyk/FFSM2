@@ -1,4 +1,4 @@
-#ifdef FFSM2_ENABLE_PLANS
+#if FFSM2_PLANS_AVAILABLE()
 
 namespace ffsm2 {
 namespace detail {
@@ -8,10 +8,10 @@ namespace detail {
 #pragma pack(push, 1)
 
 struct TaskBase {
-	FFSM2_INLINE TaskBase() noexcept {}
+	FFSM2_CONSTEXPR(11) TaskBase()								  noexcept {}
 
-	FFSM2_INLINE TaskBase(const StateID origin_,
-						  const StateID destination_) noexcept
+	FFSM2_CONSTEXPR(11) TaskBase(const StateID origin_,
+								 const StateID destination_)	  noexcept
 		: origin{origin_}
 		, destination{destination_}
 	{}
@@ -29,7 +29,13 @@ struct TaskBase {
 	};
 };
 
-inline bool operator == (const TaskBase& lhs, const TaskBase& rhs) noexcept {
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+FFSM2_CONSTEXPR(11)
+bool
+operator == (const TaskBase& lhs,
+			 const TaskBase& rhs)								  noexcept
+{
 	return lhs.origin	   == rhs.origin &&
 		   lhs.destination == rhs.destination;
 }
@@ -47,15 +53,15 @@ struct TaskT
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_INLINE TaskT() noexcept {
+	FFSM2_CONSTEXPR(11) TaskT()									  noexcept {
 		new (&storage) Payload{};
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_INLINE TaskT(const StateID origin,
-					   const StateID destination,
-					   const Payload& payload) noexcept
+	FFSM2_CONSTEXPR(11)	TaskT(const StateID origin,
+							  const StateID destination,
+							  const Payload& payload)			  noexcept
 		: TaskBase{origin, destination}
 		, payloadSet{true}
 	{
@@ -64,9 +70,9 @@ struct TaskT
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_INLINE TaskT(const StateID origin,
-					   const StateID destination,
-					   Payload&& payload) noexcept
+	FFSM2_CONSTEXPR(11)	TaskT(const StateID origin,
+							  const StateID destination,
+							  Payload&& payload)				  noexcept
 		: TaskBase{origin, destination}
 		, payloadSet{true}
 	{
@@ -95,11 +101,10 @@ struct TaskT<void>
 template <typename TPayload, Long NCapacity>
 class TaskListT {
 public:
-	using Index = Long;
+	using Index		= Long;
 
-	static constexpr Index CAPACITY = NCapacity;
-
-	static constexpr Index INVALID = Index (-1);
+	static constexpr Index CAPACITY	= NCapacity;
+	static constexpr Index INVALID	= Index (-1);
 
 private:
 	using Payload	= TPayload;
@@ -107,24 +112,24 @@ private:
 
 public:
 	template <typename... TArgs>
-	Index emplace(TArgs&&... args)												  noexcept;
+	FFSM2_CONSTEXPR(14) Index emplace(TArgs&&... args)							  noexcept;
 
-	void remove(const Index i)													  noexcept;
+	FFSM2_CONSTEXPR(14) void remove(const Index i)								  noexcept;
 
-	FFSM2_INLINE	   Item& operator[] (const Index i)							  noexcept;
-	FFSM2_INLINE const Item& operator[] (const Index i)						const noexcept;
+	FFSM2_CONSTEXPR(14)		  Item& operator[] (const Index i)					  noexcept;
+	FFSM2_CONSTEXPR(11)	const Item& operator[] (const Index i)				const noexcept;
 
-	FFSM2_INLINE Index count()												const noexcept	{ return _count;	}
+	FFSM2_CONSTEXPR(11)	Index count()										const noexcept	{ return _count;	}
 
 private:
 	FFSM2_IF_ASSERT(void verifyStructure(const Index occupied = INVALID)	const noexcept);
 
 private:
-	Item _items[CAPACITY];
 	Index _vacantHead = 0;
 	Index _vacantTail = 0;
 	Index _last  = 0;
 	Index _count = 0;
+	Item _items[CAPACITY];
 };
 
 //------------------------------------------------------------------------------

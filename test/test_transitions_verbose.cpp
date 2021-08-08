@@ -2,6 +2,7 @@
 // Created by Andrew Gresyk
 
 #define FFSM2_ENABLE_VERBOSE_DEBUG_LOG
+#define FFSM2_DISABLE_TYPEINDEX
 #include "tools.hpp"
 
 namespace test_transitions_verbose {
@@ -143,9 +144,6 @@ void step1(FSM::Instance& machine, Logger& logger) {
 		{ ffsm2::INVALID_STATE_ID,	Event::Type::ENTRY_GUARD },
 		{ FSM::stateId<A>(),		Event::Type::ENTRY_GUARD },
 
-		{ ffsm2::INVALID_STATE_ID,	Event::Type::CONSTRUCT },
-		{ FSM::stateId<A>(),		Event::Type::CONSTRUCT },
-
 		{ ffsm2::INVALID_STATE_ID,	Event::Type::ENTER },
 		{ FSM::stateId<A>(),		Event::Type::ENTER },
 	});
@@ -190,9 +188,6 @@ void step3(FSM::Instance& machine, Logger& logger) {
 		{ FSM::stateId<B>(),		Event::Type::ENTRY_GUARD },
 
 		{ FSM::stateId<A>(),		Event::Type::EXIT },
-		{ FSM::stateId<A>(),		Event::Type::DESTRUCT },
-
-		{ FSM::stateId<B>(),		Event::Type::CONSTRUCT },
 		{ FSM::stateId<B>(),		Event::Type::ENTER },
 	});
 
@@ -240,9 +235,6 @@ void step5(FSM::Instance& machine, Logger& logger) {
 		{ FSM::stateId<D>(),		Event::Type::ENTRY_GUARD },
 
 		{ FSM::stateId<B>(),		Event::Type::EXIT },
-		{ FSM::stateId<B>(),		Event::Type::DESTRUCT },
-
-		{ FSM::stateId<D>(),		Event::Type::CONSTRUCT },
 		{ FSM::stateId<D>(),		Event::Type::ENTER },
 	});
 
@@ -268,9 +260,6 @@ TEST_CASE("FSM.Transitions Verbose") {
 	logger.assertSequence({
 		{ FSM::stateId<D>(),		Event::Type::EXIT },
 		{ ffsm2::INVALID_STATE_ID,	Event::Type::EXIT },
-
-		{ FSM::stateId<D>(),		Event::Type::DESTRUCT },
-		{ ffsm2::INVALID_STATE_ID,	Event::Type::DESTRUCT },
 	});
 }
 

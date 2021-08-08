@@ -1,4 +1,4 @@
-#ifdef FFSM2_ENABLE_SERIALIZATION
+#if FFSM2_SERIALIZATION_AVAILABLE()
 
 namespace ffsm2 {
 namespace detail {
@@ -27,10 +27,10 @@ public:
 
 	using Data = uint8_t[BYTE_COUNT];
 
-	FFSM2_INLINE void clear()										  noexcept;
+	FFSM2_CONSTEXPR(14) void clear()										  noexcept	{ fill(_data, 0);	}
 
-	FFSM2_INLINE	   Data& data()									  noexcept	{ return _data;		}
-	FFSM2_INLINE const Data& data()								const noexcept	{ return _data;		}
+	FFSM2_CONSTEXPR(14)		  Data& data()									  noexcept	{ return _data;		}
+	FFSM2_CONSTEXPR(11) const Data& data()								const noexcept	{ return _data;		}
 
 private:
 	Data _data;
@@ -46,13 +46,18 @@ public:
 	using Buffer = StreamBufferT<BIT_CAPACITY>;
 
 public:
-	FFSM2_INLINE explicit BitWriteStreamT(Buffer& buffer,
-										  const Long cursor = 0)	  noexcept;
+	FFSM2_CONSTEXPR(11)	explicit BitWriteStreamT(Buffer& buffer,
+												 const Long cursor = 0)		  noexcept
+		: _buffer{buffer}
+		, _cursor{cursor}
+	{
+		_buffer.clear();
+	}
 
 	template <Short NBitWidth>
-	FFSM2_INLINE void write(const UnsignedBitWidth<NBitWidth> item)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void write(const UBitWidth<NBitWidth> item)			  noexcept;
 
-	FFSM2_INLINE Long cursor()									const noexcept	{ return _cursor;	}
+	FFSM2_CONSTEXPR(11)	Long cursor()									const noexcept	{ return _cursor;	}
 
 private:
 	Buffer& _buffer;
@@ -70,13 +75,16 @@ public:
 	using Buffer = StreamBufferT<BIT_CAPACITY>;
 
 public:
-	FFSM2_INLINE explicit BitReadStreamT(const Buffer& buffer,
-										 const Long cursor = 0)		  noexcept;
+	FFSM2_CONSTEXPR(11)	explicit BitReadStreamT(const Buffer& buffer,
+												const Long cursor = 0)		  noexcept
+		: _buffer{buffer}
+		, _cursor{cursor}
+	{}
 
 	template <Short NBitWidth>
-	FFSM2_INLINE UnsignedBitWidth<NBitWidth> read()					  noexcept;
+	FFSM2_CONSTEXPR(14)	UBitWidth<NBitWidth> read()							  noexcept;
 
-	FFSM2_INLINE Long cursor()									const noexcept	{ return _cursor;	}
+	FFSM2_CONSTEXPR(11)	Long cursor()									const noexcept	{ return _cursor;	}
 
 private:
 	const Buffer& _buffer;

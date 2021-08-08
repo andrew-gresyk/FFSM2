@@ -1,4 +1,4 @@
-#ifdef FFSM2_ENABLE_PLANS
+#if FFSM2_PLANS_AVAILABLE() && FFSM2_ASSERT_AVAILABLE()
 
 namespace ffsm2 {
 namespace detail {
@@ -6,44 +6,9 @@ namespace detail {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
-void
-PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::clearTaskStatus(const StateID stateId) noexcept {
-	if (stateId != INVALID_STATE_ID) {
-		tasksSuccesses.clear(stateId);
-		tasksFailures .clear(stateId);
-	}
-}
-
-//------------------------------------------------------------------------------
-
-template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
-void
-PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::verifyEmptyStatus(const StateID FFSM2_IF_ASSERT(stateId)) const noexcept {
-#ifdef FFSM2_ENABLE_ASSERT
-
-	if (stateId != INVALID_STATE_ID) {
-		FFSM2_ASSERT(!tasksSuccesses.get(stateId));
-		FFSM2_ASSERT(!tasksFailures .get(stateId));
-	}
-
-#endif
-}
-
-//------------------------------------------------------------------------------
-
-#ifdef FFSM2_ENABLE_ASSERT
-
-template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
-void
-PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::verifyPlans() const noexcept {
-	FFSM2_ASSERT(tasks.count() == verifyPlan());
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
+FFSM2_CONSTEXPR(14)
 Long
-PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::verifyPlan() const noexcept {
+PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::verifyPlan() const noexcept	{
 	Long length = 0;
 	const Bounds& bounds = tasksBounds;
 
@@ -78,50 +43,13 @@ PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::veri
 
 	return length;
 }
-
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC>
-void
-PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::clearTaskStatus(const StateID stateId) noexcept {
-	if (stateId != INVALID_STATE_ID) {
-		tasksSuccesses.clear(stateId);
-		tasksFailures .clear(stateId);
-	}
-}
-
-//------------------------------------------------------------------------------
-
-template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC>
-void
-PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::verifyEmptyStatus(const StateID FFSM2_IF_ASSERT(stateId)) const noexcept {
-#ifdef FFSM2_ENABLE_ASSERT
-
-	if (stateId != INVALID_STATE_ID) {
-		FFSM2_ASSERT(!tasksSuccesses.get(stateId));
-		FFSM2_ASSERT(!tasksFailures .get(stateId));
-	}
-
-#endif
-}
-
-//------------------------------------------------------------------------------
-
-#ifdef FFSM2_ENABLE_ASSERT
-
-template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC>
-void
-PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::verifyPlans() const noexcept {
-	FFSM2_ASSERT(tasks.count() == verifyPlan());
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC>
+FFSM2_CONSTEXPR(14)
 Long
-PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::verifyPlan() const noexcept {
+PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::verifyPlan() const noexcept	{
 	Long length = 0;
 	const Bounds& bounds = tasksBounds;
 
@@ -156,8 +84,6 @@ PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::ver
 
 	return length;
 }
-
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 

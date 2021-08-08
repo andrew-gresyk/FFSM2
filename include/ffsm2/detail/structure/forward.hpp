@@ -46,9 +46,9 @@ struct SI_ final {
 	using Head				= THead;
 	using StateList			= TL_<Head>;
 
-	static constexpr Short WIDTH			  = 1;
+	static constexpr Short WIDTH		= 1;
 
-	static constexpr Long  STATE_COUNT	 	  = StateList::SIZE;
+	static constexpr Long  STATE_COUNT	= StateList::SIZE;
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -59,7 +59,7 @@ struct CSI_<TInitial, TRemaining...> {
 	using Remaining			= CSI_<TRemaining...>;
 	using StateList			= Merge<typename Initial::StateList,  typename Remaining::StateList>;
 
-	static constexpr Long  STATE_COUNT		  = StateList::SIZE;
+	static constexpr Long  STATE_COUNT	= StateList::SIZE;
 };
 
 template <typename TInitial>
@@ -67,7 +67,7 @@ struct CSI_<TInitial> {
 	using Initial			= WrapInfo<TInitial>;
 	using StateList			= typename Initial::StateList;
 
-	static constexpr Long  STATE_COUNT		  = StateList::SIZE;
+	static constexpr Long  STATE_COUNT	= StateList::SIZE;
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -79,14 +79,14 @@ struct CI_ final {
 	using SubStates			= CSI_<TSubStates...>;
 	using StateList			= typename SubStates::StateList;
 
-	static constexpr Short WIDTH			  = sizeof...(TSubStates);
+	static constexpr Short WIDTH		= sizeof...(TSubStates);
 
-#ifdef FFSM2_ENABLE_SERIALIZATION
-	static constexpr Long  WIDTH_BITS	  = bitWidth(WIDTH);
-	static constexpr Long  ACTIVE_BITS	  = WIDTH_BITS;
+#if FFSM2_SERIALIZATION_AVAILABLE()
+	static constexpr Long  WIDTH_BITS	= (Long) bitWidth(WIDTH);
+	static constexpr Long  ACTIVE_BITS	= WIDTH_BITS;
 #endif
 
-	static constexpr Long  STATE_COUNT		  = StateList::SIZE;
+	static constexpr Long  STATE_COUNT	= StateList::SIZE;
 };
 
 // COMMON
@@ -102,7 +102,7 @@ template <typename TContext
 struct ArgsT final {
 	using Context		= TContext;
 
-#ifdef FFSM2_ENABLE_LOG_INTERFACE
+#if FFSM2_LOG_INTERFACE_AVAILABLE()
 	using Logger		= typename TConfig::LoggerInterface;
 #endif
 
@@ -110,19 +110,19 @@ struct ArgsT final {
 
 	static constexpr Long  STATE_COUNT		  = StateList::SIZE;
 
-#ifdef FFSM2_ENABLE_SERIALIZATION
+#if FFSM2_SERIALIZATION_AVAILABLE()
 	static constexpr Short SERIAL_BITS		  = NSerialBits;
 #endif
 
 	static constexpr Short SUBSTITUTION_LIMIT = NSubstitutionLimit;
 
-#ifdef FFSM2_ENABLE_PLANS
+#if FFSM2_PLANS_AVAILABLE()
 	static constexpr Long  TASK_CAPACITY	  = NTaskCapacity;
 #endif
 
 	using Payload		= TPayload;
 
-#ifdef FFSM2_ENABLE_SERIALIZATION
+#if FFSM2_SERIALIZATION_AVAILABLE()
 	using SerialBuffer	= StreamBufferT  <SERIAL_BITS>;
 	using WriteStream	= BitWriteStreamT<SERIAL_BITS>;
 	using ReadStream	= BitReadStreamT <SERIAL_BITS>;
@@ -153,14 +153,14 @@ struct MaterialT   <N, TA, TH> {
 	using Type = S_<N, TA, TH>;
 };
 
-template <StateID N, typename TA, 			 typename... TS>
-struct MaterialT   <N, TA, CI_<void,         TS...>> {
-	using Type = C_<   TA, StaticEmptyT<TA>, TS...>;
+template <StateID N, typename TA, 			   typename... TS>
+struct MaterialT   <N, TA, CI_<void,   TS...>> {
+	using Type = C_<   TA, EmptyT<TA>, TS...>;
 };
 
 template <StateID N, typename TA, typename TH, typename... TS>
-struct MaterialT   <N, TA, CI_<TH,			  TS...>> {
-	using Type = C_<   TA, TH,				  TS...>;
+struct MaterialT   <N, TA, CI_<TH,	   TS...>> {
+	using Type = C_<   TA,	   TH,	   TS...>;
 };
 
 template <StateID N, typename... TS>
@@ -178,7 +178,7 @@ struct RF_ final {
 
 	static constexpr Long  SUBSTITUTION_LIMIT = TConfig::SUBSTITUTION_LIMIT;
 
-#ifdef FFSM2_ENABLE_PLANS
+#if FFSM2_PLANS_AVAILABLE()
 	static constexpr Long  TASK_CAPACITY	  = TConfig::TASK_CAPACITY != INVALID_LONG ?
 													  TConfig::TASK_CAPACITY : Apex::STATE_COUNT;
 #endif
@@ -186,11 +186,11 @@ struct RF_ final {
 	using Payload		= typename TConfig::Payload;
 	using Transition	= TransitionT<Payload>;
 
-#ifdef FFSM2_ENABLE_PLANS
+#if FFSM2_PLANS_AVAILABLE()
 	using Task			= typename TConfig::Task;
 #endif
 
-#ifdef FFSM2_ENABLE_SERIALIZATION
+#if FFSM2_SERIALIZATION_AVAILABLE()
 	static constexpr Long  ACTIVE_BITS			= Apex::ACTIVE_BITS;
 #endif
 
@@ -216,28 +216,14 @@ struct RF_ final {
 
 	//----------------------------------------------------------------------
 
-	using DynamicState	= DynamicEmptyT<Args>;
+	using State			= EmptyT<Args>;
 
 	template <typename... TInjections>
-	using DynamicStateT	= DB_<TInjections...>;
+	using StateT		= B_<TInjections...>;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	using StaticState	= StaticEmptyT<Args>;
-
-	template <typename... TInjections>
-	using StaticStateT	= SB_<TInjections...>;
-
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	using State			= StaticState;
-
-	template <typename... TInjections>
-	using StateT		= StaticStateT<TInjections...>;
-
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-#ifdef FFSM2_ENABLE_LOG_INTERFACE
+#if FFSM2_LOG_INTERFACE_AVAILABLE()
 	using Logger		= typename TConfig::LoggerInterface;
 #endif
 

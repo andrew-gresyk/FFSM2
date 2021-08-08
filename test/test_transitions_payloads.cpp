@@ -145,7 +145,6 @@ struct E
 
 void step1(FSM::Instance& machine, Logger& logger) {
 	logger.assertSequence({
-		{ FSM::stateId<A>(),		Event::Type::CONSTRUCT },
 		{ FSM::stateId<A>(),		Event::Type::ENTER },
 	});
 
@@ -181,7 +180,6 @@ void step3(FSM::Instance& machine, Logger& logger) {
 		{ FSM::stateId<A>(),		Event::Type::UPDATE },
 
 		{ FSM::stateId<A>(),		Event::Type::EXIT },
-		{ FSM::stateId<A>(),		Event::Type::DESTRUCT },
 	});
 
 	REQUIRE(machine.activeStateId() == FSM::stateId<B>());
@@ -210,7 +208,6 @@ void step5(FSM::Instance& machine, Logger& logger) {
 	machine.react(Action{});
 
 	logger.assertSequence({
-		{ ffsm2::INVALID_STATE_ID,	Event::Type::REACT },
 		{ FSM::stateId<B>(),		Event::Type::REACT },
 
 		{ FSM::stateId<B>(),		Event::Type::CHANGE,	FSM::stateId<C>() },

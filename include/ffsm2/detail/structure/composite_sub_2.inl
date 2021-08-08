@@ -5,6 +5,7 @@ namespace detail {
 // COMMON
 
 template <StateID N, typename TA, Short NI, typename T>
+FFSM2_CONSTEXPR(14)
 bool
 CS_<N, TA, NI, T>::wideEntryGuard(GuardControl& control,
 								  const Short FFSM2_IF_ASSERT(prong)) noexcept
@@ -17,18 +18,7 @@ CS_<N, TA, NI, T>::wideEntryGuard(GuardControl& control,
 //------------------------------------------------------------------------------
 
 template <StateID N, typename TA, Short NI, typename T>
-void
-CS_<N, TA, NI, T>::wideConstruct(PlanControl& control,
-								 const Short FFSM2_IF_ASSERT(prong)) noexcept
-{
-	FFSM2_ASSERT(prong == PRONG_INDEX);
-
-	state.deepConstruct(control);
-}
-
-//------------------------------------------------------------------------------
-
-template <StateID N, typename TA, Short NI, typename T>
+FFSM2_CONSTEXPR(14)
 void
 CS_<N, TA, NI, T>::wideEnter(PlanControl& control,
 							 const Short FFSM2_IF_ASSERT(prong)) noexcept
@@ -41,6 +31,7 @@ CS_<N, TA, NI, T>::wideEnter(PlanControl& control,
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <StateID N, typename TA, Short NI, typename T>
+FFSM2_CONSTEXPR(14)
 void
 CS_<N, TA, NI, T>::wideReenter(PlanControl& control,
 							   const Short FFSM2_IF_ASSERT(prong)) noexcept
@@ -53,6 +44,7 @@ CS_<N, TA, NI, T>::wideReenter(PlanControl& control,
 //------------------------------------------------------------------------------
 
 template <StateID N, typename TA, Short NI, typename T>
+FFSM2_CONSTEXPR(14)
 Status
 CS_<N, TA, NI, T>::wideUpdate(FullControl& control,
 							  const Short FFSM2_IF_ASSERT(prong)) noexcept
@@ -66,6 +58,7 @@ CS_<N, TA, NI, T>::wideUpdate(FullControl& control,
 
 template <StateID N, typename TA, Short NI, typename T>
 template <typename TEvent>
+FFSM2_CONSTEXPR(14)
 Status
 CS_<N, TA, NI, T>::wideReact(FullControl& control,
 							 const TEvent& event,
@@ -80,6 +73,7 @@ CS_<N, TA, NI, T>::wideReact(FullControl& control,
 // COMMON
 
 template <StateID N, typename TA, Short NI, typename T>
+FFSM2_CONSTEXPR(14)
 bool
 CS_<N, TA, NI, T>::wideExitGuard(GuardControl& control,
 								 const Short FFSM2_IF_ASSERT(prong)) noexcept
@@ -92,6 +86,7 @@ CS_<N, TA, NI, T>::wideExitGuard(GuardControl& control,
 //------------------------------------------------------------------------------
 
 template <StateID N, typename TA, Short NI, typename T>
+FFSM2_CONSTEXPR(14)
 void
 CS_<N, TA, NI, T>::wideExit(PlanControl& control,
 							const Short FFSM2_IF_ASSERT(prong)) noexcept
@@ -99,18 +94,6 @@ CS_<N, TA, NI, T>::wideExit(PlanControl& control,
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
 	state.deepExit(control);
-}
-
-//------------------------------------------------------------------------------
-
-template <StateID N, typename TA, Short NI, typename T>
-void
-CS_<N, TA, NI, T>::wideDestruct(PlanControl& control,
-								const Short FFSM2_IF_ASSERT(prong)) noexcept
-{
-	FFSM2_ASSERT(prong == PRONG_INDEX);
-
-	state.deepDestruct(control);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

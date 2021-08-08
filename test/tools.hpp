@@ -17,16 +17,14 @@
 struct Event {
 	enum class Type {
 		ENTRY_GUARD,
-		CONSTRUCT,
 		ENTER,
 		REENTER,
 		UPDATE,
 		REACT,
 		EXIT_GUARD,
 		EXIT,
-		DESTRUCT,
 
-	//#ifdef FFSM2_ENABLE_PLANS
+	//#if FFSM2_PLANS_AVAILABLE()
 		PLAN_SUCCEEDED,
 		PLAN_FAILED,
 
@@ -80,7 +78,7 @@ struct LoggerT
 	using typename Interface::Method;
 	using typename Interface::StateID;
 
-#ifdef FFSM2_ENABLE_PLANS
+#if FFSM2_PLANS_AVAILABLE()
 	using StatusEvent	  = typename Interface::StatusEvent;
 #endif
 
@@ -92,7 +90,7 @@ struct LoggerT
 						  const StateID origin,
 						  const StateID target) noexcept override;
 
-#ifdef FFSM2_ENABLE_PLANS
+#if FFSM2_PLANS_AVAILABLE()
 
 	void recordTaskStatus(Context& context,
 						  const StateID origin,

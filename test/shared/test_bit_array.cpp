@@ -8,7 +8,7 @@ namespace test_bit_array {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-using BitArray = ffsm2::detail::BitArrayT<ffsm2::Short, 12>;
+using BitArray = ffsm2::detail::BitArrayT<12>;
 
 TEST_CASE("Shared.BitArrayT<>") {
 	BitArray bits;

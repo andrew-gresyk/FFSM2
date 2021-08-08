@@ -14,22 +14,30 @@ public:
 	friend class ArrayT;
 
 private:
-	FFSM2_INLINE IteratorT(Container& container,
-						   const Index cursor)	  noexcept
+	FFSM2_CONSTEXPR(11)	IteratorT(Container& container,
+								  const Index cursor)									  noexcept
 		: _container{container}
 		, _cursor{cursor}
 	{}
 
 public:
-	FFSM2_INLINE bool operator != (const IteratorT<Container>& other) const noexcept;
+	FFSM2_CONSTEXPR(11)	bool operator != (const IteratorT& FFSM2_IF_ASSERT(other))	const noexcept	{
+		FFSM2_ASSERT(&_container == &other._container);
 
-	FFSM2_INLINE IteratorT& operator ++()		  noexcept;
+		return _cursor != _container.limit();
+	}
 
-	FFSM2_INLINE	   Item& operator *()		  noexcept	{ return  _container[_cursor];	}
-	FFSM2_INLINE const Item& operator *()	const noexcept	{ return  _container[_cursor];	}
+	FFSM2_CONSTEXPR(14)	IteratorT& operator ++()										  noexcept	{
+		_cursor = _container.next(_cursor);
 
-	FFSM2_INLINE	   Item* operator->()		  noexcept	{ return &_container[_cursor];	}
-	FFSM2_INLINE const Item* operator->()	const noexcept	{ return &_container[_cursor];	}
+		return *this;
+	}
+
+	FFSM2_CONSTEXPR(14)		  Item& operator *()		  noexcept	{ return  _container[_cursor];	}
+	FFSM2_CONSTEXPR(11)	const Item& operator *()	const noexcept	{ return  _container[_cursor];	}
+
+	FFSM2_CONSTEXPR(14)		  Item* operator->()		  noexcept	{ return &_container[_cursor];	}
+	FFSM2_CONSTEXPR(11)	const Item* operator->()	const noexcept	{ return &_container[_cursor];	}
 
 private:
 	Container& _container;
@@ -50,20 +58,28 @@ public:
 	friend class ArrayT;
 
 private:
-	FFSM2_INLINE IteratorT(const Container& container,
-						   const Index cursor)	  noexcept
+	FFSM2_CONSTEXPR(11)	IteratorT(const Container& container,
+								  const Index cursor)									  noexcept
 		: _container{container}
 		, _cursor{cursor}
 	{}
 
 public:
-	FFSM2_INLINE bool operator != (const IteratorT<const Container>& other) const noexcept;
+	FFSM2_CONSTEXPR(11)	bool operator != (const IteratorT& FFSM2_IF_ASSERT(other))	const noexcept	{
+		FFSM2_ASSERT(&_container == &other._container);
 
-	FFSM2_INLINE IteratorT& operator ++()		  noexcept;
+		return _cursor != _container.limit();
+	}
 
-	FFSM2_INLINE const Item& operator *()	const noexcept	{ return _container[_cursor];	}
+	FFSM2_CONSTEXPR(14)	IteratorT& operator ++()										  noexcept	{
+		_cursor = _container.next(_cursor);
 
-	FFSM2_INLINE const Item* operator->()	const noexcept	{ return &operator *();			}
+		return *this;
+	}
+
+	FFSM2_CONSTEXPR(11)	const Item& operator *()	const noexcept	{ return _container[_cursor];	}
+
+	FFSM2_CONSTEXPR(11)	const Item* operator->()	const noexcept	{ return &operator *();			}
 
 private:
 	const Container& _container;
@@ -75,5 +91,3 @@ private:
 
 }
 }
-
-#include "iterator.inl"
