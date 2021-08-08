@@ -235,7 +235,7 @@ contain(const T x,
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-FFSM2_CONSTEXPR(11)
+FFSM2_CONSTEXPR(14)
 void
 fill(T& a, const char value)						  noexcept { memset(&a, (int) value, sizeof(a));	}
 

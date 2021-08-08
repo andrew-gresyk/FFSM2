@@ -376,6 +376,7 @@ constexpr FeatureTag FFSM2_FEATURE_TAG = FFSM2_TYPEINDEX_MASK
 #ifdef __clang__
 	#pragma clang diagnostic push
 	#pragma clang diagnostic ignored "-Wextra-semi" // error : extra ';' inside a class
+	#pragma clang diagnostic ignored "-Wconstexpr-not-const" // error: 'constexpr' non-static member function will not be implicitly 'const' in C++14; add 'const' to avoid a change in behavior
 #endif
 
 #if defined(__GNUC__) || defined(__GNUG__)
@@ -622,7 +623,7 @@ contain(const T x,
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-FFSM2_CONSTEXPR(11)
+FFSM2_CONSTEXPR(14)
 void
 fill(T& a, const char value)						  noexcept { memset(&a, (int) value, sizeof(a));	}
 
@@ -701,7 +702,7 @@ private:
 	{}
 
 public:
-	FFSM2_CONSTEXPR(11)	bool operator != (const IteratorT& FFSM2_IF_ASSERT(other))	const noexcept	{
+	FFSM2_CONSTEXPR(14)	bool operator != (const IteratorT& FFSM2_IF_ASSERT(other))	const noexcept	{
 		FFSM2_ASSERT(&_container == &other._container);
 
 		return _cursor != _container.limit();
