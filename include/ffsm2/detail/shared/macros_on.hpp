@@ -58,6 +58,14 @@
 	#define FFSM2_CONSTEXPR_17()										  inline
 #endif
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+#if __cplusplus >= 202002L
+	#define FFSM2_CONSTEXPR_20()									   constexpr
+#else
+	#define FFSM2_CONSTEXPR_20()										  inline
+#endif
+
 //------------------------------------------------------------------------------
 
 #define FFSM2_ARCHITECTURE(A)							FFSM2_ARCHITECTURE_##A()
@@ -72,7 +80,7 @@
 	#define FFSM2_ARCHITECTURE_32BIT()										true
 
 	#define FFSM2_64BIT_OR_32BIT(p64, p32)									 p32
-else
+#else
 	#error
 #endif
 

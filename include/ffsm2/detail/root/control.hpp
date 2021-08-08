@@ -42,7 +42,7 @@ protected:
 			control._originId = stateId;
 		}
 
-		FFSM2_CONSTEXPR(14) ~Origin()									  noexcept	{ control._originId = prevId;			}
+		FFSM2_CONSTEXPR(20) ~Origin()									  noexcept	{ control._originId = prevId;			}
 
 		ControlT& control;
 		const StateID prevId;
@@ -227,7 +227,7 @@ protected:
 				control->_locked = true;
 		}
 
-		FFSM2_CONSTEXPR(14)	~Lock()								  noexcept	{
+		FFSM2_CONSTEXPR(20)	~Lock()								  noexcept	{
 			if (control)
 				control->_locked = false;
 		}

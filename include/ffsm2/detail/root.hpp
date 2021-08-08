@@ -61,7 +61,7 @@ public:
 	   FFSM2_IF_LOG_INTERFACE(, _logger{logger})
 	{}
 
-	FFSM2_CONSTEXPR(14)	~R_()																  noexcept	{
+	FFSM2_CONSTEXPR(20)	~R_()																  noexcept	{
 		FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
 	}
 
@@ -248,7 +248,7 @@ public:
 		initialEnter();
 	}
 
-	FFSM2_CONSTEXPR(14)	~RV_()																  noexcept	{ finalExit();	}
+	FFSM2_CONSTEXPR(20)	~RV_()																  noexcept	{ finalExit();	}
 
 private:
 	using Base::initialEnter;

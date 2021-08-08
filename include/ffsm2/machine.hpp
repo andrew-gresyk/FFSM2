@@ -112,6 +112,14 @@
 	#define FFSM2_CONSTEXPR_17()										  inline
 #endif
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+#if __cplusplus >= 202002L
+	#define FFSM2_CONSTEXPR_20()									   constexpr
+#else
+	#define FFSM2_CONSTEXPR_20()										  inline
+#endif
+
 //------------------------------------------------------------------------------
 
 #define FFSM2_ARCHITECTURE(A)							FFSM2_ARCHITECTURE_##A()
@@ -126,7 +134,7 @@
 	#define FFSM2_ARCHITECTURE_32BIT()										true
 
 	#define FFSM2_64BIT_OR_32BIT(p64, p32)									 p32
-else
+#else
 	#error
 #endif
 
@@ -1385,14 +1393,14 @@ struct LoggerInterfaceT {
 	using StatusEvent	 = ::ffsm2::StatusEvent;
 #endif
 
-	FFSM2_CONSTEXPR(14)
+	FFSM2_CONSTEXPR(NO)
 	virtual
 	void recordMethod(Context& FFSM2_UNUSED(context),
 					  const StateID FFSM2_UNUSED(origin),
 					  const Method FFSM2_UNUSED(method))			  noexcept
 	{}
 
-	FFSM2_CONSTEXPR(14)
+	FFSM2_CONSTEXPR(NO)
 	virtual
 	void
 	recordTransition(Context& FFSM2_UNUSED(context),
@@ -1402,7 +1410,7 @@ struct LoggerInterfaceT {
 
 #if FFSM2_PLANS_AVAILABLE()
 
-	FFSM2_CONSTEXPR(14)
+	FFSM2_CONSTEXPR(NO)
 	virtual
 	void
 	recordTaskStatus(Context& FFSM2_UNUSED(context),
@@ -1410,7 +1418,7 @@ struct LoggerInterfaceT {
 					 const StatusEvent FFSM2_UNUSED(event))			  noexcept
 	{}
 
-	FFSM2_CONSTEXPR(14)
+	FFSM2_CONSTEXPR(NO)
 	virtual
 	void
 	recordPlanStatus(Context& FFSM2_UNUSED(context),
@@ -1419,7 +1427,7 @@ struct LoggerInterfaceT {
 
 #endif
 
-	FFSM2_CONSTEXPR(14)
+	FFSM2_CONSTEXPR(NO)
 	virtual
 	void
 	recordCancelledPending(Context& FFSM2_UNUSED(context),
@@ -3240,7 +3248,7 @@ protected:
 			control._originId = stateId;
 		}
 
-		FFSM2_CONSTEXPR(14) ~Origin()									  noexcept	{ control._originId = prevId;			}
+		FFSM2_CONSTEXPR(20) ~Origin()									  noexcept	{ control._originId = prevId;			}
 
 		ControlT& control;
 		const StateID prevId;
@@ -3425,7 +3433,7 @@ protected:
 				control->_locked = true;
 		}
 
-		FFSM2_CONSTEXPR(14)	~Lock()								  noexcept	{
+		FFSM2_CONSTEXPR(20)	~Lock()								  noexcept	{
 			if (control)
 				control->_locked = false;
 		}
@@ -5596,7 +5604,7 @@ public:
 	   FFSM2_IF_LOG_INTERFACE(, _logger{logger})
 	{}
 
-	FFSM2_CONSTEXPR(14)	~R_()																  noexcept	{
+	FFSM2_CONSTEXPR(20)	~R_()																  noexcept	{
 		FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
 	}
 
@@ -5783,7 +5791,7 @@ public:
 		initialEnter();
 	}
 
-	FFSM2_CONSTEXPR(14)	~RV_()																  noexcept	{ finalExit();	}
+	FFSM2_CONSTEXPR(20)	~RV_()																  noexcept	{ finalExit();	}
 
 private:
 	using Base::initialEnter;
