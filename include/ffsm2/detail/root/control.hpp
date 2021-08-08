@@ -405,7 +405,7 @@ public:
 												Payload&& payload)	  noexcept
 	{
 		if (!_locked) {
-			_request = Transition{_originId, stateId, std::move(payload)};
+			_request = Transition{_originId, stateId, move(payload)};
 
 			FFSM2_LOG_TRANSITION(context(), _originId, stateId);
 		}
@@ -421,7 +421,7 @@ public:
 	/// @tparam TState Destination state type
 	/// @param payload Payload
 	template <typename TState>
-	FFSM2_CONSTEXPR(14)	void changeWith(Payload&& payload)			  noexcept	{ changeWith(FullControlBase::template stateId<TState>(), std::move(payload));	}
+	FFSM2_CONSTEXPR(14)	void changeWith(Payload&& payload)			  noexcept	{ changeWith(FullControlBase::template stateId<TState>(), move(payload));	}
 
 	// COMMON
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

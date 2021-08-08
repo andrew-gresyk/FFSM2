@@ -240,7 +240,7 @@ protected:
 #endif
 
 public:
-	FFSM2_CONSTEXPR(11)	explicit RV_(Context& context
+	FFSM2_CONSTEXPR(14)	explicit RV_(Context& context
 								   FFSM2_IF_LOG_INTERFACE(, Logger* const logger = nullptr))  noexcept
 		: Base{context
 		FFSM2_IF_LOG_INTERFACE(, logger)}
@@ -374,13 +374,13 @@ public:
 	/// @tparam TState Destination state type
 	/// @param payload Payload
 	template <typename TState>
-	FFSM2_CONSTEXPR(14)	void changeWith(const Payload& payload)				  noexcept	{ changeWith(stateId<TState>(),			  payload );	}
+	FFSM2_CONSTEXPR(14)	void changeWith(const Payload& payload)				  noexcept	{ changeWith(stateId<TState>(),		 payload );	}
 
 	/// @brief Transition into a state
 	/// @tparam TState Destination state type
 	/// @param payload Payload
 	template <typename TState>
-	FFSM2_CONSTEXPR(14)	void changeWith(Payload&& payload)					  noexcept	{ changeWith(stateId<TState>(), std::move(payload));	}
+	FFSM2_CONSTEXPR(14)	void changeWith(Payload&& payload)					  noexcept	{ changeWith(stateId<TState>(), move(payload));	}
 
 	// COMMON
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -460,7 +460,7 @@ public:
 	{}
 
 	FFSM2_CONSTEXPR(14) void setContext(const Context&  context)	  noexcept { _context =			  context ; }
-	FFSM2_CONSTEXPR(14) void setContext(	  Context&& context)	  noexcept { _context = std::move(context); }
+	FFSM2_CONSTEXPR(14) void setContext(	  Context&& context)	  noexcept { _context = move(context); }
 
 private:
 	using Base::_context;

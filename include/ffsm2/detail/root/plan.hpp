@@ -68,24 +68,11 @@ public:
 	//----------------------------------------------------------------------
 
 	struct IteratorT {
-		FFSM2_CONSTEXPR(11)	IteratorT(const CPlanT& plan)		  noexcept
-			: _plan{plan}
-			, _curr{plan._bounds.first}
-		{
-			_next = next();
-		}
+		FFSM2_CONSTEXPR(14)	IteratorT(const CPlanT& plan)		  noexcept;
 
-		FFSM2_CONSTEXPR(11)	explicit operator bool()		const noexcept	{
-			FFSM2_ASSERT(_curr < CPlanT::TASK_CAPACITY ||
-						 _curr == INVALID_LONG);
+		FFSM2_CONSTEXPR(11)	explicit operator bool()		const noexcept;
 
-			return _curr < CPlanT::TASK_CAPACITY;
-		}
-
-		FFSM2_CONSTEXPR(14)	void operator ++()					  noexcept	{
-			_curr = _next;
-			_next = next();
-		}
+		FFSM2_CONSTEXPR(14)	void operator ++()					  noexcept;
 
 		FFSM2_CONSTEXPR(11) const Task& operator  *()		const noexcept	{ return  _plan._planData.tasks[_curr];		}
 		FFSM2_CONSTEXPR(11) const Task* operator ->()		const noexcept	{ return &_plan._planData.tasks[_curr];		}
@@ -109,13 +96,7 @@ private:
 	static constexpr StateID  stateId()							  noexcept	{ return			index<StateList , T>();	}
 
 public:
-	FFSM2_CONSTEXPR(11)	explicit operator bool()			const noexcept	{
-		FFSM2_ASSERT(_bounds.first < TASK_CAPACITY &&
-					 _bounds.last  < TASK_CAPACITY ||
-					 _bounds.last == INVALID_LONG);
-
-		return _bounds.first < TASK_CAPACITY;
-	}
+	FFSM2_CONSTEXPR(11)	explicit operator bool()			const noexcept;
 
 	FFSM2_CONSTEXPR(11)	IteratorT first()						  noexcept	{ return IteratorT{*this};					}
 
@@ -144,23 +125,11 @@ public:
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	struct IteratorT {
-		FFSM2_CONSTEXPR(14)	IteratorT(PlanBaseT& plan)				  noexcept
-			: _plan{plan}
-			, _curr{plan._bounds.first}
-			, _next{next()}
-		{}
+		FFSM2_CONSTEXPR(14)	IteratorT(PlanBaseT& plan)				  noexcept;
 
-		FFSM2_CONSTEXPR(14)	explicit operator bool()			const noexcept	{
-			FFSM2_ASSERT(_curr < PlanBaseT::TASK_CAPACITY ||
-						 _curr == INVALID_LONG);
+		FFSM2_CONSTEXPR(14)	explicit operator bool()			const noexcept;
 
-			return _curr < PlanBaseT::TASK_CAPACITY;
-		}
-
-		FFSM2_CONSTEXPR(14)	void operator ++()						  noexcept	{
-			_curr = _next;
-			_next = next();
-		}
+		FFSM2_CONSTEXPR(14)	void operator ++()						  noexcept;
 
 		FFSM2_CONSTEXPR(14) Task& operator  *()						  noexcept	{ return  _plan._planData.tasks[_curr];	}
 		FFSM2_CONSTEXPR(14) Task* operator ->()						  noexcept	{ return &_plan._planData.tasks[_curr];	}
@@ -177,26 +146,14 @@ public:
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	struct CIterator {
-		FFSM2_CONSTEXPR(14)	CIterator(const PlanBaseT& plan)		  noexcept
-			: _plan{plan}
-			, _curr{plan._bounds.first}
-			, _next{next()}
-		{}
+		FFSM2_CONSTEXPR(14)	CIterator(const PlanBaseT& plan)		  noexcept;
 
-		FFSM2_CONSTEXPR(14)	explicit operator bool()			const noexcept	{
-			FFSM2_ASSERT(_curr < PlanBaseT::TASK_CAPACITY ||
-						 _curr == INVALID_LONG);
+		FFSM2_CONSTEXPR(14)	explicit operator bool()			const noexcept;
 
-			return _curr < PlanBaseT::TASK_CAPACITY;
-		}
-
-		FFSM2_CONSTEXPR(14)	void operator ++()						  noexcept	{
-			_curr = _next;
-			_next = next();
-		}
+		FFSM2_CONSTEXPR(14)	void operator ++()						  noexcept;
 
 		FFSM2_CONSTEXPR(14) const Task& operator  *()			const noexcept	{ return  _plan._planData.tasks[_curr];	}
-		FFSM2_CONSTEXPR(14) const Task* operator ->()			const noexcept	{ return &_plan._planData.tasks[_curr];	}
+		FFSM2_CONSTEXPR(11) const Task* operator ->()			const noexcept	{ return &_plan._planData.tasks[_curr];	}
 
 		FFSM2_CONSTEXPR(14) Long next()							const noexcept;
 
@@ -208,30 +165,21 @@ public:
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 protected:
-	FFSM2_CONSTEXPR(11)	PlanBaseT(PlanData& planData)					  noexcept
-		: _planData{planData}
-		, _bounds{planData.tasksBounds}
-	{}
+	FFSM2_CONSTEXPR(11)	PlanBaseT(PlanData& planData)				  noexcept;
 
 	template <typename T>
-	static constexpr StateID  stateId()									  noexcept	{ return			index<StateList , T>();	}
+	static constexpr StateID  stateId()								  noexcept	{ return		index<StateList , T>();	}
 
 	FFSM2_CONSTEXPR(14)	bool append(const StateID origin,
-									const StateID destination)			  noexcept;
+									const StateID destination)		  noexcept;
 
-	FFSM2_CONSTEXPR(14)	bool linkTask(const Long index)					  noexcept;
+	FFSM2_CONSTEXPR(14)	bool linkTask(const Long index)				  noexcept;
 
 public:
-	FFSM2_CONSTEXPR(11)	explicit operator bool()					const noexcept	{
-		FFSM2_ASSERT(_bounds.first < TASK_CAPACITY &&
-					 _bounds.last  < TASK_CAPACITY ||
-					 _bounds.last == INVALID_LONG);
-
-		return _bounds.first < TASK_CAPACITY;
-	}
+	FFSM2_CONSTEXPR(14)	explicit operator bool()				const noexcept;
 
 	/// @brief Clear all tasks from the plan
-	FFSM2_CONSTEXPR(14)	void clear()									  noexcept;
+	FFSM2_CONSTEXPR(14)	void clear()								  noexcept;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -334,21 +282,11 @@ class PlanT<ArgsT<TContext
 
 	FFSM2_CONSTEXPR(14)	bool append(const StateID origin,
 									const StateID destination,
-									const Payload& payload)									  noexcept
-	{
-		_planData.planExists = true;
-
-		return linkTask(_planData.tasks.emplace(origin, destination, payload));
-	}
+									const Payload& payload)									  noexcept;
 
 	FFSM2_CONSTEXPR(14)	bool append(const StateID origin,
 									const StateID destination,
-									Payload&& payload)										  noexcept
-	{
-		_planData.planExists = true;
-
-		return linkTask(_planData.tasks.emplace(origin, destination, std::move(payload)));
-	}
+									Payload&& payload)										  noexcept;
 
 public:
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -359,7 +297,7 @@ public:
 	/// @param payload Payload
 	/// @return Seccess if FSM total number of tasks is below task capacity
 	/// @note use 'Config::TaskCapacityN<>' to increase task capacity if necessary
-	FFSM2_CONSTEXPR(14)	bool changeWith(const StateID origin, const StateID destination, const Payload & payload) noexcept	{ return append(origin								 , destination								 ,  		 payload );	}
+	FFSM2_CONSTEXPR(14)	bool changeWith(const StateID origin, const StateID destination, const Payload & payload) noexcept	{ return append(origin								 , destination								 ,		payload );	}
 
 	/// @brief Add a task to transition from 'origin' to 'destination' if 'origin' completes with 'success()'
 	/// @param origin Origin state identifier
@@ -367,7 +305,7 @@ public:
 	/// @param payload Payload
 	/// @return Seccess if FSM total number of tasks is below task capacity
 	/// @note use 'Config::TaskCapacityN<>' to increase task capacity if necessary
-	FFSM2_CONSTEXPR(14)	bool changeWith(const StateID origin, const StateID destination,	   Payload&& payload) noexcept	{ return append(origin								 , destination								 , std::move(payload));	}
+	FFSM2_CONSTEXPR(14)	bool changeWith(const StateID origin, const StateID destination,	   Payload&& payload) noexcept	{ return append(origin								 , destination								 , move(payload));	}
 
 	/// @brief Add a task to transition from 'origin' to 'destination' if 'origin' completes with 'success()'
 	/// @tparam TOrigin Origin state type
@@ -376,7 +314,7 @@ public:
 	/// @return Seccess if FSM total number of tasks is below task capacity
 	/// @note use 'Config::TaskCapacityN<>' to increase task capacity if necessary
 	template <typename TOrigin>
-	FFSM2_CONSTEXPR(14)	bool changeWith(					  const StateID destination, const Payload & payload) noexcept	{ return append(PlanBase::template stateId<TOrigin>(), destination								 , 			 payload );	}
+	FFSM2_CONSTEXPR(14)	bool changeWith(					  const StateID destination, const Payload & payload) noexcept	{ return append(PlanBase::template stateId<TOrigin>(), destination								 ,		payload );	}
 
 	/// @brief Add a task to transition from 'origin' to 'destination' if 'origin' completes with 'success()'
 	/// @tparam TOrigin Origin state type
@@ -385,7 +323,7 @@ public:
 	/// @return Seccess if FSM total number of tasks is below task capacity
 	/// @note use 'Config::TaskCapacityN<>' to increase task capacity if necessary
 	template <typename TOrigin>
-	FFSM2_CONSTEXPR(14)	bool changeWith(					  const StateID destination,	   Payload&& payload) noexcept	{ return append(PlanBase::template stateId<TOrigin>(), destination								 , std::move(payload));	}
+	FFSM2_CONSTEXPR(14)	bool changeWith(					  const StateID destination,	   Payload&& payload) noexcept	{ return append(PlanBase::template stateId<TOrigin>(), destination								 , move(payload));	}
 
 	/// @brief Add a task to transition from 'origin' to 'destination' if 'origin' completes with 'success()'
 	/// @tparam TOrigin Origin state type
@@ -394,7 +332,7 @@ public:
 	/// @return Seccess if FSM total number of tasks is below task capacity
 	/// @note use 'Config::TaskCapacityN<>' to increase task capacity if necessary
 	template <typename TOrigin, typename TDestination>
-	FFSM2_CONSTEXPR(14)	bool changeWith(												 const Payload & payload) noexcept	{ return append(PlanBase::template stateId<TOrigin>(), PlanBase::template stateId<TDestination>(), 			 payload );	}
+	FFSM2_CONSTEXPR(14)	bool changeWith(												 const Payload & payload) noexcept	{ return append(PlanBase::template stateId<TOrigin>(), PlanBase::template stateId<TDestination>(),		payload );	}
 
 	/// @brief Add a task to transition from 'origin' to 'destination' if 'origin' completes with 'success()'
 	/// @tparam TOrigin Origin state type
@@ -403,7 +341,7 @@ public:
 	/// @return Seccess if FSM total number of tasks is below task capacity
 	/// @note use 'Config::TaskCapacityN<>' to increase task capacity if necessary
 	template <typename TOrigin, typename TDestination>
-	FFSM2_CONSTEXPR(14)	bool changeWith(													   Payload&& payload) noexcept	{ return append(PlanBase::template stateId<TOrigin>(), PlanBase::template stateId<TDestination>(), std::move(payload));	}
+	FFSM2_CONSTEXPR(14)	bool changeWith(													   Payload&& payload) noexcept	{ return append(PlanBase::template stateId<TOrigin>(), PlanBase::template stateId<TDestination>(), move(payload));	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

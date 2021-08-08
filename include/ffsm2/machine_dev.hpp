@@ -44,6 +44,7 @@
 #ifndef FFSM2_DISABLE_TYPEINDEX
 	#include <typeindex>
 #endif
+#include <type_traits>		// is_base_of<>
 
 #if defined _DEBUG && _MSC_VER
 	#include <intrin.h>		// __debugbreak()

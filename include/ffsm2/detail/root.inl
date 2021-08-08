@@ -398,7 +398,7 @@ RP_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateI
 {
 	FFSM2_ASSERT(_registry.isActive());
 
-	_request = Transition{stateId, std::move(payload)};
+	_request = Transition{stateId, move(payload)};
 
 	FFSM2_LOG_TRANSITION(_context, INVALID_STATE_ID, stateId);
 }

@@ -7,8 +7,40 @@ namespace detail {
 
 template <typename TArgs>
 FFSM2_CONSTEXPR(14)
+CPlanT<TArgs>::IteratorT::IteratorT(const CPlanT& plan) noexcept
+	: _plan{plan}
+	, _curr{plan._bounds.first}
+{
+	_next = next();
+}
+
+//------------------------------------------------------------------------------
+
+template <typename TArgs>
+FFSM2_CONSTEXPR(11)
+CPlanT<TArgs>::IteratorT::operator bool() const noexcept {
+	FFSM2_ASSERT(_curr < CPlanT::TASK_CAPACITY ||
+				 _curr == INVALID_LONG);
+
+	return _curr < CPlanT::TASK_CAPACITY;
+}
+
+//------------------------------------------------------------------------------
+
+template <typename TArgs>
+FFSM2_CONSTEXPR(14)
+void
+CPlanT<TArgs>::IteratorT::operator ++() noexcept {
+	_curr = _next;
+	_next = next();
+}
+
+//------------------------------------------------------------------------------
+
+template <typename TArgs>
+FFSM2_CONSTEXPR(14)
 Long
-CPlanT<TArgs>::IteratorT::next() const noexcept	{
+CPlanT<TArgs>::IteratorT::next() const noexcept {
 	if (_curr < CPlanT::TASK_CAPACITY) {
 		const TaskLink& link = _plan._planData.taskLinks[_curr];
 
@@ -23,9 +55,52 @@ CPlanT<TArgs>::IteratorT::next() const noexcept	{
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TArgs>
+FFSM2_CONSTEXPR(11)
+CPlanT<TArgs>::operator bool() const noexcept {
+	FFSM2_ASSERT(_bounds.first < TASK_CAPACITY &&
+				 _bounds.last  < TASK_CAPACITY ||
+				 _bounds.last == INVALID_LONG);
+
+	return _bounds.first < TASK_CAPACITY;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+template <typename TArgs>
+FFSM2_CONSTEXPR(14)
+PlanBaseT<TArgs>::IteratorT::IteratorT(PlanBaseT& plan) noexcept
+	: _plan{plan}
+	, _curr{plan._bounds.first}
+	, _next{next()}
+{}
+
+//------------------------------------------------------------------------------
+
+template <typename TArgs>
+FFSM2_CONSTEXPR(14)
+PlanBaseT<TArgs>::IteratorT::operator bool() const noexcept {
+	FFSM2_ASSERT(_curr < PlanBaseT::TASK_CAPACITY ||
+				 _curr == INVALID_LONG);
+
+	return _curr < PlanBaseT::TASK_CAPACITY;
+}
+
+//------------------------------------------------------------------------------
+
+template <typename TArgs>
+FFSM2_CONSTEXPR(14)
+void
+PlanBaseT<TArgs>::IteratorT::operator ++() noexcept {
+	_curr = _next;
+	_next = next();
+}
+
+//------------------------------------------------------------------------------
+
+template <typename TArgs>
 FFSM2_CONSTEXPR(14)
 Long
-PlanBaseT<TArgs>::IteratorT::next() const noexcept	{
+PlanBaseT<TArgs>::IteratorT::next() const noexcept {
 	if (_curr < PlanBaseT::TASK_CAPACITY) {
 		const TaskLink& link = _plan._planData.taskLinks[_curr];
 
@@ -41,8 +116,39 @@ PlanBaseT<TArgs>::IteratorT::next() const noexcept	{
 
 template <typename TArgs>
 FFSM2_CONSTEXPR(14)
+PlanBaseT<TArgs>::CIterator::CIterator(const PlanBaseT& plan) noexcept
+	: _plan{plan}
+	, _curr{plan._bounds.first}
+	, _next{next()}
+{}
+
+//------------------------------------------------------------------------------
+
+template <typename TArgs>
+FFSM2_CONSTEXPR(14)
+PlanBaseT<TArgs>::CIterator::operator bool() const noexcept {
+	FFSM2_ASSERT(_curr < PlanBaseT::TASK_CAPACITY ||
+				 _curr == INVALID_LONG);
+
+	return _curr < PlanBaseT::TASK_CAPACITY;
+}
+
+//------------------------------------------------------------------------------
+
+template <typename TArgs>
+FFSM2_CONSTEXPR(14)
+void
+PlanBaseT<TArgs>::CIterator::operator ++() noexcept {
+	_curr = _next;
+	_next = next();
+}
+
+//------------------------------------------------------------------------------
+
+template <typename TArgs>
+FFSM2_CONSTEXPR(14)
 Long
-PlanBaseT<TArgs>::CIterator::next() const noexcept	{
+PlanBaseT<TArgs>::CIterator::next() const noexcept {
 	if (_curr < PlanBaseT::TASK_CAPACITY) {
 		const TaskLink& link = _plan._planData.taskLinks[_curr];
 
@@ -55,6 +161,27 @@ PlanBaseT<TArgs>::CIterator::next() const noexcept	{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+template <typename TArgs>
+FFSM2_CONSTEXPR(11)
+PlanBaseT<TArgs>::PlanBaseT(PlanData& planData) noexcept
+	: _planData{planData}
+	, _bounds{planData.tasksBounds}
+{}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <typename TArgs>
+FFSM2_CONSTEXPR(14)
+PlanBaseT<TArgs>::operator bool() const noexcept {
+	FFSM2_ASSERT(_bounds.first < TASK_CAPACITY &&
+				 _bounds.last  < TASK_CAPACITY ||
+				 _bounds.last == INVALID_LONG);
+
+	return _bounds.first < TASK_CAPACITY;
+}
+
+//------------------------------------------------------------------------------
 
 template <typename TArgs>
 FFSM2_CONSTEXPR(14)
@@ -95,6 +222,7 @@ PlanBaseT<TArgs>::linkTask(const Long index) noexcept	{
 
 			auto& currLink = _planData.taskLinks[index];
 			FFSM2_ASSERT(currLink.prev == INVALID_LONG);
+			FFSM2_ASSERT(lastLink.prev == INVALID_LONG);
 
 			currLink.prev  = _bounds.last;
 
@@ -179,6 +307,31 @@ PlanBaseT<TArgs>::remove(const Long task) noexcept	{
 
 ////////////////////////////////////////////////////////////////////////////////
 
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
+FFSM2_CONSTEXPR(14)
+bool
+PlanT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::append(const StateID origin,
+																			   const StateID destination,
+																			   const Payload& payload) noexcept
+{
+	_planData.planExists = true;
+
+	return linkTask(_planData.tasks.emplace(origin, destination, payload));
+}
+
+//------------------------------------------------------------------------------
+
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
+FFSM2_CONSTEXPR(14)
+bool
+PlanT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::append(const StateID origin,
+																			   const StateID destination,
+																			   Payload&& payload) noexcept
+{
+	_planData.planExists = true;
+
+	return linkTask(_planData.tasks.emplace(origin, destination, move(payload)));
+}
 #endif
 
 }

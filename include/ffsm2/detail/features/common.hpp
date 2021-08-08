@@ -175,14 +175,14 @@ struct alignas(4) TransitionT
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(11)
+	FFSM2_CONSTEXPR(14)
 	TransitionT()													  noexcept {
 		new (&storage) Payload{};
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(11)
+	FFSM2_CONSTEXPR(14)
 	TransitionT(const StateID destination,
 				const Payload& payload)								  noexcept
 		: TransitionBase{destination}
@@ -193,18 +193,18 @@ struct alignas(4) TransitionT
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(11)
+	FFSM2_CONSTEXPR(14)
 	TransitionT(const StateID destination,
 				Payload&& payload)									  noexcept
 		: TransitionBase{destination}
 		, payloadSet{true}
 	{
-		new (&storage) Payload{std::move(payload)};
+		new (&storage) Payload{move(payload)};
 	}
 
 	//----------------------------------------------------------------------
 
-	FFSM2_CONSTEXPR(11)
+	FFSM2_CONSTEXPR(14)
 	TransitionT(const StateID origin,
 				const StateID destination,
 				const Payload& payload)								  noexcept
@@ -216,14 +216,14 @@ struct alignas(4) TransitionT
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(11)
+	FFSM2_CONSTEXPR(14)
 	TransitionT(const StateID origin,
 				const StateID destination,
 				Payload&& payload)									  noexcept
 		: TransitionBase{origin, destination}
 		, payloadSet{true}
 	{
-		new (&storage) Payload{std::move(payload)};
+		new (&storage) Payload{move(payload)};
 	}
 
 	//----------------------------------------------------------------------

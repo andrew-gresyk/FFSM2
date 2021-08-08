@@ -53,13 +53,13 @@ struct TaskT
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(11) TaskT()									  noexcept {
+	FFSM2_CONSTEXPR(14) TaskT()									  noexcept {
 		new (&storage) Payload{};
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(11)	TaskT(const StateID origin,
+	FFSM2_CONSTEXPR(14)	TaskT(const StateID origin,
 							  const StateID destination,
 							  const Payload& payload)			  noexcept
 		: TaskBase{origin, destination}
@@ -70,13 +70,13 @@ struct TaskT
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(11)	TaskT(const StateID origin,
+	FFSM2_CONSTEXPR(14)	TaskT(const StateID origin,
 							  const StateID destination,
 							  Payload&& payload)				  noexcept
 		: TaskBase{origin, destination}
 		, payloadSet{true}
 	{
-		new (&storage) Payload{std::move(payload)};
+		new (&storage) Payload{move(payload)};
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

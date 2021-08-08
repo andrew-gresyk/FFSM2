@@ -17,7 +17,7 @@ StaticArrayT<T, NC>::operator[] (const N index) noexcept	{
 
 template <typename T, Long NC>
 template <typename N>
-FFSM2_CONSTEXPR(11)
+FFSM2_CONSTEXPR(14)
 const T&
 StaticArrayT<T, NC>::operator[] (const N index) const noexcept	{
 	FFSM2_ASSERT(0 <= index && index < CAPACITY);
@@ -79,7 +79,7 @@ ArrayT<T, NC>::operator[] (const N index) noexcept {
 
 template <typename T, Long NC>
 template <typename N>
-FFSM2_CONSTEXPR(11)
+FFSM2_CONSTEXPR(14)
 const typename ArrayT<T, NC>::Item&
 ArrayT<T, NC>::operator[] (const N index) const noexcept {
 	FFSM2_ASSERT(0 <= index && index < CAPACITY);
@@ -105,7 +105,7 @@ template <typename T, Long NC>
 FFSM2_CONSTEXPR(14)
 ArrayT<T, NC>&
 ArrayT<T, NC>::operator += (Item&& item) noexcept {
-	emplace(std::move(item));
+	emplace(move(item));
 
 	return *this;
 }

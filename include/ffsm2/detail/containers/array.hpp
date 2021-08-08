@@ -19,13 +19,13 @@ public:
 
 public:
 	FFSM2_CONSTEXPR(14)	StaticArrayT() = default;
-	FFSM2_CONSTEXPR(11)	StaticArrayT(const Item filler)						  noexcept	{ fill(filler);						}
+	FFSM2_CONSTEXPR(14)	StaticArrayT(const Item filler)						  noexcept	{ fill(filler);						}
 
 	template <typename N>
 	FFSM2_CONSTEXPR(14)		  Item& operator[] (const N index)				  noexcept;
 
 	template <typename N>
-	FFSM2_CONSTEXPR(11)	const Item& operator[] (const N index)			const noexcept;
+	FFSM2_CONSTEXPR(14)	const Item& operator[] (const N index)			const noexcept;
 
 	FFSM2_CONSTEXPR(11)	Index count()									const noexcept	{ return CAPACITY;					}
 
@@ -88,7 +88,7 @@ public:
 	FFSM2_CONSTEXPR(14)		  Item& operator[] (const N index)				  noexcept;
 
 	template <typename N>
-	FFSM2_CONSTEXPR(11)	const Item& operator[] (const N index)			const noexcept;
+	FFSM2_CONSTEXPR(14)	const Item& operator[] (const N index)			const noexcept;
 
 	FFSM2_CONSTEXPR(11)	Index  count()									const noexcept	{ return _count;					}
 
