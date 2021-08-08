@@ -4,22 +4,7 @@ namespace detail {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TG, typename TA>
-R_<TG, TA>::R_(Context& context
-			 FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
-	: _context{context}
-	FFSM2_IF_LOG_INTERFACE(, _logger{logger})
-{}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-template <typename TG, typename TA>
-R_<TG, TA>::~R_() noexcept {
-	FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
-}
-
-//------------------------------------------------------------------------------
-
-template <typename TG, typename TA>
+FFSM2_CONSTEXPR(14)
 void
 R_<TG, TA>::update() noexcept {
 	FFSM2_ASSERT(_registry.isActive());
@@ -47,6 +32,7 @@ R_<TG, TA>::update() noexcept {
 
 template <typename TG, typename TA>
 template <typename TEvent>
+FFSM2_CONSTEXPR(14)
 void
 R_<TG, TA>::react(const TEvent& event) noexcept {
 	FFSM2_ASSERT(_registry.isActive());
@@ -73,6 +59,7 @@ R_<TG, TA>::react(const TEvent& event) noexcept {
 //------------------------------------------------------------------------------
 
 template <typename TG, typename TA>
+FFSM2_CONSTEXPR(14)
 void
 R_<TG, TA>::changeTo(const StateID stateId) noexcept {
 	FFSM2_ASSERT(_registry.isActive());
@@ -84,9 +71,10 @@ R_<TG, TA>::changeTo(const StateID stateId) noexcept {
 
 //------------------------------------------------------------------------------
 
-#ifdef FFSM2_ENABLE_SERIALIZATION
+#if FFSM2_SERIALIZATION_AVAILABLE()
 
 template <typename TG, typename TA>
+FFSM2_CONSTEXPR(14)
 void
 R_<TG, TA>::save(SerialBuffer& _buffer) const noexcept {
 	FFSM2_ASSERT(_registry.isActive());
@@ -106,6 +94,7 @@ R_<TG, TA>::save(SerialBuffer& _buffer) const noexcept {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename TG, typename TA>
+FFSM2_CONSTEXPR(14)
 void
 R_<TG, TA>::load(const SerialBuffer& buffer) noexcept {
 	FFSM2_ASSERT(_registry.isActive());
@@ -119,8 +108,7 @@ R_<TG, TA>::load(const SerialBuffer& buffer) noexcept {
 					  FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
 					  FFSM2_IF_LOG_INTERFACE(, _logger)};
 
-	_apex.deepExit	  (control);
-	_apex.deepDestruct(control);
+	_apex.deepExit(control);
 
 	FFSM2_IF_TRANSITION_HISTORY(_previousTransition.clear());
 
@@ -138,17 +126,17 @@ R_<TG, TA>::load(const SerialBuffer& buffer) noexcept {
 
 	_apex.deepLoadRequested(_registry, stream);
 
-	_apex.deepConstruct(control);
-	_apex.deepEnter	   (control);
+	_apex.deepEnter(control);
 }
 
 #endif
 
 //------------------------------------------------------------------------------
 
-#ifdef FFSM2_ENABLE_TRANSITION_HISTORY
+#if FFSM2_TRANSITION_HISTORY_AVAILABLE()
 
 template <typename TG, typename TA>
+FFSM2_CONSTEXPR(14)
 bool
 R_<TG, TA>::replayTransition(const StateID destination) noexcept {
 	FFSM2_ASSERT(_registry.isActive());
@@ -171,7 +159,6 @@ R_<TG, TA>::replayTransition(const StateID destination) noexcept {
 		_registry.clearRequests();
 
 		FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
-		FFSM2_IF_STRUCTURE_REPORT(udpateActivity());
 
 		return true;
 	}
@@ -184,6 +171,7 @@ R_<TG, TA>::replayTransition(const StateID destination) noexcept {
 //------------------------------------------------------------------------------
 
 template <typename TG, typename TA>
+FFSM2_CONSTEXPR(14)
 void
 R_<TG, TA>::initialEnter() noexcept {
 	FFSM2_ASSERT(!_registry.isActive());
@@ -225,8 +213,7 @@ R_<TG, TA>::initialEnter() noexcept {
 	}
 	FFSM2_IF_TRANSITION_HISTORY(_previousTransition = currentTransition);
 
-	_apex.deepConstruct(control);
-	_apex.deepEnter	   (control);
+	_apex.deepEnter(control);
 
 	_registry.clearRequests();
 
@@ -236,6 +223,7 @@ R_<TG, TA>::initialEnter() noexcept {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename TG, typename TA>
+FFSM2_CONSTEXPR(14)
 void
 R_<TG, TA>::finalExit() noexcept {
 	FFSM2_ASSERT(_registry.isActive());
@@ -248,13 +236,13 @@ R_<TG, TA>::finalExit() noexcept {
 					  FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
 					  FFSM2_IF_LOG_INTERFACE(, _logger)};
 
-	_apex.deepExit	  (control);
-	_apex.deepDestruct(control);
+	_apex.deepExit(control);
 }
 
 //------------------------------------------------------------------------------
 
 template <typename TG, typename TA>
+FFSM2_CONSTEXPR(14)
 void
 R_<TG, TA>::processTransitions(Transition& currentTransition) noexcept {
 	FFSM2_ASSERT(_request);
@@ -298,8 +286,10 @@ R_<TG, TA>::processTransitions(Transition& currentTransition) noexcept {
 //------------------------------------------------------------------------------
 
 template <typename TG, typename TA>
+FFSM2_CONSTEXPR(14)
 void
-R_<TG, TA>::applyRequest(const StateID destination) noexcept {
+R_<TG, TA>::applyRequest(const StateID destination) noexcept
+{
 	_registry.requested = destination;
 }
 
@@ -307,6 +297,7 @@ R_<TG, TA>::applyRequest(const StateID destination) noexcept {
 // COMMON
 
 template <typename TG, typename TA>
+FFSM2_CONSTEXPR(14)
 bool
 R_<TG, TA>::cancelledByEntryGuards(const Transition& currentTransition,
 								   const Transition& pendingTransition) noexcept
@@ -326,6 +317,7 @@ R_<TG, TA>::cancelledByEntryGuards(const Transition& currentTransition,
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename TG, typename TA>
+FFSM2_CONSTEXPR(14)
 bool
 R_<TG, TA>::cancelledByGuards(const Transition& currentTransition,
 							  const Transition& pendingTransition) noexcept
@@ -343,45 +335,17 @@ R_<TG, TA>::cancelledByGuards(const Transition& currentTransition,
 		   _apex.deepForwardEntryGuard(guardControl);
 }
 
+//------------------------------------------------------------------------------
+
+#if FFSM2_STRUCTURE_REPORT_AVAILABLE()
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
 
-template <FeatureTag NFT, typename TC, typename TV, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
-RV_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::RV_(Context& context
-														   FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
-	: Base{context
-		 FFSM2_IF_LOG_INTERFACE(, logger)}
-{
-	initialEnter();
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-template <FeatureTag NFT, typename TC, typename TV, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
-RV_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::~RV_() noexcept {
-	finalExit();
-}
-
-//------------------------------------------------------------------------------
+#if FFSM2_TRANSITION_HISTORY_AVAILABLE()
 
 template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
-void
-RV_<G_<NFT, TC, Manual, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::enter() noexcept {
-	initialEnter();
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
-void
-RV_<G_<NFT, TC, Manual, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::exit() noexcept {
-	finalExit();
-}
-
-//------------------------------------------------------------------------------
-
-#ifdef FFSM2_ENABLE_TRANSITION_HISTORY
-
-template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
+FFSM2_CONSTEXPR(14)
 void
 RV_<G_<NFT, TC, Manual, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::replayEnter(const StateID destination) noexcept {
 	FFSM2_ASSERT(_registry.active == INVALID_SHORT);
@@ -399,8 +363,7 @@ RV_<G_<NFT, TC, Manual, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::replayEnter(const S
 
 	FFSM2_IF_TRANSITION_HISTORY(_previousTransition = Transition{destination});
 
-	_apex.deepConstruct(control);
-	_apex.deepEnter	   (control);
+	_apex.deepEnter(control);
 
 	_registry.clearRequests();
 
@@ -413,6 +376,7 @@ RV_<G_<NFT, TC, Manual, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::replayEnter(const S
 // COMMON
 
 template <FeatureTag NFT, typename TC, typename TV, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
+FFSM2_CONSTEXPR(14)
 void
 RP_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  stateId,
 																	const Payload& payload) noexcept
@@ -427,13 +391,14 @@ RP_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateI
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <FeatureTag NFT, typename TC, typename TV, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
+FFSM2_CONSTEXPR(14)
 void
 RP_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  stateId,
 																		 Payload&& payload) noexcept
 {
 	FFSM2_ASSERT(_registry.isActive());
 
-	_request = Transition{stateId, std::move(payload)};
+	_request = Transition{stateId, move(payload)};
 
 	FFSM2_LOG_TRANSITION(_context, INVALID_STATE_ID, stateId);
 }
@@ -441,7 +406,7 @@ RP_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateI
 // COMMON
 //------------------------------------------------------------------------------
 
-#ifdef FFSM2_ENABLE_UTILITY_THEORY
+#if FFSM2_UTILITY_THEORY_AVAILABLE()
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////

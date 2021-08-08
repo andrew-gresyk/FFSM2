@@ -26,7 +26,7 @@ struct C_ final {
 
 	using SubStates		= CS_<0, Args, 0, TSubStates...>;
 
-#ifdef FFSM2_ENABLE_SERIALIZATION
+#if FFSM2_SERIALIZATION_AVAILABLE()
 	using Info			= CI_<Head, TSubStates...>;
 
 	static constexpr Short WIDTH		  = Info::WIDTH;
@@ -35,38 +35,34 @@ struct C_ final {
 
 	//----------------------------------------------------------------------
 
-	FFSM2_INLINE bool deepForwardEntryGuard(GuardControl& control) noexcept;
-	FFSM2_INLINE bool deepEntryGuard	   (GuardControl& control) noexcept;
+	FFSM2_CONSTEXPR(14) bool deepForwardEntryGuard(GuardControl& control)  noexcept;
+	FFSM2_CONSTEXPR(14) bool deepEntryGuard		  (GuardControl& control)  noexcept;
 
-	FFSM2_INLINE void deepConstruct		   (PlanControl&  control) noexcept;
+	FFSM2_CONSTEXPR(14) void deepEnter			  (PlanControl&  control)  noexcept;
 
-	FFSM2_INLINE void deepEnter			   (PlanControl&  control) noexcept;
-
-	FFSM2_INLINE void deepUpdate		   (FullControl&  control) noexcept;
+	FFSM2_CONSTEXPR(14) void deepUpdate			  (FullControl&  control)  noexcept;
 
 	template <typename TEvent>
-	FFSM2_INLINE void deepReact			   (FullControl&  control,
-											const TEvent& event)   noexcept;
+	FFSM2_CONSTEXPR(14) void deepReact			  (FullControl&  control,
+												   const TEvent& event)    noexcept;
 
-	FFSM2_INLINE bool deepForwardExitGuard (GuardControl& control) noexcept;
-	FFSM2_INLINE bool deepExitGuard		   (GuardControl& control) noexcept;
+	FFSM2_CONSTEXPR(14) bool deepForwardExitGuard (GuardControl& control)  noexcept;
+	FFSM2_CONSTEXPR(14) bool deepExitGuard		  (GuardControl& control)  noexcept;
 
-	FFSM2_INLINE void deepExit			   (PlanControl&  control) noexcept;
-
-	FFSM2_INLINE void deepDestruct		   (PlanControl&  control) noexcept;
+	FFSM2_CONSTEXPR(14) void deepExit			  (PlanControl&  control)  noexcept;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_INLINE void deepChangeToRequested(PlanControl&  control) noexcept;
+	FFSM2_CONSTEXPR(14) void deepChangeToRequested(PlanControl&  control)  noexcept;
 
 	//----------------------------------------------------------------------
 
-#ifdef FFSM2_ENABLE_SERIALIZATION
+#if FFSM2_SERIALIZATION_AVAILABLE()
 	using WriteStream	= typename Args::WriteStream;
 	using ReadStream	= typename Args::ReadStream;
 
-	FFSM2_INLINE void deepSaveActive	   (const Registry& registry, WriteStream& stream) const noexcept;
-	FFSM2_INLINE void deepLoadRequested	   (	  Registry& registry, ReadStream&  stream) const noexcept;
+	FFSM2_CONSTEXPR(14) void deepSaveActive		  (const Registry& registry, WriteStream& stream) const noexcept;
+	FFSM2_CONSTEXPR(14) void deepLoadRequested	  (		 Registry& registry, ReadStream&  stream) const noexcept;
 #endif
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

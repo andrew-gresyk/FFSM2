@@ -69,9 +69,6 @@ TEST_CASE("FSM.Manual Activation") {
 			{ ffsm2::INVALID_STATE_ID,	Event::Type::ENTRY_GUARD },
 			{ FSM::stateId<B>(),		Event::Type::ENTRY_GUARD },
 
-			{ ffsm2::INVALID_STATE_ID,	Event::Type::CONSTRUCT },
-			{ FSM::stateId<B>(),		Event::Type::CONSTRUCT },
-
 			{ ffsm2::INVALID_STATE_ID,	Event::Type::ENTER },
 			{ FSM::stateId<B>(),		Event::Type::ENTER },
 		});
@@ -83,9 +80,6 @@ TEST_CASE("FSM.Manual Activation") {
 		logger.assertSequence({
 			{ FSM::stateId<B>(),		Event::Type::EXIT },
 			{ ffsm2::INVALID_STATE_ID,	Event::Type::EXIT },
-
-			{ FSM::stateId<B>(),		Event::Type::DESTRUCT },
-			{ ffsm2::INVALID_STATE_ID,	Event::Type::DESTRUCT },
 		});
 
 		REQUIRE(machine.activeStateId() == ffsm2::INVALID_STATE_ID);

@@ -5,6 +5,7 @@ namespace detail {
 // COMMON
 
 template <StateID N, typename TA, typename TH>
+FFSM2_CONSTEXPR(14)
 bool
 S_<N, TA, TH>::deepEntryGuard(GuardControl& control) noexcept {
 	FFSM2_LOG_STATE_METHOD(&Head::entryGuard,
@@ -14,7 +15,8 @@ S_<N, TA, TH>::deepEntryGuard(GuardControl& control) noexcept {
 
 	const bool cancelledBefore = control._cancelled;
 
-	_headBox.guard(control);
+	Head::widePreEntryGuard(control.context());
+	Head::		 entryGuard(control);
 
 	return !cancelledBefore && control._cancelled;
 }
@@ -22,23 +24,7 @@ S_<N, TA, TH>::deepEntryGuard(GuardControl& control) noexcept {
 //------------------------------------------------------------------------------
 
 template <StateID N, typename TA, typename TH>
-void
-S_<N, TA, TH>::deepConstruct(PlanControl&
-						 #if defined FFSM2_ENABLE_PLANS || defined FFSM2_ENABLE_LOG_INTERFACE
-							 control
-						 #endif
-							 ) noexcept {
-	FFSM2_IF_PLANS(control._planData.verifyEmptyStatus(STATE_ID));
-
-	FFSM2_LOG_STATE_METHOD(&Head::enter,
-						   Method::CONSTRUCT);
-
-	_headBox.construct();
-}
-
-//------------------------------------------------------------------------------
-
-template <StateID N, typename TA, typename TH>
+FFSM2_CONSTEXPR(14)
 void
 S_<N, TA, TH>::deepEnter(PlanControl& control) noexcept {
 	FFSM2_LOG_STATE_METHOD(&Head::enter,
@@ -46,13 +32,14 @@ S_<N, TA, TH>::deepEnter(PlanControl& control) noexcept {
 
 	ScopedOrigin origin{control, STATE_ID};
 
-	_headBox.get().widePreEnter(control.context());
-	_headBox.get().		  enter(control);
+	Head::widePreEnter(control.context());
+	Head::		 enter(control);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <StateID N, typename TA, typename TH>
+FFSM2_CONSTEXPR(14)
 void
 S_<N, TA, TH>::deepReenter(PlanControl& control) noexcept {
 	FFSM2_IF_PLANS(control._planData.verifyEmptyStatus(STATE_ID));
@@ -62,16 +49,14 @@ S_<N, TA, TH>::deepReenter(PlanControl& control) noexcept {
 
 	ScopedOrigin origin{control, STATE_ID};
 
-	_headBox.destruct ();
-	_headBox.construct();
-
-	_headBox.get().widePreReenter(control.context());
-	_headBox.get().		  reenter(control);
+	Head::widePreReenter(control.context());
+	Head::		 reenter(control);
 }
 
 //------------------------------------------------------------------------------
 
 template <StateID N, typename TA, typename TH>
+FFSM2_CONSTEXPR(14)
 Status
 S_<N, TA, TH>::deepUpdate(FullControl& control) noexcept {
 	FFSM2_LOG_STATE_METHOD(&Head::update,
@@ -79,8 +64,8 @@ S_<N, TA, TH>::deepUpdate(FullControl& control) noexcept {
 
 	ScopedOrigin origin{control, STATE_ID};
 
-	_headBox.get().widePreUpdate(control.context());
-	_headBox.get().		  update(control);
+	Head::widePreUpdate(control.context());
+	Head::		 update(control);
 
 	return control._status;
 }
@@ -89,6 +74,7 @@ S_<N, TA, TH>::deepUpdate(FullControl& control) noexcept {
 
 template <StateID N, typename TA, typename TH>
 template <typename TEvent>
+FFSM2_CONSTEXPR(14)
 Status
 S_<N, TA, TH>::deepReact(FullControl& control,
 						 const TEvent& event) noexcept
@@ -100,8 +86,8 @@ S_<N, TA, TH>::deepReact(FullControl& control,
 
 	ScopedOrigin origin{control, STATE_ID};
 
-	_headBox.get().widePreReact(event, control.context());
-	(_headBox.get().*reaction) (event, control);				//_headBox.get().react(event, control);
+	Head::widePreReact(event, control.context());
+	(this->*reaction)(event, control);
 
 	return control._status;
 }
@@ -109,6 +95,7 @@ S_<N, TA, TH>::deepReact(FullControl& control,
 //------------------------------------------------------------------------------
 
 template <StateID N, typename TA, typename TH>
+FFSM2_CONSTEXPR(14)
 bool
 S_<N, TA, TH>::deepExitGuard(GuardControl& control) noexcept {
 	FFSM2_LOG_STATE_METHOD(&Head::exitGuard,
@@ -118,8 +105,8 @@ S_<N, TA, TH>::deepExitGuard(GuardControl& control) noexcept {
 
 	const bool cancelledBefore = control._cancelled;
 
-	_headBox.get().widePreExitGuard(control.context());
-	_headBox.get().		  exitGuard(control);
+	Head::widePreExitGuard(control.context());
+	Head::		 exitGuard(control);
 
 	return !cancelledBefore && control._cancelled;
 }
@@ -127,6 +114,7 @@ S_<N, TA, TH>::deepExitGuard(GuardControl& control) noexcept {
 //------------------------------------------------------------------------------
 
 template <StateID N, typename TA, typename TH>
+FFSM2_CONSTEXPR(14)
 void
 S_<N, TA, TH>::deepExit(PlanControl& control) noexcept {
 	FFSM2_LOG_STATE_METHOD(&Head::exit,
@@ -139,35 +127,20 @@ S_<N, TA, TH>::deepExit(PlanControl& control) noexcept {
 	// Clang - error : no member named 'exit' in 'Blah'
 	//
 	// .. inherit state 'Blah' from ffsm2::Machine::Instance::State
-	_headBox.get().		   exit(control);
-	_headBox.get().widePostExit(control.context());
-}
+	Head::		  exit(control);
+	Head::widePostExit(control.context());
 
-//------------------------------------------------------------------------------
-
-template <StateID N, typename TA, typename TH>
-void
-S_<N, TA, TH>::deepDestruct(PlanControl&
-						#if defined FFSM2_ENABLE_LOG_INTERFACE || defined FFSM2_ENABLE_PLANS
-							control
-						#endif
-							) noexcept
-{
-	FFSM2_LOG_STATE_METHOD(&Head::exit,
-						   Method::DESTRUCT);
-
-	_headBox.destruct();
-
-#ifdef FFSM2_ENABLE_PLANS
+#if FFSM2_PLANS_AVAILABLE()
 	control._planData.clearTaskStatus(STATE_ID);
 #endif
 }
 
 //------------------------------------------------------------------------------
 
-#ifdef FFSM2_ENABLE_PLANS
+#if FFSM2_PLANS_AVAILABLE()
 
 template <StateID N, typename TA, typename TH>
+FFSM2_CONSTEXPR(14)
 void
 S_<N, TA, TH>::wrapPlanSucceeded(FullControl& control) noexcept {
 	FFSM2_LOG_STATE_METHOD(&Head::planSucceeded,
@@ -175,12 +148,13 @@ S_<N, TA, TH>::wrapPlanSucceeded(FullControl& control) noexcept {
 
 	ScopedOrigin origin{control, STATE_ID};
 
-	_headBox.get().planSucceeded(control);
+	Head::planSucceeded(control);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <StateID N, typename TA, typename TH>
+FFSM2_CONSTEXPR(14)
 void
 S_<N, TA, TH>::wrapPlanFailed(FullControl& control) noexcept {
 	FFSM2_LOG_STATE_METHOD(&Head::planFailed,
@@ -188,7 +162,7 @@ S_<N, TA, TH>::wrapPlanFailed(FullControl& control) noexcept {
 
 	ScopedOrigin origin{control, STATE_ID};
 
-	_headBox.get().planFailed(control);
+	Head::planFailed(control);
 }
 
 #endif

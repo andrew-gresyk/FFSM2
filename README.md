@@ -2,7 +2,10 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/io1x70fd52l04wad?svg=true)](https://ci.appveyor.com/project/andrew-gresyk/FFSM2)
 [![Build Status](https://travis-ci.org/andrew-gresyk/FFSM2.svg?branch=master)](https://travis-ci.org/andrew-gresyk/FFSM2)
 [![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/andrew-gresyk/FFSM2.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/andrew-gresyk/FFSM2/context:cpp)
+![GitHub Release Date](https://img.shields.io/github/release-date/andrew-gresyk/FFSM2)
 [![Gitter](https://badges.gitter.im/andrew-gresyk/FFSM2.svg)](https://gitter.im/andrew-gresyk/FFSM2)
+[![Discord](https://img.shields.io/discord/591914197219016707.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/ujpNbqSpfm)
+![Twitter Follow](https://img.shields.io/twitter/follow/andrew_gresyk?style=social)
 
 ---
 
@@ -17,8 +20,8 @@ Header-only flat FSM framework in C++11, with fully statically-defined structure
 ## Compiler Support
 
 - Visual Studio 14, 15, 16
-- GCC 5, 6, 7, 8, 9
-- Clang 3.7, 3.8, 3.9, 4, 5, 6, 7, 8, 9, 10
+- GCC 5, 6, 7, 8, 9, 10
+- Clang 3.7, 3.8, 3.9, 4, 5, 6, 7, 8, 9, 10, 11
 
 ---
 

@@ -120,9 +120,6 @@ TEST_CASE("FSM.Serialization") {
 				{ ffsm2::INVALID_STATE_ID,				Event::Type::ENTRY_GUARD },
 				{ client::FSM::stateId<client::A>(),	Event::Type::ENTRY_GUARD },
 
-				{ ffsm2::INVALID_STATE_ID,				Event::Type::CONSTRUCT },
-				{ client::FSM::stateId<client::A>(),	Event::Type::CONSTRUCT },
-
 				{ ffsm2::INVALID_STATE_ID, 				Event::Type::ENTER },
 				{ client::FSM::stateId<client::A>(),	Event::Type::ENTER },
 			});
@@ -145,12 +142,6 @@ TEST_CASE("FSM.Serialization") {
 			logger.assertSequence({
 				{ client::FSM::stateId<client::A>(),	Event::Type::EXIT },
 				{ ffsm2::INVALID_STATE_ID,				Event::Type::EXIT },
-
-				{ client::FSM::stateId<client::A>(),	Event::Type::DESTRUCT },
-				{ ffsm2::INVALID_STATE_ID,				Event::Type::DESTRUCT },
-
-				{ ffsm2::INVALID_STATE_ID, 				Event::Type::CONSTRUCT },
-				{ client::FSM::stateId<client::C>(),	Event::Type::CONSTRUCT },
 
 				{ ffsm2::INVALID_STATE_ID, 				Event::Type::ENTER },
 				{ client::FSM::stateId<client::C>(),	Event::Type::ENTER },

@@ -1,4 +1,4 @@
-#ifdef FFSM2_ENABLE_PLANS
+#if FFSM2_PLANS_AVAILABLE()
 
 namespace ffsm2 {
 namespace detail {
@@ -62,7 +62,7 @@ struct PlanDataT<ArgsT<TContext
 	using TaskLinks		= StaticArrayT<TaskLink, TASK_CAPACITY>;
 	using Payloads		= StaticArrayT<Payload,  TASK_CAPACITY>;
 
-	using TasksBits		= BitArrayT<StateID, StateList::SIZE>;
+	using TasksBits		= BitArrayT<StateList::SIZE>;
 
 	Tasks tasks;
 	TaskLinks taskLinks;
@@ -74,12 +74,12 @@ struct PlanDataT<ArgsT<TContext
 	TasksBits tasksFailures;
 	bool planExists;
 
-	void clearTaskStatus(const StateID stateId) noexcept;
-	void verifyEmptyStatus(const StateID stateId) const noexcept;
+	FFSM2_CONSTEXPR(14)	void clearTaskStatus(const StateID stateId)			  noexcept;
+	FFSM2_CONSTEXPR(14)	void verifyEmptyStatus(const StateID stateId)	const noexcept;
 
-#ifdef FFSM2_ENABLE_ASSERT
-	void verifyPlans() const noexcept;
-	Long verifyPlan()  const noexcept;
+#if FFSM2_ASSERT_AVAILABLE()
+	FFSM2_CONSTEXPR(14)	void verifyPlans()								const noexcept	{ FFSM2_ASSERT(tasks.count() == verifyPlan());	}
+	FFSM2_CONSTEXPR(14)	Long verifyPlan()								const noexcept;
 #endif
 };
 
@@ -107,7 +107,7 @@ struct PlanDataT<ArgsT<TContext
 	using Tasks			= TaskListT<void, TASK_CAPACITY>;
 	using TaskLinks		= StaticArrayT<TaskLink, TASK_CAPACITY>;
 
-	using TasksBits		= BitArrayT<StateID, StateList::SIZE>;
+	using TasksBits		= BitArrayT<StateList::SIZE>;
 
 	Tasks tasks;
 	TaskLinks taskLinks;
@@ -117,15 +117,16 @@ struct PlanDataT<ArgsT<TContext
 	TasksBits tasksFailures;
 	bool planExists;
 
-	void clearTaskStatus(const StateID stateId) noexcept;
-	void verifyEmptyStatus(const StateID stateId) const noexcept;
+	FFSM2_CONSTEXPR(14)	void clearTaskStatus(const StateID stateId)			  noexcept;
+	FFSM2_CONSTEXPR(14)	void verifyEmptyStatus(const StateID stateId)	const noexcept;
 
-#ifdef FFSM2_ENABLE_ASSERT
-	void verifyPlans() const noexcept;
-	Long verifyPlan()  const noexcept;
+#if FFSM2_ASSERT_AVAILABLE()
+	FFSM2_CONSTEXPR(14)	void verifyPlans()								const noexcept	{ FFSM2_ASSERT(tasks.count() == verifyPlan());	}
+	FFSM2_CONSTEXPR(14)	Long verifyPlan()								const noexcept;
 #endif
 };
 
+//------------------------------------------------------------------------------
 ////////////////////////////////////////////////////////////////////////////////
 
 }

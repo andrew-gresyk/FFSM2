@@ -1,6 +1,6 @@
 namespace ffsm2 {
 
-#ifdef FFSM2_ENABLE_LOG_INTERFACE
+#if FFSM2_LOG_INTERFACE_AVAILABLE()
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -12,35 +12,49 @@ struct LoggerInterfaceT {
 	using Method		 = ::ffsm2::Method;
 	using StateID		 = ::ffsm2::StateID;
 
-#ifdef FFSM2_ENABLE_PLANS
+#if FFSM2_PLANS_AVAILABLE()
 	using StatusEvent	 = ::ffsm2::StatusEvent;
 #endif
 
-	virtual void recordMethod(Context& /*context*/,
-							  const StateID /*origin*/,
-							  const Method /*method*/) noexcept
+	FFSM2_CONSTEXPR(NO)
+	virtual
+	void recordMethod(Context& FFSM2_UNUSED(context),
+					  const StateID FFSM2_UNUSED(origin),
+					  const Method FFSM2_UNUSED(method))			  noexcept
 	{}
 
-	virtual void recordTransition(Context& /*context*/,
-								  const StateID /*origin*/,
-								  const StateID /*target*/) noexcept
+	FFSM2_CONSTEXPR(NO)
+	virtual
+	void
+	recordTransition(Context& FFSM2_UNUSED(context),
+					 const StateID FFSM2_UNUSED(origin),
+					 const StateID FFSM2_UNUSED(target))			  noexcept
 	{}
 
-#ifdef FFSM2_ENABLE_PLANS
+#if FFSM2_PLANS_AVAILABLE()
 
-	virtual void recordTaskStatus(Context& /*context*/,
-								  const StateID /*origin*/,
-								  const StatusEvent /*event*/) noexcept
+	FFSM2_CONSTEXPR(NO)
+	virtual
+	void
+	recordTaskStatus(Context& FFSM2_UNUSED(context),
+					 const StateID FFSM2_UNUSED(origin),
+					 const StatusEvent FFSM2_UNUSED(event))			  noexcept
 	{}
 
-	virtual void recordPlanStatus(Context& /*context*/,
-								  const StatusEvent /*event*/) noexcept
+	FFSM2_CONSTEXPR(NO)
+	virtual
+	void
+	recordPlanStatus(Context& FFSM2_UNUSED(context),
+					 const StatusEvent FFSM2_UNUSED(event))			  noexcept
 	{}
 
 #endif
 
-	virtual void recordCancelledPending(Context& /*context*/,
-										const StateID /*origin*/) noexcept
+	FFSM2_CONSTEXPR(NO)
+	virtual
+	void
+	recordCancelledPending(Context& FFSM2_UNUSED(context),
+						   const StateID FFSM2_UNUSED(origin))		  noexcept
 	{}
 
 };

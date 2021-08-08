@@ -3,7 +3,14 @@ namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+#if FFSM2_UTILITY_THEORY_AVAILABLE()
+#endif
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+
 template <typename TA, typename TH, typename... TS>
+FFSM2_CONSTEXPR(14)
 bool
 C_<TA, TH, TS...>::deepForwardEntryGuard(GuardControl& control) noexcept {
 	FFSM2_ASSERT(control._registry.active != INVALID_SHORT);
@@ -17,6 +24,7 @@ C_<TA, TH, TS...>::deepForwardEntryGuard(GuardControl& control) noexcept {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename TA, typename TH, typename... TS>
+FFSM2_CONSTEXPR(14)
 bool
 C_<TA, TH, TS...>::deepEntryGuard(GuardControl& control) noexcept {
 	const Short requested = control._registry.requested;
@@ -29,8 +37,9 @@ C_<TA, TH, TS...>::deepEntryGuard(GuardControl& control) noexcept {
 //------------------------------------------------------------------------------
 
 template <typename TA, typename TH, typename... TS>
+FFSM2_CONSTEXPR(14)
 void
-C_<TA, TH, TS...>::deepConstruct(PlanControl& control) noexcept {
+C_<TA, TH, TS...>::deepEnter(PlanControl& control) noexcept {
 	Short& active	 = control._registry.active;
 	Short& requested = control._registry.requested;
 
@@ -40,27 +49,17 @@ C_<TA, TH, TS...>::deepConstruct(PlanControl& control) noexcept {
 	active	  = requested;
 	requested = INVALID_SHORT;
 
-	_headState.deepConstruct(control);
-	_subStates.wideConstruct(control, active);
-}
-
-//------------------------------------------------------------------------------
-
-template <typename TA, typename TH, typename... TS>
-void
-C_<TA, TH, TS...>::deepEnter(PlanControl& control) noexcept {
-	const Short active = control._registry.active;
-	FFSM2_ASSERT(active != INVALID_SHORT);
-
-	FFSM2_ASSERT(control._registry.requested == INVALID_SHORT);
-
 	_headState.deepEnter(control);
 	_subStates.wideEnter(control, active);
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 //------------------------------------------------------------------------------
+// COMMON
 
 template <typename TA, typename TH, typename... TS>
+FFSM2_CONSTEXPR(14)
 void
 C_<TA, TH, TS...>::deepUpdate(FullControl& control) noexcept {
 	const Short active = control._registry.active;
@@ -76,7 +75,7 @@ C_<TA, TH, TS...>::deepUpdate(FullControl& control) noexcept {
 		FFSM2_IF_PLANS(const Status subStatus =)
 		_subStates.wideUpdate(control, active);
 
-	#ifdef FFSM2_ENABLE_PLANS
+	#if FFSM2_PLANS_AVAILABLE()
 		if (subStatus && control._planData.planExists)
 			control.updatePlan(_headState, subStatus);
 	#endif
@@ -87,6 +86,7 @@ C_<TA, TH, TS...>::deepUpdate(FullControl& control) noexcept {
 
 template <typename TA, typename TH, typename... TS>
 template <typename TEvent>
+FFSM2_CONSTEXPR(14)
 void
 C_<TA, TH, TS...>::deepReact(FullControl& control,
 							 const TEvent& event) noexcept
@@ -104,7 +104,7 @@ C_<TA, TH, TS...>::deepReact(FullControl& control,
 		FFSM2_IF_PLANS(const Status subStatus =)
 		_subStates.wideReact(control, event, active);
 
-	#ifdef FFSM2_ENABLE_PLANS
+	#if FFSM2_PLANS_AVAILABLE()
 		if (subStatus && control._planData.planExists)
 			control.updatePlan(_headState, subStatus);
 	#endif
@@ -114,6 +114,7 @@ C_<TA, TH, TS...>::deepReact(FullControl& control,
 //------------------------------------------------------------------------------
 
 template <typename TA, typename TH, typename... TS>
+FFSM2_CONSTEXPR(14)
 bool
 C_<TA, TH, TS...>::deepForwardExitGuard(GuardControl& control) noexcept {
 	FFSM2_ASSERT(control._registry.requested != INVALID_SHORT);
@@ -127,6 +128,7 @@ C_<TA, TH, TS...>::deepForwardExitGuard(GuardControl& control) noexcept {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename TA, typename TH, typename... TS>
+FFSM2_CONSTEXPR(14)
 bool
 C_<TA, TH, TS...>::deepExitGuard(GuardControl& control) noexcept {
 	const Short active = control._registry.active;
@@ -141,39 +143,29 @@ C_<TA, TH, TS...>::deepExitGuard(GuardControl& control) noexcept {
 //------------------------------------------------------------------------------
 
 template <typename TA, typename TH, typename... TS>
+FFSM2_CONSTEXPR(14)
 void
 C_<TA, TH, TS...>::deepExit(PlanControl& control) noexcept {
-	const Short active = control._registry.active;
+	Short& active = control._registry.active;
 	FFSM2_ASSERT(active != INVALID_SHORT);
 
 	_subStates.wideExit(control, active);
 	_headState.deepExit(control);
-}
-
-//------------------------------------------------------------------------------
-
-template <typename TA, typename TH, typename... TS>
-void
-C_<TA, TH, TS...>::deepDestruct(PlanControl& control) noexcept {
-	Short& active = control._registry.active;
-
-	FFSM2_ASSERT(active != INVALID_SHORT);
-
-	_subStates.wideDestruct(control, active);
-	_headState.deepDestruct(control);
 
 	active = INVALID_SHORT;
 
-#ifdef FFSM2_ENABLE_PLANS
+#if FFSM2_PLANS_AVAILABLE()
 	auto plan = control.plan();
 	plan.clear();
 #endif
 }
 
+// COMMON
 //------------------------------------------------------------------------------
 // COMMON
 
 template <typename TA, typename TH, typename... TS>
+FFSM2_CONSTEXPR(14)
 void
 C_<TA, TH, TS...>::deepChangeToRequested(PlanControl& control) noexcept {
 	Short& active	 = control._registry.active;
@@ -183,27 +175,26 @@ C_<TA, TH, TS...>::deepChangeToRequested(PlanControl& control) noexcept {
 	FFSM2_ASSERT(requested != INVALID_SHORT);
 
 	if (requested != active) {
-		_subStates.wideExit		(control, active);
-		_subStates.wideDestruct	(control, active);
+		_subStates.wideExit	  (control, active);
 
 		active	  = requested;
 		requested = INVALID_SHORT;
 
-		_subStates.wideConstruct(control, active);
-		_subStates.wideEnter	(control, active);
+		_subStates.wideEnter  (control, active);
 	} else {
 		requested = INVALID_SHORT;
 
 		// reconstruction done in S_::reenter()
-		_subStates.wideReenter	(control, active);
+		_subStates.wideReenter(control, active);
 	}
 }
 
 //------------------------------------------------------------------------------
 
-#ifdef FFSM2_ENABLE_SERIALIZATION
+#if FFSM2_SERIALIZATION_AVAILABLE()
 
 template <typename TA, typename TH, typename... TS>
+FFSM2_CONSTEXPR(14)
 void
 C_<TA, TH, TS...>::deepSaveActive(const Registry& registry,
 								  WriteStream& stream) const noexcept
@@ -212,8 +203,10 @@ C_<TA, TH, TS...>::deepSaveActive(const Registry& registry,
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename TA, typename TH, typename... TS>
+FFSM2_CONSTEXPR(14)
 void
 C_<TA, TH, TS...>::deepLoadRequested(Registry& registry,
 									 ReadStream& stream) const noexcept
@@ -224,7 +217,6 @@ C_<TA, TH, TS...>::deepLoadRequested(Registry& registry,
 
 #endif
 
-// COMMON
 ////////////////////////////////////////////////////////////////////////////////
 
 }

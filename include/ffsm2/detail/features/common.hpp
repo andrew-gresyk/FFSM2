@@ -6,16 +6,14 @@ enum class Method : uint8_t {
 	NONE,
 
 	ENTRY_GUARD,
-	CONSTRUCT,
 	ENTER,
 	REENTER,
 	UPDATE,
 	REACT,
 	EXIT_GUARD,
 	EXIT,
-	DESTRUCT,
 
-#ifdef FFSM2_ENABLE_PLANS
+#if FFSM2_PLANS_AVAILABLE()
 	PLAN_SUCCEEDED,
 	PLAN_FAILED,
 #endif
@@ -23,7 +21,7 @@ enum class Method : uint8_t {
 	COUNT
 };
 
-#ifdef FFSM2_ENABLE_PLANS
+#if FFSM2_PLANS_AVAILABLE()
 
 enum class StatusEvent : uint8_t {
 	SUCCEEDED,
@@ -36,11 +34,12 @@ enum class StatusEvent : uint8_t {
 
 //------------------------------------------------------------------------------
 
-#ifndef FFSM2_DISABLE_TYPEINDEX
+#if FFSM2_TYPEINDEX_AVAILABLE()
 
-static inline
+static
+inline
 const char*
-stateName(const std::type_index stateType) noexcept {
+stateName(const std::type_index stateType)							  noexcept {
 	const char* const raw = stateType.name();
 
 	#if defined(_MSC_VER)
@@ -66,21 +65,20 @@ stateName(const std::type_index stateType) noexcept {
 
 //------------------------------------------------------------------------------
 
-static inline
+static
+FFSM2_CONSTEXPR(14)
 const char*
-methodName(const Method method) noexcept {
+methodName(const Method method)										  noexcept {
 	switch (method) {
 	case Method::ENTRY_GUARD:	 return "entryGuard";
 	case Method::ENTER:			 return "enter";
-	case Method::CONSTRUCT:		 return "construct";
 	case Method::REENTER:		 return "reenter";
 	case Method::UPDATE:		 return "update";
 	case Method::REACT:			 return "react";
 	case Method::EXIT_GUARD:	 return "exitGuard";
 	case Method::EXIT:			 return "exit";
-	case Method::DESTRUCT:		 return "destruct";
 
-#ifdef FFSM2_ENABLE_PLANS
+#if FFSM2_PLANS_AVAILABLE()
 	case Method::PLAN_SUCCEEDED: return "planSucceeded";
 	case Method::PLAN_FAILED:	 return "planFailed";
 #endif
@@ -106,25 +104,30 @@ namespace detail {
 #endif
 
 struct alignas(4) TransitionBase {
-	constexpr TransitionBase() noexcept = default;
+	FFSM2_CONSTEXPR(11)
+	TransitionBase() noexcept = default;
 
 	//----------------------------------------------------------------------
 
-	inline TransitionBase(const StateID destination_) noexcept
+	FFSM2_CONSTEXPR(11)
+	TransitionBase(const StateID destination_)						  noexcept
 		: destination{destination_}
 	{}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	inline TransitionBase(const StateID origin_,
-						  const StateID destination_) noexcept
+	FFSM2_CONSTEXPR(11)
+	TransitionBase(const StateID origin_,
+				   const StateID destination_)						  noexcept
 		: origin	 {origin_}
 		, destination{destination_}
 	{}
 
 	//----------------------------------------------------------------------
 
-	inline bool operator == (const TransitionBase& other) const noexcept {
+	FFSM2_CONSTEXPR(11)
+	bool
+	operator == (const TransitionBase& other)					const noexcept {
 		return origin	   == other.origin &&
 			   destination == other.destination &&
 			   method	   == other.method;
@@ -132,13 +135,17 @@ struct alignas(4) TransitionBase {
 
 	//----------------------------------------------------------------------
 
-	inline explicit operator bool() const noexcept {
+	FFSM2_CONSTEXPR(11)
+	explicit
+	operator bool()												const noexcept {
 		return destination != INVALID_STATE_ID;
 	}
 
 	//----------------------------------------------------------------------
 
-	inline void clear() noexcept {
+	FFSM2_CONSTEXPR(14)
+	void
+	clear()															  noexcept {
 		destination	= INVALID_STATE_ID;
 	}
 
@@ -162,18 +169,22 @@ struct alignas(4) TransitionT
 	using Payload = TPayload;
 	using Storage = typename std::aligned_storage<sizeof(Payload), 4>::type;
 
-	using TransitionBase::TransitionBase;
-
 	//----------------------------------------------------------------------
 
-	FFSM2_INLINE TransitionT() noexcept {
+	using TransitionBase::TransitionBase;
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	FFSM2_CONSTEXPR(14)
+	TransitionT()													  noexcept {
 		new (&storage) Payload{};
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_INLINE TransitionT(const StateID destination,
-							 const Payload& payload) noexcept
+	FFSM2_CONSTEXPR(14)
+	TransitionT(const StateID destination,
+				const Payload& payload)								  noexcept
 		: TransitionBase{destination}
 		, payloadSet{true}
 	{
@@ -182,19 +193,21 @@ struct alignas(4) TransitionT
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_INLINE TransitionT(const StateID destination,
-							 Payload&& payload) noexcept
+	FFSM2_CONSTEXPR(14)
+	TransitionT(const StateID destination,
+				Payload&& payload)									  noexcept
 		: TransitionBase{destination}
 		, payloadSet{true}
 	{
-		new (&storage) Payload{std::move(payload)};
+		new (&storage) Payload{move(payload)};
 	}
 
 	//----------------------------------------------------------------------
 
-	FFSM2_INLINE TransitionT(const StateID origin,
-							 const StateID destination,
-							 const Payload& payload) noexcept
+	FFSM2_CONSTEXPR(14)
+	TransitionT(const StateID origin,
+				const StateID destination,
+				const Payload& payload)								  noexcept
 		: TransitionBase{origin, destination}
 		, payloadSet{true}
 	{
@@ -203,21 +216,33 @@ struct alignas(4) TransitionT
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_INLINE TransitionT(const StateID origin,
-							 const StateID destination,
-							 Payload&& payload) noexcept
+	FFSM2_CONSTEXPR(14)
+	TransitionT(const StateID origin,
+				const StateID destination,
+				Payload&& payload)									  noexcept
 		: TransitionBase{origin, destination}
 		, payloadSet{true}
 	{
-		new (&storage) Payload{std::move(payload)};
+		new (&storage) Payload{move(payload)};
 	}
 
 	//----------------------------------------------------------------------
 
-	FFSM2_INLINE bool operator == (const TransitionT& other) const noexcept {
+	FFSM2_CONSTEXPR(11)
+	bool
+	operator == (const TransitionT& other)						const noexcept {
 		return TransitionBase::operator == (other) &&
 			   (payloadSet ==  other.payloadSet);
 		//	  (!payloadSet && !other.payloadSet || payload ==  other.payload);
+	}
+
+	//----------------------------------------------------------------------
+
+	FFSM2_CONSTEXPR(11)
+	const Payload*
+	payload()													const noexcept {
+		return payloadSet ?
+			reinterpret_cast<const Payload*>(&storage) : nullptr;
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
