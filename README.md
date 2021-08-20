@@ -1,11 +1,12 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Build status](https://ci.appveyor.com/api/projects/status/io1x70fd52l04wad?svg=true)](https://ci.appveyor.com/project/andrew-gresyk/FFSM2)
-[![Build Status](https://travis-ci.com/andrew-gresyk/FFSM2.svg?branch=master)](https://travis-ci.com/andrew-gresyk/FFSM2)
-[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/andrew-gresyk/FFSM2.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/andrew-gresyk/FFSM2/context:cpp)
-![GitHub Release Date](https://img.shields.io/github/release-date/andrew-gresyk/FFSM2)
+[![GitHub Release Date](https://img.shields.io/github/release-date/andrew-gresyk/FFSM2)](https://github.com/andrew-gresyk/FFSM2/releases)
+[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/andrew-gresyk/FFSM2.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/andrew-gresyk/FFSM2/context:cpp)  
+[![MSBuild](https://github.com/andrew-gresyk/FFSM2/actions/workflows/msbuild.yml/badge.svg)](https://github.com/andrew-gresyk/FFSM2/actions/workflows/msbuild.yml)
+[![CMake](https://github.com/andrew-gresyk/FFSM2/actions/workflows/cmake.yml/badge.svg)](https://github.com/andrew-gresyk/FFSM2/actions/workflows/cmake.yml)
+[![Build status](https://ci.appveyor.com/api/projects/status/io1x70fd52l04wad?svg=true)](https://ci.appveyor.com/project/andrew-gresyk/FFSM2)  
 [![Gitter](https://badges.gitter.im/andrew-gresyk/FFSM2.svg)](https://gitter.im/andrew-gresyk/FFSM2)
 [![Discord](https://img.shields.io/discord/591914197219016707.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/ujpNbqSpfm)
-![Twitter Follow](https://img.shields.io/twitter/follow/andrew_gresyk?style=social)
+[![Twitter Follow](https://img.shields.io/twitter/follow/andrew_gresyk?style=social)](https://www.twitter.com/andrew_gresyk)
 
 ---
 
@@ -33,7 +34,7 @@ Header-only flat FSM framework in C++11, with fully statically-defined structure
 
 ## See Also
 
-- **[HFSM2](https://hfsm.dev)**: High-Performance **Hierarchical** Finite State Machine
+- **[FFSM2](https://hfsm.dev)**: High-Performance **Hierarchical** Finite State Machine
 
 ---
 
@@ -51,7 +52,7 @@ Header-only flat FSM framework in C++11, with fully statically-defined structure
 - Header-only
 - Convenient, minimal boilerplate
 - Fully static, no dynamic allocations
-- Uses inline-friendly compile-time pylymorphism, no virtual methods are used
+- Uses inline-friendly compile-time polymorphism, no virtual methods are used
 - Type-safe transitions: `FSM.changeTo<TargetState>()` with optional payloads
 - Scaleable, supports robust state re-use via state injections
 - Gamedev-friendly, supports explicit `State::update()`
@@ -68,14 +69,8 @@ Header-only flat FSM framework in C++11, with fully statically-defined structure
 
 ---
 
-## Receive Updates
-
-- Blog: **[gresyk.dev](https://gresyk.dev)**
-- Twitter: **[@andrew_gresyk](https://www.twitter.com/andrew_gresyk)**
-
----
-
 ## Get In Touch
 
-- Discord: **[HFSM.dev](https://discord.gg/ZfWjhFj)**
+- Twitter: **[@andrew_gresyk](https://www.twitter.com/andrew_gresyk)**
+- Discord: **[HFSM.dev](https://discord.gg/v4t3tzh)**
 - Gitter: **[andrew-gresyk/FFSM2](https://gitter.im/andrew-gresyk/FFSM2)**
