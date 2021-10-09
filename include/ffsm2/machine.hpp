@@ -391,7 +391,7 @@ namespace ffsm2 {
 //------------------------------------------------------------------------------
 
 struct EmptyContext {};
-struct EmptyPayload {};
+struct EmptyPayload final {};
 
 struct Automatic;
 struct Manual;
@@ -411,30 +411,35 @@ static constexpr StateID	INVALID_STATE_ID	= INVALID_LONG;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <bool B, typename TT, typename TF>
-struct ConditionalT {
+template <bool B,
+		  typename TT,
+		  typename TF>
+struct ConditionalT final {
 	using Type = TT;
 };
 
-template <typename TT, typename TF>
-struct ConditionalT<false, TT, TF> {
+template <typename TT,
+		  typename TF>
+struct ConditionalT<false, TT, TF> final {
 	using Type = TF;
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <bool B, typename TT, typename TF>
+template <bool B,
+		  typename TT,
+		  typename TF>
 using Conditional = typename ConditionalT<B, TT, TF>::Type;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-struct RemoveConstT {
+struct RemoveConstT final {
 	using Type = T;
 };
 
 template <typename T>
-struct RemoveConstT<const T> {
+struct RemoveConstT<const T> final {
 	using Type = T;
 };
 
@@ -446,17 +451,17 @@ using RemoveConst = typename RemoveConstT<T>::Type;
 //------------------------------------------------------------------------------
 
 template <typename T>
-struct RemoveReferenceT {
+struct RemoveReferenceT final {
 	using Type = T;
 };
 
 template <typename T>
-struct RemoveReferenceT<T&> {
+struct RemoveReferenceT<T&> final {
 	using Type = T;
 };
 
 template <typename T>
-struct RemoveReferenceT<T&&> {
+struct RemoveReferenceT<T&&> final {
 	using Type = T;
 };
 
@@ -1266,7 +1271,7 @@ struct alignas(4) TransitionBase {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TPayload>
-struct alignas(4) TransitionT
+struct alignas(4) TransitionT final
 	: TransitionBase
 {
 	using Payload = TPayload;
@@ -1357,7 +1362,7 @@ struct alignas(4) TransitionT
 //------------------------------------------------------------------------------
 
 template <>
-struct alignas(4) TransitionT<void>
+struct alignas(4) TransitionT<void> final
 	: TransitionBase
 {
 	using TransitionBase::TransitionBase;
@@ -1369,7 +1374,7 @@ struct alignas(4) TransitionT<void>
 
 }
 
-struct Request {
+struct Request final {
 	Short index;
 };
 
@@ -1505,7 +1510,7 @@ private:
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename T>
-struct StaticArrayT<T, 0> {
+struct StaticArrayT<T, 0> final {
 	using Item		= T;
 
 	FFSM2_CONSTEXPR(11)	StaticArrayT() = default;
@@ -1735,9 +1740,14 @@ public:
 
 	FFSM2_CONSTEXPR(14) void clear()							  noexcept;
 
-	FFSM2_CONSTEXPR(14) bool get  (const Index index)		const noexcept;
-	FFSM2_CONSTEXPR(14) void set  (const Index index)			  noexcept;
-	FFSM2_CONSTEXPR(14) void clear(const Index index)			  noexcept;
+	template <typename TIndex>
+	FFSM2_CONSTEXPR(14) bool get  (const TIndex index)		const noexcept;
+
+	template <typename TIndex>
+	FFSM2_CONSTEXPR(14) void set  (const TIndex index)			  noexcept;
+
+	template <typename TIndex>
+	FFSM2_CONSTEXPR(14) void clear(const TIndex index)			  noexcept;
 
 private:
 	uint8_t _storage[UNIT_COUNT];
@@ -1764,55 +1774,69 @@ namespace ffsm2 {
 namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//------------------------------------------------------------------------------
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+// COMMON
 
 template <unsigned NCapacity>
 FFSM2_CONSTEXPR(14)
 void
 BitArrayT<NCapacity>::clear() noexcept {
-	for (uint8_t& unit: _storage)
+	for (uint8_t& unit : _storage)
 		unit = uint8_t{0};
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 template <unsigned NCapacity>
+template <typename TIndex>
 FFSM2_CONSTEXPR(14)
 bool
-BitArrayT<NCapacity>::get(const Index index) const noexcept {
+BitArrayT<NCapacity>::get(const TIndex index) const noexcept {
 	FFSM2_ASSERT(index < CAPACITY);
 
-	const Index unit = index / 8;
-	const Index bit  = index % 8;
+	const Index unit = (Index) index / 8;
+	const Index bit  = (Index) index % 8;
 	const uint8_t mask = 1 << bit;
 
 	return (_storage[unit] & mask) != 0;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//------------------------------------------------------------------------------
 
 template <unsigned NCapacity>
+template <typename TIndex>
 FFSM2_CONSTEXPR(14)
 void
-BitArrayT<NCapacity>::set(const Index index) noexcept {
+BitArrayT<NCapacity>::set(const TIndex index) noexcept {
 	FFSM2_ASSERT(index < CAPACITY);
 
-	const Index unit = index / 8;
-	const Index bit  = index % 8;
+	const Index unit = (Index) index / 8;
+	const Index bit  = (Index) index % 8;
 	const uint8_t mask = 1 << bit;
 
 	_storage[unit] |= mask;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//------------------------------------------------------------------------------
 
 template <unsigned NCapacity>
+template <typename TIndex>
 FFSM2_CONSTEXPR(14)
 void
-BitArrayT<NCapacity>::clear(const Index index) noexcept {
+BitArrayT<NCapacity>::clear(const TIndex index) noexcept {
 	FFSM2_ASSERT(index < CAPACITY);
 
-	const Index unit = index / 8;
-	const Index bit  = index % 8;
+	const Index unit = (Index) index / 8;
+	const Index bit  = (Index) index % 8;
 	const uint8_t mask = 1 << bit;
 
 	_storage[unit] &= ~mask;
@@ -1869,7 +1893,7 @@ operator == (const TaskBase& lhs,
 //------------------------------------------------------------------------------
 
 template <typename TPayload>
-struct TaskT
+struct TaskT final
 	: TaskBase
 {
 	using Payload = TPayload;
@@ -1914,7 +1938,7 @@ struct TaskT
 //------------------------------------------------------------------------------
 
 template <>
-struct TaskT<void>
+struct TaskT<void> final
 	: TaskBase
 {
 	using TaskBase::TaskBase;
@@ -1980,22 +2004,23 @@ template <typename... TA>
 FFSM2_CONSTEXPR(14)
 Long
 TaskListT<TP, NC>::emplace(TA&&... args) noexcept {
+	FFSM2_ASSERT(_last  <= CAPACITY);
+
 	if (_count < CAPACITY) {
 		FFSM2_ASSERT(_vacantHead < CAPACITY);
 		FFSM2_ASSERT(_vacantTail < CAPACITY);
 
 		const Index index = _vacantHead;
-		auto& cell = _items[index];
-		++_count;
+		Item& item = _items[index];
 
 		if (_vacantHead != _vacantTail) {
 			// recycle
-			FFSM2_ASSERT(cell.prev == INVALID);
-			FFSM2_ASSERT(cell.next != INVALID);
+			FFSM2_ASSERT(item.prev == INVALID);
+			FFSM2_ASSERT(item.next != INVALID);
 
-			_vacantHead = cell.next;
+			_vacantHead = item.next;
 
-			auto& head = _items[_vacantHead];
+			Item& head = _items[_vacantHead];
 			FFSM2_ASSERT(head.prev == index);
 			head.prev = INVALID;
 		} else if (_last < CAPACITY - 1) {
@@ -2004,19 +2029,22 @@ TaskListT<TP, NC>::emplace(TA&&... args) noexcept {
 			_vacantHead = _last;
 			_vacantTail = _last;
 
-			auto& vacant = _items[_vacantHead];
+			Item& vacant = _items[_vacantHead];
 			vacant.prev = INVALID;
 			vacant.next = INVALID;
 		} else {
-			FFSM2_ASSERT(_count == CAPACITY);
+			// last
+			FFSM2_ASSERT(_count == CAPACITY - 1);
 
+			_last = CAPACITY;
 			_vacantHead = INVALID;
 			_vacantTail = INVALID;
 		}
 
-		FFSM2_IF_ASSERT(verifyStructure());
+		new (&item) Item{forward<TA>(args)...};
+		++_count;
 
-		new (&cell) Item{forward<TA>(args)...};
+		FFSM2_IF_ASSERT(verifyStructure());
 
 		return index;
 	} else {
@@ -2038,16 +2066,16 @@ void
 TaskListT<TP, NC>::remove(const Index i) noexcept {
 	FFSM2_ASSERT(i < CAPACITY && _count);
 
-	auto& fresh = _items[i];
+	Item& item = _items[i];
 
 	if (_count < CAPACITY) {
 		FFSM2_ASSERT(_vacantHead < CAPACITY);
 		FFSM2_ASSERT(_vacantTail < CAPACITY);
 
-		fresh.prev = INVALID;
-		fresh.next = _vacantHead;
+		item.prev = INVALID;
+		item.next = _vacantHead;
 
-		auto& head = _items[_vacantHead];
+		Item& head = _items[_vacantHead];
 		head.prev = i;
 
 		_vacantHead = i;
@@ -2057,8 +2085,8 @@ TaskListT<TP, NC>::remove(const Index i) noexcept {
 		FFSM2_ASSERT(_vacantHead == INVALID);
 		FFSM2_ASSERT(_vacantTail == INVALID);
 
-		fresh.prev = INVALID;
-		fresh.next = INVALID;
+		item.prev = INVALID;
+		item.next = INVALID;
 
 		_vacantHead = i;
 		_vacantTail = i;
@@ -2105,17 +2133,17 @@ TaskListT<TP, NC>::verifyStructure(const Index occupied) const noexcept {
 		FFSM2_ASSERT(_items[_vacantHead].prev == INVALID);
 		FFSM2_ASSERT(_items[_vacantTail].next == INVALID);
 
-		auto emptyCount = 1;
+		Index emptyCount = 1;
 
-		for (auto c = _vacantHead; c != _vacantTail; ) {
+		for (Index c = _vacantHead; c != _vacantTail; ) {
 			FFSM2_ASSERT(occupied != c);
 
-			const auto& current = _items[c];
+			const Item& current = _items[c];
 
-			const auto f = current.next;
+			const Long f = current.next;
 			if (f != INVALID) {
 				// next
-				const auto& following = _items[f];
+				const Item& following = _items[f];
 
 				FFSM2_ASSERT(following.prev == c);
 
@@ -2155,14 +2183,14 @@ namespace detail {
 
 #pragma pack(push, 1)
 
-struct TaskLink {
+struct TaskLink final {
 	Long prev		= INVALID_LONG;
 	Long next		= INVALID_LONG;
 };
 
 //------------------------------------------------------------------------------
 
-struct Bounds {
+struct Bounds final {
 	Long first		= INVALID_LONG;
 	Long last		= INVALID_LONG;
 };
@@ -2198,7 +2226,7 @@ struct PlanDataT<ArgsT<TContext
 					 FFSM2_IF_SERIALIZATION(, NSerialBits)
 					 , NSubstitutionLimit
 					 , NTaskCapacity
-					 , TPayload>>
+					 , TPayload>> final
 {
 	using StateList		= TStateList;
 	using Payload		= TPayload;
@@ -2245,7 +2273,7 @@ struct PlanDataT<ArgsT<TContext
 					 FFSM2_IF_SERIALIZATION(, NSerialBits)
 					 , NSubstitutionLimit
 					 , NTaskCapacity
-					 , void>>
+					 , void>> final
 {
 	using StateList		= TStateList;
 
@@ -2450,7 +2478,7 @@ namespace detail {
 
 #pragma pack(push, 1)
 
-struct Status {
+struct Status final {
 	enum class Result {
 		NONE,
 		SUCCESS,
@@ -2512,7 +2540,7 @@ public:
 
 	//----------------------------------------------------------------------
 
-	struct IteratorT {
+	struct IteratorT final {
 		FFSM2_CONSTEXPR(14)	IteratorT(const CPlanT& plan)		  noexcept;
 
 		FFSM2_CONSTEXPR(14)	explicit operator bool()		const noexcept;
@@ -2569,7 +2597,7 @@ public:
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	struct IteratorT {
+	struct IteratorT final {
 		FFSM2_CONSTEXPR(14)	IteratorT(PlanBaseT& plan)			  noexcept;
 
 		FFSM2_CONSTEXPR(14)	explicit operator bool()		const noexcept;
@@ -2590,7 +2618,7 @@ public:
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	struct CIterator {
+	struct CIterator final {
 		FFSM2_CONSTEXPR(14)	CIterator(const PlanBaseT& plan)	  noexcept;
 
 		FFSM2_CONSTEXPR(14)	explicit operator bool()		const noexcept;
@@ -2655,11 +2683,13 @@ public:
 
 	/// @brief Begin iteration over plan tasks
 	/// @return IteratorT to the first task
-	FFSM2_CONSTEXPR(14)	IteratorT first()											  noexcept	{ return  IteratorT{*this};										}
+	FFSM2_CONSTEXPR(14)	 IteratorT first()											  noexcept	{ return  IteratorT{*this};										}
 
 	/// @brief Begin iteration over plan tasks
 	/// @return CIterator to the first task
 	FFSM2_CONSTEXPR(11)	CIterator first()										const noexcept	{ return CIterator{*this};										}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 private:
 	FFSM2_CONSTEXPR(14)	void remove(const Long task)								  noexcept;
@@ -3096,14 +3126,14 @@ PlanBaseT<TArgs>::clear() noexcept	{
 		{
 			FFSM2_ASSERT(index < TaskLinks::CAPACITY);
 
-			const auto& taskLink = _planData.taskLinks[index];
+			const auto& link = _planData.taskLinks[index];
 			FFSM2_ASSERT(index == _bounds.first ?
-							 taskLink.prev == INVALID_LONG :
-							 taskLink.prev <  TaskLinks::CAPACITY);
+							 link.prev == INVALID_LONG :
+							 link.prev <  TaskLinks::CAPACITY);
 
-			const Long next = taskLink.next;
+			const Long next = link.next;
 
-			_planData.tasks.remove(index);
+			remove(index);
 
 			index = next;
 		}
@@ -3121,35 +3151,35 @@ PlanBaseT<TArgs>::clear() noexcept	{
 template <typename TArgs>
 FFSM2_CONSTEXPR(14)
 void
-PlanBaseT<TArgs>::remove(const Long task) noexcept	{
+PlanBaseT<TArgs>::remove(const Long index) noexcept {
 	FFSM2_ASSERT(_planData.planExists);
 	FFSM2_ASSERT(_bounds.first < TaskLinks::CAPACITY);
 	FFSM2_ASSERT(_bounds.last  < TaskLinks::CAPACITY);
 
-	FFSM2_ASSERT(task < TaskLinks::CAPACITY);
+	FFSM2_ASSERT(index < TaskLinks::CAPACITY);
 
-	TaskLink& curr = _planData.taskLinks[task];
+	TaskLink& link = _planData.taskLinks[index];
 
-	if (curr.prev < TaskLinks::CAPACITY) {
-		TaskLink& prev = _planData.taskLinks[curr.prev];
-		prev.next = curr.next;
+	if (link.prev < TaskLinks::CAPACITY) {
+		TaskLink& prev = _planData.taskLinks[link.prev];
+		prev.next = link.next;
 	} else {
-		FFSM2_ASSERT(_bounds.first == task);
-		_bounds.first = curr.next;
+		FFSM2_ASSERT(_bounds.first == index);
+		_bounds.first = link.next;
 	}
 
-	if (curr.next < TaskLinks::CAPACITY) {
-		TaskLink& next = _planData.taskLinks[curr.next];
-		next.prev = curr.prev;
+	if (link.next < TaskLinks::CAPACITY) {
+		TaskLink& next = _planData.taskLinks[link.next];
+		next.prev = link.prev;
 	} else {
-		FFSM2_ASSERT(_bounds.last == task);
-		_bounds.last = curr.prev;
+		FFSM2_ASSERT(_bounds.last == index);
+		_bounds.last = link.prev;
 	}
 
-	curr.prev = INVALID_LONG;
-	curr.next = INVALID_LONG;
+	link.prev = INVALID_LONG;
+	link.next = INVALID_LONG;
 
-	_planData.tasks.remove(task);
+	_planData.tasks.remove(index);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -3202,7 +3232,7 @@ struct ArgsT;
 
 //------------------------------------------------------------------------------
 
-struct Registry {
+struct Registry final {
 	FFSM2_CONSTEXPR(11)	bool isActive()					const noexcept	{ return active != INVALID_SHORT;	}
 
 	FFSM2_CONSTEXPR(14)	void clearRequests()				  noexcept	{ requested = INVALID_SHORT;		}
@@ -3250,16 +3280,11 @@ protected:
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	struct Origin {
+	struct Origin final {
 		FFSM2_CONSTEXPR(14)	Origin(ControlT& control_,
-								   const StateID stateId)				  noexcept
-			: control{control_}
-			, prevId{control._originId}
-		{
-			control._originId = stateId;
-		}
+								   const StateID stateId)				  noexcept;
 
-		FFSM2_CONSTEXPR(20) ~Origin()									  noexcept	{ control._originId = prevId;			}
+		FFSM2_CONSTEXPR(20) ~Origin()									  noexcept;
 
 		ControlT& control;
 		const StateID prevId;
@@ -3436,18 +3461,9 @@ protected:
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	struct Lock {
-		FFSM2_CONSTEXPR(14)	Lock(FullControlBaseT& control_)	  noexcept
-			: control{!control_._locked ? &control_ : nullptr}
-		{
-			if (control)
-				control->_locked = true;
-		}
-
-		FFSM2_CONSTEXPR(20)	~Lock()								  noexcept	{
-			if (control)
-				control->_locked = false;
-		}
+	struct Lock final {
+		FFSM2_CONSTEXPR(14)	Lock(FullControlBaseT& control_)	  noexcept;
+		FFSM2_CONSTEXPR(20)	~Lock()								  noexcept;
 
 		FullControlBaseT* const control;
 	};
@@ -3464,13 +3480,7 @@ public:
 
 	/// @brief Transition into a state
 	/// @param stateId State identifier
-	FFSM2_CONSTEXPR(14)	void changeTo(const StateID stateId)	  noexcept	{
-		if (!_locked) {
-			_request = Transition{_originId, stateId};
-
-			FFSM2_LOG_TRANSITION(context(), _originId, stateId);
-		}
-	}
+	FFSM2_CONSTEXPR(14)	void changeTo(const StateID stateId)	  noexcept;
 
 	/// @brief Transition into a state
 	/// @tparam TState State type
@@ -3488,23 +3498,10 @@ public:
 #if FFSM2_PLANS_AVAILABLE()
 
 	/// @brief Succeed a plan task for the current state
-	FFSM2_CONSTEXPR(14)	void succeed()							  noexcept	{
-		_status.result = Status::Result::SUCCESS;
-
-		_planData.tasksSuccesses.set(_originId);
-
-		FFSM2_LOG_TASK_STATUS(context(), _originId, StatusEvent::SUCCEEDED);
-	}
+	FFSM2_CONSTEXPR(14)	void succeed()							  noexcept;
 
 	/// @brief Fail a plan task for the current state
-	FFSM2_CONSTEXPR(14)	void fail()								  noexcept	{
-		_status.result = Status::Result::FAILURE;
-
-		_planData.tasksFailures.set(_originId);
-
-		FFSM2_LOG_TASK_STATUS(context(), _originId, StatusEvent::FAILED);
-	}
-
+	FFSM2_CONSTEXPR(14)	void fail()								  noexcept;
 
 #endif
 
@@ -3606,27 +3603,13 @@ public:
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
 	FFSM2_CONSTEXPR(14)	void changeWith   (const StateID  stateId,
-										   const Payload& payload)	  noexcept
-	{
-		if (!_locked) {
-			_request = Transition{_originId, stateId, payload};
-
-			FFSM2_LOG_TRANSITION(context(), _originId, stateId);
-		}
-	}
+										   const Payload& payload)	  noexcept;
 
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
 	FFSM2_CONSTEXPR(14)	void changeWith   (const StateID  stateId,
-												Payload&& payload)	  noexcept
-	{
-		if (!_locked) {
-			_request = Transition{_originId, stateId, move(payload)};
-
-			FFSM2_LOG_TRANSITION(context(), _originId, stateId);
-		}
-	}
+												Payload&& payload)	  noexcept;
 
 	/// @brief Transition into a state
 	/// @tparam TState Destination state type
@@ -3805,11 +3788,7 @@ public:
 
 	/// @brief Cancel pending transition request
 	///		(can be used to substitute a transition into the current state with a different one)
-	FFSM2_CONSTEXPR(14)	void cancelPendingTransition()				  noexcept	{
-		_cancelled = true;
-
-		FFSM2_LOG_CANCELLED_PENDING(context(), _originId);
-	}
+	FFSM2_CONSTEXPR(14)	void cancelPendingTransition()				  noexcept;
 
 private:
 	using FullControl::_registry;
@@ -3831,7 +3810,95 @@ namespace ffsm2 {
 namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
+// COMMON
 
+template <typename TArgs>
+FFSM2_CONSTEXPR(14)
+ControlT<TArgs>::Origin::Origin(ControlT& control_,
+								const StateID stateId) noexcept
+	: control{control_}
+	, prevId{control._originId}
+{
+	control._originId = stateId;
+}
+
+//------------------------------------------------------------------------------
+
+template <typename TArgs>
+FFSM2_CONSTEXPR(20)
+ControlT<TArgs>::Origin::~Origin() noexcept {
+	control._originId = prevId;
+}
+
+// COMMON
+////////////////////////////////////////////////////////////////////////////////
+// COMMON
+
+template <typename TArgs>
+FFSM2_CONSTEXPR(14)
+FullControlBaseT<TArgs>::Lock::Lock(FullControlBaseT& control_) noexcept
+	: control{!control_._locked ? &control_ : nullptr}
+{
+	if (control)
+		control->_locked = true;
+}
+
+//------------------------------------------------------------------------------
+
+template <typename TArgs>
+FFSM2_CONSTEXPR(20)
+FullControlBaseT<TArgs>::Lock::~Lock() noexcept	{
+	if (control)
+		control->_locked = false;
+}
+
+// COMMON
+//------------------------------------------------------------------------------
+// COMMON
+
+template <typename TArgs>
+FFSM2_CONSTEXPR(14)
+void
+FullControlBaseT<TArgs>::changeTo(const StateID stateId) noexcept {
+	if (!_locked) {
+		_request = Transition{_originId, stateId};
+
+		FFSM2_LOG_TRANSITION(context(), _originId, stateId);
+	}
+}
+
+// COMMON
+//------------------------------------------------------------------------------
+
+#if FFSM2_PLANS_AVAILABLE()
+
+template <typename TArgs>
+FFSM2_CONSTEXPR(14)
+void
+FullControlBaseT<TArgs>::succeed() noexcept {
+	_status.result = Status::Result::SUCCESS;
+
+	_planData.tasksSuccesses.set(_originId);
+
+	FFSM2_LOG_TASK_STATUS(context(), _originId, StatusEvent::SUCCEEDED);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <typename TArgs>
+FFSM2_CONSTEXPR(14)
+void
+FullControlBaseT<TArgs>::fail() noexcept {
+	_status.result = Status::Result::FAILURE;
+
+	_planData.tasksFailures.set(_originId);
+
+	FFSM2_LOG_TASK_STATUS(context(), _originId, StatusEvent::FAILED);
+}
+
+#endif
+
+////////////////////////////////////////////////////////////////////////////////
 #if FFSM2_PLANS_AVAILABLE()
 
 template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
@@ -3873,7 +3940,39 @@ FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::u
 
 #endif
 
-////////////////////////////////////////////////////////////////////////////////
+//------------------------------------------------------------------------------
+// COMMON
+
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL FFSM2_IF_PLANS(, Long NTC), typename TTP>
+FFSM2_CONSTEXPR(14)
+void
+FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL FFSM2_IF_PLANS(, NTC), TTP>>::changeWith(const StateID  stateId,
+																										   const Payload& payload) noexcept
+{
+	if (!_locked) {
+		_request = Transition{_originId, stateId, payload};
+
+		FFSM2_LOG_TRANSITION(context(), _originId, stateId);
+	}
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL FFSM2_IF_PLANS(, Long NTC), typename TTP>
+FFSM2_CONSTEXPR(14)
+void
+FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL FFSM2_IF_PLANS(, NTC), TTP>>::changeWith(const StateID  stateId,
+																										   Payload&& payload) noexcept
+{
+	if (!_locked) {
+		_request = Transition{_originId, stateId, move(payload)};
+
+		FFSM2_LOG_TRANSITION(context(), _originId, stateId);
+	}
+}
+
+// COMMON
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #if FFSM2_PLANS_AVAILABLE()
 
@@ -3915,6 +4014,17 @@ FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::
 }
 
 #endif
+
+////////////////////////////////////////////////////////////////////////////////
+
+template <typename TArgs>
+FFSM2_CONSTEXPR(14)
+void
+GuardControlT<TArgs>::cancelPendingTransition() noexcept {
+	_cancelled = true;
+
+	FFSM2_LOG_CANCELLED_PENDING(context(), _originId);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -4536,12 +4646,12 @@ template <typename...>
 struct WrapInfoT;
 
 template <typename TH>
-struct WrapInfoT<	 TH> {
+struct WrapInfoT<	 TH> final {
 	using Type = SI_<TH>;
 };
 
 template <typename TH, typename... TS>
-struct WrapInfoT< CI_<TH, TS...>> {
+struct WrapInfoT< CI_<TH, TS...>> final {
 	using Type =  CI_<TH, TS...>;
 };
 
@@ -4564,7 +4674,7 @@ struct SI_ final {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename TInitial, typename... TRemaining>
-struct CSI_<TInitial, TRemaining...> {
+struct CSI_<TInitial, TRemaining...> final {
 	using Initial			= WrapInfo<TInitial>;
 	using Remaining			= CSI_<TRemaining...>;
 	using StateList			= Merge<typename Initial::StateList,  typename Remaining::StateList>;
@@ -4573,7 +4683,7 @@ struct CSI_<TInitial, TRemaining...> {
 };
 
 template <typename TInitial>
-struct CSI_<TInitial> {
+struct CSI_<TInitial> final {
 	using Initial			= WrapInfo<TInitial>;
 	using StateList			= typename Initial::StateList;
 
@@ -4659,17 +4769,17 @@ template <StateID, typename...>
 struct MaterialT;
 
 template <StateID N, typename TA, typename TH>
-struct MaterialT   <N, TA, TH> {
+struct MaterialT   <N, TA, TH> final {
 	using Type = S_<N, TA, TH>;
 };
 
 template <StateID N, typename TA, 			   typename... TS>
-struct MaterialT   <N, TA, CI_<void,   TS...>> {
+struct MaterialT   <N, TA, CI_<void,   TS...>> final {
 	using Type = C_<   TA, EmptyT<TA>, TS...>;
 };
 
 template <StateID N, typename TA, typename TH, typename... TS>
-struct MaterialT   <N, TA, CI_<TH,	   TS...>> {
+struct MaterialT   <N, TA, CI_<TH,	   TS...>> final {
 	using Type = C_<   TA,	   TH,	   TS...>;
 };
 
@@ -4752,7 +4862,7 @@ template <StateID, typename, Short, typename>
 struct CSubMaterialT;
 
 template <StateID N, typename TA, Short NI, typename... TS>
-struct CSubMaterialT<N, TA, NI, TL_<TS...>> {
+struct CSubMaterialT<N, TA, NI, TL_<TS...>> final {
 	using Type = CS_<N, TA, NI,		TS...>;
 };
 
@@ -5504,7 +5614,7 @@ template <FeatureTag NFeatureTag
 		, Long NSubstitutionLimit
 		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload>
-struct M_	   <G_<NFeatureTag, TContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>> {
+struct M_	   <G_<NFeatureTag, TContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>> final {
 	using Cfg = G_<NFeatureTag, TContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>;
 
 	static constexpr FeatureTag FEATURE_TAG = NFeatureTag;
@@ -6579,14 +6689,22 @@ RP_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateI
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//#undef FFSM2_UNUSED
+
+#undef FFSM2_ATTRIBUTE
+#undef FFSM2_ATTRIBUTE_FALLTHROUGH
+#undef FFSM2_ATTRIBUTE_NO_UNIQUE_ADDRESS
+
 #undef FFSM2_CONSTEXPR
+#undef FFSM2_CONSTEXPR_NO
 #undef FFSM2_CONSTEXPR_11
 #undef FFSM2_CONSTEXPR_14
 #undef FFSM2_CONSTEXPR_17
+#undef FFSM2_CONSTEXPR_20
 
-//#undef FFSM2_ARCHITECTURE
-//#undef FFSM2_ARCHITECTURE_64
-//#undef FFSM2_ARCHITECTURE_32
+#undef FFSM2_ARCHITECTURE
+#undef FFSM2_ARCHITECTURE_64
+#undef FFSM2_ARCHITECTURE_32
 #undef FFSM2_64BIT_OR_32BIT
 
 //#undef FFSM2_BREAK

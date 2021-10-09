@@ -33,16 +33,11 @@ protected:
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	struct Origin {
+	struct Origin final {
 		FFSM2_CONSTEXPR(14)	Origin(ControlT& control_,
-								   const StateID stateId)				  noexcept
-			: control{control_}
-			, prevId{control._originId}
-		{
-			control._originId = stateId;
-		}
+								   const StateID stateId)				  noexcept;
 
-		FFSM2_CONSTEXPR(20) ~Origin()									  noexcept	{ control._originId = prevId;			}
+		FFSM2_CONSTEXPR(20) ~Origin()									  noexcept;
 
 		ControlT& control;
 		const StateID prevId;
@@ -219,18 +214,9 @@ protected:
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	struct Lock {
-		FFSM2_CONSTEXPR(14)	Lock(FullControlBaseT& control_)	  noexcept
-			: control{!control_._locked ? &control_ : nullptr}
-		{
-			if (control)
-				control->_locked = true;
-		}
-
-		FFSM2_CONSTEXPR(20)	~Lock()								  noexcept	{
-			if (control)
-				control->_locked = false;
-		}
+	struct Lock final {
+		FFSM2_CONSTEXPR(14)	Lock(FullControlBaseT& control_)	  noexcept;
+		FFSM2_CONSTEXPR(20)	~Lock()								  noexcept;
 
 		FullControlBaseT* const control;
 	};
@@ -247,13 +233,7 @@ public:
 
 	/// @brief Transition into a state
 	/// @param stateId State identifier
-	FFSM2_CONSTEXPR(14)	void changeTo(const StateID stateId)	  noexcept	{
-		if (!_locked) {
-			_request = Transition{_originId, stateId};
-
-			FFSM2_LOG_TRANSITION(context(), _originId, stateId);
-		}
-	}
+	FFSM2_CONSTEXPR(14)	void changeTo(const StateID stateId)	  noexcept;
 
 	/// @brief Transition into a state
 	/// @tparam TState State type
@@ -271,23 +251,10 @@ public:
 #if FFSM2_PLANS_AVAILABLE()
 
 	/// @brief Succeed a plan task for the current state
-	FFSM2_CONSTEXPR(14)	void succeed()							  noexcept	{
-		_status.result = Status::Result::SUCCESS;
-
-		_planData.tasksSuccesses.set(_originId);
-
-		FFSM2_LOG_TASK_STATUS(context(), _originId, StatusEvent::SUCCEEDED);
-	}
+	FFSM2_CONSTEXPR(14)	void succeed()							  noexcept;
 
 	/// @brief Fail a plan task for the current state
-	FFSM2_CONSTEXPR(14)	void fail()								  noexcept	{
-		_status.result = Status::Result::FAILURE;
-
-		_planData.tasksFailures.set(_originId);
-
-		FFSM2_LOG_TASK_STATUS(context(), _originId, StatusEvent::FAILED);
-	}
-
+	FFSM2_CONSTEXPR(14)	void fail()								  noexcept;
 
 #endif
 
@@ -389,27 +356,13 @@ public:
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
 	FFSM2_CONSTEXPR(14)	void changeWith   (const StateID  stateId,
-										   const Payload& payload)	  noexcept
-	{
-		if (!_locked) {
-			_request = Transition{_originId, stateId, payload};
-
-			FFSM2_LOG_TRANSITION(context(), _originId, stateId);
-		}
-	}
+										   const Payload& payload)	  noexcept;
 
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
 	FFSM2_CONSTEXPR(14)	void changeWith   (const StateID  stateId,
-												Payload&& payload)	  noexcept
-	{
-		if (!_locked) {
-			_request = Transition{_originId, stateId, move(payload)};
-
-			FFSM2_LOG_TRANSITION(context(), _originId, stateId);
-		}
-	}
+												Payload&& payload)	  noexcept;
 
 	/// @brief Transition into a state
 	/// @tparam TState Destination state type
@@ -588,11 +541,7 @@ public:
 
 	/// @brief Cancel pending transition request
 	///		(can be used to substitute a transition into the current state with a different one)
-	FFSM2_CONSTEXPR(14)	void cancelPendingTransition()				  noexcept	{
-		_cancelled = true;
-
-		FFSM2_LOG_CANCELLED_PENDING(context(), _originId);
-	}
+	FFSM2_CONSTEXPR(14)	void cancelPendingTransition()				  noexcept;
 
 private:
 	using FullControl::_registry;

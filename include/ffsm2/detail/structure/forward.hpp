@@ -26,12 +26,12 @@ template <typename...>
 struct WrapInfoT;
 
 template <typename TH>
-struct WrapInfoT<	 TH> {
+struct WrapInfoT<	 TH> final {
 	using Type = SI_<TH>;
 };
 
 template <typename TH, typename... TS>
-struct WrapInfoT< CI_<TH, TS...>> {
+struct WrapInfoT< CI_<TH, TS...>> final {
 	using Type =  CI_<TH, TS...>;
 };
 
@@ -54,7 +54,7 @@ struct SI_ final {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename TInitial, typename... TRemaining>
-struct CSI_<TInitial, TRemaining...> {
+struct CSI_<TInitial, TRemaining...> final {
 	using Initial			= WrapInfo<TInitial>;
 	using Remaining			= CSI_<TRemaining...>;
 	using StateList			= Merge<typename Initial::StateList,  typename Remaining::StateList>;
@@ -63,7 +63,7 @@ struct CSI_<TInitial, TRemaining...> {
 };
 
 template <typename TInitial>
-struct CSI_<TInitial> {
+struct CSI_<TInitial> final {
 	using Initial			= WrapInfo<TInitial>;
 	using StateList			= typename Initial::StateList;
 
@@ -149,17 +149,17 @@ template <StateID, typename...>
 struct MaterialT;
 
 template <StateID N, typename TA, typename TH>
-struct MaterialT   <N, TA, TH> {
+struct MaterialT   <N, TA, TH> final {
 	using Type = S_<N, TA, TH>;
 };
 
 template <StateID N, typename TA, 			   typename... TS>
-struct MaterialT   <N, TA, CI_<void,   TS...>> {
+struct MaterialT   <N, TA, CI_<void,   TS...>> final {
 	using Type = C_<   TA, EmptyT<TA>, TS...>;
 };
 
 template <StateID N, typename TA, typename TH, typename... TS>
-struct MaterialT   <N, TA, CI_<TH,	   TS...>> {
+struct MaterialT   <N, TA, CI_<TH,	   TS...>> final {
 	using Type = C_<   TA,	   TH,	   TS...>;
 };
 
@@ -242,7 +242,7 @@ template <StateID, typename, Short, typename>
 struct CSubMaterialT;
 
 template <StateID N, typename TA, Short NI, typename... TS>
-struct CSubMaterialT<N, TA, NI, TL_<TS...>> {
+struct CSubMaterialT<N, TA, NI, TL_<TS...>> final {
 	using Type = CS_<N, TA, NI,		TS...>;
 };
 

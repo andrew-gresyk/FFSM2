@@ -7,14 +7,14 @@ namespace detail {
 
 #pragma pack(push, 1)
 
-struct TaskLink {
+struct TaskLink final {
 	Long prev		= INVALID_LONG;
 	Long next		= INVALID_LONG;
 };
 
 //------------------------------------------------------------------------------
 
-struct Bounds {
+struct Bounds final {
 	Long first		= INVALID_LONG;
 	Long last		= INVALID_LONG;
 };
@@ -50,7 +50,7 @@ struct PlanDataT<ArgsT<TContext
 					 FFSM2_IF_SERIALIZATION(, NSerialBits)
 					 , NSubstitutionLimit
 					 , NTaskCapacity
-					 , TPayload>>
+					 , TPayload>> final
 {
 	using StateList		= TStateList;
 	using Payload		= TPayload;
@@ -97,7 +97,7 @@ struct PlanDataT<ArgsT<TContext
 					 FFSM2_IF_SERIALIZATION(, NSerialBits)
 					 , NSubstitutionLimit
 					 , NTaskCapacity
-					 , void>>
+					 , void>> final
 {
 	using StateList		= TStateList;
 
