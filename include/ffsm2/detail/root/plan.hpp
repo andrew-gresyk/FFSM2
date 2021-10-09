@@ -5,7 +5,7 @@ namespace detail {
 
 #pragma pack(push, 1)
 
-struct Status {
+struct Status final {
 	enum class Result {
 		NONE,
 		SUCCESS,
@@ -67,7 +67,7 @@ public:
 
 	//----------------------------------------------------------------------
 
-	struct IteratorT {
+	struct IteratorT final {
 		FFSM2_CONSTEXPR(14)	IteratorT(const CPlanT& plan)		  noexcept;
 
 		FFSM2_CONSTEXPR(14)	explicit operator bool()		const noexcept;
@@ -124,7 +124,7 @@ public:
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	struct IteratorT {
+	struct IteratorT final {
 		FFSM2_CONSTEXPR(14)	IteratorT(PlanBaseT& plan)			  noexcept;
 
 		FFSM2_CONSTEXPR(14)	explicit operator bool()		const noexcept;
@@ -145,7 +145,7 @@ public:
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	struct CIterator {
+	struct CIterator final {
 		FFSM2_CONSTEXPR(14)	CIterator(const PlanBaseT& plan)	  noexcept;
 
 		FFSM2_CONSTEXPR(14)	explicit operator bool()		const noexcept;
@@ -210,11 +210,13 @@ public:
 
 	/// @brief Begin iteration over plan tasks
 	/// @return IteratorT to the first task
-	FFSM2_CONSTEXPR(14)	IteratorT first()											  noexcept	{ return  IteratorT{*this};										}
+	FFSM2_CONSTEXPR(14)	 IteratorT first()											  noexcept	{ return  IteratorT{*this};										}
 
 	/// @brief Begin iteration over plan tasks
 	/// @return CIterator to the first task
 	FFSM2_CONSTEXPR(11)	CIterator first()										const noexcept	{ return CIterator{*this};										}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 private:
 	FFSM2_CONSTEXPR(14)	void remove(const Long task)								  noexcept;

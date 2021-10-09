@@ -14,7 +14,7 @@ struct ArgsT;
 
 //------------------------------------------------------------------------------
 
-struct Registry {
+struct Registry final {
 	FFSM2_CONSTEXPR(11)	bool isActive()					const noexcept	{ return active != INVALID_SHORT;	}
 
 	FFSM2_CONSTEXPR(14)	void clearRequests()				  noexcept	{ requested = INVALID_SHORT;		}

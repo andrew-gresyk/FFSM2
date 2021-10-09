@@ -18,9 +18,14 @@ public:
 
 	FFSM2_CONSTEXPR(14) void clear()							  noexcept;
 
-	FFSM2_CONSTEXPR(14) bool get  (const Index index)		const noexcept;
-	FFSM2_CONSTEXPR(14) void set  (const Index index)			  noexcept;
-	FFSM2_CONSTEXPR(14) void clear(const Index index)			  noexcept;
+	template <typename TIndex>
+	FFSM2_CONSTEXPR(14) bool get  (const TIndex index)		const noexcept;
+
+	template <typename TIndex>
+	FFSM2_CONSTEXPR(14) void set  (const TIndex index)			  noexcept;
+
+	template <typename TIndex>
+	FFSM2_CONSTEXPR(14) void clear(const TIndex index)			  noexcept;
 
 private:
 	uint8_t _storage[UNIT_COUNT];

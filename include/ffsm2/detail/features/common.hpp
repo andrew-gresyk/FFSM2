@@ -163,7 +163,7 @@ struct alignas(4) TransitionBase {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TPayload>
-struct alignas(4) TransitionT
+struct alignas(4) TransitionT final
 	: TransitionBase
 {
 	using Payload = TPayload;
@@ -254,7 +254,7 @@ struct alignas(4) TransitionT
 //------------------------------------------------------------------------------
 
 template <>
-struct alignas(4) TransitionT<void>
+struct alignas(4) TransitionT<void> final
 	: TransitionBase
 {
 	using TransitionBase::TransitionBase;
@@ -266,7 +266,7 @@ struct alignas(4) TransitionT<void>
 
 }
 
-struct Request {
+struct Request final {
 	Short index;
 };
 

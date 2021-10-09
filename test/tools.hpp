@@ -14,7 +14,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-struct Event {
+struct Event final {
 	enum class Type {
 		ENTRY_GUARD,
 		ENTER,
@@ -68,7 +68,7 @@ using Events = std::vector<Event>;
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TConfig>
-struct LoggerT
+struct LoggerT final
 	:								 TConfig::LoggerInterface
 {
 	using Interface		  = typename TConfig::LoggerInterface;
