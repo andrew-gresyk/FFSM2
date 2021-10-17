@@ -20,9 +20,10 @@ Header-only flat FSM framework in C++11, with fully statically-defined structure
 
 ## Compiler Support
 
-- Visual Studio 14, 15, 16
-- GCC 5, 6, 7, 8, 9, 10
-- Clang 3.7, 3.8, 3.9, 4, 5, 6, 7, 8, 9, 10, 11
+- Visual Studio: 14, 15, 16
+- GCC: 5, 6, 7, 8, 9, 10
+- Clang: 3.7, 3.8, 3.9, 4, 5, 6, 7, 8, 9, 10, 11
+- AppleClang: 12
 
 ---
 
@@ -74,3 +75,9 @@ Header-only flat FSM framework in C++11, with fully statically-defined structure
 - Twitter: **[@andrew_gresyk](https://www.twitter.com/andrew_gresyk)**
 - Discord: **[HFSM.dev](https://discord.gg/v4t3tzh)**
 - Gitter: **[andrew-gresyk/FFSM2](https://gitter.im/andrew-gresyk/FFSM2)**
+
+---
+
+## Special Thanks
+
+- [Alexis Paques](https://github.com/AlexisTM)
