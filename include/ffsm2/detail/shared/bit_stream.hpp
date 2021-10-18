@@ -27,10 +27,10 @@ public:
 
 	using Data = uint8_t[BYTE_COUNT];
 
-	FFSM2_CONSTEXPR(14) void clear()										  noexcept	{ fill(_data, 0);	}
+	FFSM2_CONSTEXPR(14)	void clear()										  noexcept	{ fill(_data, 0);	}
 
 	FFSM2_CONSTEXPR(14)		  Data& data()									  noexcept	{ return _data;		}
-	FFSM2_CONSTEXPR(11) const Data& data()								const noexcept	{ return _data;		}
+	FFSM2_CONSTEXPR(11)	const Data& data()								const noexcept	{ return _data;		}
 
 private:
 	Data _data;

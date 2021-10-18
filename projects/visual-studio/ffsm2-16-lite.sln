@@ -7,8 +7,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_", "_", "{498EF6B0-5565-41
 	ProjectSection(SolutionItems) = preProject
 		..\..\.editorconfig = ..\..\.editorconfig
 		..\..\.gitignore = ..\..\.gitignore
-		..\..\.travis.yml = ..\..\.travis.yml
-		..\..\appveyor.yml = ..\..\appveyor.yml
 		..\..\CMakeLists.txt = ..\..\CMakeLists.txt
 		..\..\README.md = ..\..\README.md
 	EndProjectSection
@@ -31,6 +29,12 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "temp-clang", "temp-clang.vcxproj", "{6DB92FC0-A25C-43A4-A081-C2D60848C90F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test-14", "test-14.vcxproj", "{0895F78B-D3D4-4BEF-8E12-DAABE32686E5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{2454DB6B-D252-4BC5-9135-9FF428FAE6D1}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\.github\workflows\cmake.yml = ..\..\.github\workflows\cmake.yml
+		..\..\.github\workflows\msbuild.yml = ..\..\.github\workflows\msbuild.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -106,6 +110,7 @@ Global
 		{D3DB7031-218F-4223-A376-E496400581AB} = {D1870447-2122-4EFE-A1CF-26DBE8D3A7FF}
 		{6DB92FC0-A25C-43A4-A081-C2D60848C90F} = {D1870447-2122-4EFE-A1CF-26DBE8D3A7FF}
 		{0895F78B-D3D4-4BEF-8E12-DAABE32686E5} = {58AC2401-48A7-4AFA-A6F4-5F00DFAF260A}
+		{2454DB6B-D252-4BC5-9135-9FF428FAE6D1} = {498EF6B0-5565-411A-839A-B41294202103}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3BE666E0-1098-42CF-B1FD-F0F0CA579F4C}

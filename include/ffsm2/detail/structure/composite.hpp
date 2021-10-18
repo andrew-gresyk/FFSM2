@@ -35,25 +35,25 @@ struct C_ final {
 
 	//----------------------------------------------------------------------
 
-	FFSM2_CONSTEXPR(14) bool deepForwardEntryGuard(GuardControl& control)  noexcept;
-	FFSM2_CONSTEXPR(14) bool deepEntryGuard		  (GuardControl& control)  noexcept;
+	FFSM2_CONSTEXPR(14)	bool deepForwardEntryGuard(GuardControl& control)  noexcept;
+	FFSM2_CONSTEXPR(14)	bool deepEntryGuard		  (GuardControl& control)  noexcept;
 
-	FFSM2_CONSTEXPR(14) void deepEnter			  (PlanControl&  control)  noexcept;
+	FFSM2_CONSTEXPR(14)	void deepEnter			  (PlanControl&  control)  noexcept;
 
-	FFSM2_CONSTEXPR(14) void deepUpdate			  (FullControl&  control)  noexcept;
+	FFSM2_CONSTEXPR(14)	void deepUpdate			  (FullControl&  control)  noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14) void deepReact			  (FullControl&  control,
+	FFSM2_CONSTEXPR(14)	void deepReact			  (FullControl&  control,
 												   const TEvent& event)    noexcept;
 
-	FFSM2_CONSTEXPR(14) bool deepForwardExitGuard (GuardControl& control)  noexcept;
-	FFSM2_CONSTEXPR(14) bool deepExitGuard		  (GuardControl& control)  noexcept;
+	FFSM2_CONSTEXPR(14)	bool deepForwardExitGuard (GuardControl& control)  noexcept;
+	FFSM2_CONSTEXPR(14)	bool deepExitGuard		  (GuardControl& control)  noexcept;
 
-	FFSM2_CONSTEXPR(14) void deepExit			  (PlanControl&  control)  noexcept;
+	FFSM2_CONSTEXPR(14)	void deepExit			  (PlanControl&  control)  noexcept;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(14) void deepChangeToRequested(PlanControl&  control)  noexcept;
+	FFSM2_CONSTEXPR(14)	void deepChangeToRequested(PlanControl&  control)  noexcept;
 
 	//----------------------------------------------------------------------
 
@@ -61,8 +61,8 @@ struct C_ final {
 	using WriteStream	= typename Args::WriteStream;
 	using ReadStream	= typename Args::ReadStream;
 
-	FFSM2_CONSTEXPR(14) void deepSaveActive		  (const Registry& registry, WriteStream& stream) const noexcept;
-	FFSM2_CONSTEXPR(14) void deepLoadRequested	  (		 Registry& registry, ReadStream&  stream) const noexcept;
+	FFSM2_CONSTEXPR(14)	void deepSaveActive		  (const Registry& registry, WriteStream& stream) const noexcept;
+	FFSM2_CONSTEXPR(14)	void deepLoadRequested	  (		 Registry& registry, ReadStream&  stream) const noexcept;
 #endif
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

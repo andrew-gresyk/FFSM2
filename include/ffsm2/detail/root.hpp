@@ -73,7 +73,7 @@ public:
 
 	/// @brief Access context
 	/// @return context
-	FFSM2_CONSTEXPR(11) const Context& context()							const noexcept	{ return _context;									}
+	FFSM2_CONSTEXPR(11)	const Context& context()							const noexcept	{ return _context;									}
 
 	//----------------------------------------------------------------------
 
@@ -92,7 +92,7 @@ public:
 	/// @tparam TEvent Event type
 	/// @param event Event to react to
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14) void react(const TEvent& event)							  noexcept;
+	FFSM2_CONSTEXPR(14)	void react(const TEvent& event)							  noexcept;
 
 	//----------------------------------------------------------------------
 
@@ -118,12 +118,12 @@ public:
 
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
-	FFSM2_CONSTEXPR(14) void changeTo		 (const StateID stateId)			  noexcept;
+	FFSM2_CONSTEXPR(14)	void changeTo		 (const StateID stateId)			  noexcept;
 
 	/// @brief Transition into a state
 	/// @tparam TState Destination state type
 	template <typename TState>
-	FFSM2_CONSTEXPR(14) void changeTo		 ()									  noexcept	{ changeTo (stateId<TState>());					}
+	FFSM2_CONSTEXPR(14)	void changeTo		 ()									  noexcept	{ changeTo (stateId<TState>());					}
 
 	// COMMON
 	//------------------------------------------------------------------------------
@@ -138,12 +138,12 @@ public:
 	/// @brief Serialize FSM into 'buffer'
 	/// @param buffer 'SerialBuffer' to serialize to
 	/// @see FFSM2_ENABLE_SERIALIZATION
-	FFSM2_CONSTEXPR(14) void save(		SerialBuffer& buffer)				const noexcept;
+	FFSM2_CONSTEXPR(14)	void save(		SerialBuffer& buffer)				const noexcept;
 
 	/// @brief De-serialize FSM from 'buffer'
 	/// @param buffer 'SerialBuffer' to de-serialize from
 	/// @see FFSM2_ENABLE_SERIALIZATION
-	FFSM2_CONSTEXPR(14) void load(const SerialBuffer& buffer)					  noexcept;
+	FFSM2_CONSTEXPR(14)	void load(const SerialBuffer& buffer)					  noexcept;
 
 #endif
 
@@ -174,14 +174,14 @@ public:
 	/// @brief Attach logger
 	/// @param logger A logger implementing 'ffsm2::LoggerInterfaceT<>' interface
 	/// @see FFSM2_ENABLE_LOG_INTERFACE
-	FFSM2_CONSTEXPR(14) void attachLogger(Logger* const logger)								  noexcept	{ _logger = logger;								}
+	FFSM2_CONSTEXPR(14)	void attachLogger(Logger* const logger)								  noexcept	{ _logger = logger;								}
 
 #endif
 
 	//----------------------------------------------------------------------
 
 protected:
-	FFSM2_CONSTEXPR(14) void initialEnter()													  noexcept;
+	FFSM2_CONSTEXPR(14)	void initialEnter()													  noexcept;
 	FFSM2_CONSTEXPR(14)	void finalExit()													  noexcept;
 
 	FFSM2_CONSTEXPR(14)	void processTransitions(Transition& currentTransition)				  noexcept;
@@ -459,8 +459,8 @@ public:
 			 FFSM2_IF_LOG_INTERFACE(, logger)}
 	{}
 
-	FFSM2_CONSTEXPR(14) void setContext(const Context&  context)	  noexcept { _context =			  context ; }
-	FFSM2_CONSTEXPR(14) void setContext(	  Context&& context)	  noexcept { _context = move(context); }
+	FFSM2_CONSTEXPR(14)	void setContext(const Context&  context)	  noexcept { _context =		 context ; }
+	FFSM2_CONSTEXPR(14)	void setContext(	  Context&& context)	  noexcept { _context = move(context); }
 
 private:
 	using Base::_context;
@@ -500,7 +500,7 @@ public:
 			 FFSM2_IF_LOG_INTERFACE(, logger)}
 	{}
 
-	FFSM2_CONSTEXPR(14) void setContext(Context context)	  noexcept { _context = context; }
+	FFSM2_CONSTEXPR(14)	void setContext(Context context)	  noexcept { _context = context; }
 
 private:
 	using Base::_context;
@@ -540,7 +540,7 @@ public:
 			 FFSM2_IF_LOG_INTERFACE(, logger)}
 	{}
 
-	FFSM2_CONSTEXPR(14) void setContext(Context context)	  noexcept { _context = context; }
+	FFSM2_CONSTEXPR(14)	void setContext(Context context)	  noexcept { _context = context; }
 
 private:
 	using Base::_context;

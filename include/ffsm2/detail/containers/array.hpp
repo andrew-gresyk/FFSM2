@@ -32,11 +32,11 @@ public:
 	FFSM2_CONSTEXPR(14)	void fill(const Item filler)						  noexcept;
 	FFSM2_CONSTEXPR(14)	void clear()										  noexcept	{ fill(INVALID_SHORT);				}
 
-	FFSM2_CONSTEXPR(14)  Iterator  begin()									  noexcept	{ return  Iterator(*this, first());	}
+	FFSM2_CONSTEXPR(14)	 Iterator  begin()									  noexcept	{ return  Iterator(*this, first());	}
 	FFSM2_CONSTEXPR(11)	CIterator  begin()								const noexcept	{ return CIterator(*this, first());	}
 	FFSM2_CONSTEXPR(11)	CIterator cbegin()								const noexcept	{ return CIterator(*this, first());	}
 
-	FFSM2_CONSTEXPR(14)  Iterator	 end()									  noexcept	{ return  Iterator(*this, limit());	}
+	FFSM2_CONSTEXPR(14)	 Iterator	 end()									  noexcept	{ return  Iterator(*this, limit());	}
 	FFSM2_CONSTEXPR(11)	CIterator	 end()								const noexcept	{ return CIterator(*this, limit());	}
 	FFSM2_CONSTEXPR(11)	CIterator	cend()								const noexcept	{ return CIterator(*this, limit());	}
 
@@ -76,13 +76,13 @@ public:
 	static constexpr Index CAPACITY	= NCapacity;
 
 public:
-	FFSM2_CONSTEXPR(14)  void clear()										  noexcept	{ _count = 0;						}
+	FFSM2_CONSTEXPR(14)	 void clear()										  noexcept	{ _count = 0;						}
 
 	template <typename... TArgs>
-	FFSM2_CONSTEXPR(14) Index emplace(const TArgs &... args)				  noexcept;
+	FFSM2_CONSTEXPR(14)	Index emplace(const TArgs &... args)				  noexcept;
 
 	template <typename... TArgs>
-	FFSM2_CONSTEXPR(14) Index emplace(		TArgs&&... args)				  noexcept;
+	FFSM2_CONSTEXPR(14)	Index emplace(		TArgs&&... args)				  noexcept;
 
 	template <typename N>
 	FFSM2_CONSTEXPR(14)		  Item& operator[] (const N index)				  noexcept;
@@ -92,17 +92,17 @@ public:
 
 	FFSM2_CONSTEXPR(11)	Index  count()									const noexcept	{ return _count;					}
 
-	FFSM2_CONSTEXPR(14) ArrayT& operator += (const Item & item)				  noexcept;
-	FFSM2_CONSTEXPR(14) ArrayT& operator += (	   Item&& item)				  noexcept;
+	FFSM2_CONSTEXPR(14)	ArrayT& operator += (const Item & item)				  noexcept;
+	FFSM2_CONSTEXPR(14)	ArrayT& operator += (	   Item&& item)				  noexcept;
 
 	template <Long N>
-	FFSM2_CONSTEXPR(14) ArrayT& operator += (const ArrayT<Item, N>& other)	  noexcept;
+	FFSM2_CONSTEXPR(14)	ArrayT& operator += (const ArrayT<Item, N>& other)	  noexcept;
 
-	FFSM2_CONSTEXPR(14)  Iterator  begin()									  noexcept	{ return  Iterator(*this, first());	}
+	FFSM2_CONSTEXPR(14)	 Iterator  begin()									  noexcept	{ return  Iterator(*this, first());	}
 	FFSM2_CONSTEXPR(11)	CIterator  begin()								const noexcept	{ return CIterator(*this, first());	}
 	FFSM2_CONSTEXPR(11)	CIterator cbegin()								const noexcept	{ return CIterator(*this, first());	}
 
-	FFSM2_CONSTEXPR(14)  Iterator	 end()									  noexcept	{ return  Iterator(*this, limit());	}
+	FFSM2_CONSTEXPR(14)	 Iterator	 end()									  noexcept	{ return  Iterator(*this, limit());	}
 	FFSM2_CONSTEXPR(11)	CIterator	 end()								const noexcept	{ return CIterator(*this, limit());	}
 	FFSM2_CONSTEXPR(11)	CIterator	cend()								const noexcept	{ return CIterator(*this, limit());	}
 

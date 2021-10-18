@@ -806,10 +806,10 @@ public:
 
 	using Data = uint8_t[BYTE_COUNT];
 
-	FFSM2_CONSTEXPR(14) void clear()										  noexcept	{ fill(_data, 0);	}
+	FFSM2_CONSTEXPR(14)	void clear()										  noexcept	{ fill(_data, 0);	}
 
 	FFSM2_CONSTEXPR(14)		  Data& data()									  noexcept	{ return _data;		}
-	FFSM2_CONSTEXPR(11) const Data& data()								const noexcept	{ return _data;		}
+	FFSM2_CONSTEXPR(11)	const Data& data()								const noexcept	{ return _data;		}
 
 private:
 	Data _data;
@@ -1490,11 +1490,11 @@ public:
 	FFSM2_CONSTEXPR(14)	void fill(const Item filler)						  noexcept;
 	FFSM2_CONSTEXPR(14)	void clear()										  noexcept	{ fill(INVALID_SHORT);				}
 
-	FFSM2_CONSTEXPR(14)  Iterator  begin()									  noexcept	{ return  Iterator(*this, first());	}
+	FFSM2_CONSTEXPR(14)	 Iterator  begin()									  noexcept	{ return  Iterator(*this, first());	}
 	FFSM2_CONSTEXPR(11)	CIterator  begin()								const noexcept	{ return CIterator(*this, first());	}
 	FFSM2_CONSTEXPR(11)	CIterator cbegin()								const noexcept	{ return CIterator(*this, first());	}
 
-	FFSM2_CONSTEXPR(14)  Iterator	 end()									  noexcept	{ return  Iterator(*this, limit());	}
+	FFSM2_CONSTEXPR(14)	 Iterator	 end()									  noexcept	{ return  Iterator(*this, limit());	}
 	FFSM2_CONSTEXPR(11)	CIterator	 end()								const noexcept	{ return CIterator(*this, limit());	}
 	FFSM2_CONSTEXPR(11)	CIterator	cend()								const noexcept	{ return CIterator(*this, limit());	}
 
@@ -1534,13 +1534,13 @@ public:
 	static constexpr Index CAPACITY	= NCapacity;
 
 public:
-	FFSM2_CONSTEXPR(14)  void clear()										  noexcept	{ _count = 0;						}
+	FFSM2_CONSTEXPR(14)	 void clear()										  noexcept	{ _count = 0;						}
 
 	template <typename... TArgs>
-	FFSM2_CONSTEXPR(14) Index emplace(const TArgs &... args)				  noexcept;
+	FFSM2_CONSTEXPR(14)	Index emplace(const TArgs &... args)				  noexcept;
 
 	template <typename... TArgs>
-	FFSM2_CONSTEXPR(14) Index emplace(		TArgs&&... args)				  noexcept;
+	FFSM2_CONSTEXPR(14)	Index emplace(		TArgs&&... args)				  noexcept;
 
 	template <typename N>
 	FFSM2_CONSTEXPR(14)		  Item& operator[] (const N index)				  noexcept;
@@ -1550,17 +1550,17 @@ public:
 
 	FFSM2_CONSTEXPR(11)	Index  count()									const noexcept	{ return _count;					}
 
-	FFSM2_CONSTEXPR(14) ArrayT& operator += (const Item & item)				  noexcept;
-	FFSM2_CONSTEXPR(14) ArrayT& operator += (	   Item&& item)				  noexcept;
+	FFSM2_CONSTEXPR(14)	ArrayT& operator += (const Item & item)				  noexcept;
+	FFSM2_CONSTEXPR(14)	ArrayT& operator += (	   Item&& item)				  noexcept;
 
 	template <Long N>
-	FFSM2_CONSTEXPR(14) ArrayT& operator += (const ArrayT<Item, N>& other)	  noexcept;
+	FFSM2_CONSTEXPR(14)	ArrayT& operator += (const ArrayT<Item, N>& other)	  noexcept;
 
-	FFSM2_CONSTEXPR(14)  Iterator  begin()									  noexcept	{ return  Iterator(*this, first());	}
+	FFSM2_CONSTEXPR(14)	 Iterator  begin()									  noexcept	{ return  Iterator(*this, first());	}
 	FFSM2_CONSTEXPR(11)	CIterator  begin()								const noexcept	{ return CIterator(*this, first());	}
 	FFSM2_CONSTEXPR(11)	CIterator cbegin()								const noexcept	{ return CIterator(*this, first());	}
 
-	FFSM2_CONSTEXPR(14)  Iterator	 end()									  noexcept	{ return  Iterator(*this, limit());	}
+	FFSM2_CONSTEXPR(14)	 Iterator	 end()									  noexcept	{ return  Iterator(*this, limit());	}
 	FFSM2_CONSTEXPR(11)	CIterator	 end()								const noexcept	{ return CIterator(*this, limit());	}
 	FFSM2_CONSTEXPR(11)	CIterator	cend()								const noexcept	{ return CIterator(*this, limit());	}
 
@@ -1736,18 +1736,18 @@ public:
 	static constexpr Index UNIT_COUNT = contain(CAPACITY, 8);
 
 public:
-	FFSM2_CONSTEXPR(14) BitArrayT()								  noexcept	{ clear();	}
+	FFSM2_CONSTEXPR(14)	BitArrayT()								  noexcept	{ clear();	}
 
-	FFSM2_CONSTEXPR(14) void clear()							  noexcept;
-
-	template <typename TIndex>
-	FFSM2_CONSTEXPR(14) bool get  (const TIndex index)		const noexcept;
+	FFSM2_CONSTEXPR(14)	void clear()							  noexcept;
 
 	template <typename TIndex>
-	FFSM2_CONSTEXPR(14) void set  (const TIndex index)			  noexcept;
+	FFSM2_CONSTEXPR(14)	bool get  (const TIndex index)		const noexcept;
 
 	template <typename TIndex>
-	FFSM2_CONSTEXPR(14) void clear(const TIndex index)			  noexcept;
+	FFSM2_CONSTEXPR(14)	void set  (const TIndex index)			  noexcept;
+
+	template <typename TIndex>
+	FFSM2_CONSTEXPR(14)	void clear(const TIndex index)			  noexcept;
 
 private:
 	uint8_t _storage[UNIT_COUNT];
@@ -1858,9 +1858,9 @@ namespace detail {
 #pragma pack(push, 1)
 
 struct TaskBase {
-	FFSM2_CONSTEXPR(11) TaskBase()								  noexcept {}
+	FFSM2_CONSTEXPR(11)	TaskBase()								  noexcept {}
 
-	FFSM2_CONSTEXPR(11) TaskBase(const StateID origin_,
+	FFSM2_CONSTEXPR(11)	TaskBase(const StateID origin_,
 								 const StateID destination_)	  noexcept
 		: origin{origin_}
 		, destination{destination_}
@@ -1903,7 +1903,7 @@ struct TaskT final
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(14) TaskT()									  noexcept {
+	FFSM2_CONSTEXPR(14)	TaskT()									  noexcept {
 		new (&storage) Payload{};
 	}
 
@@ -1962,9 +1962,9 @@ private:
 
 public:
 	template <typename... TArgs>
-	FFSM2_CONSTEXPR(14) Index emplace(TArgs&&... args)							  noexcept;
+	FFSM2_CONSTEXPR(14)	Index emplace(TArgs&&... args)							  noexcept;
 
-	FFSM2_CONSTEXPR(14) void remove(const Index i)								  noexcept;
+	FFSM2_CONSTEXPR(14)	void remove(const Index i)								  noexcept;
 
 	FFSM2_CONSTEXPR(14)		  Item& operator[] (const Index i)					  noexcept;
 	FFSM2_CONSTEXPR(11)	const Item& operator[] (const Index i)				const noexcept;
@@ -2547,8 +2547,8 @@ public:
 
 		FFSM2_CONSTEXPR(14)	void operator ++()					  noexcept;
 
-		FFSM2_CONSTEXPR(11) const Task& operator  *()		const noexcept	{ return  _plan._planData.tasks[_curr];		}
-		FFSM2_CONSTEXPR(11) const Task* operator ->()		const noexcept	{ return &_plan._planData.tasks[_curr];		}
+		FFSM2_CONSTEXPR(11)	const Task& operator  *()		const noexcept	{ return  _plan._planData.tasks[_curr];		}
+		FFSM2_CONSTEXPR(11)	const Task* operator ->()		const noexcept	{ return &_plan._planData.tasks[_curr];		}
 
 		FFSM2_CONSTEXPR(14)	Long next()						const noexcept;
 
@@ -2604,12 +2604,12 @@ public:
 
 		FFSM2_CONSTEXPR(14)	void operator ++()					  noexcept;
 
-		FFSM2_CONSTEXPR(14) Task& operator  *()					  noexcept	{ return  _plan._planData.tasks[_curr];	}
-		FFSM2_CONSTEXPR(14) Task* operator ->()					  noexcept	{ return &_plan._planData.tasks[_curr];	}
+		FFSM2_CONSTEXPR(14)	Task& operator  *()					  noexcept	{ return  _plan._planData.tasks[_curr];		}
+		FFSM2_CONSTEXPR(14)	Task* operator ->()					  noexcept	{ return &_plan._planData.tasks[_curr];		}
 
-		FFSM2_CONSTEXPR(14) void remove()						  noexcept	{ _plan.remove(_curr);					}
+		FFSM2_CONSTEXPR(14)	void remove()						  noexcept	{ _plan.remove(_curr);						}
 
-		FFSM2_CONSTEXPR(14) Long next()						const noexcept;
+		FFSM2_CONSTEXPR(14)	Long next()						const noexcept;
 
 		PlanBaseT& _plan;
 		Long _curr;
@@ -2625,10 +2625,10 @@ public:
 
 		FFSM2_CONSTEXPR(14)	void operator ++()					  noexcept;
 
-		FFSM2_CONSTEXPR(14) const Task& operator  *()		const noexcept	{ return  _plan._planData.tasks[_curr];	}
-		FFSM2_CONSTEXPR(11) const Task* operator ->()		const noexcept	{ return &_plan._planData.tasks[_curr];	}
+		FFSM2_CONSTEXPR(14)	const Task& operator  *()		const noexcept	{ return  _plan._planData.tasks[_curr];		}
+		FFSM2_CONSTEXPR(11)	const Task* operator ->()		const noexcept	{ return &_plan._planData.tasks[_curr];		}
 
-		FFSM2_CONSTEXPR(14) Long next()						const noexcept;
+		FFSM2_CONSTEXPR(14)	Long next()						const noexcept;
 
 		const PlanBaseT& _plan;
 		Long _curr;
@@ -2641,7 +2641,7 @@ protected:
 	FFSM2_CONSTEXPR(11)	PlanBaseT(PlanData& planData)			  noexcept;
 
 	template <typename T>
-	static constexpr StateID  stateId()							  noexcept	{ return		index<StateList , T>();	}
+	static constexpr StateID  stateId()							  noexcept	{ return		index<StateList , T>();		}
 
 	FFSM2_CONSTEXPR(14)	bool append(const StateID origin,
 									const StateID destination)	  noexcept;
@@ -3284,7 +3284,7 @@ protected:
 		FFSM2_CONSTEXPR(14)	Origin(ControlT& control_,
 								   const StateID stateId)				  noexcept;
 
-		FFSM2_CONSTEXPR(20) ~Origin()									  noexcept;
+		FFSM2_CONSTEXPR(20)	~Origin()									  noexcept;
 
 		ControlT& control;
 		const StateID prevId;
@@ -3322,7 +3322,7 @@ public:
 	/// @brief Access FSM context (data shared between states and/or data interface between FSM and external code)
 	/// @return context
 	/// @see Control::context()
-	FFSM2_CONSTEXPR(11) const Context& _()							const noexcept	{ return _context;						}
+	FFSM2_CONSTEXPR(11)	const Context& _()							const noexcept	{ return _context;						}
 
 	/// @brief Access FSM context (data shared between states and/or data interface between FSM and external code)
 	/// @return context
@@ -3332,13 +3332,13 @@ public:
 	/// @brief Access FSM context (data shared between states and/or data interface between FSM and external code)
 	/// @return context
 	/// @see Control::_()
-	FFSM2_CONSTEXPR(11) const Context& context()					const noexcept	{ return _context;						}
+	FFSM2_CONSTEXPR(11)	const Context& context()					const noexcept	{ return _context;						}
 
 	//----------------------------------------------------------------------
 
 	/// @brief Inspect current transition request
 	/// @return Transition requests
-	FFSM2_CONSTEXPR(11) const Transition& request()					const noexcept	{ return _request;						}
+	FFSM2_CONSTEXPR(11)	const Transition& request()					const noexcept	{ return _request;						}
 
 	//----------------------------------------------------------------------
 	//----------------------------------------------------------------------
@@ -3347,7 +3347,7 @@ public:
 
 	/// @brief Access read-only plan
 	/// @return Plan
-	FFSM2_CONSTEXPR(11) CPlan plan()								const noexcept	{ return CPlan{_planData};				}
+	FFSM2_CONSTEXPR(11)	CPlan plan()								const noexcept	{ return CPlan{_planData};				}
 
 #endif
 
@@ -3357,7 +3357,7 @@ public:
 
 	/// @brief Get transitions processed during last 'update()', 'react()' or 'replayTransition()'
 	/// @return Array of last transition requests
-	FFSM2_CONSTEXPR(11) const Transition& previousTransitions()		const noexcept	{ return _previousTransition;			}
+	FFSM2_CONSTEXPR(11)	const Transition& previousTransitions()		const noexcept	{ return _previousTransition;			}
 
 #endif
 
@@ -3420,7 +3420,7 @@ public:
 
 	/// @brief Access read-only plan
 	/// @return Read-only plan
-	FFSM2_CONSTEXPR(11) CPlan plan()						const noexcept	{ return CPlan{_planData};						}
+	FFSM2_CONSTEXPR(11)	CPlan plan()								const noexcept	{ return CPlan{_planData};				}
 
 // COMMON
 #endif
@@ -3752,7 +3752,7 @@ class GuardControlT final
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(11) GuardControlT(Context& context
+	FFSM2_CONSTEXPR(11)	GuardControlT(Context& context
 									, Registry& registry
 									, Transition& request
 									, const Transition& currentTransition
@@ -3780,11 +3780,11 @@ public:
 
 	/// @brief Get current transition request
 	/// @return Current transition request
-	FFSM2_CONSTEXPR(11) const Transition& currentTransitions()	const noexcept	{ return _currentTransition;	}
+	FFSM2_CONSTEXPR(11)	const Transition& currentTransitions()		const noexcept	{ return _currentTransition;			}
 
 	/// @brief Get pending transition request
 	/// @return Pending transition request
-	FFSM2_CONSTEXPR(11)	const Transition& pendingTransition()	const noexcept	{ return _pendingTransition;	}
+	FFSM2_CONSTEXPR(11)	const Transition& pendingTransition()		const noexcept	{ return _pendingTransition;			}
 
 	/// @brief Cancel pending transition request
 	///		(can be used to substitute a transition into the current state with a different one)
@@ -4057,20 +4057,20 @@ protected:
 	using GuardControl	= GuardControlT<TArgs>;
 
 public:
-	FFSM2_CONSTEXPR(14) void preEntryGuard(Context&)	  noexcept {}
+	FFSM2_CONSTEXPR(14)	void preEntryGuard(Context&)	  noexcept {}
 
-	FFSM2_CONSTEXPR(14) void preEnter	  (Context&)	  noexcept {}
-	FFSM2_CONSTEXPR(14) void preReenter	  (Context&)	  noexcept {}
+	FFSM2_CONSTEXPR(14)	void preEnter	  (Context&)	  noexcept {}
+	FFSM2_CONSTEXPR(14)	void preReenter	  (Context&)	  noexcept {}
 
-	FFSM2_CONSTEXPR(14) void preUpdate	  (Context&)	  noexcept {}
+	FFSM2_CONSTEXPR(14)	void preUpdate	  (Context&)	  noexcept {}
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14) void preReact	  (const TEvent&,
+	FFSM2_CONSTEXPR(14)	void preReact	  (const TEvent&,
 										   Context&)	  noexcept {}
 
-	FFSM2_CONSTEXPR(14) void preExitGuard (Context&)	  noexcept {}
+	FFSM2_CONSTEXPR(14)	void preExitGuard (Context&)	  noexcept {}
 
-	FFSM2_CONSTEXPR(14) void postExit	  (Context&)	  noexcept {}
+	FFSM2_CONSTEXPR(14)	void postExit	  (Context&)	  noexcept {}
 
 	template <typename T>
 	static constexpr StateID  stateId()					  noexcept { return index<StateList, T>();				}
@@ -4104,20 +4104,20 @@ struct B_<TFirst, TRest...>
 
 	using TFirst::stateId;
 
-	FFSM2_CONSTEXPR(14) void widePreEntryGuard(Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void widePreEntryGuard(Context& context)	  noexcept;
 
-	FFSM2_CONSTEXPR(14) void widePreEnter	  (Context& context)	  noexcept;
-	FFSM2_CONSTEXPR(14) void widePreReenter	  (Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void widePreEnter	  (Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void widePreReenter	  (Context& context)	  noexcept;
 
-	FFSM2_CONSTEXPR(14) void widePreUpdate	  (Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void widePreUpdate	  (Context& context)	  noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14) void widePreReact	  (const TEvent& event,
+	FFSM2_CONSTEXPR(14)	void widePreReact	  (const TEvent& event,
 											   Context& context)	  noexcept;
 
-	FFSM2_CONSTEXPR(14) void widePreExitGuard (Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void widePreExitGuard (Context& context)	  noexcept;
 
-	FFSM2_CONSTEXPR(14) void widePostExit	  (Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void widePostExit	  (Context& context)	  noexcept;
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -4142,40 +4142,40 @@ struct B_<TFirst>
 
 	using TFirst::stateId;
 
-	FFSM2_CONSTEXPR(14) void entryGuard		  (GuardControl&)		  noexcept {}
+	FFSM2_CONSTEXPR(14)	void entryGuard		  (GuardControl&)		  noexcept {}
 
-	FFSM2_CONSTEXPR(14) void enter			  (PlanControl&)		  noexcept {}
-	FFSM2_CONSTEXPR(14) void reenter		  (PlanControl&)		  noexcept {}
+	FFSM2_CONSTEXPR(14)	void enter			  (PlanControl&)		  noexcept {}
+	FFSM2_CONSTEXPR(14)	void reenter		  (PlanControl&)		  noexcept {}
 
-	FFSM2_CONSTEXPR(14) void update			  (FullControl&)		  noexcept {}
+	FFSM2_CONSTEXPR(14)	void update			  (FullControl&)		  noexcept {}
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14) void react			  (const TEvent&,
+	FFSM2_CONSTEXPR(14)	void react			  (const TEvent&,
 											   FullControl&)		  noexcept {}
 
-	FFSM2_CONSTEXPR(14) void exitGuard		  (GuardControl&)		  noexcept {}
+	FFSM2_CONSTEXPR(14)	void exitGuard		  (GuardControl&)		  noexcept {}
 
-	FFSM2_CONSTEXPR(14) void exit			  (PlanControl&)		  noexcept {}
+	FFSM2_CONSTEXPR(14)	void exit			  (PlanControl&)		  noexcept {}
 
 #if FFSM2_PLANS_AVAILABLE()
-	FFSM2_CONSTEXPR(14) void planSucceeded	  (FullControl&)		  noexcept {}
-	FFSM2_CONSTEXPR(14) void planFailed		  (FullControl&)		  noexcept {}
+	FFSM2_CONSTEXPR(14)	void planSucceeded	  (FullControl&)		  noexcept {}
+	FFSM2_CONSTEXPR(14)	void planFailed		  (FullControl&)		  noexcept {}
 #endif
 
-	FFSM2_CONSTEXPR(14) void widePreEntryGuard(Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void widePreEntryGuard(Context& context)	  noexcept;
 
-	FFSM2_CONSTEXPR(14) void widePreEnter	  (Context& context)	  noexcept;
-	FFSM2_CONSTEXPR(14) void widePreReenter	  (Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void widePreEnter	  (Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void widePreReenter	  (Context& context)	  noexcept;
 
-	FFSM2_CONSTEXPR(14) void widePreUpdate	  (Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void widePreUpdate	  (Context& context)	  noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14) void widePreReact	  (const TEvent& event,
+	FFSM2_CONSTEXPR(14)	void widePreReact	  (const TEvent& event,
 											   Context& context)	  noexcept;
 
-	FFSM2_CONSTEXPR(14) void widePreExitGuard (Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void widePreExitGuard (Context& context)	  noexcept;
 
-	FFSM2_CONSTEXPR(14) void widePostExit	  (Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void widePostExit	  (Context& context)	  noexcept;
 };
 
 //------------------------------------------------------------------------------
@@ -4373,31 +4373,31 @@ struct S_ final
 
 	//----------------------------------------------------------------------
 
-	FFSM2_CONSTEXPR(14) bool	deepEntryGuard		 (GuardControl& control)  noexcept;
+	FFSM2_CONSTEXPR(14)	bool	deepEntryGuard		 (GuardControl& control)  noexcept;
 
-	FFSM2_CONSTEXPR(14) void	deepEnter			 (PlanControl&  control)  noexcept;
-	FFSM2_CONSTEXPR(14) void	deepReenter			 (PlanControl&  control)  noexcept;
+	FFSM2_CONSTEXPR(14)	void	deepEnter			 (PlanControl&  control)  noexcept;
+	FFSM2_CONSTEXPR(14)	void	deepReenter			 (PlanControl&  control)  noexcept;
 
-	FFSM2_CONSTEXPR(14) Status	deepUpdate			 (FullControl&  control)  noexcept;
+	FFSM2_CONSTEXPR(14)	Status	deepUpdate			 (FullControl&  control)  noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14) Status	deepReact			 (FullControl&  control,
+	FFSM2_CONSTEXPR(14)	Status	deepReact			 (FullControl&  control,
 													  const TEvent& event)	  noexcept;
 
-	FFSM2_CONSTEXPR(14) bool	deepExitGuard		 (GuardControl& control)  noexcept;
+	FFSM2_CONSTEXPR(14)	bool	deepExitGuard		 (GuardControl& control)  noexcept;
 
-	FFSM2_CONSTEXPR(14) void	deepExit			 (PlanControl&  control)  noexcept;
+	FFSM2_CONSTEXPR(14)	void	deepExit			 (PlanControl&  control)  noexcept;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #if FFSM2_PLANS_AVAILABLE()
-	FFSM2_CONSTEXPR(14) void	wrapPlanSucceeded	 (FullControl&  control)  noexcept;
-	FFSM2_CONSTEXPR(14) void	wrapPlanFailed		 (FullControl&  control)  noexcept;
+	FFSM2_CONSTEXPR(14)	void	wrapPlanSucceeded	 (FullControl&  control)  noexcept;
+	FFSM2_CONSTEXPR(14)	void	wrapPlanFailed		 (FullControl&  control)  noexcept;
 #endif
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(14) void	deepChangeToRequested(Control&)				  noexcept	{}
+	FFSM2_CONSTEXPR(14)	void	deepChangeToRequested(Control&)				  noexcept	{}
 
 	//----------------------------------------------------------------------
 
@@ -4405,7 +4405,7 @@ struct S_ final
 
 	using Empty			= EmptyT<TArgs>;
 
-	static FFSM2_CONSTEXPR(11) bool isBare() noexcept	{ return std::is_base_of<Head, Empty>::value;	}
+	static FFSM2_CONSTEXPR(11)	bool isBare() noexcept	{ return std::is_base_of<Head, Empty>::value;	}
 
 	FFSM2_IF_TYPEINDEX(const std::type_index TYPE = isBare() ? typeid(None) : typeid(Head));
 
@@ -4916,24 +4916,24 @@ struct CS_ final {
 
 	//----------------------------------------------------------------------
 
-	FFSM2_CONSTEXPR(14) bool	wideEntryGuard		 (GuardControl& control, const Short prong)  noexcept;
+	FFSM2_CONSTEXPR(14)	bool	wideEntryGuard		 (GuardControl& control, const Short prong)  noexcept;
 
-	FFSM2_CONSTEXPR(14) void	wideEnter			 (PlanControl&  control, const Short prong)  noexcept;
-	FFSM2_CONSTEXPR(14) void	wideReenter			 (PlanControl&  control, const Short prong)  noexcept;
+	FFSM2_CONSTEXPR(14)	void	wideEnter			 (PlanControl&  control, const Short prong)  noexcept;
+	FFSM2_CONSTEXPR(14)	void	wideReenter			 (PlanControl&  control, const Short prong)  noexcept;
 
-	FFSM2_CONSTEXPR(14) Status	wideUpdate			 (FullControl&  control, const Short prong)  noexcept;
+	FFSM2_CONSTEXPR(14)	Status	wideUpdate			 (FullControl&  control, const Short prong)  noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14) Status	wideReact			 (FullControl&  control,
+	FFSM2_CONSTEXPR(14)	Status	wideReact			 (FullControl&  control,
 													  const TEvent& event,	 const Short prong)  noexcept;
 
-	FFSM2_CONSTEXPR(14) bool	wideExitGuard		 (GuardControl& control, const Short prong)  noexcept;
+	FFSM2_CONSTEXPR(14)	bool	wideExitGuard		 (GuardControl& control, const Short prong)  noexcept;
 
-	FFSM2_CONSTEXPR(14) void	wideExit			 (PlanControl&  control, const Short prong)  noexcept;
+	FFSM2_CONSTEXPR(14)	void	wideExit			 (PlanControl&  control, const Short prong)  noexcept;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(14) void	wideChangeToRequested(PlanControl&  control, const Short prong)  noexcept;
+	FFSM2_CONSTEXPR(14)	void	wideChangeToRequested(PlanControl&  control, const Short prong)  noexcept;
 
 	//----------------------------------------------------------------------
 
@@ -4965,24 +4965,24 @@ struct CS_<NStateId, TArgs, NIndex, TState> final {
 
 	//----------------------------------------------------------------------
 
-	FFSM2_CONSTEXPR(14) bool	wideEntryGuard		 (GuardControl& control, const Short prong)  noexcept;
+	FFSM2_CONSTEXPR(14)	bool	wideEntryGuard		 (GuardControl& control, const Short prong)  noexcept;
 
-	FFSM2_CONSTEXPR(14) void	wideEnter			 (PlanControl&  control, const Short prong)  noexcept;
-	FFSM2_CONSTEXPR(14) void	wideReenter			 (PlanControl&  control, const Short prong)  noexcept;
+	FFSM2_CONSTEXPR(14)	void	wideEnter			 (PlanControl&  control, const Short prong)  noexcept;
+	FFSM2_CONSTEXPR(14)	void	wideReenter			 (PlanControl&  control, const Short prong)  noexcept;
 
-	FFSM2_CONSTEXPR(14) Status	wideUpdate			 (FullControl&  control, const Short prong)  noexcept;
+	FFSM2_CONSTEXPR(14)	Status	wideUpdate			 (FullControl&  control, const Short prong)  noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14) Status	wideReact			 (FullControl&  control,
+	FFSM2_CONSTEXPR(14)	Status	wideReact			 (FullControl&  control,
 													  const TEvent& event,	 const Short prong)  noexcept;
 
-	FFSM2_CONSTEXPR(14) bool	wideExitGuard		 (GuardControl& control, const Short prong)  noexcept;
+	FFSM2_CONSTEXPR(14)	bool	wideExitGuard		 (GuardControl& control, const Short prong)  noexcept;
 
-	FFSM2_CONSTEXPR(14) void	wideExit			 (PlanControl&  control, const Short prong)  noexcept;
+	FFSM2_CONSTEXPR(14)	void	wideExit			 (PlanControl&  control, const Short prong)  noexcept;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(14) void	wideChangeToRequested(PlanControl&  control, const Short prong)  noexcept;
+	FFSM2_CONSTEXPR(14)	void	wideChangeToRequested(PlanControl&  control, const Short prong)  noexcept;
 
 	//----------------------------------------------------------------------
 
@@ -5273,25 +5273,25 @@ struct C_ final {
 
 	//----------------------------------------------------------------------
 
-	FFSM2_CONSTEXPR(14) bool deepForwardEntryGuard(GuardControl& control)  noexcept;
-	FFSM2_CONSTEXPR(14) bool deepEntryGuard		  (GuardControl& control)  noexcept;
+	FFSM2_CONSTEXPR(14)	bool deepForwardEntryGuard(GuardControl& control)  noexcept;
+	FFSM2_CONSTEXPR(14)	bool deepEntryGuard		  (GuardControl& control)  noexcept;
 
-	FFSM2_CONSTEXPR(14) void deepEnter			  (PlanControl&  control)  noexcept;
+	FFSM2_CONSTEXPR(14)	void deepEnter			  (PlanControl&  control)  noexcept;
 
-	FFSM2_CONSTEXPR(14) void deepUpdate			  (FullControl&  control)  noexcept;
+	FFSM2_CONSTEXPR(14)	void deepUpdate			  (FullControl&  control)  noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14) void deepReact			  (FullControl&  control,
+	FFSM2_CONSTEXPR(14)	void deepReact			  (FullControl&  control,
 												   const TEvent& event)    noexcept;
 
-	FFSM2_CONSTEXPR(14) bool deepForwardExitGuard (GuardControl& control)  noexcept;
-	FFSM2_CONSTEXPR(14) bool deepExitGuard		  (GuardControl& control)  noexcept;
+	FFSM2_CONSTEXPR(14)	bool deepForwardExitGuard (GuardControl& control)  noexcept;
+	FFSM2_CONSTEXPR(14)	bool deepExitGuard		  (GuardControl& control)  noexcept;
 
-	FFSM2_CONSTEXPR(14) void deepExit			  (PlanControl&  control)  noexcept;
+	FFSM2_CONSTEXPR(14)	void deepExit			  (PlanControl&  control)  noexcept;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(14) void deepChangeToRequested(PlanControl&  control)  noexcept;
+	FFSM2_CONSTEXPR(14)	void deepChangeToRequested(PlanControl&  control)  noexcept;
 
 	//----------------------------------------------------------------------
 
@@ -5299,8 +5299,8 @@ struct C_ final {
 	using WriteStream	= typename Args::WriteStream;
 	using ReadStream	= typename Args::ReadStream;
 
-	FFSM2_CONSTEXPR(14) void deepSaveActive		  (const Registry& registry, WriteStream& stream) const noexcept;
-	FFSM2_CONSTEXPR(14) void deepLoadRequested	  (		 Registry& registry, ReadStream&  stream) const noexcept;
+	FFSM2_CONSTEXPR(14)	void deepSaveActive		  (const Registry& registry, WriteStream& stream) const noexcept;
+	FFSM2_CONSTEXPR(14)	void deepLoadRequested	  (		 Registry& registry, ReadStream&  stream) const noexcept;
 #endif
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -5747,7 +5747,7 @@ public:
 
 	/// @brief Access context
 	/// @return context
-	FFSM2_CONSTEXPR(11) const Context& context()							const noexcept	{ return _context;									}
+	FFSM2_CONSTEXPR(11)	const Context& context()							const noexcept	{ return _context;									}
 
 	//----------------------------------------------------------------------
 
@@ -5766,7 +5766,7 @@ public:
 	/// @tparam TEvent Event type
 	/// @param event Event to react to
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14) void react(const TEvent& event)							  noexcept;
+	FFSM2_CONSTEXPR(14)	void react(const TEvent& event)							  noexcept;
 
 	//----------------------------------------------------------------------
 
@@ -5792,12 +5792,12 @@ public:
 
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
-	FFSM2_CONSTEXPR(14) void changeTo		 (const StateID stateId)			  noexcept;
+	FFSM2_CONSTEXPR(14)	void changeTo		 (const StateID stateId)			  noexcept;
 
 	/// @brief Transition into a state
 	/// @tparam TState Destination state type
 	template <typename TState>
-	FFSM2_CONSTEXPR(14) void changeTo		 ()									  noexcept	{ changeTo (stateId<TState>());					}
+	FFSM2_CONSTEXPR(14)	void changeTo		 ()									  noexcept	{ changeTo (stateId<TState>());					}
 
 	// COMMON
 	//------------------------------------------------------------------------------
@@ -5812,12 +5812,12 @@ public:
 	/// @brief Serialize FSM into 'buffer'
 	/// @param buffer 'SerialBuffer' to serialize to
 	/// @see FFSM2_ENABLE_SERIALIZATION
-	FFSM2_CONSTEXPR(14) void save(		SerialBuffer& buffer)				const noexcept;
+	FFSM2_CONSTEXPR(14)	void save(		SerialBuffer& buffer)				const noexcept;
 
 	/// @brief De-serialize FSM from 'buffer'
 	/// @param buffer 'SerialBuffer' to de-serialize from
 	/// @see FFSM2_ENABLE_SERIALIZATION
-	FFSM2_CONSTEXPR(14) void load(const SerialBuffer& buffer)					  noexcept;
+	FFSM2_CONSTEXPR(14)	void load(const SerialBuffer& buffer)					  noexcept;
 
 #endif
 
@@ -5848,14 +5848,14 @@ public:
 	/// @brief Attach logger
 	/// @param logger A logger implementing 'ffsm2::LoggerInterfaceT<>' interface
 	/// @see FFSM2_ENABLE_LOG_INTERFACE
-	FFSM2_CONSTEXPR(14) void attachLogger(Logger* const logger)								  noexcept	{ _logger = logger;								}
+	FFSM2_CONSTEXPR(14)	void attachLogger(Logger* const logger)								  noexcept	{ _logger = logger;								}
 
 #endif
 
 	//----------------------------------------------------------------------
 
 protected:
-	FFSM2_CONSTEXPR(14) void initialEnter()													  noexcept;
+	FFSM2_CONSTEXPR(14)	void initialEnter()													  noexcept;
 	FFSM2_CONSTEXPR(14)	void finalExit()													  noexcept;
 
 	FFSM2_CONSTEXPR(14)	void processTransitions(Transition& currentTransition)				  noexcept;
@@ -6133,8 +6133,8 @@ public:
 			 FFSM2_IF_LOG_INTERFACE(, logger)}
 	{}
 
-	FFSM2_CONSTEXPR(14) void setContext(const Context&  context)	  noexcept { _context =			  context ; }
-	FFSM2_CONSTEXPR(14) void setContext(	  Context&& context)	  noexcept { _context = move(context); }
+	FFSM2_CONSTEXPR(14)	void setContext(const Context&  context)	  noexcept { _context =		 context ; }
+	FFSM2_CONSTEXPR(14)	void setContext(	  Context&& context)	  noexcept { _context = move(context); }
 
 private:
 	using Base::_context;
@@ -6174,7 +6174,7 @@ public:
 			 FFSM2_IF_LOG_INTERFACE(, logger)}
 	{}
 
-	FFSM2_CONSTEXPR(14) void setContext(Context context)	  noexcept { _context = context; }
+	FFSM2_CONSTEXPR(14)	void setContext(Context context)	  noexcept { _context = context; }
 
 private:
 	using Base::_context;
@@ -6214,7 +6214,7 @@ public:
 			 FFSM2_IF_LOG_INTERFACE(, logger)}
 	{}
 
-	FFSM2_CONSTEXPR(14) void setContext(Context context)	  noexcept { _context = context; }
+	FFSM2_CONSTEXPR(14)	void setContext(Context context)	  noexcept { _context = context; }
 
 private:
 	using Base::_context;

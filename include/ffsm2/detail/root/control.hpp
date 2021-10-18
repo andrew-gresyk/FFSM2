@@ -37,7 +37,7 @@ protected:
 		FFSM2_CONSTEXPR(14)	Origin(ControlT& control_,
 								   const StateID stateId)				  noexcept;
 
-		FFSM2_CONSTEXPR(20) ~Origin()									  noexcept;
+		FFSM2_CONSTEXPR(20)	~Origin()									  noexcept;
 
 		ControlT& control;
 		const StateID prevId;
@@ -75,7 +75,7 @@ public:
 	/// @brief Access FSM context (data shared between states and/or data interface between FSM and external code)
 	/// @return context
 	/// @see Control::context()
-	FFSM2_CONSTEXPR(11) const Context& _()							const noexcept	{ return _context;						}
+	FFSM2_CONSTEXPR(11)	const Context& _()							const noexcept	{ return _context;						}
 
 	/// @brief Access FSM context (data shared between states and/or data interface between FSM and external code)
 	/// @return context
@@ -85,13 +85,13 @@ public:
 	/// @brief Access FSM context (data shared between states and/or data interface between FSM and external code)
 	/// @return context
 	/// @see Control::_()
-	FFSM2_CONSTEXPR(11) const Context& context()					const noexcept	{ return _context;						}
+	FFSM2_CONSTEXPR(11)	const Context& context()					const noexcept	{ return _context;						}
 
 	//----------------------------------------------------------------------
 
 	/// @brief Inspect current transition request
 	/// @return Transition requests
-	FFSM2_CONSTEXPR(11) const Transition& request()					const noexcept	{ return _request;						}
+	FFSM2_CONSTEXPR(11)	const Transition& request()					const noexcept	{ return _request;						}
 
 	//----------------------------------------------------------------------
 	//----------------------------------------------------------------------
@@ -100,7 +100,7 @@ public:
 
 	/// @brief Access read-only plan
 	/// @return Plan
-	FFSM2_CONSTEXPR(11) CPlan plan()								const noexcept	{ return CPlan{_planData};				}
+	FFSM2_CONSTEXPR(11)	CPlan plan()								const noexcept	{ return CPlan{_planData};				}
 
 #endif
 
@@ -110,7 +110,7 @@ public:
 
 	/// @brief Get transitions processed during last 'update()', 'react()' or 'replayTransition()'
 	/// @return Array of last transition requests
-	FFSM2_CONSTEXPR(11) const Transition& previousTransitions()		const noexcept	{ return _previousTransition;			}
+	FFSM2_CONSTEXPR(11)	const Transition& previousTransitions()		const noexcept	{ return _previousTransition;			}
 
 #endif
 
@@ -173,7 +173,7 @@ public:
 
 	/// @brief Access read-only plan
 	/// @return Read-only plan
-	FFSM2_CONSTEXPR(11) CPlan plan()						const noexcept	{ return CPlan{_planData};						}
+	FFSM2_CONSTEXPR(11)	CPlan plan()								const noexcept	{ return CPlan{_planData};				}
 
 // COMMON
 #endif
@@ -505,7 +505,7 @@ class GuardControlT final
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(11) GuardControlT(Context& context
+	FFSM2_CONSTEXPR(11)	GuardControlT(Context& context
 									, Registry& registry
 									, Transition& request
 									, const Transition& currentTransition
@@ -533,11 +533,11 @@ public:
 
 	/// @brief Get current transition request
 	/// @return Current transition request
-	FFSM2_CONSTEXPR(11) const Transition& currentTransitions()	const noexcept	{ return _currentTransition;	}
+	FFSM2_CONSTEXPR(11)	const Transition& currentTransitions()		const noexcept	{ return _currentTransition;			}
 
 	/// @brief Get pending transition request
 	/// @return Pending transition request
-	FFSM2_CONSTEXPR(11)	const Transition& pendingTransition()	const noexcept	{ return _pendingTransition;	}
+	FFSM2_CONSTEXPR(11)	const Transition& pendingTransition()		const noexcept	{ return _pendingTransition;			}
 
 	/// @brief Cancel pending transition request
 	///		(can be used to substitute a transition into the current state with a different one)
