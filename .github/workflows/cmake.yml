@@ -11,41 +11,36 @@ jobs:
     runs-on: ${{ matrix.PLATFORM.OS }}
 
     env:
-      CC: ${{ matrix.PLATFORM.CC }}-${{ matrix.PLATFORM.VERSION }}
-      CXX: ${{ matrix.PLATFORM.CXX }}-${{ matrix.PLATFORM.VERSION }}
+      CC: ${{ matrix.PLATFORM.CC }}
+      CXX: ${{ matrix.PLATFORM.CXX }}
 
     strategy:
       matrix:
         PLATFORM:
           - {
               OS: ubuntu-latest,
-              CC: gcc,
-              CXX: g++,
-              VERSION: 9
+              CC: gcc-9,
+              CXX: g++-9
             }
           - {
               OS: ubuntu-latest,
-              CC: gcc,
-              CXX: g++,
-              VERSION: 10
+              CC: gcc-10,
+              CXX: g++-10
             }
           - {
               OS: ubuntu-latest,
-              CC: gcc,
-              CXX: g++,
-              VERSION: 11
+              CC: gcc-11,
+              CXX: g++-11
             }
           - {
               OS: ubuntu-latest,
               CC: clang,
-              CXX: clang++,
-              VERSION: 11
+              CXX: clang++
             }
           - {
               OS: macos-latest,
               CC: clang,
-              CXX: clang++,
-              VERSION: 12
+              CXX: clang++
             }
 
         BUILD_CONFIG: [ Release, Debug ]
@@ -55,13 +50,12 @@ jobs:
 
     - name: Install GCC on ubuntu
       if: |
-          startsWith(matrix.PLATFORM.OS, 'ubuntu') &&
-          startsWith(matrix.PLATFORM.CC, 'gcc')
+        startsWith(matrix.PLATFORM.OS, 'ubuntu') &&
+        startsWith(matrix.PLATFORM.CC, 'gcc-')
       run: |
         sudo add-apt-repository ppa:ubuntu-toolchain-r/test
         sudo apt-get update
-        sudo apt-get install ${{ matrix.PLATFORM.CC }}-${{ matrix.PLATFORM.VERSION }} ${{ matrix.PLATFORM.CXX }}-${{ matrix.PLATFORM.VERSION }}
-        ${{ matrix.PLATFORM.CXX }}-${{ matrix.PLATFORM.VERSION }} --version
+        sudo apt-get install ${{ matrix.PLATFORM.CC }} ${{ matrix.PLATFORM.CXX }}
       # continue-on-error: true
 
     # main test
