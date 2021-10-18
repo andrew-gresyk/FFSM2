@@ -19,6 +19,26 @@ jobs:
         PLATFORM:
           - {
               OS: ubuntu-latest,
+              CC: gcc-5,
+              CXX: g++-5
+            }
+          - {
+              OS: ubuntu-latest,
+              CC: gcc-6,
+              CXX: g++-6
+            }
+          - {
+              OS: ubuntu-latest,
+              CC: gcc-7,
+              CXX: g++-7
+            }
+          - {
+              OS: ubuntu-latest,
+              CC: gcc-8,
+              CXX: g++-8
+            }
+          - {
+              OS: ubuntu-latest,
               CC: gcc-9,
               CXX: g++-9
             }
