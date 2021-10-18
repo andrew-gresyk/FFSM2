@@ -41,24 +41,24 @@ struct CS_ final {
 
 	//----------------------------------------------------------------------
 
-	FFSM2_CONSTEXPR(14) bool	wideEntryGuard		 (GuardControl& control, const Short prong)  noexcept;
+	FFSM2_CONSTEXPR(14)	bool	wideEntryGuard		 (GuardControl& control, const Short prong)  noexcept;
 
-	FFSM2_CONSTEXPR(14) void	wideEnter			 (PlanControl&  control, const Short prong)  noexcept;
-	FFSM2_CONSTEXPR(14) void	wideReenter			 (PlanControl&  control, const Short prong)  noexcept;
+	FFSM2_CONSTEXPR(14)	void	wideEnter			 (PlanControl&  control, const Short prong)  noexcept;
+	FFSM2_CONSTEXPR(14)	void	wideReenter			 (PlanControl&  control, const Short prong)  noexcept;
 
-	FFSM2_CONSTEXPR(14) Status	wideUpdate			 (FullControl&  control, const Short prong)  noexcept;
+	FFSM2_CONSTEXPR(14)	Status	wideUpdate			 (FullControl&  control, const Short prong)  noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14) Status	wideReact			 (FullControl&  control,
+	FFSM2_CONSTEXPR(14)	Status	wideReact			 (FullControl&  control,
 													  const TEvent& event,	 const Short prong)  noexcept;
 
-	FFSM2_CONSTEXPR(14) bool	wideExitGuard		 (GuardControl& control, const Short prong)  noexcept;
+	FFSM2_CONSTEXPR(14)	bool	wideExitGuard		 (GuardControl& control, const Short prong)  noexcept;
 
-	FFSM2_CONSTEXPR(14) void	wideExit			 (PlanControl&  control, const Short prong)  noexcept;
+	FFSM2_CONSTEXPR(14)	void	wideExit			 (PlanControl&  control, const Short prong)  noexcept;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(14) void	wideChangeToRequested(PlanControl&  control, const Short prong)  noexcept;
+	FFSM2_CONSTEXPR(14)	void	wideChangeToRequested(PlanControl&  control, const Short prong)  noexcept;
 
 	//----------------------------------------------------------------------
 
@@ -90,24 +90,24 @@ struct CS_<NStateId, TArgs, NIndex, TState> final {
 
 	//----------------------------------------------------------------------
 
-	FFSM2_CONSTEXPR(14) bool	wideEntryGuard		 (GuardControl& control, const Short prong)  noexcept;
+	FFSM2_CONSTEXPR(14)	bool	wideEntryGuard		 (GuardControl& control, const Short prong)  noexcept;
 
-	FFSM2_CONSTEXPR(14) void	wideEnter			 (PlanControl&  control, const Short prong)  noexcept;
-	FFSM2_CONSTEXPR(14) void	wideReenter			 (PlanControl&  control, const Short prong)  noexcept;
+	FFSM2_CONSTEXPR(14)	void	wideEnter			 (PlanControl&  control, const Short prong)  noexcept;
+	FFSM2_CONSTEXPR(14)	void	wideReenter			 (PlanControl&  control, const Short prong)  noexcept;
 
-	FFSM2_CONSTEXPR(14) Status	wideUpdate			 (FullControl&  control, const Short prong)  noexcept;
+	FFSM2_CONSTEXPR(14)	Status	wideUpdate			 (FullControl&  control, const Short prong)  noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14) Status	wideReact			 (FullControl&  control,
+	FFSM2_CONSTEXPR(14)	Status	wideReact			 (FullControl&  control,
 													  const TEvent& event,	 const Short prong)  noexcept;
 
-	FFSM2_CONSTEXPR(14) bool	wideExitGuard		 (GuardControl& control, const Short prong)  noexcept;
+	FFSM2_CONSTEXPR(14)	bool	wideExitGuard		 (GuardControl& control, const Short prong)  noexcept;
 
-	FFSM2_CONSTEXPR(14) void	wideExit			 (PlanControl&  control, const Short prong)  noexcept;
+	FFSM2_CONSTEXPR(14)	void	wideExit			 (PlanControl&  control, const Short prong)  noexcept;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(14) void	wideChangeToRequested(PlanControl&  control, const Short prong)  noexcept;
+	FFSM2_CONSTEXPR(14)	void	wideChangeToRequested(PlanControl&  control, const Short prong)  noexcept;
 
 	//----------------------------------------------------------------------
 

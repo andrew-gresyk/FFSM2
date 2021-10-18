@@ -37,31 +37,31 @@ struct S_ final
 
 	//----------------------------------------------------------------------
 
-	FFSM2_CONSTEXPR(14) bool	deepEntryGuard		 (GuardControl& control)  noexcept;
+	FFSM2_CONSTEXPR(14)	bool	deepEntryGuard		 (GuardControl& control)  noexcept;
 
-	FFSM2_CONSTEXPR(14) void	deepEnter			 (PlanControl&  control)  noexcept;
-	FFSM2_CONSTEXPR(14) void	deepReenter			 (PlanControl&  control)  noexcept;
+	FFSM2_CONSTEXPR(14)	void	deepEnter			 (PlanControl&  control)  noexcept;
+	FFSM2_CONSTEXPR(14)	void	deepReenter			 (PlanControl&  control)  noexcept;
 
-	FFSM2_CONSTEXPR(14) Status	deepUpdate			 (FullControl&  control)  noexcept;
+	FFSM2_CONSTEXPR(14)	Status	deepUpdate			 (FullControl&  control)  noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14) Status	deepReact			 (FullControl&  control,
+	FFSM2_CONSTEXPR(14)	Status	deepReact			 (FullControl&  control,
 													  const TEvent& event)	  noexcept;
 
-	FFSM2_CONSTEXPR(14) bool	deepExitGuard		 (GuardControl& control)  noexcept;
+	FFSM2_CONSTEXPR(14)	bool	deepExitGuard		 (GuardControl& control)  noexcept;
 
-	FFSM2_CONSTEXPR(14) void	deepExit			 (PlanControl&  control)  noexcept;
+	FFSM2_CONSTEXPR(14)	void	deepExit			 (PlanControl&  control)  noexcept;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #if FFSM2_PLANS_AVAILABLE()
-	FFSM2_CONSTEXPR(14) void	wrapPlanSucceeded	 (FullControl&  control)  noexcept;
-	FFSM2_CONSTEXPR(14) void	wrapPlanFailed		 (FullControl&  control)  noexcept;
+	FFSM2_CONSTEXPR(14)	void	wrapPlanSucceeded	 (FullControl&  control)  noexcept;
+	FFSM2_CONSTEXPR(14)	void	wrapPlanFailed		 (FullControl&  control)  noexcept;
 #endif
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(14) void	deepChangeToRequested(Control&)				  noexcept	{}
+	FFSM2_CONSTEXPR(14)	void	deepChangeToRequested(Control&)				  noexcept	{}
 
 	//----------------------------------------------------------------------
 
@@ -69,7 +69,7 @@ struct S_ final
 
 	using Empty			= EmptyT<TArgs>;
 
-	static FFSM2_CONSTEXPR(11) bool isBare() noexcept	{ return std::is_base_of<Head, Empty>::value;	}
+	static FFSM2_CONSTEXPR(11)	bool isBare() noexcept	{ return std::is_base_of<Head, Empty>::value;	}
 
 	FFSM2_IF_TYPEINDEX(const std::type_index TYPE = isBare() ? typeid(None) : typeid(Head));
 

@@ -8,9 +8,9 @@ namespace detail {
 #pragma pack(push, 1)
 
 struct TaskBase {
-	FFSM2_CONSTEXPR(11) TaskBase()								  noexcept {}
+	FFSM2_CONSTEXPR(11)	TaskBase()								  noexcept {}
 
-	FFSM2_CONSTEXPR(11) TaskBase(const StateID origin_,
+	FFSM2_CONSTEXPR(11)	TaskBase(const StateID origin_,
 								 const StateID destination_)	  noexcept
 		: origin{origin_}
 		, destination{destination_}
@@ -53,7 +53,7 @@ struct TaskT final
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(14) TaskT()									  noexcept {
+	FFSM2_CONSTEXPR(14)	TaskT()									  noexcept {
 		new (&storage) Payload{};
 	}
 
@@ -112,9 +112,9 @@ private:
 
 public:
 	template <typename... TArgs>
-	FFSM2_CONSTEXPR(14) Index emplace(TArgs&&... args)							  noexcept;
+	FFSM2_CONSTEXPR(14)	Index emplace(TArgs&&... args)							  noexcept;
 
-	FFSM2_CONSTEXPR(14) void remove(const Index i)								  noexcept;
+	FFSM2_CONSTEXPR(14)	void remove(const Index i)								  noexcept;
 
 	FFSM2_CONSTEXPR(14)		  Item& operator[] (const Index i)					  noexcept;
 	FFSM2_CONSTEXPR(11)	const Item& operator[] (const Index i)				const noexcept;
