@@ -19,6 +19,16 @@ jobs:
         PLATFORM:
           - {
               OS: ubuntu-latest,
+              CC: gcc-5,
+              CXX: g++-5
+            }
+          - {
+              OS: ubuntu-latest,
+              CC: gcc-6,
+              CXX: g++-6
+            }
+          - {
+              OS: ubuntu-latest,
               CC: gcc-7,
               CXX: g++-7
             }
@@ -60,13 +70,14 @@ jobs:
 
     - name: Install GCC on ubuntu
       if: |
+        echo "deb http://old-releases.ubuntu.com/ubuntu xenial main" | sudo tee /etc/apt/sources.list
+        sudo apt-add-repository -r universe
         startsWith(matrix.PLATFORM.OS, 'ubuntu') &&
         startsWith(matrix.PLATFORM.CC, 'gcc-')
       run: |
         sudo add-apt-repository ppa:ubuntu-toolchain-r/test
         sudo apt-get update
         sudo apt-get install ${{ matrix.PLATFORM.CC }} ${{ matrix.PLATFORM.CXX }}
-      # continue-on-error: true
 
     # main test
     - name: Configure Test

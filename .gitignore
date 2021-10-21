@@ -8,7 +8,8 @@ cmake-*
 
 *.user
 
-/binaries-*
+/binaries*
+/build*
 /hfsm_test.dir
 /projects/code-lite/build-*
 /projects/code-lite/tags
