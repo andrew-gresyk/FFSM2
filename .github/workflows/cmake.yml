@@ -128,7 +128,7 @@ jobs:
         startsWith(matrix.PLATFORM.CC, 'clang-')
       run: |
         wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
-        echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal main" | sudo tee /etc/apt/sources.list
+        echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-${{ matrix.PLATFORM.VERSION }} main" | sudo tee /etc/apt/sources.list
         sudo add-apt-repository ppa:ubuntu-toolchain-r/test
         sudo apt-get update
         sudo apt-get install ${{ matrix.PLATFORM.CC }} ${{ matrix.PLATFORM.CXX }}
