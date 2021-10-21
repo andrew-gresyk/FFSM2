@@ -52,24 +52,24 @@ jobs:
               CC: gcc-11,
               CXX: g++-11
             }
-          - {
-              OS: ubuntu-latest,
-              CC: clang-4.0,
-              CXX: clang++-4.0,
-              VERSION: '4.0'
-            }
-          - {
-              OS: ubuntu-latest,
-              CC: clang-5.0,
-              CXX: clang++-5.0,
-              VERSION: '5.0'
-            }
-          - {
-              OS: ubuntu-latest,
-              CC: clang-6.0,
-              CXX: clang++-6.0,
-              VERSION: '6.0'
-            }
+          # - {
+          #     OS: ubuntu-latest,
+          #     CC: clang-4.0,
+          #     CXX: clang++-4.0,
+          #     VERSION: '4.0'
+          #   }
+          # - {
+          #     OS: ubuntu-latest,
+          #     CC: clang-5.0,
+          #     CXX: clang++-5.0,
+          #     VERSION: '5.0'
+          #   }
+          # - {
+          #     OS: ubuntu-latest,
+          #     CC: clang-6.0,
+          #     CXX: clang++-6.0,
+          #     VERSION: '6.0'
+          #   }
           - {
               OS: ubuntu-latest,
               CC: clang-7,
