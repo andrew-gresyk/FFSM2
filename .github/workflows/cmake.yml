@@ -18,37 +18,37 @@ jobs:
       matrix:
         PLATFORM:
           - {
-              OS: ubuntu-18.04,
+              OS: ubuntu-latest,
               CC: gcc-5,
               CXX: g++-5
             }
           - {
-              OS: ubuntu-18.04,
+              OS: ubuntu-latest,
               CC: gcc-6,
               CXX: g++-6
             }
           - {
-              OS: ubuntu-20.04,
+              OS: ubuntu-18.04,
               CC: gcc-7,
               CXX: g++-7
             }
           - {
-              OS: ubuntu-20.04,
+              OS: ubuntu-latest,
               CC: gcc-8,
               CXX: g++-8
             }
           - {
-              OS: ubuntu-20.04,
+              OS: ubuntu-18.04,
               CC: gcc-9,
               CXX: g++-9
             }
           - {
-              OS: ubuntu-20.04,
+              OS: ubuntu-18.04,
               CC: gcc-10,
               CXX: g++-10
             }
           - {
-              OS: ubuntu-20.04,
+              OS: ubuntu-latest,
               CC: gcc-11,
               CXX: g++-11
             }
@@ -91,17 +91,25 @@ jobs:
           - {
               OS: ubuntu-20.04,
               CC: clang-10,
-              CXX: clang++-10,
-              VERSION: '10'
+              CXX: clang++-10
             }
           - {
               OS: ubuntu-20.04,
               CC: clang-11,
-              CXX: clang++-11,
-              VERSION: '11'
+              CXX: clang++-11
             }
           - {
-              OS: macos-latest,
+              OS: ubuntu-20.04,
+              CC: clang-12,
+              CXX: clang++-12
+            }
+          - {
+              OS: macos-10.15,
+              CC: clang,
+              CXX: clang++
+            }
+          - {
+              OS: macos-11,
               CC: clang,
               CXX: clang++
             }
@@ -114,7 +122,7 @@ jobs:
     # install dependencies
     - name: Install GCC on ubuntu
       if: |
-        startsWith(matrix.PLATFORM.OS, 'ubuntu') &&
+        matrix.PLATFORM.OS == 'ubuntu-latest ' &&
         startsWith(matrix.PLATFORM.CC, 'gcc-')
       run: |
         echo "deb http://dk.archive.ubuntu.com/ubuntu/ bionic main universe" | sudo tee /etc/apt/sources.list
@@ -125,10 +133,11 @@ jobs:
     - name: Install Clang on ubuntu
       if: |
         matrix.PLATFORM.OS == 'ubuntu-20.04' &&
-        startsWith(matrix.PLATFORM.CC, 'clang-')
+        startsWith(matrix.PLATFORM.CC, 'clang-') &&
+        matrix.PLATFORM.VERSION
       run: |
         wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
-        echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-${{ matrix.PLATFORM.VERSION }} main" | sudo tee /etc/apt/sources.list
+        echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-${{ matrix.PLATFORM.VERSION }} main universe" | sudo tee /etc/apt/sources.list
         sudo add-apt-repository ppa:ubuntu-toolchain-r/test
         sudo apt-get update
         sudo apt-get install ${{ matrix.PLATFORM.CC }} ${{ matrix.PLATFORM.CXX }}
