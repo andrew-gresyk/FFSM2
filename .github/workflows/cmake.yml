@@ -73,7 +73,7 @@ jobs:
         startsWith(matrix.PLATFORM.OS, 'ubuntu') &&
         startsWith(matrix.PLATFORM.CC, 'gcc-')
       run: |
-        echo "deb http://old-releases.ubuntu.com/ubuntu xenial main" | sudo tee /etc/apt/sources.list
+        echo "deb http://old-releases.ubuntu.com/ubuntu zesty main" | sudo tee /etc/apt/sources.list.d/zesty.list
         sudo add-apt-repository ppa:ubuntu-toolchain-r/test
         sudo apt-get update
         sudo apt-get install ${{ matrix.PLATFORM.CC }} ${{ matrix.PLATFORM.CXX }}
