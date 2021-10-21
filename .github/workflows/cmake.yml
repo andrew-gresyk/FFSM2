@@ -18,12 +18,12 @@ jobs:
       matrix:
         PLATFORM:
           - {
-              OS: ubuntu-latest,
+              OS: ubuntu-18.04,
               CC: gcc-5,
               CXX: g++-5
             }
           - {
-              OS: ubuntu-latest,
+              OS: ubuntu-18.04,
               CC: gcc-6,
               CXX: g++-6
             }
@@ -73,7 +73,6 @@ jobs:
         startsWith(matrix.PLATFORM.OS, 'ubuntu') &&
         startsWith(matrix.PLATFORM.CC, 'gcc-')
       run: |
-        echo "deb http://dk.archive.ubuntu.com/ubuntu/ bionic main universe" | sudo tee /etc/apt/sources.list
         sudo add-apt-repository ppa:ubuntu-toolchain-r/test
         sudo apt-get update
         sudo apt-get install ${{ matrix.PLATFORM.CC }} ${{ matrix.PLATFORM.CXX }}
