@@ -19,31 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\include\ffsm2\detail\containers\array.hpp" />
-    <ClInclude Include="..\..\include\ffsm2\detail\containers\bit_array.hpp" />
-    <ClInclude Include="..\..\include\ffsm2\detail\containers\task_list.hpp" />
-    <ClInclude Include="..\..\include\ffsm2\detail\features\common.hpp" />
-    <ClInclude Include="..\..\include\ffsm2\detail\features\logger_interface.hpp" />
-    <ClInclude Include="..\..\include\ffsm2\detail\root.hpp" />
-    <ClInclude Include="..\..\include\ffsm2\detail\root\control.hpp" />
-    <ClInclude Include="..\..\include\ffsm2\detail\root\plan.hpp" />
-    <ClInclude Include="..\..\include\ffsm2\detail\root\plan_data.hpp" />
-    <ClInclude Include="..\..\include\ffsm2\detail\root\registry.hpp" />
-    <ClInclude Include="..\..\include\ffsm2\detail\shared\bit_stream.hpp" />
-    <ClInclude Include="..\..\include\ffsm2\detail\shared\iterator.hpp" />
-    <ClInclude Include="..\..\include\ffsm2\detail\shared\macros_off.hpp" />
-    <ClInclude Include="..\..\include\ffsm2\detail\shared\macros_on.hpp" />
-    <ClInclude Include="..\..\include\ffsm2\detail\shared\type_list.hpp" />
-    <ClInclude Include="..\..\include\ffsm2\detail\shared\utility.hpp" />
-    <ClInclude Include="..\..\include\ffsm2\detail\structure\composite.hpp" />
-    <ClInclude Include="..\..\include\ffsm2\detail\structure\composite_sub.hpp" />
-    <ClInclude Include="..\..\include\ffsm2\detail\structure\forward.hpp" />
-    <ClInclude Include="..\..\include\ffsm2\detail\structure\injections.hpp" />
-    <ClInclude Include="..\..\include\ffsm2\detail\structure\state.hpp" />
-    <ClInclude Include="..\..\include\ffsm2\machine_dev.hpp" />
-    <ClInclude Include="..\..\test\tools.hpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="..\..\test\main.cpp" />
     <ClCompile Include="..\..\test\shared\test_bit_array.cpp" />
     <ClCompile Include="..\..\test\shared\test_bit_stream.cpp" />
@@ -60,19 +35,44 @@
     <ClCompile Include="..\..\test\test_transitions_verbose.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\include\ffsm2\detail\containers\array.inl" />
-    <None Include="..\..\include\ffsm2\detail\containers\bit_array.inl" />
-    <None Include="..\..\include\ffsm2\detail\containers\task_list.inl" />
-    <None Include="..\..\include\ffsm2\detail\root.inl" />
-    <None Include="..\..\include\ffsm2\detail\root\control.inl" />
-    <None Include="..\..\include\ffsm2\detail\root\plan.inl" />
-    <None Include="..\..\include\ffsm2\detail\root\plan_data.inl" />
-    <None Include="..\..\include\ffsm2\detail\shared\bit_stream.inl" />
-    <None Include="..\..\include\ffsm2\detail\structure\composite.inl" />
-    <None Include="..\..\include\ffsm2\detail\structure\composite_sub_1.inl" />
-    <None Include="..\..\include\ffsm2\detail\structure\composite_sub_2.inl" />
-    <None Include="..\..\include\ffsm2\detail\structure\injections.inl" />
-    <None Include="..\..\include\ffsm2\detail\structure\state.inl" />
+    <ClInclude Include="..\..\development\ffsm2\detail\containers\array.hpp" />
+    <ClInclude Include="..\..\development\ffsm2\detail\containers\bit_array.hpp" />
+    <ClInclude Include="..\..\development\ffsm2\detail\containers\task_list.hpp" />
+    <ClInclude Include="..\..\development\ffsm2\detail\features\common.hpp" />
+    <ClInclude Include="..\..\development\ffsm2\detail\features\logger_interface.hpp" />
+    <ClInclude Include="..\..\development\ffsm2\detail\root.hpp" />
+    <ClInclude Include="..\..\development\ffsm2\detail\root\control.hpp" />
+    <ClInclude Include="..\..\development\ffsm2\detail\root\plan.hpp" />
+    <ClInclude Include="..\..\development\ffsm2\detail\root\plan_data.hpp" />
+    <ClInclude Include="..\..\development\ffsm2\detail\root\registry.hpp" />
+    <ClInclude Include="..\..\development\ffsm2\detail\shared\bit_stream.hpp" />
+    <ClInclude Include="..\..\development\ffsm2\detail\shared\iterator.hpp" />
+    <ClInclude Include="..\..\development\ffsm2\detail\shared\macros_off.hpp" />
+    <ClInclude Include="..\..\development\ffsm2\detail\shared\macros_on.hpp" />
+    <ClInclude Include="..\..\development\ffsm2\detail\shared\type_list.hpp" />
+    <ClInclude Include="..\..\development\ffsm2\detail\shared\utility.hpp" />
+    <ClInclude Include="..\..\development\ffsm2\detail\structure\composite.hpp" />
+    <ClInclude Include="..\..\development\ffsm2\detail\structure\composite_sub.hpp" />
+    <ClInclude Include="..\..\development\ffsm2\detail\structure\forward.hpp" />
+    <ClInclude Include="..\..\development\ffsm2\detail\structure\injections.hpp" />
+    <ClInclude Include="..\..\development\ffsm2\detail\structure\state.hpp" />
+    <ClInclude Include="..\..\development\ffsm2\machine_dev.hpp" />
+    <ClInclude Include="..\..\test\tools.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\development\ffsm2\detail\containers\array.inl" />
+    <None Include="..\..\development\ffsm2\detail\containers\bit_array.inl" />
+    <None Include="..\..\development\ffsm2\detail\containers\task_list.inl" />
+    <None Include="..\..\development\ffsm2\detail\root.inl" />
+    <None Include="..\..\development\ffsm2\detail\root\control.inl" />
+    <None Include="..\..\development\ffsm2\detail\root\plan.inl" />
+    <None Include="..\..\development\ffsm2\detail\root\plan_data.inl" />
+    <None Include="..\..\development\ffsm2\detail\shared\bit_stream.inl" />
+    <None Include="..\..\development\ffsm2\detail\structure\composite.inl" />
+    <None Include="..\..\development\ffsm2\detail\structure\composite_sub_1.inl" />
+    <None Include="..\..\development\ffsm2\detail\structure\composite_sub_2.inl" />
+    <None Include="..\..\development\ffsm2\detail\structure\injections.inl" />
+    <None Include="..\..\development\ffsm2\detail\structure\state.inl" />
     <None Include="..\..\test\tools.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -109,28 +109,24 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
-  <ImportGroup Label="Shared">
-  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="shared-14.props" />
+    <Import Project="shared-vs-14.props" />
     <Import Project="doctest.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="shared-14.props" />
+    <Import Project="shared-vs-14.props" />
     <Import Project="doctest.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="shared-14.props" />
+    <Import Project="shared-vs-14.props" />
     <Import Project="doctest.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="shared-14.props" />
+    <Import Project="shared-vs-14.props" />
     <Import Project="doctest.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -148,17 +144,12 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <Link />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -171,17 +162,12 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <Link />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>

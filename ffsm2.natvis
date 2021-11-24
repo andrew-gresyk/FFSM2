@@ -30,7 +30,7 @@
 		</Expand>
 	</Type>
 
-	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	<!-- ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ -->
 
 	<Type Name="ffsm2::detail::StaticArrayT&lt;*&gt;">
 		<Expand HideRawView="true">
@@ -47,16 +47,17 @@
 		<Expand HideRawView="true">
 			<IndexListItems>
 				<Size>CAPACITY</Size>
-				<ValueNode>(_storage[$i / UNIT_WIDTH] &gt;&gt; ($i % UNIT_WIDTH)) &amp; 0x1</ValueNode>
+				<ValueNode>(_storage[$i / 8] &gt;&gt; ($i % 8)) &amp; 0x1</ValueNode>
 			</IndexListItems>
 		</Expand>
 	</Type>
 
 	<Type Name="ffsm2::detail::BitArrayT&lt;*&gt;::Bits">
+		<DisplayString>&lt;{CAPACITY &amp; 0x1}&gt;</DisplayString>
 		<Expand HideRawView="true">
 			<IndexListItems>
 				<Size>CAPACITY</Size>
-				<ValueNode>(_storage[$i / UNIT_WIDTH] &gt;&gt; ($i % UNIT_WIDTH)) &amp; 0x1</ValueNode>
+				<ValueNode>(_storage[$i / 8] &gt;&gt; ($i % 8)) &amp; 0x1</ValueNode>
 			</IndexListItems>
 		</Expand>
 	</Type>
@@ -65,7 +66,7 @@
 		<Expand HideRawView="true">
 			<IndexListItems>
 				<Size>CAPACITY</Size>
-				<ValueNode>(_storage[$i / UNIT_WIDTH] &gt;&gt; ($i % UNIT_WIDTH)) &amp; 0x1</ValueNode>
+				<ValueNode>(_storage[$i / 8] &gt;&gt; ($i % 8)) &amp; 0x1</ValueNode>
 			</IndexListItems>
 		</Expand>
 	</Type>
