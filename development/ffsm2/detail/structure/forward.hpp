@@ -149,17 +149,17 @@ template <StateID, typename...>
 struct MaterialT;
 
 template <StateID N, typename TA, typename TH>
-struct MaterialT   <N, TA, TH> final {
+struct MaterialT   <N, TA, TH> {
 	using Type = S_<N, TA, TH>;
 };
 
 template <StateID N, typename TA, 			   typename... TS>
-struct MaterialT   <N, TA, CI_<void,   TS...>> final {
+struct MaterialT   <N, TA, CI_<void,   TS...>> {
 	using Type = C_<   TA, EmptyT<TA>, TS...>;
 };
 
 template <StateID N, typename TA, typename TH, typename... TS>
-struct MaterialT   <N, TA, CI_<TH,	   TS...>> final {
+struct MaterialT   <N, TA, CI_<TH,	   TS...>> {
 	using Type = C_<   TA,	   TH,	   TS...>;
 };
 

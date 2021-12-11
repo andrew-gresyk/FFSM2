@@ -1,5 +1,5 @@
 ﻿// FFSM2 (flat state machine for games and interactive applications)
-// 1.1.0 (2021-11-24)
+// 1.2.0 (2021-12-11)
 //
 // Created by Andrew Gresyk
 //
@@ -32,7 +32,7 @@
 #pragma once
 
 #define FFSM2_VERSION_MAJOR 1
-#define FFSM2_VERSION_MINOR 1
+#define FFSM2_VERSION_MINOR 2
 #define FFSM2_VERSION_PATCH 0
 
 #define FFSM2_VERSION (10000 * FFSM2_VERSION_MAJOR + 100 * FFSM2_VERSION_MINOR + FFSM2_VERSION_PATCH)
@@ -118,6 +118,14 @@
 	#define FFSM2_CONSTEXPR_20()									   constexpr
 #else
 	#define FFSM2_CONSTEXPR_20()										  inline
+#endif
+
+//------------------------------------------------------------------------------
+
+#if defined _MSC_VER
+	#define FFSM2_EMPTY_BASES							 __declspec(empty_bases)
+#else
+	#define FFSM2_EMPTY_BASES
 #endif
 
 //------------------------------------------------------------------------------
@@ -4350,7 +4358,7 @@ struct None {};
 template <StateID NStateId,
 		  typename TArgs,
 		  typename THead>
-struct S_ final
+struct S_
 	: THead
 {
 	static constexpr auto STATE_ID	 = NStateId;
@@ -4769,17 +4777,17 @@ template <StateID, typename...>
 struct MaterialT;
 
 template <StateID N, typename TA, typename TH>
-struct MaterialT   <N, TA, TH> final {
+struct MaterialT   <N, TA, TH> {
 	using Type = S_<N, TA, TH>;
 };
 
 template <StateID N, typename TA, 			   typename... TS>
-struct MaterialT   <N, TA, CI_<void,   TS...>> final {
+struct MaterialT   <N, TA, CI_<void,   TS...>> {
 	using Type = C_<   TA, EmptyT<TA>, TS...>;
 };
 
 template <StateID N, typename TA, typename TH, typename... TS>
-struct MaterialT   <N, TA, CI_<TH,	   TS...>> final {
+struct MaterialT   <N, TA, CI_<TH,	   TS...>> {
 	using Type = C_<   TA,	   TH,	   TS...>;
 };
 
@@ -4882,12 +4890,27 @@ template <StateID NStateId,
 		  typename TArgs,
 		  Short NIndex,
 		  typename... TStates>
-struct CS_ final {
+struct FFSM2_EMPTY_BASES CS_
+	: CSubMaterial<NStateId,
+				   TArgs,
+				   NIndex,
+				   LHalfTypes<TStates...>>
+	, CSubMaterial<NStateId + LHalfTypes<TStates...>::SIZE,
+				   TArgs,
+				   NIndex + LHalfTypes<TStates...>::SIZE,
+				   RHalfTypes<TStates...>>
+{
 	static_assert(sizeof...(TStates) >= 2, "");
 
-	static constexpr StateID  INITIAL_ID  = NStateId;
+	using LMaterial		= CSubMaterial<NStateId,
+									   TArgs,
+									   NIndex,
+									   LHalfTypes<TStates...>>;
 
-	static constexpr Short	  PRONG_INDEX = NIndex;
+	using RMaterial		= CSubMaterial<NStateId + LHalfTypes<TStates...>::SIZE,
+									   TArgs,
+									   NIndex + LHalfTypes<TStates...>::SIZE,
+									   RHalfTypes<TStates...>>;
 
 	using Args			= TArgs;
 
@@ -4898,21 +4921,11 @@ struct CS_ final {
 	using FullControl	= FullControlT <Args>;
 	using GuardControl	= GuardControlT<Args>;
 
-	static constexpr Short	  L_PRONG	  = PRONG_INDEX;
+	static constexpr StateID  INITIAL_ID  = NStateId;
+	static constexpr Short	  PRONG_INDEX = NIndex;
 
 	using LStateList	= LHalfTypes<TStates...>;
-	using LMaterial		= CSubMaterial<INITIAL_ID,
-									   Args,
-									   L_PRONG,
-									   LStateList>;
-
 	static constexpr Short	  R_PRONG	  = PRONG_INDEX + LStateList::SIZE;
-
-	using RStateList	= RHalfTypes<TStates...>;
-	using RMaterial		= CSubMaterial<INITIAL_ID + LStateList::SIZE,
-									   Args,
-									   R_PRONG,
-									   RStateList>;
 
 	//----------------------------------------------------------------------
 
@@ -4936,9 +4949,6 @@ struct CS_ final {
 	FFSM2_CONSTEXPR(14)	void	wideChangeToRequested(PlanControl&  control, const Short prong)  noexcept;
 
 	//----------------------------------------------------------------------
-
-	LMaterial lHalf;
-	RMaterial rHalf;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -4947,8 +4957,10 @@ template <StateID NStateId,
 		  typename TArgs,
 		  Short NIndex,
 		  typename TState>
-struct CS_<NStateId, TArgs, NIndex, TState> final {
-	static constexpr StateID INITIAL_ID	= NStateId;
+struct FFSM2_EMPTY_BASES CS_<NStateId, TArgs, NIndex, TState>
+	: Material<NStateId, TArgs, TState>
+{
+	using State			= Material<NStateId, TArgs, TState>;
 
 	static constexpr Short PRONG_INDEX	= NIndex;
 
@@ -4961,8 +4973,6 @@ struct CS_<NStateId, TArgs, NIndex, TState> final {
 	using FullControl	= FullControlT <Args>;
 	using GuardControl	= GuardControlT<Args>;
 
-	using State			= Material<INITIAL_ID, Args, TState>;
-
 	//----------------------------------------------------------------------
 
 	FFSM2_CONSTEXPR(14)	bool	wideEntryGuard		 (GuardControl& control, const Short prong)  noexcept;
@@ -4985,8 +4995,6 @@ struct CS_<NStateId, TArgs, NIndex, TState> final {
 	FFSM2_CONSTEXPR(14)	void	wideChangeToRequested(PlanControl&  control, const Short prong)  noexcept;
 
 	//----------------------------------------------------------------------
-
-	State state;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -5009,9 +5017,9 @@ CS_<N, TA, NI, TS...>::wideEntryGuard(GuardControl& control,
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
 	if (prong < R_PRONG)
-		return lHalf.wideEntryGuard(control, prong);
+		return LMaterial::wideEntryGuard(control, prong);
 	else
-		return rHalf.wideEntryGuard(control, prong);
+		return RMaterial::wideEntryGuard(control, prong);
 }
 
 //------------------------------------------------------------------------------
@@ -5025,9 +5033,9 @@ CS_<N, TA, NI, TS...>::wideEnter(PlanControl& control,
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
 	if (prong < R_PRONG)
-		lHalf.wideEnter(control, prong);
+		LMaterial::wideEnter(control, prong);
 	else
-		rHalf.wideEnter(control, prong);
+		RMaterial::wideEnter(control, prong);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -5041,9 +5049,9 @@ CS_<N, TA, NI, TS...>::wideReenter(PlanControl& control,
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
 	if (prong < R_PRONG)
-		lHalf.wideReenter(control, prong);
+		LMaterial::wideReenter(control, prong);
 	else
-		rHalf.wideReenter(control, prong);
+		RMaterial::wideReenter(control, prong);
 }
 
 //------------------------------------------------------------------------------
@@ -5057,8 +5065,8 @@ CS_<N, TA, NI, TS...>::wideUpdate(FullControl& control,
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
 	return prong < R_PRONG ?
-		lHalf.wideUpdate(control, prong) :
-		rHalf.wideUpdate(control, prong);
+		LMaterial::wideUpdate(control, prong) :
+		RMaterial::wideUpdate(control, prong);
 }
 
 //------------------------------------------------------------------------------
@@ -5074,8 +5082,8 @@ CS_<N, TA, NI, TS...>::wideReact(FullControl& control,
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
 	return prong < R_PRONG ?
-		lHalf.wideReact(control, event, prong) :
-		rHalf.wideReact(control, event, prong);
+		LMaterial::wideReact(control, event, prong) :
+		RMaterial::wideReact(control, event, prong);
 }
 
 //------------------------------------------------------------------------------
@@ -5092,9 +5100,9 @@ CS_<N, TA, NI, TS...>::wideExitGuard(GuardControl& control,
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
 	if (prong < R_PRONG)
-		return lHalf.wideExitGuard(control, prong);
+		return LMaterial::wideExitGuard(control, prong);
 	else
-		return rHalf.wideExitGuard(control, prong);
+		return RMaterial::wideExitGuard(control, prong);
 }
 
 //------------------------------------------------------------------------------
@@ -5108,9 +5116,9 @@ CS_<N, TA, NI, TS...>::wideExit(PlanControl& control,
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
 	if (prong < R_PRONG)
-		lHalf.wideExit(control, prong);
+		LMaterial::wideExit(control, prong);
 	else
-		rHalf.wideExit(control, prong);
+		RMaterial::wideExit(control, prong);
 }
 
 //------------------------------------------------------------------------------
@@ -5125,9 +5133,9 @@ CS_<N, TA, NI, TS...>::wideChangeToRequested(PlanControl& control,
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
 	if (prong < R_PRONG)
-		lHalf.wideChangeToRequested(control, prong);
+		LMaterial::wideChangeToRequested(control, prong);
 	else
-		rHalf.wideChangeToRequested(control, prong);
+		RMaterial::wideChangeToRequested(control, prong);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -5148,7 +5156,7 @@ CS_<N, TA, NI, T>::wideEntryGuard(GuardControl& control,
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
-	return state.deepEntryGuard(control);
+	return State::deepEntryGuard(control);
 }
 
 //------------------------------------------------------------------------------
@@ -5161,7 +5169,7 @@ CS_<N, TA, NI, T>::wideEnter(PlanControl& control,
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
-	state.deepEnter(control);
+	State::deepEnter(control);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -5174,7 +5182,7 @@ CS_<N, TA, NI, T>::wideReenter(PlanControl& control,
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
-	state.deepReenter(control);
+	State::deepReenter(control);
 }
 
 //------------------------------------------------------------------------------
@@ -5187,7 +5195,7 @@ CS_<N, TA, NI, T>::wideUpdate(FullControl& control,
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
-	return state.deepUpdate(control);
+	return State::deepUpdate(control);
 }
 
 //------------------------------------------------------------------------------
@@ -5202,7 +5210,7 @@ CS_<N, TA, NI, T>::wideReact(FullControl& control,
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
-	return state.deepReact(control, event);
+	return State::deepReact(control, event);
 }
 
 //------------------------------------------------------------------------------
@@ -5216,7 +5224,7 @@ CS_<N, TA, NI, T>::wideExitGuard(GuardControl& control,
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
-	return state.deepExitGuard(control);
+	return State::deepExitGuard(control);
 }
 
 //------------------------------------------------------------------------------
@@ -5229,7 +5237,7 @@ CS_<N, TA, NI, T>::wideExit(PlanControl& control,
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
-	state.deepExit(control);
+	State::deepExit(control);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -5244,8 +5252,14 @@ namespace detail {
 template <typename TArgs,
 		  typename THead,
 		  typename... TSubStates>
-struct C_ final {
+struct FFSM2_EMPTY_BASES C_
+	: S_<INVALID_STATE_ID, TArgs, THead>
+	, CS_<0, TArgs, 0, TSubStates...>
+{
 	using Args			= TArgs;
+
+	using HeadState		= S_<INVALID_STATE_ID, Args, THead>;
+	using SubStates		= CS_<0, Args, 0, TSubStates...>;
 
 	using StateList		= typename Args::StateList;
 
@@ -5259,12 +5273,9 @@ struct C_ final {
 
 	using GuardControl	= GuardControlT<Args>;
 
-	using Head			= THead;
-	using HeadState		= S_<INVALID_STATE_ID, Args, Head>;
-
-	using SubStates		= CS_<0, Args, 0, TSubStates...>;
 
 #if FFSM2_SERIALIZATION_AVAILABLE()
+	using Head			= THead;
 	using Info			= CI_<Head, TSubStates...>;
 
 	static constexpr Short WIDTH		  = Info::WIDTH;
@@ -5304,9 +5315,6 @@ struct C_ final {
 #endif
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	HeadState _headState;
-	SubStates _subStates;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -5334,7 +5342,7 @@ C_<TA, TH, TS...>::deepForwardEntryGuard(GuardControl& control) noexcept {
 	const Short  requested  = control._registry.requested;
 	FFSM2_ASSERT(requested != INVALID_SHORT);
 
-	return _subStates.wideEntryGuard(control, requested);
+	return SubStates::wideEntryGuard(control, requested);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -5346,8 +5354,8 @@ C_<TA, TH, TS...>::deepEntryGuard(GuardControl& control) noexcept {
 	const Short requested = control._registry.requested;
 	FFSM2_ASSERT(requested != INVALID_SHORT);
 
-	return _headState.deepEntryGuard(control) ||
-		   _subStates.wideEntryGuard(control, requested);
+	return HeadState::deepEntryGuard(control) ||
+		   SubStates::wideEntryGuard(control, requested);
 }
 
 //------------------------------------------------------------------------------
@@ -5365,8 +5373,8 @@ C_<TA, TH, TS...>::deepEnter(PlanControl& control) noexcept {
 	active	  = requested;
 	requested = INVALID_SHORT;
 
-	_headState.deepEnter(control);
-	_subStates.wideEnter(control, active);
+	HeadState::deepEnter(control);
+	SubStates::wideEnter(control, active);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -5383,17 +5391,17 @@ C_<TA, TH, TS...>::deepUpdate(FullControl& control) noexcept {
 
 	FFSM2_ASSERT(control._registry.requested == INVALID_SHORT);
 
-	if (_headState.deepUpdate(control)) {
+	if (HeadState::deepUpdate(control)) {
 		ControlLock lock{control};
 
-		_subStates.wideUpdate(control, active);
+		SubStates::wideUpdate(control, active);
 	} else {
 		FFSM2_IF_PLANS(const Status subStatus =)
-		_subStates.wideUpdate(control, active);
+		SubStates::wideUpdate(control, active);
 
 	#if FFSM2_PLANS_AVAILABLE()
 		if (subStatus && control._planData.planExists)
-			control.updatePlan(_headState, subStatus);
+			control.updatePlan((HeadState&) *this, subStatus);
 	#endif
 	}
 }
@@ -5412,17 +5420,17 @@ C_<TA, TH, TS...>::deepReact(FullControl& control,
 
 	FFSM2_ASSERT(control._registry.requested == INVALID_SHORT);
 
-	if (_headState.deepReact(control, event)) {
+	if (HeadState::deepReact(control, event)) {
 		ControlLock lock{control};
 
-		_subStates.wideReact(control, event, active);
+		SubStates::wideReact(control, event, active);
 	} else {
 		FFSM2_IF_PLANS(const Status subStatus =)
-		_subStates.wideReact(control, event, active);
+		SubStates::wideReact(control, event, active);
 
 	#if FFSM2_PLANS_AVAILABLE()
 		if (subStatus && control._planData.planExists)
-			control.updatePlan(_headState, subStatus);
+			control.updatePlan((HeadState&) *this, subStatus);
 	#endif
 	}
 }
@@ -5438,7 +5446,7 @@ C_<TA, TH, TS...>::deepForwardExitGuard(GuardControl& control) noexcept {
 	const Short  active  = control._registry.active;
 	FFSM2_ASSERT(active != INVALID_SHORT);
 
-	return _subStates.wideExitGuard(control, active);
+	return SubStates::wideExitGuard(control, active);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -5452,8 +5460,8 @@ C_<TA, TH, TS...>::deepExitGuard(GuardControl& control) noexcept {
 
 	FFSM2_ASSERT(control._registry.requested != INVALID_SHORT);
 
-	return _headState.deepExitGuard(control) ||
-		   _subStates.wideExitGuard(control, active);
+	return HeadState::deepExitGuard(control) ||
+		   SubStates::wideExitGuard(control, active);
 }
 
 //------------------------------------------------------------------------------
@@ -5465,8 +5473,8 @@ C_<TA, TH, TS...>::deepExit(PlanControl& control) noexcept {
 	Short& active = control._registry.active;
 	FFSM2_ASSERT(active != INVALID_SHORT);
 
-	_subStates.wideExit(control, active);
-	_headState.deepExit(control);
+	SubStates::wideExit(control, active);
+	HeadState::deepExit(control);
 
 	active = INVALID_SHORT;
 
@@ -5491,17 +5499,17 @@ C_<TA, TH, TS...>::deepChangeToRequested(PlanControl& control) noexcept {
 	FFSM2_ASSERT(requested != INVALID_SHORT);
 
 	if (requested != active) {
-		_subStates.wideExit	  (control, active);
+		SubStates::wideExit	  (control, active);
 
 		active	  = requested;
 		requested = INVALID_SHORT;
 
-		_subStates.wideEnter  (control, active);
+		SubStates::wideEnter  (control, active);
 	} else {
 		requested = INVALID_SHORT;
 
 		// reconstruction done in S_::reenter()
-		_subStates.wideReenter(control, active);
+		SubStates::wideReenter(control, active);
 	}
 }
 
@@ -5682,7 +5690,9 @@ namespace detail {
 /// @tparam TApex Root region type
 template <typename TConfig,
 		  typename TApex>
-class R_ {
+class R_
+	: protected Material<0, typename RF_<TConfig, TApex>::Args, TApex>
+{
 public:
 	static constexpr FeatureTag FEATURE_TAG = TConfig::FEATURE_TAG;
 
@@ -5690,16 +5700,14 @@ public:
 	using Payload				= typename TConfig::Payload;
 
 protected:
-	using Apex					= TApex;
-
-	using Forward				= RF_<TConfig, Apex>;
+	using Forward				= RF_<TConfig, TApex>;
 	using StateList				= typename Forward::StateList;
 	using Args					= typename Forward::Args;
 
 	static_assert(Args::STATE_COUNT <  (unsigned) -1, "Too many states in the FSM. Change 'Short' type.");
 	static_assert(Args::STATE_COUNT == (unsigned) StateList::SIZE, "STATE_COUNT != StateList::SIZE");
 
-	using MaterialApex			= Material<0, Args, Apex>;
+	using Apex					= Material<0, Args, TApex>;
 
 	using Control				= ControlT	   <Args>;
 	using PlanControl			= PlanControlT <Args>;
@@ -5879,8 +5887,6 @@ protected:
 
 	Transition _request;
 
-	MaterialApex _apex;
-
 	FFSM2_IF_LOG_INTERFACE(Logger* _logger);
 };
 
@@ -5977,6 +5983,8 @@ private:
 	using Base::finalExit;
 
 #if FFSM2_TRANSITION_HISTORY_AVAILABLE()
+	using Apex					= typename Base::Apex;
+
 	using Base::applyRequest;
 
 	using Base::_previousTransition;
@@ -5987,7 +5995,6 @@ private:
 		using Base::_planData;
 	#endif
 	using Base::_request;
-	using Base::_apex;
 	#if FFSM2_LOG_INTERFACE_AVAILABLE()
 		using Base::_logger;
 	#endif
@@ -6232,11 +6239,11 @@ template <FeatureTag NFeatureTag
 		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload
 		, typename TApex>
-class RC_			<G_<NFeatureTag, EmptyContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
-	: public	 RP_<G_<NFeatureTag, EmptyContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
+class FFSM2_EMPTY_BASES RC_<G_<NFeatureTag, EmptyContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
+	: public			RP_<G_<NFeatureTag, EmptyContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
 	, EmptyContext
 {
-	using Base = RP_<G_<NFeatureTag, EmptyContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
+	using Base		  = RP_<G_<NFeatureTag, EmptyContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
 
 public:
 	static constexpr FeatureTag FEATURE_TAG = Base::FEATURE_TAG;
@@ -6275,7 +6282,7 @@ R_<TG, TA>::update() noexcept {
 					  FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
 					  FFSM2_IF_LOG_INTERFACE(, _logger)};
 
-	_apex.deepUpdate(control);
+	Apex::deepUpdate(control);
 
 	FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
 
@@ -6303,7 +6310,7 @@ R_<TG, TA>::react(const TEvent& event) noexcept {
 					  FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
 					  FFSM2_IF_LOG_INTERFACE(, _logger)};
 
-	_apex.deepReact(control, event);
+	Apex::deepReact(control, event);
 
 	FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
 
@@ -6347,7 +6354,7 @@ R_<TG, TA>::save(SerialBuffer& _buffer) const noexcept {
 	// TODO: save _previousTransition		// FFSM2_IF_TRANSITION_HISTORY()
 	// TODO: save _activityHistory			// FFSM2_IF_STRUCTURE_REPORT()
 
-	_apex.deepSaveActive(_registry, stream);
+	Apex::deepSaveActive(_registry, stream);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -6367,7 +6374,7 @@ R_<TG, TA>::load(const SerialBuffer& buffer) noexcept {
 					  FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
 					  FFSM2_IF_LOG_INTERFACE(, _logger)};
 
-	_apex.deepExit(control);
+	Apex::deepExit(control);
 
 	FFSM2_IF_TRANSITION_HISTORY(_previousTransition.clear());
 
@@ -6383,9 +6390,9 @@ R_<TG, TA>::load(const SerialBuffer& buffer) noexcept {
 	// TODO: load _previousTransition	// FFSM2_IF_TRANSITION_HISTORY()
 	// TODO: load _activityHistory		// FFSM2_IF_STRUCTURE_REPORT()
 
-	_apex.deepLoadRequested(_registry, stream);
+	Apex::deepLoadRequested(_registry, stream);
 
-	_apex.deepEnter(control);
+	Apex::deepEnter(control);
 }
 
 #endif
@@ -6413,7 +6420,7 @@ R_<TG, TA>::replayTransition(const StateID destination) noexcept {
 		applyRequest(destination);
 		_previousTransition = Transition{destination};
 
-		_apex.deepChangeToRequested(control);
+		Apex::deepChangeToRequested(control);
 
 		_registry.clearRequests();
 
@@ -6472,7 +6479,7 @@ R_<TG, TA>::initialEnter() noexcept {
 	}
 	FFSM2_IF_TRANSITION_HISTORY(_previousTransition = currentTransition);
 
-	_apex.deepEnter(control);
+	Apex::deepEnter(control);
 
 	_registry.clearRequests();
 
@@ -6495,7 +6502,7 @@ R_<TG, TA>::finalExit() noexcept {
 					  FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
 					  FFSM2_IF_LOG_INTERFACE(, _logger)};
 
-	_apex.deepExit(control);
+	Apex::deepExit(control);
 }
 
 //------------------------------------------------------------------------------
@@ -6534,7 +6541,7 @@ R_<TG, TA>::processTransitions(Transition& currentTransition) noexcept {
 	}
 
 	if (currentTransition)
-		_apex.deepChangeToRequested(control);
+		Apex::deepChangeToRequested(control);
 
 	_registry.clearRequests();
 
@@ -6570,7 +6577,7 @@ R_<TG, TA>::cancelledByEntryGuards(const Transition& currentTransition,
 							FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
 							FFSM2_IF_LOG_INTERFACE(, _logger)};
 
-	return _apex.deepEntryGuard(guardControl);
+	return Apex::deepEntryGuard(guardControl);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -6590,8 +6597,8 @@ R_<TG, TA>::cancelledByGuards(const Transition& currentTransition,
 							FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
 							FFSM2_IF_LOG_INTERFACE(, _logger)};
 
-	return _apex.deepForwardExitGuard(guardControl) ||
-		   _apex.deepForwardEntryGuard(guardControl);
+	return Apex::deepForwardExitGuard(guardControl) ||
+		   Apex::deepForwardEntryGuard(guardControl);
 }
 
 //------------------------------------------------------------------------------
@@ -6622,7 +6629,7 @@ RV_<G_<NFT, TC, Manual, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::replayEnter(const S
 
 	FFSM2_IF_TRANSITION_HISTORY(_previousTransition = Transition{destination});
 
-	_apex.deepEnter(control);
+	Apex::deepEnter(control);
 
 	_registry.clearRequests();
 

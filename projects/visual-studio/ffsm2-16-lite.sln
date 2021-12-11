@@ -32,8 +32,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test-14", "test-14.vcxproj"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{2454DB6B-D252-4BC5-9135-9FF428FAE6D1}"
 	ProjectSection(SolutionItems) = preProject
+		..\..\.github\workflows\cmake-qemu-arm.yml = ..\..\.github\workflows\cmake-qemu-arm.yml
 		..\..\.github\workflows\cmake.yml = ..\..\.github\workflows\cmake.yml
+		..\..\.github\workflows\codeql-analysis.yml = ..\..\.github\workflows\codeql-analysis.yml
+		..\..\.github\workflows\flawfinder-analysis.yml = ..\..\.github\workflows\flawfinder-analysis.yml
 		..\..\.github\workflows\msbuild.yml = ..\..\.github\workflows\msbuild.yml
+		..\..\.github\workflows\msvc-analysis.yml = ..\..\.github\workflows\msvc-analysis.yml
 	EndProjectSection
 EndProject
 Global

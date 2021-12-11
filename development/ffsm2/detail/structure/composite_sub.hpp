@@ -7,12 +7,27 @@ template <StateID NStateId,
 		  typename TArgs,
 		  Short NIndex,
 		  typename... TStates>
-struct CS_ final {
+struct FFSM2_EMPTY_BASES CS_
+	: CSubMaterial<NStateId,
+				   TArgs,
+				   NIndex,
+				   LHalfTypes<TStates...>>
+	, CSubMaterial<NStateId + LHalfTypes<TStates...>::SIZE,
+				   TArgs,
+				   NIndex + LHalfTypes<TStates...>::SIZE,
+				   RHalfTypes<TStates...>>
+{
 	static_assert(sizeof...(TStates) >= 2, "");
 
-	static constexpr StateID  INITIAL_ID  = NStateId;
+	using LMaterial		= CSubMaterial<NStateId,
+									   TArgs,
+									   NIndex,
+									   LHalfTypes<TStates...>>;
 
-	static constexpr Short	  PRONG_INDEX = NIndex;
+	using RMaterial		= CSubMaterial<NStateId + LHalfTypes<TStates...>::SIZE,
+									   TArgs,
+									   NIndex + LHalfTypes<TStates...>::SIZE,
+									   RHalfTypes<TStates...>>;
 
 	using Args			= TArgs;
 
@@ -23,21 +38,11 @@ struct CS_ final {
 	using FullControl	= FullControlT <Args>;
 	using GuardControl	= GuardControlT<Args>;
 
-	static constexpr Short	  L_PRONG	  = PRONG_INDEX;
+	static constexpr StateID  INITIAL_ID  = NStateId;
+	static constexpr Short	  PRONG_INDEX = NIndex;
 
 	using LStateList	= LHalfTypes<TStates...>;
-	using LMaterial		= CSubMaterial<INITIAL_ID,
-									   Args,
-									   L_PRONG,
-									   LStateList>;
-
 	static constexpr Short	  R_PRONG	  = PRONG_INDEX + LStateList::SIZE;
-
-	using RStateList	= RHalfTypes<TStates...>;
-	using RMaterial		= CSubMaterial<INITIAL_ID + LStateList::SIZE,
-									   Args,
-									   R_PRONG,
-									   RStateList>;
 
 	//----------------------------------------------------------------------
 
@@ -61,9 +66,6 @@ struct CS_ final {
 	FFSM2_CONSTEXPR(14)	void	wideChangeToRequested(PlanControl&  control, const Short prong)  noexcept;
 
 	//----------------------------------------------------------------------
-
-	LMaterial lHalf;
-	RMaterial rHalf;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -72,8 +74,10 @@ template <StateID NStateId,
 		  typename TArgs,
 		  Short NIndex,
 		  typename TState>
-struct CS_<NStateId, TArgs, NIndex, TState> final {
-	static constexpr StateID INITIAL_ID	= NStateId;
+struct FFSM2_EMPTY_BASES CS_<NStateId, TArgs, NIndex, TState>
+	: Material<NStateId, TArgs, TState>
+{
+	using State			= Material<NStateId, TArgs, TState>;
 
 	static constexpr Short PRONG_INDEX	= NIndex;
 
@@ -86,8 +90,6 @@ struct CS_<NStateId, TArgs, NIndex, TState> final {
 	using FullControl	= FullControlT <Args>;
 	using GuardControl	= GuardControlT<Args>;
 
-	using State			= Material<INITIAL_ID, Args, TState>;
-
 	//----------------------------------------------------------------------
 
 	FFSM2_CONSTEXPR(14)	bool	wideEntryGuard		 (GuardControl& control, const Short prong)  noexcept;
@@ -110,8 +112,6 @@ struct CS_<NStateId, TArgs, NIndex, TState> final {
 	FFSM2_CONSTEXPR(14)	void	wideChangeToRequested(PlanControl&  control, const Short prong)  noexcept;
 
 	//----------------------------------------------------------------------
-
-	State state;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

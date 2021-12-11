@@ -6,8 +6,14 @@ namespace detail {
 template <typename TArgs,
 		  typename THead,
 		  typename... TSubStates>
-struct C_ final {
+struct FFSM2_EMPTY_BASES C_
+	: S_<INVALID_STATE_ID, TArgs, THead>
+	, CS_<0, TArgs, 0, TSubStates...>
+{
 	using Args			= TArgs;
+
+	using HeadState		= S_<INVALID_STATE_ID, Args, THead>;
+	using SubStates		= CS_<0, Args, 0, TSubStates...>;
 
 	using StateList		= typename Args::StateList;
 
@@ -21,12 +27,9 @@ struct C_ final {
 
 	using GuardControl	= GuardControlT<Args>;
 
-	using Head			= THead;
-	using HeadState		= S_<INVALID_STATE_ID, Args, Head>;
-
-	using SubStates		= CS_<0, Args, 0, TSubStates...>;
 
 #if FFSM2_SERIALIZATION_AVAILABLE()
+	using Head			= THead;
 	using Info			= CI_<Head, TSubStates...>;
 
 	static constexpr Short WIDTH		  = Info::WIDTH;
@@ -66,9 +69,6 @@ struct C_ final {
 #endif
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	HeadState _headState;
-	SubStates _subStates;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
