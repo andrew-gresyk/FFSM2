@@ -8,7 +8,9 @@ namespace detail {
 /// @tparam TApex Root region type
 template <typename TConfig,
 		  typename TApex>
-class R_ {
+class R_
+	: protected Material<0, typename RF_<TConfig, TApex>::Args, TApex>
+{
 public:
 	static constexpr FeatureTag FEATURE_TAG = TConfig::FEATURE_TAG;
 
@@ -16,16 +18,14 @@ public:
 	using Payload				= typename TConfig::Payload;
 
 protected:
-	using Apex					= TApex;
-
-	using Forward				= RF_<TConfig, Apex>;
+	using Forward				= RF_<TConfig, TApex>;
 	using StateList				= typename Forward::StateList;
 	using Args					= typename Forward::Args;
 
 	static_assert(Args::STATE_COUNT <  (unsigned) -1, "Too many states in the FSM. Change 'Short' type.");
 	static_assert(Args::STATE_COUNT == (unsigned) StateList::SIZE, "STATE_COUNT != StateList::SIZE");
 
-	using MaterialApex			= Material<0, Args, Apex>;
+	using Apex					= Material<0, Args, TApex>;
 
 	using Control				= ControlT	   <Args>;
 	using PlanControl			= PlanControlT <Args>;
@@ -205,8 +205,6 @@ protected:
 
 	Transition _request;
 
-	MaterialApex _apex;
-
 	FFSM2_IF_LOG_INTERFACE(Logger* _logger);
 };
 
@@ -303,6 +301,8 @@ private:
 	using Base::finalExit;
 
 #if FFSM2_TRANSITION_HISTORY_AVAILABLE()
+	using Apex					= typename Base::Apex;
+
 	using Base::applyRequest;
 
 	using Base::_previousTransition;
@@ -313,7 +313,6 @@ private:
 		using Base::_planData;
 	#endif
 	using Base::_request;
-	using Base::_apex;
 	#if FFSM2_LOG_INTERFACE_AVAILABLE()
 		using Base::_logger;
 	#endif
@@ -558,11 +557,11 @@ template <FeatureTag NFeatureTag
 		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload
 		, typename TApex>
-class RC_			<G_<NFeatureTag, EmptyContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
-	: public	 RP_<G_<NFeatureTag, EmptyContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
+class FFSM2_EMPTY_BASES RC_<G_<NFeatureTag, EmptyContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
+	: public			RP_<G_<NFeatureTag, EmptyContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
 	, EmptyContext
 {
-	using Base = RP_<G_<NFeatureTag, EmptyContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
+	using Base		  = RP_<G_<NFeatureTag, EmptyContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
 
 public:
 	static constexpr FeatureTag FEATURE_TAG = Base::FEATURE_TAG;

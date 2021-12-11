@@ -14,7 +14,7 @@ struct None {};
 template <StateID NStateId,
 		  typename TArgs,
 		  typename THead>
-struct S_ final
+struct S_
 	: THead
 {
 	static constexpr auto STATE_ID	 = NStateId;

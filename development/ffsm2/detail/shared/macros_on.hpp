@@ -68,6 +68,14 @@
 
 //------------------------------------------------------------------------------
 
+#if defined _MSC_VER
+	#define FFSM2_EMPTY_BASES							 __declspec(empty_bases)
+#else
+	#define FFSM2_EMPTY_BASES
+#endif
+
+//------------------------------------------------------------------------------
+
 #define FFSM2_ARCHITECTURE(A)							FFSM2_ARCHITECTURE_##A()
 
 #if INTPTR_MAX == INT64_MAX

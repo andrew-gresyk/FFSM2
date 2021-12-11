@@ -12,7 +12,7 @@ CS_<N, TA, NI, T>::wideEntryGuard(GuardControl& control,
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
-	return state.deepEntryGuard(control);
+	return State::deepEntryGuard(control);
 }
 
 //------------------------------------------------------------------------------
@@ -25,7 +25,7 @@ CS_<N, TA, NI, T>::wideEnter(PlanControl& control,
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
-	state.deepEnter(control);
+	State::deepEnter(control);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -38,7 +38,7 @@ CS_<N, TA, NI, T>::wideReenter(PlanControl& control,
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
-	state.deepReenter(control);
+	State::deepReenter(control);
 }
 
 //------------------------------------------------------------------------------
@@ -51,7 +51,7 @@ CS_<N, TA, NI, T>::wideUpdate(FullControl& control,
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
-	return state.deepUpdate(control);
+	return State::deepUpdate(control);
 }
 
 //------------------------------------------------------------------------------
@@ -66,7 +66,7 @@ CS_<N, TA, NI, T>::wideReact(FullControl& control,
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
-	return state.deepReact(control, event);
+	return State::deepReact(control, event);
 }
 
 //------------------------------------------------------------------------------
@@ -80,7 +80,7 @@ CS_<N, TA, NI, T>::wideExitGuard(GuardControl& control,
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
-	return state.deepExitGuard(control);
+	return State::deepExitGuard(control);
 }
 
 //------------------------------------------------------------------------------
@@ -93,7 +93,7 @@ CS_<N, TA, NI, T>::wideExit(PlanControl& control,
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
-	state.deepExit(control);
+	State::deepExit(control);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

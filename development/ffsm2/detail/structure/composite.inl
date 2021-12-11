@@ -18,7 +18,7 @@ C_<TA, TH, TS...>::deepForwardEntryGuard(GuardControl& control) noexcept {
 	const Short  requested  = control._registry.requested;
 	FFSM2_ASSERT(requested != INVALID_SHORT);
 
-	return _subStates.wideEntryGuard(control, requested);
+	return SubStates::wideEntryGuard(control, requested);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -30,8 +30,8 @@ C_<TA, TH, TS...>::deepEntryGuard(GuardControl& control) noexcept {
 	const Short requested = control._registry.requested;
 	FFSM2_ASSERT(requested != INVALID_SHORT);
 
-	return _headState.deepEntryGuard(control) ||
-		   _subStates.wideEntryGuard(control, requested);
+	return HeadState::deepEntryGuard(control) ||
+		   SubStates::wideEntryGuard(control, requested);
 }
 
 //------------------------------------------------------------------------------
@@ -49,8 +49,8 @@ C_<TA, TH, TS...>::deepEnter(PlanControl& control) noexcept {
 	active	  = requested;
 	requested = INVALID_SHORT;
 
-	_headState.deepEnter(control);
-	_subStates.wideEnter(control, active);
+	HeadState::deepEnter(control);
+	SubStates::wideEnter(control, active);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -67,17 +67,17 @@ C_<TA, TH, TS...>::deepUpdate(FullControl& control) noexcept {
 
 	FFSM2_ASSERT(control._registry.requested == INVALID_SHORT);
 
-	if (_headState.deepUpdate(control)) {
+	if (HeadState::deepUpdate(control)) {
 		ControlLock lock{control};
 
-		_subStates.wideUpdate(control, active);
+		SubStates::wideUpdate(control, active);
 	} else {
 		FFSM2_IF_PLANS(const Status subStatus =)
-		_subStates.wideUpdate(control, active);
+		SubStates::wideUpdate(control, active);
 
 	#if FFSM2_PLANS_AVAILABLE()
 		if (subStatus && control._planData.planExists)
-			control.updatePlan(_headState, subStatus);
+			control.updatePlan((HeadState&) *this, subStatus);
 	#endif
 	}
 }
@@ -96,17 +96,17 @@ C_<TA, TH, TS...>::deepReact(FullControl& control,
 
 	FFSM2_ASSERT(control._registry.requested == INVALID_SHORT);
 
-	if (_headState.deepReact(control, event)) {
+	if (HeadState::deepReact(control, event)) {
 		ControlLock lock{control};
 
-		_subStates.wideReact(control, event, active);
+		SubStates::wideReact(control, event, active);
 	} else {
 		FFSM2_IF_PLANS(const Status subStatus =)
-		_subStates.wideReact(control, event, active);
+		SubStates::wideReact(control, event, active);
 
 	#if FFSM2_PLANS_AVAILABLE()
 		if (subStatus && control._planData.planExists)
-			control.updatePlan(_headState, subStatus);
+			control.updatePlan((HeadState&) *this, subStatus);
 	#endif
 	}
 }
@@ -122,7 +122,7 @@ C_<TA, TH, TS...>::deepForwardExitGuard(GuardControl& control) noexcept {
 	const Short  active  = control._registry.active;
 	FFSM2_ASSERT(active != INVALID_SHORT);
 
-	return _subStates.wideExitGuard(control, active);
+	return SubStates::wideExitGuard(control, active);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -136,8 +136,8 @@ C_<TA, TH, TS...>::deepExitGuard(GuardControl& control) noexcept {
 
 	FFSM2_ASSERT(control._registry.requested != INVALID_SHORT);
 
-	return _headState.deepExitGuard(control) ||
-		   _subStates.wideExitGuard(control, active);
+	return HeadState::deepExitGuard(control) ||
+		   SubStates::wideExitGuard(control, active);
 }
 
 //------------------------------------------------------------------------------
@@ -149,8 +149,8 @@ C_<TA, TH, TS...>::deepExit(PlanControl& control) noexcept {
 	Short& active = control._registry.active;
 	FFSM2_ASSERT(active != INVALID_SHORT);
 
-	_subStates.wideExit(control, active);
-	_headState.deepExit(control);
+	SubStates::wideExit(control, active);
+	HeadState::deepExit(control);
 
 	active = INVALID_SHORT;
 
@@ -175,17 +175,17 @@ C_<TA, TH, TS...>::deepChangeToRequested(PlanControl& control) noexcept {
 	FFSM2_ASSERT(requested != INVALID_SHORT);
 
 	if (requested != active) {
-		_subStates.wideExit	  (control, active);
+		SubStates::wideExit	  (control, active);
 
 		active	  = requested;
 		requested = INVALID_SHORT;
 
-		_subStates.wideEnter  (control, active);
+		SubStates::wideEnter  (control, active);
 	} else {
 		requested = INVALID_SHORT;
 
 		// reconstruction done in S_::reenter()
-		_subStates.wideReenter(control, active);
+		SubStates::wideReenter(control, active);
 	}
 }
 
