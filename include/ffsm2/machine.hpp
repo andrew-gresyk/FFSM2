@@ -1,5 +1,5 @@
 ﻿// FFSM2 (flat state machine for games and interactive applications)
-// 1.2.0 (2021-12-11)
+// 1.3.0 (2022-01-22)
 //
 // Created by Andrew Gresyk
 //
@@ -9,7 +9,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2021
+// Copyright (c) 2022
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@
 #pragma once
 
 #define FFSM2_VERSION_MAJOR 1
-#define FFSM2_VERSION_MINOR 2
+#define FFSM2_VERSION_MINOR 3
 #define FFSM2_VERSION_PATCH 0
 
 #define FFSM2_VERSION (10000 * FFSM2_VERSION_MAJOR + 100 * FFSM2_VERSION_MINOR + FFSM2_VERSION_PATCH)
@@ -501,10 +501,10 @@ using UIndex = Conditional<N <= (1ull <<  8),  uint8_t,
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <uint64_t N>
-using UCapacity = Conditional<N <= (1ull <<  8) - 1,  uint8_t,
-				  Conditional<N <= (1ull << 16) - 1, uint16_t,
-				  Conditional<N <= (1ull << 32) - 1, uint32_t,
-														 void>>>;
+using UCapacity = Conditional<N < (1ull <<  8),  uint8_t,
+				  Conditional<N < (1ull << 16), uint16_t,
+				  Conditional<N < (1ull << 32), uint32_t,
+													void>>>;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -639,47 +639,6 @@ template <typename T>
 FFSM2_CONSTEXPR(14)
 void
 fill(T& a, const char value)						  noexcept { memset(&a, (int) value, sizeof(a));	}
-
-//------------------------------------------------------------------------------
-
-template <typename T>
-FFSM2_CONSTEXPR(14)
-void
-swap(T& l, T& r)									  noexcept	{
-	T t = move(l);
-	l = move(r);
-	r = move(t);
-}
-
-//------------------------------------------------------------------------------
-
-template <typename TTo,
-		  typename TFrom>
-FFSM2_CONSTEXPR(14)
-void
-overwrite(TTo& to, const TFrom& from)				  noexcept	{
-	static_assert(sizeof(TTo) == sizeof(TFrom), "");
-
-#if defined(__GNUC__) || defined(__GNUG__)
-	memcpy  (&to,			  &from, sizeof(from));
-#else
-	memcpy_s(&to, sizeof(to), &from, sizeof(from));
-#endif
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-template <typename TO,
-		  typename TI>
-FFSM2_CONSTEXPR(14)
-TO
-convert(const TI& in)								  noexcept	{
-	TO out;
-
-	overwrite(out, in);
-
-	return out;
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1125,7 +1084,9 @@ enum class Method : uint8_t {
 	ENTER,
 	REENTER,
 	UPDATE,
+	REVERSE_UPDATE,
 	REACT,
+	REVERSE_REACT,
 	EXIT_GUARD,
 	EXIT,
 
@@ -1190,7 +1151,9 @@ methodName(const Method method)										  noexcept {
 	case Method::ENTER:			 return "enter";
 	case Method::REENTER:		 return "reenter";
 	case Method::UPDATE:		 return "update";
+	case Method::REVERSE_UPDATE: return "reverseUpdate";
 	case Method::REACT:			 return "react";
+	case Method::REVERSE_REACT:	 return "reverseReact";
 	case Method::EXIT_GUARD:	 return "exitGuard";
 	case Method::EXIT:			 return "exit";
 
@@ -1247,6 +1210,16 @@ struct alignas(4) TransitionBase {
 		return origin	   == other.origin &&
 			   destination == other.destination &&
 			   method	   == other.method;
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	FFSM2_CONSTEXPR(11)
+	bool
+	operator != (const TransitionBase& other)					const noexcept {
+		return origin	   != other.origin ||
+			   destination != other.destination ||
+			   method	   != other.method;
 	}
 
 	//----------------------------------------------------------------------
@@ -1349,7 +1322,17 @@ struct alignas(4) TransitionT final
 	operator == (const TransitionT& other)						const noexcept {
 		return TransitionBase::operator == (other) &&
 			   (payloadSet ==  other.payloadSet);
-		//	  (!payloadSet && !other.payloadSet || payload ==  other.payload);
+		//	  (!payloadSet && !other.payloadSet || payload == other.payload);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	FFSM2_CONSTEXPR(11)
+	bool
+	operator != (const TransitionT& other)						const noexcept {
+		return TransitionBase::operator != (other) ||
+			   (payloadSet != other.payloadSet);
+		//	   (payloadSet |= other.payloadSet || payload != other.payload);
 	}
 
 	//----------------------------------------------------------------------
@@ -1512,7 +1495,7 @@ private:
 	FFSM2_CONSTEXPR(11)	Index limit()									const noexcept	{ return CAPACITY;					}
 
 private:
-	Item _items[CAPACITY];
+	Item _items[CAPACITY] {};
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1579,7 +1562,7 @@ private:
 
 private:
 	Index _count = 0;
-	Item _items[CAPACITY];
+	Item _items[CAPACITY] {};
 };
 
 //------------------------------------------------------------------------------
@@ -2579,7 +2562,7 @@ private:
 public:
 	FFSM2_CONSTEXPR(14)	explicit operator bool()			const noexcept;
 
-	FFSM2_CONSTEXPR(11)	IteratorT first()						  noexcept	{ return IteratorT{*this};					}
+	FFSM2_CONSTEXPR(14)	IteratorT first()						  noexcept	{ return IteratorT{*this};					}
 
 private:
 	const PlanData& _planData;
@@ -4054,7 +4037,7 @@ protected:
 
 	using StateList		= typename TArgs::StateList;
 
-	using Control		= ControlT<TArgs>;
+	using Control		= ControlT	  <TArgs>;
 	using PlanControl	= PlanControlT<TArgs>;
 
 #if FFSM2_PLANS_AVAILABLE()
@@ -4065,23 +4048,39 @@ protected:
 	using GuardControl	= GuardControlT<TArgs>;
 
 public:
-	FFSM2_CONSTEXPR(14)	void preEntryGuard(Context&)	  noexcept {}
+	FFSM2_CONSTEXPR(14)	void preEntryGuard	  (Context&)	  noexcept	{}
 
-	FFSM2_CONSTEXPR(14)	void preEnter	  (Context&)	  noexcept {}
-	FFSM2_CONSTEXPR(14)	void preReenter	  (Context&)	  noexcept {}
+	FFSM2_CONSTEXPR(14)	void preEnter		  (Context&)	  noexcept	{}
+	FFSM2_CONSTEXPR(14)	void preReenter		  (Context&)	  noexcept	{}
 
-	FFSM2_CONSTEXPR(14)	void preUpdate	  (Context&)	  noexcept {}
+	FFSM2_CONSTEXPR(14)	void preUpdate		  (Context&)	  noexcept	{}
+	FFSM2_CONSTEXPR(14)	void postUpdate		  (Context&)	  noexcept	{}
+
+	FFSM2_CONSTEXPR(14)	void preReverseUpdate (Context&)	  noexcept	{}
+	FFSM2_CONSTEXPR(14)	void postReverseUpdate(Context&)	  noexcept	{}
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	void preReact	  (const TEvent&,
-										   Context&)	  noexcept {}
+	FFSM2_CONSTEXPR(14)	void preReact		  (const TEvent&,
+											   Context&)	  noexcept	{}
 
-	FFSM2_CONSTEXPR(14)	void preExitGuard (Context&)	  noexcept {}
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void postReact		  (const TEvent&,
+											   Context&)	  noexcept	{}
 
-	FFSM2_CONSTEXPR(14)	void postExit	  (Context&)	  noexcept {}
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void preReverseReact  (const TEvent&,
+											   Context&)	  noexcept	{}
+
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void postReverseReact (const TEvent&,
+											   Context&)	  noexcept	{}
+
+	FFSM2_CONSTEXPR(14)	void preExitGuard	  (Context&)	  noexcept	{}
+
+	FFSM2_CONSTEXPR(14)	void postExit		  (Context&)	  noexcept	{}
 
 	template <typename T>
-	static constexpr StateID  stateId()					  noexcept { return index<StateList, T>();				}
+	static constexpr StateID stateId()						  noexcept	{ return index<StateList, T>();				}
 };
 
 //------------------------------------------------------------------------------
@@ -4092,7 +4091,7 @@ struct B_;
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename TFirst, typename... TRest>
-struct B_<TFirst, TRest...>
+struct FFSM2_EMPTY_BASES B_<TFirst, TRest...>
 	: TFirst
 	, B_<TRest...>
 {
@@ -4112,20 +4111,36 @@ struct B_<TFirst, TRest...>
 
 	using TFirst::stateId;
 
-	FFSM2_CONSTEXPR(14)	void widePreEntryGuard(Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void widePreEntryGuard	  (Context& context)	  noexcept;
 
-	FFSM2_CONSTEXPR(14)	void widePreEnter	  (Context& context)	  noexcept;
-	FFSM2_CONSTEXPR(14)	void widePreReenter	  (Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void widePreEnter		  (Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void widePreReenter		  (Context& context)	  noexcept;
 
-	FFSM2_CONSTEXPR(14)	void widePreUpdate	  (Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void widePreUpdate		  (Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void widePostUpdate		  (Context& context)	  noexcept;
+
+	FFSM2_CONSTEXPR(14)	void widePreReverseUpdate (Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void widePostReverseUpdate(Context& context)	  noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	void widePreReact	  (const TEvent& event,
-											   Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void widePreReact		  (const TEvent& event,
+												   Context& context)	  noexcept;
 
-	FFSM2_CONSTEXPR(14)	void widePreExitGuard (Context& context)	  noexcept;
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void widePostReact		  (const TEvent& event,
+												   Context& context)	  noexcept;
 
-	FFSM2_CONSTEXPR(14)	void widePostExit	  (Context& context)	  noexcept;
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void widePreReverseReact  (const TEvent& event,
+												   Context& context)	  noexcept;
+
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void widePostReverseReact (const TEvent& event,
+												   Context& context)	  noexcept;
+
+	FFSM2_CONSTEXPR(14)	void widePreExitGuard	  (Context& context)	  noexcept;
+
+	FFSM2_CONSTEXPR(14)	void widePostExit		  (Context& context)	  noexcept;
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -4150,40 +4165,64 @@ struct B_<TFirst>
 
 	using TFirst::stateId;
 
-	FFSM2_CONSTEXPR(14)	void entryGuard		  (GuardControl&)		  noexcept {}
-
-	FFSM2_CONSTEXPR(14)	void enter			  (PlanControl&)		  noexcept {}
-	FFSM2_CONSTEXPR(14)	void reenter		  (PlanControl&)		  noexcept {}
-
-	FFSM2_CONSTEXPR(14)	void update			  (FullControl&)		  noexcept {}
-
-	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	void react			  (const TEvent&,
-											   FullControl&)		  noexcept {}
-
-	FFSM2_CONSTEXPR(14)	void exitGuard		  (GuardControl&)		  noexcept {}
-
-	FFSM2_CONSTEXPR(14)	void exit			  (PlanControl&)		  noexcept {}
-
-#if FFSM2_PLANS_AVAILABLE()
-	FFSM2_CONSTEXPR(14)	void planSucceeded	  (FullControl&)		  noexcept {}
-	FFSM2_CONSTEXPR(14)	void planFailed		  (FullControl&)		  noexcept {}
+#if FFSM2_UTILITY_THEORY_AVAILABLE()
 #endif
 
-	FFSM2_CONSTEXPR(14)	void widePreEntryGuard(Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void entryGuard			  (GuardControl&)		  noexcept	{}
 
-	FFSM2_CONSTEXPR(14)	void widePreEnter	  (Context& context)	  noexcept;
-	FFSM2_CONSTEXPR(14)	void widePreReenter	  (Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void enter				  (PlanControl&)		  noexcept	{}
+	FFSM2_CONSTEXPR(14)	void reenter			  (PlanControl&)		  noexcept	{}
 
-	FFSM2_CONSTEXPR(14)	void widePreUpdate	  (Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void update				  (FullControl&)		  noexcept	{}
+	FFSM2_CONSTEXPR(14)	void reverseUpdate		  (FullControl&)		  noexcept	{}
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	void widePreReact	  (const TEvent& event,
-											   Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void react				  (const TEvent&,
+												   FullControl&)		  noexcept	{}
 
-	FFSM2_CONSTEXPR(14)	void widePreExitGuard (Context& context)	  noexcept;
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void reverseReact		  (const TEvent&,
+												   FullControl&)		  noexcept	{}
 
-	FFSM2_CONSTEXPR(14)	void widePostExit	  (Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void exitGuard			  (GuardControl&)		  noexcept	{}
+
+	FFSM2_CONSTEXPR(14)	void exit				  (PlanControl&)		  noexcept	{}
+
+#if FFSM2_PLANS_AVAILABLE()
+	FFSM2_CONSTEXPR(14)	void planSucceeded		  (FullControl&)		  noexcept	{}
+	FFSM2_CONSTEXPR(14)	void planFailed			  (FullControl&)		  noexcept	{}
+#endif
+
+	FFSM2_CONSTEXPR(14)	void widePreEntryGuard	  (Context& context)	  noexcept;
+
+	FFSM2_CONSTEXPR(14)	void widePreEnter		  (Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void widePreReenter		  (Context& context)	  noexcept;
+
+	FFSM2_CONSTEXPR(14)	void widePreUpdate		  (Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void widePostUpdate		  (Context& context)	  noexcept;
+
+	FFSM2_CONSTEXPR(14)	void widePreReverseUpdate (Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void widePostReverseUpdate(Context& context)	  noexcept;
+
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void widePreReact		  (const TEvent& event,
+												   Context& context)	  noexcept;
+
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void widePostReact		  (const TEvent& event,
+												   Context& context)	  noexcept;
+
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void widePreReverseReact  (const TEvent& event,
+												   Context& context)	  noexcept;
+
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void widePostReverseReact (const TEvent& event,
+												   Context& context)	  noexcept;
+
+	FFSM2_CONSTEXPR(14)	void widePreExitGuard	  (Context& context)	  noexcept;
+
+	FFSM2_CONSTEXPR(14)	void widePostExit		  (Context& context)	  noexcept;
 };
 
 //------------------------------------------------------------------------------
@@ -4205,7 +4244,7 @@ template <typename TF, typename... TR>
 FFSM2_CONSTEXPR(14)
 void
 B_<TF, TR...>::widePreEntryGuard(Context& context) noexcept {
-	TF::preEntryGuard(context);
+	TF		 ::	   preEntryGuard(context);
 	B_<TR...>::widePreEntryGuard(context);
 }
 
@@ -4215,7 +4254,7 @@ template <typename TF, typename... TR>
 FFSM2_CONSTEXPR(14)
 void
 B_<TF, TR...>::widePreEnter(Context& context) noexcept {
-	TF::preEnter(context);
+	TF		 ::	   preEnter(context);
 	B_<TR...>::widePreEnter(context);
 }
 
@@ -4225,7 +4264,7 @@ template <typename TF, typename... TR>
 FFSM2_CONSTEXPR(14)
 void
 B_<TF, TR...>::widePreReenter(Context& context) noexcept {
-	TF::preReenter(context);
+	TF		 ::	   preReenter(context);
 	B_<TR...>::widePreReenter(context);
 }
 
@@ -4235,8 +4274,34 @@ template <typename TF, typename... TR>
 FFSM2_CONSTEXPR(14)
 void
 B_<TF, TR...>::widePreUpdate(Context& context) noexcept {
-	TF::preUpdate(context);
+	TF		 ::	   preUpdate(context);
 	B_<TR...>::widePreUpdate(context);
+}
+
+template <typename TF, typename... TR>
+FFSM2_CONSTEXPR(14)
+void
+B_<TF, TR...>::widePostUpdate(Context& context) noexcept {
+	TF		 ::	   postUpdate(context);
+	B_<TR...>::widePostUpdate(context);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <typename TF, typename... TR>
+FFSM2_CONSTEXPR(14)
+void
+B_<TF, TR...>::widePreReverseUpdate(Context& context) noexcept {
+	TF		 ::	   preReverseUpdate(context);
+	B_<TR...>::widePreReverseUpdate(context);
+}
+
+template <typename TF, typename... TR>
+FFSM2_CONSTEXPR(14)
+void
+B_<TF, TR...>::widePostReverseUpdate(Context& context) noexcept {
+	TF		 ::	   postReverseUpdate(context);
+	B_<TR...>::widePostReverseUpdate(context);
 }
 
 //------------------------------------------------------------------------------
@@ -4248,8 +4313,43 @@ void
 B_<TF, TR...>::widePreReact(const TEvent& event,
 							Context& context) noexcept
 {
-	TF::preReact(event, context);
+	TF		 ::	   preReact(event, context);
 	B_<TR...>::widePreReact(event, context);
+}
+
+template <typename TF, typename... TR>
+template <typename TEvent>
+FFSM2_CONSTEXPR(14)
+void
+B_<TF, TR...>::widePostReact(const TEvent& event,
+							Context& context) noexcept
+{
+	TF		 ::	   postReact(event, context);
+	B_<TR...>::widePostReact(event, context);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <typename TF, typename... TR>
+template <typename TEvent>
+FFSM2_CONSTEXPR(14)
+void
+B_<TF, TR...>::widePreReverseReact(const TEvent& event,
+								   Context& context) noexcept
+{
+	TF		 ::	   preReverseReact(event, context);
+	B_<TR...>::widePreReverseReact(event, context);
+}
+
+template <typename TF, typename... TR>
+template <typename TEvent>
+FFSM2_CONSTEXPR(14)
+void
+B_<TF, TR...>::widePostReverseReact(const TEvent& event,
+									Context& context) noexcept
+{
+	TF		 ::	   postReverseReact(event, context);
+	B_<TR...>::widePostReverseReact(event, context);
 }
 
 //------------------------------------------------------------------------------
@@ -4258,7 +4358,7 @@ template <typename TF, typename... TR>
 FFSM2_CONSTEXPR(14)
 void
 B_<TF, TR...>::widePreExitGuard(Context& context) noexcept {
-	TF::preExitGuard(context);
+	TF		 ::	   preExitGuard(context);
 	B_<TR...>::widePreExitGuard(context);
 }
 
@@ -4268,9 +4368,16 @@ template <typename TF, typename... TR>
 FFSM2_CONSTEXPR(14)
 void
 B_<TF, TR...>::widePostExit(Context& context) noexcept {
-	TF::postExit(context);
+	TF		 ::	   postExit(context);
 	B_<TR...>::widePostExit(context);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+}
+}
+namespace ffsm2 {
+namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -4278,7 +4385,7 @@ template <typename TF>
 FFSM2_CONSTEXPR(14)
 void
 B_<TF>::widePreEntryGuard(Context& context) noexcept {
-	TF::preEntryGuard(context);
+	TF::	preEntryGuard(context);
 }
 
 //------------------------------------------------------------------------------
@@ -4287,7 +4394,7 @@ template <typename TF>
 FFSM2_CONSTEXPR(14)
 void
 B_<TF>::widePreEnter(Context& context) noexcept {
-	TF::preEnter(context);
+	TF::	preEnter(context);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -4296,7 +4403,7 @@ template <typename TF>
 FFSM2_CONSTEXPR(14)
 void
 B_<TF>::widePreReenter(Context& context) noexcept {
-	TF::preReenter(context);
+	TF::	preReenter(context);
 }
 
 //------------------------------------------------------------------------------
@@ -4305,7 +4412,30 @@ template <typename TF>
 FFSM2_CONSTEXPR(14)
 void
 B_<TF>::widePreUpdate(Context& context) noexcept {
-	TF::preUpdate(context);
+	TF::	preUpdate(context);
+}
+
+template <typename TF>
+FFSM2_CONSTEXPR(14)
+void
+B_<TF>::widePostUpdate(Context& context) noexcept {
+	TF::	postUpdate(context);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <typename TF>
+FFSM2_CONSTEXPR(14)
+void
+B_<TF>::widePreReverseUpdate(Context& context) noexcept {
+	TF::	preReverseUpdate(context);
+}
+
+template <typename TF>
+FFSM2_CONSTEXPR(14)
+void
+B_<TF>::widePostReverseUpdate(Context& context) noexcept {
+	TF::	postReverseUpdate(context);
 }
 
 //------------------------------------------------------------------------------
@@ -4317,7 +4447,39 @@ void
 B_<TF>::widePreReact(const TEvent& event,
 					 Context& context) noexcept
 {
-	TF::preReact(event, context);
+	TF::	preReact(event, context);
+}
+
+template <typename TF>
+template <typename TEvent>
+FFSM2_CONSTEXPR(14)
+void
+B_<TF>::widePostReact(const TEvent& event,
+					  Context& context) noexcept
+{
+	TF::	postReact(event, context);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <typename TF>
+template <typename TEvent>
+FFSM2_CONSTEXPR(14)
+void
+B_<TF>::widePreReverseReact(const TEvent& event,
+							Context& context) noexcept
+{
+	TF::	preReverseReact(event, context);
+}
+
+template <typename TF>
+template <typename TEvent>
+FFSM2_CONSTEXPR(14)
+void
+B_<TF>::widePostReverseReact(const TEvent& event,
+							 Context& context) noexcept
+{
+	TF::	postReverseReact(event, context);
 }
 
 //------------------------------------------------------------------------------
@@ -4326,7 +4488,7 @@ template <typename TF>
 FFSM2_CONSTEXPR(14)
 void
 B_<TF>::widePreExitGuard(Context& context) noexcept {
-	TF::preExitGuard(context);
+	TF::	preExitGuard(context);
 }
 
 //------------------------------------------------------------------------------
@@ -4335,7 +4497,7 @@ template <typename TF>
 FFSM2_CONSTEXPR(14)
 void
 B_<TF>::widePostExit(Context& context) noexcept {
-	TF::postExit(context);
+	TF::	postExit(context);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -4380,6 +4542,8 @@ struct S_
 	using Head			= THead;
 
 	//----------------------------------------------------------------------
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	FFSM2_CONSTEXPR(14)	bool	deepEntryGuard		 (GuardControl& control)  noexcept;
 
@@ -4387,9 +4551,14 @@ struct S_
 	FFSM2_CONSTEXPR(14)	void	deepReenter			 (PlanControl&  control)  noexcept;
 
 	FFSM2_CONSTEXPR(14)	Status	deepUpdate			 (FullControl&  control)  noexcept;
+	FFSM2_CONSTEXPR(14)	Status	deepReverseUpdate	 (FullControl&  control)  noexcept;
 
 	template <typename TEvent>
 	FFSM2_CONSTEXPR(14)	Status	deepReact			 (FullControl&  control,
+													  const TEvent& event)	  noexcept;
+
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	Status	deepReverseReact	 (FullControl&  control,
 													  const TEvent& event)	  noexcept;
 
 	FFSM2_CONSTEXPR(14)	bool	deepExitGuard		 (GuardControl& control)  noexcept;
@@ -4459,10 +4628,10 @@ namespace detail {
 ////////////////////////////////////////////////////////////////////////////////
 // COMMON
 
-template <StateID N, typename TA, typename TH>
+template <StateID NN, typename TA, typename TH>
 FFSM2_CONSTEXPR(14)
 bool
-S_<N, TA, TH>::deepEntryGuard(GuardControl& control) noexcept {
+S_<NN, TA, TH>::deepEntryGuard(GuardControl& control) noexcept {
 	FFSM2_LOG_STATE_METHOD(&Head::entryGuard,
 						   Method::ENTRY_GUARD);
 
@@ -4478,10 +4647,10 @@ S_<N, TA, TH>::deepEntryGuard(GuardControl& control) noexcept {
 
 //------------------------------------------------------------------------------
 
-template <StateID N, typename TA, typename TH>
+template <StateID NN, typename TA, typename TH>
 FFSM2_CONSTEXPR(14)
 void
-S_<N, TA, TH>::deepEnter(PlanControl& control) noexcept {
+S_<NN, TA, TH>::deepEnter(PlanControl& control) noexcept {
 	FFSM2_LOG_STATE_METHOD(&Head::enter,
 						   Method::ENTER);
 
@@ -4493,10 +4662,10 @@ S_<N, TA, TH>::deepEnter(PlanControl& control) noexcept {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <StateID N, typename TA, typename TH>
+template <StateID NN, typename TA, typename TH>
 FFSM2_CONSTEXPR(14)
 void
-S_<N, TA, TH>::deepReenter(PlanControl& control) noexcept {
+S_<NN, TA, TH>::deepReenter(PlanControl& control) noexcept {
 	FFSM2_IF_PLANS(control._planData.verifyEmptyStatus(STATE_ID));
 
 	FFSM2_LOG_STATE_METHOD(&Head::reenter,
@@ -4510,29 +4679,48 @@ S_<N, TA, TH>::deepReenter(PlanControl& control) noexcept {
 
 //------------------------------------------------------------------------------
 
-template <StateID N, typename TA, typename TH>
+template <StateID NN, typename TA, typename TH>
 FFSM2_CONSTEXPR(14)
 Status
-S_<N, TA, TH>::deepUpdate(FullControl& control) noexcept {
+S_<NN, TA, TH>::deepUpdate(FullControl& control) noexcept {
 	FFSM2_LOG_STATE_METHOD(&Head::update,
 						   Method::UPDATE);
 
 	ScopedOrigin origin{control, STATE_ID};
 
-	Head::widePreUpdate(control.context());
-	Head::		 update(control);
+	Head:: widePreUpdate(control.context());
+	Head::		  update(control);
+	Head::widePostUpdate(control.context());
+
+	return control._status;
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <StateID NN, typename TA, typename TH>
+FFSM2_CONSTEXPR(14)
+Status
+S_<NN, TA, TH>::deepReverseUpdate(FullControl& control) noexcept {
+	FFSM2_LOG_STATE_METHOD(&Head::reverseUpdate,
+						   Method::REVERSE_UPDATE);
+
+	ScopedOrigin origin{control, STATE_ID};
+
+	Head:: widePreReverseUpdate(control.context());
+	Head::		  reverseUpdate(control);
+	Head::widePostReverseUpdate(control.context());
 
 	return control._status;
 }
 
 //------------------------------------------------------------------------------
 
-template <StateID N, typename TA, typename TH>
+template <StateID NN, typename TA, typename TH>
 template <typename TEvent>
 FFSM2_CONSTEXPR(14)
 Status
-S_<N, TA, TH>::deepReact(FullControl& control,
-						 const TEvent& event) noexcept
+S_<NN, TA, TH>::deepReact(FullControl& control,
+						  const TEvent& event) noexcept
 {
 	auto reaction = static_cast<void (Head::*)(const TEvent&, FullControl&)>(&Head::react);
 
@@ -4541,18 +4729,43 @@ S_<N, TA, TH>::deepReact(FullControl& control,
 
 	ScopedOrigin origin{control, STATE_ID};
 
-	Head::widePreReact(event, control.context());
-	(this->*reaction)(event, control);
+	Head:: widePreReact(event, control.context());
+	(this->*reaction)  (event, control);
+	Head::widePostReact(event, control.context());
 
 	return control._status;
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <StateID NN, typename TA, typename TH>
+template <typename TEvent>
+FFSM2_CONSTEXPR(14)
+Status
+S_<NN, TA, TH>::deepReverseReact(FullControl& control,
+								 const TEvent& event) noexcept
+{
+	auto reaction = static_cast<void (Head::*)(const TEvent&, FullControl&)>(&Head::reverseReact);
+
+	FFSM2_LOG_STATE_METHOD(reaction,
+						   Method::REVERSE_REACT);
+
+	ScopedOrigin origin{control, STATE_ID};
+
+	Head:: widePreReverseReact(event, control.context());
+	(this->*reaction)		  (event, control);
+	Head::widePostReverseReact(event, control.context());
+
+	return control._status;
+
+}
+
 //------------------------------------------------------------------------------
 
-template <StateID N, typename TA, typename TH>
+template <StateID NN, typename TA, typename TH>
 FFSM2_CONSTEXPR(14)
 bool
-S_<N, TA, TH>::deepExitGuard(GuardControl& control) noexcept {
+S_<NN, TA, TH>::deepExitGuard(GuardControl& control) noexcept {
 	FFSM2_LOG_STATE_METHOD(&Head::exitGuard,
 						   Method::EXIT_GUARD);
 
@@ -4568,10 +4781,10 @@ S_<N, TA, TH>::deepExitGuard(GuardControl& control) noexcept {
 
 //------------------------------------------------------------------------------
 
-template <StateID N, typename TA, typename TH>
+template <StateID NN, typename TA, typename TH>
 FFSM2_CONSTEXPR(14)
 void
-S_<N, TA, TH>::deepExit(PlanControl& control) noexcept {
+S_<NN, TA, TH>::deepExit(PlanControl& control) noexcept {
 	FFSM2_LOG_STATE_METHOD(&Head::exit,
 						   Method::EXIT);
 
@@ -4594,10 +4807,10 @@ S_<N, TA, TH>::deepExit(PlanControl& control) noexcept {
 
 #if FFSM2_PLANS_AVAILABLE()
 
-template <StateID N, typename TA, typename TH>
+template <StateID NN, typename TA, typename TH>
 FFSM2_CONSTEXPR(14)
 void
-S_<N, TA, TH>::wrapPlanSucceeded(FullControl& control) noexcept {
+S_<NN, TA, TH>::wrapPlanSucceeded(FullControl& control) noexcept {
 	FFSM2_LOG_STATE_METHOD(&Head::planSucceeded,
 						   Method::PLAN_SUCCEEDED);
 
@@ -4608,10 +4821,10 @@ S_<N, TA, TH>::wrapPlanSucceeded(FullControl& control) noexcept {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <StateID N, typename TA, typename TH>
+template <StateID NN, typename TA, typename TH>
 FFSM2_CONSTEXPR(14)
 void
-S_<N, TA, TH>::wrapPlanFailed(FullControl& control) noexcept {
+S_<NN, TA, TH>::wrapPlanFailed(FullControl& control) noexcept {
 	FFSM2_LOG_STATE_METHOD(&Head::planFailed,
 						   Method::PLAN_FAILED);
 
@@ -4639,14 +4852,8 @@ struct SI_;
 template <typename, typename...>
 struct CI_;
 
-template <typename...>
+template <typename>
 struct CSI_;
-
-template <typename TInitial, typename... TRemaining>
-struct CSI_<TInitial, TRemaining...>;
-
-template <typename TInitial>
-struct CSI_<TInitial>;
 
 //------------------------------------------------------------------------------
 
@@ -4659,8 +4866,8 @@ struct WrapInfoT<	 TH> final {
 };
 
 template <typename TH, typename... TS>
-struct WrapInfoT< CI_<TH, TS...>> final {
-	using Type =  CI_<TH, TS...>;
+struct WrapInfoT<CI_<TH, TS...>> final {
+	using Type = CI_<TH, TS...>;
 };
 
 template <typename... TS>
@@ -4681,18 +4888,18 @@ struct SI_ final {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename TInitial, typename... TRemaining>
-struct CSI_<TInitial, TRemaining...> final {
-	using Initial			= WrapInfo<TInitial>;
-	using Remaining			= CSI_<TRemaining...>;
+template <typename TI, typename... TR>
+struct CSI_<TL_<TI, TR...>> final {
+	using Initial			= WrapInfo<TI>;
+	using Remaining			= CSI_<TL_<TR...>>;
 	using StateList			= Merge<typename Initial::StateList,  typename Remaining::StateList>;
 
 	static constexpr Long  STATE_COUNT	= StateList::SIZE;
 };
 
-template <typename TInitial>
-struct CSI_<TInitial> final {
-	using Initial			= WrapInfo<TInitial>;
+template <typename TI>
+struct CSI_<TL_<TI>> final {
+	using Initial			= WrapInfo<TI>;
 	using StateList			= typename Initial::StateList;
 
 	static constexpr Long  STATE_COUNT	= StateList::SIZE;
@@ -4704,7 +4911,7 @@ template <typename THead, typename... TSubStates>
 struct CI_ final {
 	using Head				= THead;
 	using HeadInfo			= SI_<Head>;
-	using SubStates			= CSI_<TSubStates...>;
+	using SubStates			= CSI_<TL_<TSubStates...>>;
 	using StateList			= typename SubStates::StateList;
 
 	static constexpr Short WIDTH		= sizeof...(TSubStates);
@@ -4765,7 +4972,7 @@ struct S_;
 template <typename, typename, typename...>
 struct C_;
 
-template <StateID, typename, Short, typename...>
+template <StateID, typename, Short, typename>
 struct CS_;
 
 template <typename, typename>
@@ -4774,25 +4981,25 @@ class RC_;
 //------------------------------------------------------------------------------
 
 template <StateID, typename...>
-struct MaterialT;
+struct MaterialT_;
 
-template <StateID N, typename TA, typename TH>
-struct MaterialT   <N, TA, TH> {
-	using Type = S_<N, TA, TH>;
+template <StateID NN, typename TA, typename TH>
+struct MaterialT_  <NN, TA, TH> final {
+	using Type = S_<NN, TA, TH>;
 };
 
-template <StateID N, typename TA, 			   typename... TS>
-struct MaterialT   <N, TA, CI_<void,   TS...>> {
+template <StateID NN, typename TA, 			   typename... TS>
+struct MaterialT_  <NN, TA, CI_<void,   TS...>> {
 	using Type = C_<   TA, EmptyT<TA>, TS...>;
 };
 
-template <StateID N, typename TA, typename TH, typename... TS>
-struct MaterialT   <N, TA, CI_<TH,	   TS...>> {
+template <StateID NN, typename TA, typename TH, typename... TS>
+struct MaterialT_  <NN, TA, CI_<TH,	   TS...>> {
 	using Type = C_<   TA,	   TH,	   TS...>;
 };
 
-template <StateID N, typename... TS>
-using Material = typename MaterialT<N, TS...>::Type;
+template <StateID NN, typename... TS>
+using MaterialT = typename MaterialT_<NN, TS...>::Type;
 
 //------------------------------------------------------------------------------
 
@@ -4867,15 +5074,34 @@ struct RF_ final {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <StateID, typename, Short, typename>
-struct CSubMaterialT;
+struct LHalfCST;
 
-template <StateID N, typename TA, Short NI, typename... TS>
-struct CSubMaterialT<N, TA, NI, TL_<TS...>> final {
-	using Type = CS_<N, TA, NI,		TS...>;
+template <StateID NN, typename TA, Short NI, typename... TS>
+struct LHalfCST<NN, TA, NI, TL_<TS...>> final {
+	using Type = CS_<NN,
+					 TA,
+					 NI,
+					 LHalfTypes<TS...>>;
 };
 
-template <StateID N, typename TA, Short NI, typename TL>
-using CSubMaterial = typename CSubMaterialT<N, TA, NI, TL>::Type;
+template <StateID NN, typename TA, Short NI, typename TL>
+using LHalfCS = typename LHalfCST<NN, TA, NI, TL>::Type;
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <StateID, typename, Short, typename>
+struct RHalfCST;
+
+template <StateID NN, typename TA, Short NI, typename... TS>
+struct RHalfCST<NN, TA, NI, TL_<TS...>> final {
+	using Type = CS_<NN + sizeof...(TS) / 2,
+					 TA,
+					 NI + sizeof...(TS) / 2,
+					 RHalfTypes<TS...>>;
+};
+
+template <StateID NN, typename TA, Short NI, typename TL>
+using RHalfCS = typename RHalfCST<NN, TA, NI, TL>::Type;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -4890,29 +5116,23 @@ template <StateID NStateId,
 		  typename TArgs,
 		  Short NIndex,
 		  typename... TStates>
-struct FFSM2_EMPTY_BASES CS_
-	: CSubMaterial<NStateId,
-				   TArgs,
-				   NIndex,
-				   LHalfTypes<TStates...>>
-	, CSubMaterial<NStateId + LHalfTypes<TStates...>::SIZE,
-				   TArgs,
-				   NIndex + LHalfTypes<TStates...>::SIZE,
-				   RHalfTypes<TStates...>>
+struct FFSM2_EMPTY_BASES CS_<NStateId,
+							 TArgs,
+							 NIndex,
+							 TL_<TStates...>>
+	: LHalfCS<NStateId,
+			  TArgs,
+			  NIndex,
+			  TL_<TStates...>>
+	, RHalfCS<NStateId,
+			  TArgs,
+			  NIndex,
+			  TL_<TStates...>>
 {
 	static_assert(sizeof...(TStates) >= 2, "");
 
-	using LMaterial		= CSubMaterial<NStateId,
-									   TArgs,
-									   NIndex,
-									   LHalfTypes<TStates...>>;
-
-	using RMaterial		= CSubMaterial<NStateId + LHalfTypes<TStates...>::SIZE,
-									   TArgs,
-									   NIndex + LHalfTypes<TStates...>::SIZE,
-									   RHalfTypes<TStates...>>;
-
 	using Args			= TArgs;
+	using SubStateList	= TL_<TStates...>;
 
 	using StateList		= typename Args::StateList;
 
@@ -4923,11 +5143,20 @@ struct FFSM2_EMPTY_BASES CS_
 
 	static constexpr StateID  INITIAL_ID  = NStateId;
 	static constexpr Short	  PRONG_INDEX = NIndex;
+	static constexpr Short	  R_PRONG	  = PRONG_INDEX + sizeof...(TStates) / 2;
 
-	using LStateList	= LHalfTypes<TStates...>;
-	static constexpr Short	  R_PRONG	  = PRONG_INDEX + LStateList::SIZE;
+	using LHalf			= LHalfCS<INITIAL_ID,
+								  Args,
+								  PRONG_INDEX,
+								  SubStateList>;
+
+	using RHalf			= RHalfCS<INITIAL_ID,
+								  Args,
+								  PRONG_INDEX,
+								  SubStateList>;
 
 	//----------------------------------------------------------------------
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	FFSM2_CONSTEXPR(14)	bool	wideEntryGuard		 (GuardControl& control, const Short prong)  noexcept;
 
@@ -4935,9 +5164,14 @@ struct FFSM2_EMPTY_BASES CS_
 	FFSM2_CONSTEXPR(14)	void	wideReenter			 (PlanControl&  control, const Short prong)  noexcept;
 
 	FFSM2_CONSTEXPR(14)	Status	wideUpdate			 (FullControl&  control, const Short prong)  noexcept;
+	FFSM2_CONSTEXPR(14)	Status	wideReverseUpdate	 (FullControl&  control, const Short prong)  noexcept;
 
 	template <typename TEvent>
 	FFSM2_CONSTEXPR(14)	Status	wideReact			 (FullControl&  control,
+													  const TEvent& event,	 const Short prong)  noexcept;
+
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	Status	wideReverseReact	 (FullControl&  control,
 													  const TEvent& event,	 const Short prong)  noexcept;
 
 	FFSM2_CONSTEXPR(14)	bool	wideExitGuard		 (GuardControl& control, const Short prong)  noexcept;
@@ -4957,11 +5191,14 @@ template <StateID NStateId,
 		  typename TArgs,
 		  Short NIndex,
 		  typename TState>
-struct FFSM2_EMPTY_BASES CS_<NStateId, TArgs, NIndex, TState>
-	: Material<NStateId, TArgs, TState>
+struct CS_<NStateId,
+		   TArgs,
+		   NIndex,
+		   TL_<TState>>
+	: MaterialT<NStateId,
+				TArgs,
+				TState>
 {
-	using State			= Material<NStateId, TArgs, TState>;
-
 	static constexpr Short PRONG_INDEX	= NIndex;
 
 	using Args			= TArgs;
@@ -4973,7 +5210,12 @@ struct FFSM2_EMPTY_BASES CS_<NStateId, TArgs, NIndex, TState>
 	using FullControl	= FullControlT <Args>;
 	using GuardControl	= GuardControlT<Args>;
 
+	using State			= MaterialT<NStateId,
+									Args,
+									TState>;
+
 	//----------------------------------------------------------------------
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	FFSM2_CONSTEXPR(14)	bool	wideEntryGuard		 (GuardControl& control, const Short prong)  noexcept;
 
@@ -4981,9 +5223,14 @@ struct FFSM2_EMPTY_BASES CS_<NStateId, TArgs, NIndex, TState>
 	FFSM2_CONSTEXPR(14)	void	wideReenter			 (PlanControl&  control, const Short prong)  noexcept;
 
 	FFSM2_CONSTEXPR(14)	Status	wideUpdate			 (FullControl&  control, const Short prong)  noexcept;
+	FFSM2_CONSTEXPR(14)	Status	wideReverseUpdate	 (FullControl&  control, const Short prong)  noexcept;
 
 	template <typename TEvent>
 	FFSM2_CONSTEXPR(14)	Status	wideReact			 (FullControl&  control,
+													  const TEvent& event,	 const Short prong)  noexcept;
+
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	Status	wideReverseReact	 (FullControl&  control,
 													  const TEvent& event,	 const Short prong)  noexcept;
 
 	FFSM2_CONSTEXPR(14)	bool	wideExitGuard		 (GuardControl& control, const Short prong)  noexcept;
@@ -5008,134 +5255,166 @@ namespace detail {
 ////////////////////////////////////////////////////////////////////////////////
 // COMMON
 
-template <StateID N, typename TA, Short NI, typename... TS>
+template <StateID NN, typename TA, Short NI, typename... TS>
 FFSM2_CONSTEXPR(14)
 bool
-CS_<N, TA, NI, TS...>::wideEntryGuard(GuardControl& control,
+CS_<NN, TA, NI, TL_<TS...>>::wideEntryGuard(GuardControl& control,
+											const Short prong) noexcept
+{
+	FFSM2_ASSERT(prong != INVALID_SHORT);
+
+	if (prong < R_PRONG)
+		return LHalf::wideEntryGuard(control, prong);
+	else
+		return RHalf::wideEntryGuard(control, prong);
+}
+
+//------------------------------------------------------------------------------
+
+template <StateID NN, typename TA, Short NI, typename... TS>
+FFSM2_CONSTEXPR(14)
+void
+CS_<NN, TA, NI, TL_<TS...>>::wideEnter(PlanControl& control,
+									   const Short prong) noexcept
+{
+	FFSM2_ASSERT(prong != INVALID_SHORT);
+
+	if (prong < R_PRONG)
+		LHalf::wideEnter(control, prong);
+	else
+		RHalf::wideEnter(control, prong);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <StateID NN, typename TA, Short NI, typename... TS>
+FFSM2_CONSTEXPR(14)
+void
+CS_<NN, TA, NI, TL_<TS...>>::wideReenter(PlanControl& control,
+										 const Short prong) noexcept
+{
+	FFSM2_ASSERT(prong != INVALID_SHORT);
+
+	if (prong < R_PRONG)
+		LHalf::wideReenter(control, prong);
+	else
+		RHalf::wideReenter(control, prong);
+}
+
+//------------------------------------------------------------------------------
+
+template <StateID NN, typename TA, Short NI, typename... TS>
+FFSM2_CONSTEXPR(14)
+Status
+CS_<NN, TA, NI, TL_<TS...>>::wideUpdate(FullControl& control,
+										const Short prong) noexcept
+{
+	FFSM2_ASSERT(prong != INVALID_SHORT);
+
+	return prong < R_PRONG ?
+		LHalf::wideUpdate(control, prong) :
+		RHalf::wideUpdate(control, prong);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <StateID NN, typename TA, Short NI, typename... TS>
+FFSM2_CONSTEXPR(14)
+Status
+CS_<NN, TA, NI, TL_<TS...>>::wideReverseUpdate(FullControl& control,
+											   const Short prong) noexcept
+{
+	FFSM2_ASSERT(prong != INVALID_SHORT);
+
+	return prong < R_PRONG ?
+		LHalf::wideReverseUpdate(control, prong) :
+		RHalf::wideReverseUpdate(control, prong);
+}
+
+//------------------------------------------------------------------------------
+
+template <StateID NN, typename TA, Short NI, typename... TS>
+template <typename TEvent>
+FFSM2_CONSTEXPR(14)
+Status
+CS_<NN, TA, NI, TL_<TS...>>::wideReact(FullControl& control,
+									   const TEvent& event,
+									   const Short prong) noexcept
+{
+	FFSM2_ASSERT(prong != INVALID_SHORT);
+
+	return prong < R_PRONG ?
+		LHalf::wideReact(control, event, prong) :
+		RHalf::wideReact(control, event, prong);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <StateID NN, typename TA, Short NI, typename... TS>
+template <typename TEvent>
+FFSM2_CONSTEXPR(14)
+Status
+CS_<NN, TA, NI, TL_<TS...>>::wideReverseReact(FullControl& control,
+											  const TEvent& event,
+											  const Short prong) noexcept
+{
+	FFSM2_ASSERT(prong != INVALID_SHORT);
+
+	return prong < R_PRONG ?
+		LHalf::wideReverseReact(control, event, prong) :
+		RHalf::wideReverseReact(control, event, prong);
+}
+
+//------------------------------------------------------------------------------
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// COMMON
+
+template <StateID NN, typename TA, Short NI, typename... TS>
+FFSM2_CONSTEXPR(14)
+bool
+CS_<NN, TA, NI, TL_<TS...>>::wideExitGuard(GuardControl& control,
+										   const Short prong) noexcept
+{
+	FFSM2_ASSERT(prong != INVALID_SHORT);
+
+	if (prong < R_PRONG)
+		return LHalf::wideExitGuard(control, prong);
+	else
+		return RHalf::wideExitGuard(control, prong);
+}
+
+//------------------------------------------------------------------------------
+
+template <StateID NN, typename TA, Short NI, typename... TS>
+FFSM2_CONSTEXPR(14)
+void
+CS_<NN, TA, NI, TL_<TS...>>::wideExit(PlanControl& control,
 									  const Short prong) noexcept
 {
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
 	if (prong < R_PRONG)
-		return LMaterial::wideEntryGuard(control, prong);
+		LHalf::wideExit(control, prong);
 	else
-		return RMaterial::wideEntryGuard(control, prong);
-}
-
-//------------------------------------------------------------------------------
-
-template <StateID N, typename TA, Short NI, typename... TS>
-FFSM2_CONSTEXPR(14)
-void
-CS_<N, TA, NI, TS...>::wideEnter(PlanControl& control,
-								 const Short prong) noexcept
-{
-	FFSM2_ASSERT(prong != INVALID_SHORT);
-
-	if (prong < R_PRONG)
-		LMaterial::wideEnter(control, prong);
-	else
-		RMaterial::wideEnter(control, prong);
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-template <StateID N, typename TA, Short NI, typename... TS>
-FFSM2_CONSTEXPR(14)
-void
-CS_<N, TA, NI, TS...>::wideReenter(PlanControl& control,
-								   const Short prong) noexcept
-{
-	FFSM2_ASSERT(prong != INVALID_SHORT);
-
-	if (prong < R_PRONG)
-		LMaterial::wideReenter(control, prong);
-	else
-		RMaterial::wideReenter(control, prong);
-}
-
-//------------------------------------------------------------------------------
-
-template <StateID N, typename TA, Short NI, typename... TS>
-FFSM2_CONSTEXPR(14)
-Status
-CS_<N, TA, NI, TS...>::wideUpdate(FullControl& control,
-								  const Short prong) noexcept
-{
-	FFSM2_ASSERT(prong != INVALID_SHORT);
-
-	return prong < R_PRONG ?
-		LMaterial::wideUpdate(control, prong) :
-		RMaterial::wideUpdate(control, prong);
-}
-
-//------------------------------------------------------------------------------
-
-template <StateID N, typename TA, Short NI, typename... TS>
-template <typename TEvent>
-FFSM2_CONSTEXPR(14)
-Status
-CS_<N, TA, NI, TS...>::wideReact(FullControl& control,
-								 const TEvent& event,
-								 const Short prong) noexcept
-{
-	FFSM2_ASSERT(prong != INVALID_SHORT);
-
-	return prong < R_PRONG ?
-		LMaterial::wideReact(control, event, prong) :
-		RMaterial::wideReact(control, event, prong);
-}
-
-//------------------------------------------------------------------------------
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// COMMON
-
-template <StateID N, typename TA, Short NI, typename... TS>
-FFSM2_CONSTEXPR(14)
-bool
-CS_<N, TA, NI, TS...>::wideExitGuard(GuardControl& control,
-									 const Short prong) noexcept
-{
-	FFSM2_ASSERT(prong != INVALID_SHORT);
-
-	if (prong < R_PRONG)
-		return LMaterial::wideExitGuard(control, prong);
-	else
-		return RMaterial::wideExitGuard(control, prong);
-}
-
-//------------------------------------------------------------------------------
-
-template <StateID N, typename TA, Short NI, typename... TS>
-FFSM2_CONSTEXPR(14)
-void
-CS_<N, TA, NI, TS...>::wideExit(PlanControl& control,
-								const Short prong) noexcept
-{
-	FFSM2_ASSERT(prong != INVALID_SHORT);
-
-	if (prong < R_PRONG)
-		LMaterial::wideExit(control, prong);
-	else
-		RMaterial::wideExit(control, prong);
+		RHalf::wideExit(control, prong);
 }
 
 //------------------------------------------------------------------------------
 // COMMON
 
-template <StateID N, typename TA, Short NI, typename... TS>
+template <StateID NN, typename TA, Short NI, typename... TS>
 FFSM2_CONSTEXPR(14)
 void
-CS_<N, TA, NI, TS...>::wideChangeToRequested(PlanControl& control,
-											 const Short prong) noexcept
+CS_<NN, TA, NI, TL_<TS...>>::wideChangeToRequested(PlanControl& control,
+												   const Short prong) noexcept
 {
 	FFSM2_ASSERT(prong != INVALID_SHORT);
 
 	if (prong < R_PRONG)
-		LMaterial::wideChangeToRequested(control, prong);
+		LHalf::wideChangeToRequested(control, prong);
 	else
-		RMaterial::wideChangeToRequested(control, prong);
+		RHalf::wideChangeToRequested(control, prong);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -5148,11 +5427,11 @@ namespace detail {
 ////////////////////////////////////////////////////////////////////////////////
 // COMMON
 
-template <StateID N, typename TA, Short NI, typename T>
+template <StateID NN, typename TA, Short NI, typename T>
 FFSM2_CONSTEXPR(14)
 bool
-CS_<N, TA, NI, T>::wideEntryGuard(GuardControl& control,
-								  const Short FFSM2_IF_ASSERT(prong)) noexcept
+CS_<NN, TA, NI, TL_<T>>::wideEntryGuard(GuardControl& control,
+										const Short FFSM2_IF_ASSERT(prong)) noexcept
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
@@ -5161,11 +5440,11 @@ CS_<N, TA, NI, T>::wideEntryGuard(GuardControl& control,
 
 //------------------------------------------------------------------------------
 
-template <StateID N, typename TA, Short NI, typename T>
+template <StateID NN, typename TA, Short NI, typename T>
 FFSM2_CONSTEXPR(14)
 void
-CS_<N, TA, NI, T>::wideEnter(PlanControl& control,
-							 const Short FFSM2_IF_ASSERT(prong)) noexcept
+CS_<NN, TA, NI, TL_<T>>::wideEnter(PlanControl& control,
+								   const Short FFSM2_IF_ASSERT(prong)) noexcept
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
@@ -5174,11 +5453,11 @@ CS_<N, TA, NI, T>::wideEnter(PlanControl& control,
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <StateID N, typename TA, Short NI, typename T>
+template <StateID NN, typename TA, Short NI, typename T>
 FFSM2_CONSTEXPR(14)
 void
-CS_<N, TA, NI, T>::wideReenter(PlanControl& control,
-							   const Short FFSM2_IF_ASSERT(prong)) noexcept
+CS_<NN, TA, NI, TL_<T>>::wideReenter(PlanControl& control,
+									 const Short FFSM2_IF_ASSERT(prong)) noexcept
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
@@ -5187,40 +5466,68 @@ CS_<N, TA, NI, T>::wideReenter(PlanControl& control,
 
 //------------------------------------------------------------------------------
 
-template <StateID N, typename TA, Short NI, typename T>
+template <StateID NN, typename TA, Short NI, typename T>
 FFSM2_CONSTEXPR(14)
 Status
-CS_<N, TA, NI, T>::wideUpdate(FullControl& control,
-							  const Short FFSM2_IF_ASSERT(prong)) noexcept
+CS_<NN, TA, NI, TL_<T>>::wideUpdate(FullControl& control,
+									const Short FFSM2_IF_ASSERT(prong)) noexcept
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
 	return State::deepUpdate(control);
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <StateID NN, typename TA, Short NI, typename T>
+FFSM2_CONSTEXPR(14)
+Status
+CS_<NN, TA, NI, TL_<T>>::wideReverseUpdate(FullControl& control,
+										   const Short FFSM2_IF_ASSERT(prong)) noexcept
+{
+	FFSM2_ASSERT(prong == PRONG_INDEX);
+
+	return State::deepReverseUpdate(control);
+}
+
 //------------------------------------------------------------------------------
 
-template <StateID N, typename TA, Short NI, typename T>
+template <StateID NN, typename TA, Short NI, typename T>
 template <typename TEvent>
 FFSM2_CONSTEXPR(14)
 Status
-CS_<N, TA, NI, T>::wideReact(FullControl& control,
-							 const TEvent& event,
-							 const Short FFSM2_IF_ASSERT(prong)) noexcept
+CS_<NN, TA, NI, TL_<T>>::wideReact(FullControl& control,
+								   const TEvent& event,
+								   const Short FFSM2_IF_ASSERT(prong)) noexcept
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
 	return State::deepReact(control, event);
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <StateID NN, typename TA, Short NI, typename T>
+template <typename TEvent>
+FFSM2_CONSTEXPR(14)
+Status
+CS_<NN, TA, NI, TL_<T>>::wideReverseReact(FullControl& control,
+										  const TEvent& event,
+										  const Short FFSM2_IF_ASSERT(prong)) noexcept
+{
+	FFSM2_ASSERT(prong == PRONG_INDEX);
+
+	return State::deepReverseReact(control, event);
+}
+
 //------------------------------------------------------------------------------
 // COMMON
 
-template <StateID N, typename TA, Short NI, typename T>
+template <StateID NN, typename TA, Short NI, typename T>
 FFSM2_CONSTEXPR(14)
 bool
-CS_<N, TA, NI, T>::wideExitGuard(GuardControl& control,
-								 const Short FFSM2_IF_ASSERT(prong)) noexcept
+CS_<NN, TA, NI, TL_<T>>::wideExitGuard(GuardControl& control,
+									   const Short FFSM2_IF_ASSERT(prong)) noexcept
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
@@ -5229,11 +5536,11 @@ CS_<N, TA, NI, T>::wideExitGuard(GuardControl& control,
 
 //------------------------------------------------------------------------------
 
-template <StateID N, typename TA, Short NI, typename T>
+template <StateID NN, typename TA, Short NI, typename T>
 FFSM2_CONSTEXPR(14)
 void
-CS_<N, TA, NI, T>::wideExit(PlanControl& control,
-							const Short FFSM2_IF_ASSERT(prong)) noexcept
+CS_<NN, TA, NI, TL_<T>>::wideExit(PlanControl& control,
+								  const Short FFSM2_IF_ASSERT(prong)) noexcept
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
@@ -5254,12 +5561,12 @@ template <typename TArgs,
 		  typename... TSubStates>
 struct FFSM2_EMPTY_BASES C_
 	: S_<INVALID_STATE_ID, TArgs, THead>
-	, CS_<0, TArgs, 0, TSubStates...>
+	, CS_<0, TArgs, 0, TL_<TSubStates...>>
 {
 	using Args			= TArgs;
 
 	using HeadState		= S_<INVALID_STATE_ID, Args, THead>;
-	using SubStates		= CS_<0, Args, 0, TSubStates...>;
+	using SubStates		= CS_<0, Args, 0, TL_<TSubStates...>>;
 
 	using StateList		= typename Args::StateList;
 
@@ -5288,11 +5595,17 @@ struct FFSM2_EMPTY_BASES C_
 	FFSM2_CONSTEXPR(14)	bool deepEntryGuard		  (GuardControl& control)  noexcept;
 
 	FFSM2_CONSTEXPR(14)	void deepEnter			  (PlanControl&  control)  noexcept;
+	FFSM2_CONSTEXPR(14)	void deepReenter		  (PlanControl&  control)  noexcept;
 
 	FFSM2_CONSTEXPR(14)	void deepUpdate			  (FullControl&  control)  noexcept;
+	FFSM2_CONSTEXPR(14)	void deepReverseUpdate	  (FullControl&  control)  noexcept;
 
 	template <typename TEvent>
 	FFSM2_CONSTEXPR(14)	void deepReact			  (FullControl&  control,
+												   const TEvent& event)    noexcept;
+
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void deepReverseReact	  (FullControl&  control,
 												   const TEvent& event)    noexcept;
 
 	FFSM2_CONSTEXPR(14)	bool deepForwardExitGuard (GuardControl& control)  noexcept;
@@ -5379,6 +5692,12 @@ C_<TA, TH, TS...>::deepEnter(PlanControl& control) noexcept {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+template <typename TA, typename TH, typename... TS>
+FFSM2_CONSTEXPR(14)
+void
+C_<TA, TH, TS...>::deepReenter(PlanControl& /*control*/) noexcept {
+}
+
 //------------------------------------------------------------------------------
 // COMMON
 
@@ -5404,6 +5723,26 @@ C_<TA, TH, TS...>::deepUpdate(FullControl& control) noexcept {
 			control.updatePlan((HeadState&) *this, subStatus);
 	#endif
 	}
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <typename TA, typename TH, typename... TS>
+FFSM2_CONSTEXPR(14)
+void
+C_<TA, TH, TS...>::deepReverseUpdate(FullControl& control) noexcept {
+	const Short active = control._registry.active;
+	FFSM2_ASSERT(active != INVALID_SHORT);
+
+	FFSM2_IF_PLANS(const Status subStatus =)
+		SubStates::wideReverseUpdate(control, active);
+
+	HeadState::deepReverseUpdate(control);
+
+	#if FFSM2_PLANS_AVAILABLE()
+		if (subStatus && control._planData.planExists)
+			control.updatePlan((HeadState&) *this, subStatus);
+	#endif
 }
 
 //------------------------------------------------------------------------------
@@ -5433,6 +5772,29 @@ C_<TA, TH, TS...>::deepReact(FullControl& control,
 			control.updatePlan((HeadState&) *this, subStatus);
 	#endif
 	}
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <typename TA, typename TH, typename... TS>
+template <typename TEvent>
+FFSM2_CONSTEXPR(14)
+void
+C_<TA, TH, TS...>::deepReverseReact(FullControl& control,
+									const TEvent& event) noexcept
+{
+	const Short active = control._registry.active;
+	FFSM2_ASSERT(active != INVALID_SHORT);
+
+	FFSM2_IF_PLANS(const Status subStatus =)
+		SubStates::wideReverseReact(control, event, active);
+
+	HeadState::deepReverseReact(control, event);
+
+	#if FFSM2_PLANS_AVAILABLE()
+		if (subStatus && control._planData.planExists)
+			control.updatePlan((HeadState&) *this, subStatus);
+	#endif
 }
 
 //------------------------------------------------------------------------------
@@ -5690,9 +6052,7 @@ namespace detail {
 /// @tparam TApex Root region type
 template <typename TConfig,
 		  typename TApex>
-class R_
-	: protected Material<0, typename RF_<TConfig, TApex>::Args, TApex>
-{
+class R_ {
 public:
 	static constexpr FeatureTag FEATURE_TAG = TConfig::FEATURE_TAG;
 
@@ -5707,7 +6067,7 @@ protected:
 	static_assert(Args::STATE_COUNT <  (unsigned) -1, "Too many states in the FSM. Change 'Short' type.");
 	static_assert(Args::STATE_COUNT == (unsigned) StateList::SIZE, "STATE_COUNT != StateList::SIZE");
 
-	using Apex					= Material<0, Args, TApex>;
+	using Apex					= MaterialT<0, Args, TApex>;
 
 	using Control				= ControlT	   <Args>;
 	using PlanControl			= PlanControlT <Args>;
@@ -5738,24 +6098,19 @@ public:
 	//----------------------------------------------------------------------
 
 	FFSM2_CONSTEXPR(11)	explicit R_(Context& context
-								  FFSM2_IF_LOG_INTERFACE(, Logger* const logger = nullptr))  noexcept
-		: _context{context}
-	   FFSM2_IF_LOG_INTERFACE(, _logger{logger})
-	{}
+								  FFSM2_IF_LOG_INTERFACE(, Logger* const logger = nullptr))	  noexcept;
 
-	FFSM2_CONSTEXPR(20)	~R_()																  noexcept	{
-		FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
-	}
+	FFSM2_CONSTEXPR(20)	~R_()																  noexcept;
 
 	//----------------------------------------------------------------------
 
 	/// @brief Access context
 	/// @return context
-	FFSM2_CONSTEXPR(14)		  Context& context()								  noexcept	{ return _context;									}
+	FFSM2_CONSTEXPR(14)		  Context& context()								  noexcept	{ return _context;								}
 
 	/// @brief Access context
 	/// @return context
-	FFSM2_CONSTEXPR(11)	const Context& context()							const noexcept	{ return _context;									}
+	FFSM2_CONSTEXPR(11)	const Context& context()							const noexcept	{ return _context;								}
 
 	//----------------------------------------------------------------------
 
@@ -5763,18 +6118,45 @@ public:
 	/// @tparam TState State type
 	/// @return Numeric state identifier
 	template <typename TState>
-	static constexpr StateID stateId()											  noexcept	{ return index<StateList, TState>();				}
+	static constexpr StateID stateId()											  noexcept	{ return index<StateList, TState>();			}
 
 	//----------------------------------------------------------------------
 
-	/// @brief Trigger FSM update cycle (recursively call 'update()' on all active states, then process requested transitions)
-	FFSM2_CONSTEXPR(14)	void update() noexcept;
+	/// @brief Access state instance
+	/// @tparam TState State type
+	/// @return State instance
+	template <typename TState>
+	FFSM2_CONSTEXPR(14)		  TState& access()									  noexcept	{ return static_cast<	   TState&>(_apex);			}
 
-	/// @brief Have FSM react to an event (recursively call matching 'react<>()' on all active states, then process requested transitions)
+	/// @brief Access state instance
+	/// @tparam TState State type
+	/// @return State instance
+	template <typename TState>
+	FFSM2_CONSTEXPR(11)	const TState& access()								const noexcept	{ return static_cast<const TState&>(_apex);			}
+
+	//----------------------------------------------------------------------
+
+	/// @brief Trigger FSM update cycle (recursively call 'update()' from the root down to the leaf states,
+	///   on all active states, then process requested transitions)
+	FFSM2_CONSTEXPR(14)	void update()											  noexcept;
+
+	/// @brief Trigger FSM update cycle (recursively call 'update()' in reverse order, from the leaf states to the root,
+	///   on all active states, then process requested transitions)
+	FFSM2_CONSTEXPR(14)	void reverseUpdate()									  noexcept;
+
+	/// @brief Have FSM react to an event (recursively call matching 'react<>()' from the root down to the leaf states,
+	///    on all active states, then process requested transitions)
 	/// @tparam TEvent Event type
 	/// @param event Event to react to
 	template <typename TEvent>
 	FFSM2_CONSTEXPR(14)	void react(const TEvent& event)							  noexcept;
+
+	/// @brief Have FSM react to an event (recursively call matching 'react<>()' in reverse order, from the leaf states to the root,
+	///   on all active states, then process requested transitions)
+	/// @tparam TEvent Event type
+	/// @param event Event to react to
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void reverseReact(const TEvent& event)					  noexcept;
 
 	//----------------------------------------------------------------------
 
@@ -5868,7 +6250,8 @@ protected:
 
 	FFSM2_CONSTEXPR(14)	void processTransitions(Transition& currentTransition)				  noexcept;
 
-	FFSM2_CONSTEXPR(14)	void applyRequest(const StateID destination)						  noexcept;
+	FFSM2_CONSTEXPR(14)	bool applyRequest(const Transition& currentTransition,
+										  const StateID destination)						  noexcept;
 
 	FFSM2_CONSTEXPR(14)	bool cancelledByEntryGuards(const Transition& currentTransition,
 													const Transition& pendingTransition)	  noexcept;
@@ -5886,6 +6269,8 @@ protected:
 	FFSM2_IF_PLANS(PlanData _planData);
 
 	Transition _request;
+
+	Apex _apex;
 
 	FFSM2_IF_LOG_INTERFACE(Logger* _logger);
 };
@@ -5933,6 +6318,10 @@ public:
 private:
 	using Base::initialEnter;
 	using Base::finalExit;
+
+#if FFSM2_TRANSITION_HISTORY_AVAILABLE()
+	using Base::_apex;
+#endif
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -5990,6 +6379,7 @@ private:
 	using Base::_previousTransition;
 
 	using Base::_context;
+	using Base::_apex;
 	using Base::_registry;
 	#if FFSM2_PLANS_AVAILABLE()
 		using Base::_planData;
@@ -6270,6 +6660,24 @@ namespace detail {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TG, typename TA>
+FFSM2_CONSTEXPR(11)
+R_<TG, TA>::R_(Context& context
+			 FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
+	: _context{context}
+	FFSM2_IF_LOG_INTERFACE(, _logger{logger})
+{}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <typename TG, typename TA>
+FFSM2_CONSTEXPR(20)
+R_<TG, TA>::~R_() noexcept {
+	FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
+}
+
+//------------------------------------------------------------------------------
+
+template <typename TG, typename TA>
 FFSM2_CONSTEXPR(14)
 void
 R_<TG, TA>::update() noexcept {
@@ -6282,7 +6690,62 @@ R_<TG, TA>::update() noexcept {
 					  FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
 					  FFSM2_IF_LOG_INTERFACE(, _logger)};
 
-	Apex::deepUpdate(control);
+	_apex.deepUpdate(control);
+
+	FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
+
+	Transition currentTransition;
+
+	if (_request)
+		processTransitions(currentTransition);
+
+	FFSM2_IF_TRANSITION_HISTORY(_previousTransition = currentTransition);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <typename TG, typename TA>
+FFSM2_CONSTEXPR(14)
+void
+R_<TG, TA>::reverseUpdate() noexcept {
+	FFSM2_ASSERT(_registry.isActive());
+
+	FullControl control{_context
+					  , _registry
+					  , _request
+					  FFSM2_IF_PLANS(, _planData)
+					  FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
+					  FFSM2_IF_LOG_INTERFACE(, _logger)};
+
+	_apex.deepReverseUpdate(control);
+
+	FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
+
+	Transition currentTransition;
+
+	if (_request)
+		processTransitions(currentTransition);
+
+	FFSM2_IF_TRANSITION_HISTORY(_previousTransition = currentTransition);
+}
+
+//------------------------------------------------------------------------------
+
+template <typename TG, typename TA>
+template <typename TEvent>
+FFSM2_CONSTEXPR(14)
+void
+R_<TG, TA>::react(const TEvent& event) noexcept {
+	FFSM2_ASSERT(_registry.isActive());
+
+	FullControl control{_context
+					  , _registry
+					  , _request
+					  FFSM2_IF_PLANS(, _planData)
+					  FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
+					  FFSM2_IF_LOG_INTERFACE(, _logger)};
+
+	_apex.deepReact(control, event);
 
 	FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
 
@@ -6300,7 +6763,7 @@ template <typename TG, typename TA>
 template <typename TEvent>
 FFSM2_CONSTEXPR(14)
 void
-R_<TG, TA>::react(const TEvent& event) noexcept {
+R_<TG, TA>::reverseReact(const TEvent& event) noexcept {
 	FFSM2_ASSERT(_registry.isActive());
 
 	FullControl control{_context
@@ -6310,7 +6773,7 @@ R_<TG, TA>::react(const TEvent& event) noexcept {
 					  FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
 					  FFSM2_IF_LOG_INTERFACE(, _logger)};
 
-	Apex::deepReact(control, event);
+	_apex.deepReverseReact(control, event);
 
 	FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
 
@@ -6354,7 +6817,7 @@ R_<TG, TA>::save(SerialBuffer& _buffer) const noexcept {
 	// TODO: save _previousTransition		// FFSM2_IF_TRANSITION_HISTORY()
 	// TODO: save _activityHistory			// FFSM2_IF_STRUCTURE_REPORT()
 
-	Apex::deepSaveActive(_registry, stream);
+	_apex.deepSaveActive(_registry, stream);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -6374,7 +6837,7 @@ R_<TG, TA>::load(const SerialBuffer& buffer) noexcept {
 					  FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
 					  FFSM2_IF_LOG_INTERFACE(, _logger)};
 
-	Apex::deepExit(control);
+	_apex.deepExit(control);
 
 	FFSM2_IF_TRANSITION_HISTORY(_previousTransition.clear());
 
@@ -6390,9 +6853,9 @@ R_<TG, TA>::load(const SerialBuffer& buffer) noexcept {
 	// TODO: load _previousTransition	// FFSM2_IF_TRANSITION_HISTORY()
 	// TODO: load _activityHistory		// FFSM2_IF_STRUCTURE_REPORT()
 
-	Apex::deepLoadRequested(_registry, stream);
+	_apex.deepLoadRequested(_registry, stream);
 
-	Apex::deepEnter(control);
+	_apex.deepEnter(control);
 }
 
 #endif
@@ -6417,10 +6880,13 @@ R_<TG, TA>::replayTransition(const StateID destination) noexcept {
 						  , _previousTransition
 						  FFSM2_IF_LOG_INTERFACE(, _logger)};
 
-		applyRequest(destination);
+		Transition currentTransition;
+		applyRequest(currentTransition,
+					 destination);
+
 		_previousTransition = Transition{destination};
 
-		Apex::deepChangeToRequested(control);
+		_apex.deepChangeToRequested(control);
 
 		_registry.clearRequests();
 
@@ -6451,10 +6917,10 @@ R_<TG, TA>::initialEnter() noexcept {
 					  FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
 					  FFSM2_IF_LOG_INTERFACE(, _logger)};
 
-	applyRequest(0);
-
 	Transition currentTransition;
 	Transition pendingTransition;
+
+	applyRequest(currentTransition, 0);
 
 	cancelledByEntryGuards(currentTransition,
 						   pendingTransition);
@@ -6465,21 +6931,26 @@ R_<TG, TA>::initialEnter() noexcept {
 	{
 		//backup();
 
-		applyRequest(_request.destination);
-		pendingTransition = _request;
-		_request.clear();
+		if (applyRequest(currentTransition,
+						 _request.destination))
+		{
+			pendingTransition = _request;
+			_request.clear();
 
-		if (cancelledByEntryGuards(currentTransition,
-								   pendingTransition))
-			FFSM2_BREAK();
-		else
-			currentTransition = pendingTransition;
+			if (cancelledByEntryGuards(currentTransition,
+									   pendingTransition))
+				FFSM2_BREAK();
+			else
+				currentTransition = pendingTransition;
 
-		pendingTransition.clear();
+			pendingTransition.clear();
+		} else
+			_request.clear();
 	}
+	FFSM2_ASSERT(!_request);
 	FFSM2_IF_TRANSITION_HISTORY(_previousTransition = currentTransition);
 
-	Apex::deepEnter(control);
+	_apex.deepEnter(control);
 
 	_registry.clearRequests();
 
@@ -6502,7 +6973,7 @@ R_<TG, TA>::finalExit() noexcept {
 					  FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
 					  FFSM2_IF_LOG_INTERFACE(, _logger)};
 
-	Apex::deepExit(control);
+	_apex.deepExit(control);
 }
 
 //------------------------------------------------------------------------------
@@ -6528,20 +6999,26 @@ R_<TG, TA>::processTransitions(Transition& currentTransition) noexcept {
 	{
 		//backup();
 
-		applyRequest(_request.destination);
-		pendingTransition = _request;
-		_request.clear();
+		if (applyRequest(currentTransition,
+						 _request.destination))
+		{
+			pendingTransition = _request;
+			_request.clear();
 
-		if (cancelledByGuards(currentTransition, pendingTransition))
-			;
-		else
-			currentTransition = pendingTransition;
+			if (cancelledByGuards(currentTransition,
+								  pendingTransition))
+				;
+			else
+				currentTransition = pendingTransition;
 
-		pendingTransition.clear();
+			pendingTransition.clear();
+		} else
+			_request.clear();
 	}
+	FFSM2_ASSERT(!_request);
 
 	if (currentTransition)
-		Apex::deepChangeToRequested(control);
+		_apex.deepChangeToRequested(control);
 
 	_registry.clearRequests();
 
@@ -6553,10 +7030,16 @@ R_<TG, TA>::processTransitions(Transition& currentTransition) noexcept {
 
 template <typename TG, typename TA>
 FFSM2_CONSTEXPR(14)
-void
-R_<TG, TA>::applyRequest(const StateID destination) noexcept
+bool
+R_<TG, TA>::applyRequest(const Transition& currentTransition,
+						 const StateID destination) noexcept
 {
-	_registry.requested = destination;
+	if (currentTransition != Transition{destination}) {
+		_registry.requested = destination;
+
+		return true;
+	} else
+		return false;
 }
 
 //------------------------------------------------------------------------------
@@ -6577,7 +7060,7 @@ R_<TG, TA>::cancelledByEntryGuards(const Transition& currentTransition,
 							FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
 							FFSM2_IF_LOG_INTERFACE(, _logger)};
 
-	return Apex::deepEntryGuard(guardControl);
+	return _apex.deepEntryGuard(guardControl);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -6597,9 +7080,14 @@ R_<TG, TA>::cancelledByGuards(const Transition& currentTransition,
 							FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
 							FFSM2_IF_LOG_INTERFACE(, _logger)};
 
-	return Apex::deepForwardExitGuard(guardControl) ||
-		   Apex::deepForwardEntryGuard(guardControl);
+	return _apex.deepForwardExitGuard (guardControl) ||
+		   _apex.deepForwardEntryGuard(guardControl);
 }
+
+//------------------------------------------------------------------------------
+
+#if FFSM2_STRUCTURE_REPORT_AVAILABLE()
+#endif
 
 //------------------------------------------------------------------------------
 
@@ -6625,11 +7113,13 @@ RV_<G_<NFT, TC, Manual, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::replayEnter(const S
 					  FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
 					  FFSM2_IF_LOG_INTERFACE(, _logger)};
 
-	applyRequest(destination);
+	Transition currentTransition;
+	applyRequest(currentTransition,
+				 destination);
 
 	FFSM2_IF_TRANSITION_HISTORY(_previousTransition = Transition{destination});
 
-	Apex::deepEnter(control);
+	_apex.deepEnter(control);
 
 	_registry.clearRequests();
 

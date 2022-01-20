@@ -36,6 +36,8 @@ struct S_
 	using Head			= THead;
 
 	//----------------------------------------------------------------------
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	FFSM2_CONSTEXPR(14)	bool	deepEntryGuard		 (GuardControl& control)  noexcept;
 
@@ -43,9 +45,14 @@ struct S_
 	FFSM2_CONSTEXPR(14)	void	deepReenter			 (PlanControl&  control)  noexcept;
 
 	FFSM2_CONSTEXPR(14)	Status	deepUpdate			 (FullControl&  control)  noexcept;
+	FFSM2_CONSTEXPR(14)	Status	deepReverseUpdate	 (FullControl&  control)  noexcept;
 
 	template <typename TEvent>
 	FFSM2_CONSTEXPR(14)	Status	deepReact			 (FullControl&  control,
+													  const TEvent& event)	  noexcept;
+
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	Status	deepReverseReact	 (FullControl&  control,
 													  const TEvent& event)	  noexcept;
 
 	FFSM2_CONSTEXPR(14)	bool	deepExitGuard		 (GuardControl& control)  noexcept;

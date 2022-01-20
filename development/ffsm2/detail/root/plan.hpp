@@ -98,7 +98,7 @@ private:
 public:
 	FFSM2_CONSTEXPR(14)	explicit operator bool()			const noexcept;
 
-	FFSM2_CONSTEXPR(11)	IteratorT first()						  noexcept	{ return IteratorT{*this};					}
+	FFSM2_CONSTEXPR(14)	IteratorT first()						  noexcept	{ return IteratorT{*this};					}
 
 private:
 	const PlanData& _planData;

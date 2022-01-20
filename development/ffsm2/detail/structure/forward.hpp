@@ -11,14 +11,8 @@ struct SI_;
 template <typename, typename...>
 struct CI_;
 
-template <typename...>
+template <typename>
 struct CSI_;
-
-template <typename TInitial, typename... TRemaining>
-struct CSI_<TInitial, TRemaining...>;
-
-template <typename TInitial>
-struct CSI_<TInitial>;
 
 //------------------------------------------------------------------------------
 
@@ -31,8 +25,8 @@ struct WrapInfoT<	 TH> final {
 };
 
 template <typename TH, typename... TS>
-struct WrapInfoT< CI_<TH, TS...>> final {
-	using Type =  CI_<TH, TS...>;
+struct WrapInfoT<CI_<TH, TS...>> final {
+	using Type = CI_<TH, TS...>;
 };
 
 template <typename... TS>
@@ -53,18 +47,18 @@ struct SI_ final {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename TInitial, typename... TRemaining>
-struct CSI_<TInitial, TRemaining...> final {
-	using Initial			= WrapInfo<TInitial>;
-	using Remaining			= CSI_<TRemaining...>;
+template <typename TI, typename... TR>
+struct CSI_<TL_<TI, TR...>> final {
+	using Initial			= WrapInfo<TI>;
+	using Remaining			= CSI_<TL_<TR...>>;
 	using StateList			= Merge<typename Initial::StateList,  typename Remaining::StateList>;
 
 	static constexpr Long  STATE_COUNT	= StateList::SIZE;
 };
 
-template <typename TInitial>
-struct CSI_<TInitial> final {
-	using Initial			= WrapInfo<TInitial>;
+template <typename TI>
+struct CSI_<TL_<TI>> final {
+	using Initial			= WrapInfo<TI>;
 	using StateList			= typename Initial::StateList;
 
 	static constexpr Long  STATE_COUNT	= StateList::SIZE;
@@ -76,7 +70,7 @@ template <typename THead, typename... TSubStates>
 struct CI_ final {
 	using Head				= THead;
 	using HeadInfo			= SI_<Head>;
-	using SubStates			= CSI_<TSubStates...>;
+	using SubStates			= CSI_<TL_<TSubStates...>>;
 	using StateList			= typename SubStates::StateList;
 
 	static constexpr Short WIDTH		= sizeof...(TSubStates);
@@ -137,7 +131,7 @@ struct S_;
 template <typename, typename, typename...>
 struct C_;
 
-template <StateID, typename, Short, typename...>
+template <StateID, typename, Short, typename>
 struct CS_;
 
 template <typename, typename>
@@ -146,25 +140,25 @@ class RC_;
 //------------------------------------------------------------------------------
 
 template <StateID, typename...>
-struct MaterialT;
+struct MaterialT_;
 
-template <StateID N, typename TA, typename TH>
-struct MaterialT   <N, TA, TH> {
-	using Type = S_<N, TA, TH>;
+template <StateID NN, typename TA, typename TH>
+struct MaterialT_  <NN, TA, TH> final {
+	using Type = S_<NN, TA, TH>;
 };
 
-template <StateID N, typename TA, 			   typename... TS>
-struct MaterialT   <N, TA, CI_<void,   TS...>> {
+template <StateID NN, typename TA, 			   typename... TS>
+struct MaterialT_  <NN, TA, CI_<void,   TS...>> {
 	using Type = C_<   TA, EmptyT<TA>, TS...>;
 };
 
-template <StateID N, typename TA, typename TH, typename... TS>
-struct MaterialT   <N, TA, CI_<TH,	   TS...>> {
+template <StateID NN, typename TA, typename TH, typename... TS>
+struct MaterialT_  <NN, TA, CI_<TH,	   TS...>> {
 	using Type = C_<   TA,	   TH,	   TS...>;
 };
 
-template <StateID N, typename... TS>
-using Material = typename MaterialT<N, TS...>::Type;
+template <StateID NN, typename... TS>
+using MaterialT = typename MaterialT_<NN, TS...>::Type;
 
 //------------------------------------------------------------------------------
 
@@ -239,15 +233,34 @@ struct RF_ final {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <StateID, typename, Short, typename>
-struct CSubMaterialT;
+struct LHalfCST;
 
-template <StateID N, typename TA, Short NI, typename... TS>
-struct CSubMaterialT<N, TA, NI, TL_<TS...>> final {
-	using Type = CS_<N, TA, NI,		TS...>;
+template <StateID NN, typename TA, Short NI, typename... TS>
+struct LHalfCST<NN, TA, NI, TL_<TS...>> final {
+	using Type = CS_<NN,
+					 TA,
+					 NI,
+					 LHalfTypes<TS...>>;
 };
 
-template <StateID N, typename TA, Short NI, typename TL>
-using CSubMaterial = typename CSubMaterialT<N, TA, NI, TL>::Type;
+template <StateID NN, typename TA, Short NI, typename TL>
+using LHalfCS = typename LHalfCST<NN, TA, NI, TL>::Type;
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <StateID, typename, Short, typename>
+struct RHalfCST;
+
+template <StateID NN, typename TA, Short NI, typename... TS>
+struct RHalfCST<NN, TA, NI, TL_<TS...>> final {
+	using Type = CS_<NN + sizeof...(TS) / 2,
+					 TA,
+					 NI + sizeof...(TS) / 2,
+					 RHalfTypes<TS...>>;
+};
+
+template <StateID NN, typename TA, Short NI, typename TL>
+using RHalfCS = typename RHalfCST<NN, TA, NI, TL>::Type;
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -143,6 +143,12 @@
     <ClCompile Include="..\..\test\test_replication.cpp">
       <Filter>test</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\test\test_injections.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\test_access.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\test\tools.inl">
@@ -172,9 +178,6 @@
     <None Include="..\..\development\ffsm2\detail\structure\composite_sub_2.inl">
       <Filter>ffsm2\detail\structure</Filter>
     </None>
-    <None Include="..\..\development\ffsm2\detail\structure\injections.inl">
-      <Filter>ffsm2\detail\structure</Filter>
-    </None>
     <None Include="..\..\development\ffsm2\detail\structure\state.inl">
       <Filter>ffsm2\detail\structure</Filter>
     </None>
@@ -186,6 +189,12 @@
     </None>
     <None Include="..\..\development\ffsm2\detail\containers\task_list.inl">
       <Filter>ffsm2\detail\containers</Filter>
+    </None>
+    <None Include="..\..\development\ffsm2\detail\structure\injections_2.inl">
+      <Filter>ffsm2\detail\structure</Filter>
+    </None>
+    <None Include="..\..\development\ffsm2\detail\structure\injections_1.inl">
+      <Filter>ffsm2\detail\structure</Filter>
     </None>
   </ItemGroup>
 </Project>

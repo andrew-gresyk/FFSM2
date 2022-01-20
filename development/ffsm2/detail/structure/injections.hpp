@@ -13,7 +13,7 @@ protected:
 
 	using StateList		= typename TArgs::StateList;
 
-	using Control		= ControlT<TArgs>;
+	using Control		= ControlT	  <TArgs>;
 	using PlanControl	= PlanControlT<TArgs>;
 
 #if FFSM2_PLANS_AVAILABLE()
@@ -24,23 +24,39 @@ protected:
 	using GuardControl	= GuardControlT<TArgs>;
 
 public:
-	FFSM2_CONSTEXPR(14)	void preEntryGuard(Context&)	  noexcept {}
+	FFSM2_CONSTEXPR(14)	void preEntryGuard	  (Context&)	  noexcept	{}
 
-	FFSM2_CONSTEXPR(14)	void preEnter	  (Context&)	  noexcept {}
-	FFSM2_CONSTEXPR(14)	void preReenter	  (Context&)	  noexcept {}
+	FFSM2_CONSTEXPR(14)	void preEnter		  (Context&)	  noexcept	{}
+	FFSM2_CONSTEXPR(14)	void preReenter		  (Context&)	  noexcept	{}
 
-	FFSM2_CONSTEXPR(14)	void preUpdate	  (Context&)	  noexcept {}
+	FFSM2_CONSTEXPR(14)	void preUpdate		  (Context&)	  noexcept	{}
+	FFSM2_CONSTEXPR(14)	void postUpdate		  (Context&)	  noexcept	{}
+
+	FFSM2_CONSTEXPR(14)	void preReverseUpdate (Context&)	  noexcept	{}
+	FFSM2_CONSTEXPR(14)	void postReverseUpdate(Context&)	  noexcept	{}
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	void preReact	  (const TEvent&,
-										   Context&)	  noexcept {}
+	FFSM2_CONSTEXPR(14)	void preReact		  (const TEvent&,
+											   Context&)	  noexcept	{}
 
-	FFSM2_CONSTEXPR(14)	void preExitGuard (Context&)	  noexcept {}
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void postReact		  (const TEvent&,
+											   Context&)	  noexcept	{}
 
-	FFSM2_CONSTEXPR(14)	void postExit	  (Context&)	  noexcept {}
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void preReverseReact  (const TEvent&,
+											   Context&)	  noexcept	{}
+
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void postReverseReact (const TEvent&,
+											   Context&)	  noexcept	{}
+
+	FFSM2_CONSTEXPR(14)	void preExitGuard	  (Context&)	  noexcept	{}
+
+	FFSM2_CONSTEXPR(14)	void postExit		  (Context&)	  noexcept	{}
 
 	template <typename T>
-	static constexpr StateID  stateId()					  noexcept { return index<StateList, T>();				}
+	static constexpr StateID stateId()						  noexcept	{ return index<StateList, T>();				}
 };
 
 //------------------------------------------------------------------------------
@@ -51,7 +67,7 @@ struct B_;
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename TFirst, typename... TRest>
-struct B_<TFirst, TRest...>
+struct FFSM2_EMPTY_BASES B_<TFirst, TRest...>
 	: TFirst
 	, B_<TRest...>
 {
@@ -71,20 +87,36 @@ struct B_<TFirst, TRest...>
 
 	using TFirst::stateId;
 
-	FFSM2_CONSTEXPR(14)	void widePreEntryGuard(Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void widePreEntryGuard	  (Context& context)	  noexcept;
 
-	FFSM2_CONSTEXPR(14)	void widePreEnter	  (Context& context)	  noexcept;
-	FFSM2_CONSTEXPR(14)	void widePreReenter	  (Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void widePreEnter		  (Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void widePreReenter		  (Context& context)	  noexcept;
 
-	FFSM2_CONSTEXPR(14)	void widePreUpdate	  (Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void widePreUpdate		  (Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void widePostUpdate		  (Context& context)	  noexcept;
+
+	FFSM2_CONSTEXPR(14)	void widePreReverseUpdate (Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void widePostReverseUpdate(Context& context)	  noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	void widePreReact	  (const TEvent& event,
-											   Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void widePreReact		  (const TEvent& event,
+												   Context& context)	  noexcept;
 
-	FFSM2_CONSTEXPR(14)	void widePreExitGuard (Context& context)	  noexcept;
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void widePostReact		  (const TEvent& event,
+												   Context& context)	  noexcept;
 
-	FFSM2_CONSTEXPR(14)	void widePostExit	  (Context& context)	  noexcept;
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void widePreReverseReact  (const TEvent& event,
+												   Context& context)	  noexcept;
+
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void widePostReverseReact (const TEvent& event,
+												   Context& context)	  noexcept;
+
+	FFSM2_CONSTEXPR(14)	void widePreExitGuard	  (Context& context)	  noexcept;
+
+	FFSM2_CONSTEXPR(14)	void widePostExit		  (Context& context)	  noexcept;
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -109,40 +141,64 @@ struct B_<TFirst>
 
 	using TFirst::stateId;
 
-	FFSM2_CONSTEXPR(14)	void entryGuard		  (GuardControl&)		  noexcept {}
-
-	FFSM2_CONSTEXPR(14)	void enter			  (PlanControl&)		  noexcept {}
-	FFSM2_CONSTEXPR(14)	void reenter		  (PlanControl&)		  noexcept {}
-
-	FFSM2_CONSTEXPR(14)	void update			  (FullControl&)		  noexcept {}
-
-	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	void react			  (const TEvent&,
-											   FullControl&)		  noexcept {}
-
-	FFSM2_CONSTEXPR(14)	void exitGuard		  (GuardControl&)		  noexcept {}
-
-	FFSM2_CONSTEXPR(14)	void exit			  (PlanControl&)		  noexcept {}
-
-#if FFSM2_PLANS_AVAILABLE()
-	FFSM2_CONSTEXPR(14)	void planSucceeded	  (FullControl&)		  noexcept {}
-	FFSM2_CONSTEXPR(14)	void planFailed		  (FullControl&)		  noexcept {}
+#if FFSM2_UTILITY_THEORY_AVAILABLE()
 #endif
 
-	FFSM2_CONSTEXPR(14)	void widePreEntryGuard(Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void entryGuard			  (GuardControl&)		  noexcept	{}
 
-	FFSM2_CONSTEXPR(14)	void widePreEnter	  (Context& context)	  noexcept;
-	FFSM2_CONSTEXPR(14)	void widePreReenter	  (Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void enter				  (PlanControl&)		  noexcept	{}
+	FFSM2_CONSTEXPR(14)	void reenter			  (PlanControl&)		  noexcept	{}
 
-	FFSM2_CONSTEXPR(14)	void widePreUpdate	  (Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void update				  (FullControl&)		  noexcept	{}
+	FFSM2_CONSTEXPR(14)	void reverseUpdate		  (FullControl&)		  noexcept	{}
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	void widePreReact	  (const TEvent& event,
-											   Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void react				  (const TEvent&,
+												   FullControl&)		  noexcept	{}
 
-	FFSM2_CONSTEXPR(14)	void widePreExitGuard (Context& context)	  noexcept;
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void reverseReact		  (const TEvent&,
+												   FullControl&)		  noexcept	{}
 
-	FFSM2_CONSTEXPR(14)	void widePostExit	  (Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void exitGuard			  (GuardControl&)		  noexcept	{}
+
+	FFSM2_CONSTEXPR(14)	void exit				  (PlanControl&)		  noexcept	{}
+
+#if FFSM2_PLANS_AVAILABLE()
+	FFSM2_CONSTEXPR(14)	void planSucceeded		  (FullControl&)		  noexcept	{}
+	FFSM2_CONSTEXPR(14)	void planFailed			  (FullControl&)		  noexcept	{}
+#endif
+
+	FFSM2_CONSTEXPR(14)	void widePreEntryGuard	  (Context& context)	  noexcept;
+
+	FFSM2_CONSTEXPR(14)	void widePreEnter		  (Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void widePreReenter		  (Context& context)	  noexcept;
+
+	FFSM2_CONSTEXPR(14)	void widePreUpdate		  (Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void widePostUpdate		  (Context& context)	  noexcept;
+
+	FFSM2_CONSTEXPR(14)	void widePreReverseUpdate (Context& context)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void widePostReverseUpdate(Context& context)	  noexcept;
+
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void widePreReact		  (const TEvent& event,
+												   Context& context)	  noexcept;
+
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void widePostReact		  (const TEvent& event,
+												   Context& context)	  noexcept;
+
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void widePreReverseReact  (const TEvent& event,
+												   Context& context)	  noexcept;
+
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void widePostReverseReact (const TEvent& event,
+												   Context& context)	  noexcept;
+
+	FFSM2_CONSTEXPR(14)	void widePreExitGuard	  (Context& context)	  noexcept;
+
+	FFSM2_CONSTEXPR(14)	void widePostExit		  (Context& context)	  noexcept;
 };
 
 //------------------------------------------------------------------------------
@@ -155,4 +211,5 @@ using EmptyT = B_<InjectionT<TArgs>>;
 }
 }
 
-#include "injections.inl"
+#include "injections_1.inl"
+#include "injections_2.inl"

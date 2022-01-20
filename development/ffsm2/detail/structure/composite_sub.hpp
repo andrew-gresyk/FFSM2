@@ -7,29 +7,23 @@ template <StateID NStateId,
 		  typename TArgs,
 		  Short NIndex,
 		  typename... TStates>
-struct FFSM2_EMPTY_BASES CS_
-	: CSubMaterial<NStateId,
-				   TArgs,
-				   NIndex,
-				   LHalfTypes<TStates...>>
-	, CSubMaterial<NStateId + LHalfTypes<TStates...>::SIZE,
-				   TArgs,
-				   NIndex + LHalfTypes<TStates...>::SIZE,
-				   RHalfTypes<TStates...>>
+struct FFSM2_EMPTY_BASES CS_<NStateId,
+							 TArgs,
+							 NIndex,
+							 TL_<TStates...>>
+	: LHalfCS<NStateId,
+			  TArgs,
+			  NIndex,
+			  TL_<TStates...>>
+	, RHalfCS<NStateId,
+			  TArgs,
+			  NIndex,
+			  TL_<TStates...>>
 {
 	static_assert(sizeof...(TStates) >= 2, "");
 
-	using LMaterial		= CSubMaterial<NStateId,
-									   TArgs,
-									   NIndex,
-									   LHalfTypes<TStates...>>;
-
-	using RMaterial		= CSubMaterial<NStateId + LHalfTypes<TStates...>::SIZE,
-									   TArgs,
-									   NIndex + LHalfTypes<TStates...>::SIZE,
-									   RHalfTypes<TStates...>>;
-
 	using Args			= TArgs;
+	using SubStateList	= TL_<TStates...>;
 
 	using StateList		= typename Args::StateList;
 
@@ -40,11 +34,20 @@ struct FFSM2_EMPTY_BASES CS_
 
 	static constexpr StateID  INITIAL_ID  = NStateId;
 	static constexpr Short	  PRONG_INDEX = NIndex;
+	static constexpr Short	  R_PRONG	  = PRONG_INDEX + sizeof...(TStates) / 2;
 
-	using LStateList	= LHalfTypes<TStates...>;
-	static constexpr Short	  R_PRONG	  = PRONG_INDEX + LStateList::SIZE;
+	using LHalf			= LHalfCS<INITIAL_ID,
+								  Args,
+								  PRONG_INDEX,
+								  SubStateList>;
+
+	using RHalf			= RHalfCS<INITIAL_ID,
+								  Args,
+								  PRONG_INDEX,
+								  SubStateList>;
 
 	//----------------------------------------------------------------------
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	FFSM2_CONSTEXPR(14)	bool	wideEntryGuard		 (GuardControl& control, const Short prong)  noexcept;
 
@@ -52,9 +55,14 @@ struct FFSM2_EMPTY_BASES CS_
 	FFSM2_CONSTEXPR(14)	void	wideReenter			 (PlanControl&  control, const Short prong)  noexcept;
 
 	FFSM2_CONSTEXPR(14)	Status	wideUpdate			 (FullControl&  control, const Short prong)  noexcept;
+	FFSM2_CONSTEXPR(14)	Status	wideReverseUpdate	 (FullControl&  control, const Short prong)  noexcept;
 
 	template <typename TEvent>
 	FFSM2_CONSTEXPR(14)	Status	wideReact			 (FullControl&  control,
+													  const TEvent& event,	 const Short prong)  noexcept;
+
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	Status	wideReverseReact	 (FullControl&  control,
 													  const TEvent& event,	 const Short prong)  noexcept;
 
 	FFSM2_CONSTEXPR(14)	bool	wideExitGuard		 (GuardControl& control, const Short prong)  noexcept;
@@ -74,11 +82,14 @@ template <StateID NStateId,
 		  typename TArgs,
 		  Short NIndex,
 		  typename TState>
-struct FFSM2_EMPTY_BASES CS_<NStateId, TArgs, NIndex, TState>
-	: Material<NStateId, TArgs, TState>
+struct CS_<NStateId,
+		   TArgs,
+		   NIndex,
+		   TL_<TState>>
+	: MaterialT<NStateId,
+				TArgs,
+				TState>
 {
-	using State			= Material<NStateId, TArgs, TState>;
-
 	static constexpr Short PRONG_INDEX	= NIndex;
 
 	using Args			= TArgs;
@@ -90,7 +101,12 @@ struct FFSM2_EMPTY_BASES CS_<NStateId, TArgs, NIndex, TState>
 	using FullControl	= FullControlT <Args>;
 	using GuardControl	= GuardControlT<Args>;
 
+	using State			= MaterialT<NStateId,
+									Args,
+									TState>;
+
 	//----------------------------------------------------------------------
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	FFSM2_CONSTEXPR(14)	bool	wideEntryGuard		 (GuardControl& control, const Short prong)  noexcept;
 
@@ -98,9 +114,14 @@ struct FFSM2_EMPTY_BASES CS_<NStateId, TArgs, NIndex, TState>
 	FFSM2_CONSTEXPR(14)	void	wideReenter			 (PlanControl&  control, const Short prong)  noexcept;
 
 	FFSM2_CONSTEXPR(14)	Status	wideUpdate			 (FullControl&  control, const Short prong)  noexcept;
+	FFSM2_CONSTEXPR(14)	Status	wideReverseUpdate	 (FullControl&  control, const Short prong)  noexcept;
 
 	template <typename TEvent>
 	FFSM2_CONSTEXPR(14)	Status	wideReact			 (FullControl&  control,
+													  const TEvent& event,	 const Short prong)  noexcept;
+
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	Status	wideReverseReact	 (FullControl&  control,
 													  const TEvent& event,	 const Short prong)  noexcept;
 
 	FFSM2_CONSTEXPR(14)	bool	wideExitGuard		 (GuardControl& control, const Short prong)  noexcept;
