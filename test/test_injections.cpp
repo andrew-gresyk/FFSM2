@@ -3,7 +3,7 @@
 
 #define FFSM2_ENABLE_VERBOSE_DEBUG_LOG
 #define FFSM2_DISABLE_TYPEINDEX
-#include <ffsm2/machine_dev.hpp>
+#include <ffsm2/machine.hpp>
 
 #include <doctest/doctest.h>
 
