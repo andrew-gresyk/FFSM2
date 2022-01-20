@@ -4,10 +4,10 @@ namespace detail {
 ////////////////////////////////////////////////////////////////////////////////
 // COMMON
 
-template <StateID N, typename TA, typename TH>
+template <StateID NN, typename TA, typename TH>
 FFSM2_CONSTEXPR(14)
 bool
-S_<N, TA, TH>::deepEntryGuard(GuardControl& control) noexcept {
+S_<NN, TA, TH>::deepEntryGuard(GuardControl& control) noexcept {
 	FFSM2_LOG_STATE_METHOD(&Head::entryGuard,
 						   Method::ENTRY_GUARD);
 
@@ -23,10 +23,10 @@ S_<N, TA, TH>::deepEntryGuard(GuardControl& control) noexcept {
 
 //------------------------------------------------------------------------------
 
-template <StateID N, typename TA, typename TH>
+template <StateID NN, typename TA, typename TH>
 FFSM2_CONSTEXPR(14)
 void
-S_<N, TA, TH>::deepEnter(PlanControl& control) noexcept {
+S_<NN, TA, TH>::deepEnter(PlanControl& control) noexcept {
 	FFSM2_LOG_STATE_METHOD(&Head::enter,
 						   Method::ENTER);
 
@@ -38,10 +38,10 @@ S_<N, TA, TH>::deepEnter(PlanControl& control) noexcept {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <StateID N, typename TA, typename TH>
+template <StateID NN, typename TA, typename TH>
 FFSM2_CONSTEXPR(14)
 void
-S_<N, TA, TH>::deepReenter(PlanControl& control) noexcept {
+S_<NN, TA, TH>::deepReenter(PlanControl& control) noexcept {
 	FFSM2_IF_PLANS(control._planData.verifyEmptyStatus(STATE_ID));
 
 	FFSM2_LOG_STATE_METHOD(&Head::reenter,
@@ -55,29 +55,48 @@ S_<N, TA, TH>::deepReenter(PlanControl& control) noexcept {
 
 //------------------------------------------------------------------------------
 
-template <StateID N, typename TA, typename TH>
+template <StateID NN, typename TA, typename TH>
 FFSM2_CONSTEXPR(14)
 Status
-S_<N, TA, TH>::deepUpdate(FullControl& control) noexcept {
+S_<NN, TA, TH>::deepUpdate(FullControl& control) noexcept {
 	FFSM2_LOG_STATE_METHOD(&Head::update,
 						   Method::UPDATE);
 
 	ScopedOrigin origin{control, STATE_ID};
 
-	Head::widePreUpdate(control.context());
-	Head::		 update(control);
+	Head:: widePreUpdate(control.context());
+	Head::		  update(control);
+	Head::widePostUpdate(control.context());
+
+	return control._status;
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <StateID NN, typename TA, typename TH>
+FFSM2_CONSTEXPR(14)
+Status
+S_<NN, TA, TH>::deepReverseUpdate(FullControl& control) noexcept {
+	FFSM2_LOG_STATE_METHOD(&Head::reverseUpdate,
+						   Method::REVERSE_UPDATE);
+
+	ScopedOrigin origin{control, STATE_ID};
+
+	Head:: widePreReverseUpdate(control.context());
+	Head::		  reverseUpdate(control);
+	Head::widePostReverseUpdate(control.context());
 
 	return control._status;
 }
 
 //------------------------------------------------------------------------------
 
-template <StateID N, typename TA, typename TH>
+template <StateID NN, typename TA, typename TH>
 template <typename TEvent>
 FFSM2_CONSTEXPR(14)
 Status
-S_<N, TA, TH>::deepReact(FullControl& control,
-						 const TEvent& event) noexcept
+S_<NN, TA, TH>::deepReact(FullControl& control,
+						  const TEvent& event) noexcept
 {
 	auto reaction = static_cast<void (Head::*)(const TEvent&, FullControl&)>(&Head::react);
 
@@ -86,18 +105,43 @@ S_<N, TA, TH>::deepReact(FullControl& control,
 
 	ScopedOrigin origin{control, STATE_ID};
 
-	Head::widePreReact(event, control.context());
-	(this->*reaction)(event, control);
+	Head:: widePreReact(event, control.context());
+	(this->*reaction)  (event, control);
+	Head::widePostReact(event, control.context());
 
 	return control._status;
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <StateID NN, typename TA, typename TH>
+template <typename TEvent>
+FFSM2_CONSTEXPR(14)
+Status
+S_<NN, TA, TH>::deepReverseReact(FullControl& control,
+								 const TEvent& event) noexcept
+{
+	auto reaction = static_cast<void (Head::*)(const TEvent&, FullControl&)>(&Head::reverseReact);
+
+	FFSM2_LOG_STATE_METHOD(reaction,
+						   Method::REVERSE_REACT);
+
+	ScopedOrigin origin{control, STATE_ID};
+
+	Head:: widePreReverseReact(event, control.context());
+	(this->*reaction)		  (event, control);
+	Head::widePostReverseReact(event, control.context());
+
+	return control._status;
+
+}
+
 //------------------------------------------------------------------------------
 
-template <StateID N, typename TA, typename TH>
+template <StateID NN, typename TA, typename TH>
 FFSM2_CONSTEXPR(14)
 bool
-S_<N, TA, TH>::deepExitGuard(GuardControl& control) noexcept {
+S_<NN, TA, TH>::deepExitGuard(GuardControl& control) noexcept {
 	FFSM2_LOG_STATE_METHOD(&Head::exitGuard,
 						   Method::EXIT_GUARD);
 
@@ -113,10 +157,10 @@ S_<N, TA, TH>::deepExitGuard(GuardControl& control) noexcept {
 
 //------------------------------------------------------------------------------
 
-template <StateID N, typename TA, typename TH>
+template <StateID NN, typename TA, typename TH>
 FFSM2_CONSTEXPR(14)
 void
-S_<N, TA, TH>::deepExit(PlanControl& control) noexcept {
+S_<NN, TA, TH>::deepExit(PlanControl& control) noexcept {
 	FFSM2_LOG_STATE_METHOD(&Head::exit,
 						   Method::EXIT);
 
@@ -139,10 +183,10 @@ S_<N, TA, TH>::deepExit(PlanControl& control) noexcept {
 
 #if FFSM2_PLANS_AVAILABLE()
 
-template <StateID N, typename TA, typename TH>
+template <StateID NN, typename TA, typename TH>
 FFSM2_CONSTEXPR(14)
 void
-S_<N, TA, TH>::wrapPlanSucceeded(FullControl& control) noexcept {
+S_<NN, TA, TH>::wrapPlanSucceeded(FullControl& control) noexcept {
 	FFSM2_LOG_STATE_METHOD(&Head::planSucceeded,
 						   Method::PLAN_SUCCEEDED);
 
@@ -153,10 +197,10 @@ S_<N, TA, TH>::wrapPlanSucceeded(FullControl& control) noexcept {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <StateID N, typename TA, typename TH>
+template <StateID NN, typename TA, typename TH>
 FFSM2_CONSTEXPR(14)
 void
-S_<N, TA, TH>::wrapPlanFailed(FullControl& control) noexcept {
+S_<NN, TA, TH>::wrapPlanFailed(FullControl& control) noexcept {
 	FFSM2_LOG_STATE_METHOD(&Head::planFailed,
 						   Method::PLAN_FAILED);
 

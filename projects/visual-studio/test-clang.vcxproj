@@ -31,7 +31,9 @@
     <ClCompile Include="..\..\test\shared\test_bit_array.cpp" />
     <ClCompile Include="..\..\test\shared\test_bit_stream.cpp" />
     <ClCompile Include="..\..\test\shared\test_task_list.cpp" />
+    <ClCompile Include="..\..\test\test_access.cpp" />
     <ClCompile Include="..\..\test\test_contexts.cpp" />
+    <ClCompile Include="..\..\test\test_injections.cpp" />
     <ClCompile Include="..\..\test\test_manual_activation.cpp" />
     <ClCompile Include="..\..\test\test_plans.cpp" />
     <ClCompile Include="..\..\test\test_plans_payloads.cpp" />
@@ -79,7 +81,8 @@
     <None Include="..\..\development\ffsm2\detail\structure\composite.inl" />
     <None Include="..\..\development\ffsm2\detail\structure\composite_sub_1.inl" />
     <None Include="..\..\development\ffsm2\detail\structure\composite_sub_2.inl" />
-    <None Include="..\..\development\ffsm2\detail\structure\injections.inl" />
+    <None Include="..\..\development\ffsm2\detail\structure\injections_1.inl" />
+    <None Include="..\..\development\ffsm2\detail\structure\injections_2.inl" />
     <None Include="..\..\development\ffsm2\detail\structure\state.inl" />
     <None Include="..\..\test\tools.inl" />
   </ItemGroup>

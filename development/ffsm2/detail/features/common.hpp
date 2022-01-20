@@ -9,7 +9,9 @@ enum class Method : uint8_t {
 	ENTER,
 	REENTER,
 	UPDATE,
+	REVERSE_UPDATE,
 	REACT,
+	REVERSE_REACT,
 	EXIT_GUARD,
 	EXIT,
 
@@ -74,7 +76,9 @@ methodName(const Method method)										  noexcept {
 	case Method::ENTER:			 return "enter";
 	case Method::REENTER:		 return "reenter";
 	case Method::UPDATE:		 return "update";
+	case Method::REVERSE_UPDATE: return "reverseUpdate";
 	case Method::REACT:			 return "react";
+	case Method::REVERSE_REACT:	 return "reverseReact";
 	case Method::EXIT_GUARD:	 return "exitGuard";
 	case Method::EXIT:			 return "exit";
 
@@ -131,6 +135,16 @@ struct alignas(4) TransitionBase {
 		return origin	   == other.origin &&
 			   destination == other.destination &&
 			   method	   == other.method;
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	FFSM2_CONSTEXPR(11)
+	bool
+	operator != (const TransitionBase& other)					const noexcept {
+		return origin	   != other.origin ||
+			   destination != other.destination ||
+			   method	   != other.method;
 	}
 
 	//----------------------------------------------------------------------
@@ -233,7 +247,17 @@ struct alignas(4) TransitionT final
 	operator == (const TransitionT& other)						const noexcept {
 		return TransitionBase::operator == (other) &&
 			   (payloadSet ==  other.payloadSet);
-		//	  (!payloadSet && !other.payloadSet || payload ==  other.payload);
+		//	  (!payloadSet && !other.payloadSet || payload == other.payload);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	FFSM2_CONSTEXPR(11)
+	bool
+	operator != (const TransitionT& other)						const noexcept {
+		return TransitionBase::operator != (other) ||
+			   (payloadSet != other.payloadSet);
+		//	   (payloadSet |= other.payloadSet || payload != other.payload);
 	}
 
 	//----------------------------------------------------------------------

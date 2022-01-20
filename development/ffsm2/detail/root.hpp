@@ -8,9 +8,7 @@ namespace detail {
 /// @tparam TApex Root region type
 template <typename TConfig,
 		  typename TApex>
-class R_
-	: protected Material<0, typename RF_<TConfig, TApex>::Args, TApex>
-{
+class R_ {
 public:
 	static constexpr FeatureTag FEATURE_TAG = TConfig::FEATURE_TAG;
 
@@ -25,7 +23,7 @@ protected:
 	static_assert(Args::STATE_COUNT <  (unsigned) -1, "Too many states in the FSM. Change 'Short' type.");
 	static_assert(Args::STATE_COUNT == (unsigned) StateList::SIZE, "STATE_COUNT != StateList::SIZE");
 
-	using Apex					= Material<0, Args, TApex>;
+	using Apex					= MaterialT<0, Args, TApex>;
 
 	using Control				= ControlT	   <Args>;
 	using PlanControl			= PlanControlT <Args>;
@@ -56,24 +54,19 @@ public:
 	//----------------------------------------------------------------------
 
 	FFSM2_CONSTEXPR(11)	explicit R_(Context& context
-								  FFSM2_IF_LOG_INTERFACE(, Logger* const logger = nullptr))  noexcept
-		: _context{context}
-	   FFSM2_IF_LOG_INTERFACE(, _logger{logger})
-	{}
+								  FFSM2_IF_LOG_INTERFACE(, Logger* const logger = nullptr))	  noexcept;
 
-	FFSM2_CONSTEXPR(20)	~R_()																  noexcept	{
-		FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
-	}
+	FFSM2_CONSTEXPR(20)	~R_()																  noexcept;
 
 	//----------------------------------------------------------------------
 
 	/// @brief Access context
 	/// @return context
-	FFSM2_CONSTEXPR(14)		  Context& context()								  noexcept	{ return _context;									}
+	FFSM2_CONSTEXPR(14)		  Context& context()								  noexcept	{ return _context;								}
 
 	/// @brief Access context
 	/// @return context
-	FFSM2_CONSTEXPR(11)	const Context& context()							const noexcept	{ return _context;									}
+	FFSM2_CONSTEXPR(11)	const Context& context()							const noexcept	{ return _context;								}
 
 	//----------------------------------------------------------------------
 
@@ -81,18 +74,45 @@ public:
 	/// @tparam TState State type
 	/// @return Numeric state identifier
 	template <typename TState>
-	static constexpr StateID stateId()											  noexcept	{ return index<StateList, TState>();				}
+	static constexpr StateID stateId()											  noexcept	{ return index<StateList, TState>();			}
 
 	//----------------------------------------------------------------------
 
-	/// @brief Trigger FSM update cycle (recursively call 'update()' on all active states, then process requested transitions)
-	FFSM2_CONSTEXPR(14)	void update() noexcept;
+	/// @brief Access state instance
+	/// @tparam TState State type
+	/// @return State instance
+	template <typename TState>
+	FFSM2_CONSTEXPR(14)		  TState& access()									  noexcept	{ return static_cast<	   TState&>(_apex);			}
 
-	/// @brief Have FSM react to an event (recursively call matching 'react<>()' on all active states, then process requested transitions)
+	/// @brief Access state instance
+	/// @tparam TState State type
+	/// @return State instance
+	template <typename TState>
+	FFSM2_CONSTEXPR(11)	const TState& access()								const noexcept	{ return static_cast<const TState&>(_apex);			}
+
+	//----------------------------------------------------------------------
+
+	/// @brief Trigger FSM update cycle (recursively call 'update()' from the root down to the leaf states,
+	///   on all active states, then process requested transitions)
+	FFSM2_CONSTEXPR(14)	void update()											  noexcept;
+
+	/// @brief Trigger FSM update cycle (recursively call 'update()' in reverse order, from the leaf states to the root,
+	///   on all active states, then process requested transitions)
+	FFSM2_CONSTEXPR(14)	void reverseUpdate()									  noexcept;
+
+	/// @brief Have FSM react to an event (recursively call matching 'react<>()' from the root down to the leaf states,
+	///    on all active states, then process requested transitions)
 	/// @tparam TEvent Event type
 	/// @param event Event to react to
 	template <typename TEvent>
 	FFSM2_CONSTEXPR(14)	void react(const TEvent& event)							  noexcept;
+
+	/// @brief Have FSM react to an event (recursively call matching 'react<>()' in reverse order, from the leaf states to the root,
+	///   on all active states, then process requested transitions)
+	/// @tparam TEvent Event type
+	/// @param event Event to react to
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void reverseReact(const TEvent& event)					  noexcept;
 
 	//----------------------------------------------------------------------
 
@@ -186,7 +206,8 @@ protected:
 
 	FFSM2_CONSTEXPR(14)	void processTransitions(Transition& currentTransition)				  noexcept;
 
-	FFSM2_CONSTEXPR(14)	void applyRequest(const StateID destination)						  noexcept;
+	FFSM2_CONSTEXPR(14)	bool applyRequest(const Transition& currentTransition,
+										  const StateID destination)						  noexcept;
 
 	FFSM2_CONSTEXPR(14)	bool cancelledByEntryGuards(const Transition& currentTransition,
 													const Transition& pendingTransition)	  noexcept;
@@ -204,6 +225,8 @@ protected:
 	FFSM2_IF_PLANS(PlanData _planData);
 
 	Transition _request;
+
+	Apex _apex;
 
 	FFSM2_IF_LOG_INTERFACE(Logger* _logger);
 };
@@ -251,6 +274,10 @@ public:
 private:
 	using Base::initialEnter;
 	using Base::finalExit;
+
+#if FFSM2_TRANSITION_HISTORY_AVAILABLE()
+	using Base::_apex;
+#endif
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -308,6 +335,7 @@ private:
 	using Base::_previousTransition;
 
 	using Base::_context;
+	using Base::_apex;
 	using Base::_registry;
 	#if FFSM2_PLANS_AVAILABLE()
 		using Base::_planData;

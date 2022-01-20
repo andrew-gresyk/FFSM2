@@ -43,6 +43,22 @@ template <bool B,
 		  typename TF>
 using Conditional = typename ConditionalT<B, TT, TF>::Type;
 
+//------------------------------------------------------------------------------
+
+template <typename, typename>
+struct IsSameT final {
+	static constexpr bool Value = false;
+};
+
+template <typename T>
+struct IsSameT<T, T> final {
+	static constexpr bool Value = true;
+};
+
+template <typename T0,
+		  typename T1>
+static constexpr bool IsSame = IsSameT<T0, T1>::Value;
+
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
@@ -105,10 +121,10 @@ using UIndex = Conditional<N <= (1ull <<  8),  uint8_t,
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <uint64_t N>
-using UCapacity = Conditional<N <= (1ull <<  8) - 1,  uint8_t,
-				  Conditional<N <= (1ull << 16) - 1, uint16_t,
-				  Conditional<N <= (1ull << 32) - 1, uint32_t,
-														 void>>>;
+using UCapacity = Conditional<N < (1ull <<  8),  uint8_t,
+				  Conditional<N < (1ull << 16), uint16_t,
+				  Conditional<N < (1ull << 32), uint32_t,
+													void>>>;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -243,47 +259,6 @@ template <typename T>
 FFSM2_CONSTEXPR(14)
 void
 fill(T& a, const char value)						  noexcept { memset(&a, (int) value, sizeof(a));	}
-
-//------------------------------------------------------------------------------
-
-template <typename T>
-FFSM2_CONSTEXPR(14)
-void
-swap(T& l, T& r)									  noexcept	{
-	T t = move(l);
-	l = move(r);
-	r = move(t);
-}
-
-//------------------------------------------------------------------------------
-
-template <typename TTo,
-		  typename TFrom>
-FFSM2_CONSTEXPR(14)
-void
-overwrite(TTo& to, const TFrom& from)				  noexcept	{
-	static_assert(sizeof(TTo) == sizeof(TFrom), "");
-
-#if defined(__GNUC__) || defined(__GNUG__)
-	memcpy  (&to,			  &from, sizeof(from));
-#else
-	memcpy_s(&to, sizeof(to), &from, sizeof(from));
-#endif
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-template <typename TO,
-		  typename TI>
-FFSM2_CONSTEXPR(14)
-TO
-convert(const TI& in)								  noexcept	{
-	TO out;
-
-	overwrite(out, in);
-
-	return out;
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 

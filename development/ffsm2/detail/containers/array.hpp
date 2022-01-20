@@ -46,7 +46,7 @@ private:
 	FFSM2_CONSTEXPR(11)	Index limit()									const noexcept	{ return CAPACITY;					}
 
 private:
-	Item _items[CAPACITY];
+	Item _items[CAPACITY] {};
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -113,7 +113,7 @@ private:
 
 private:
 	Index _count = 0;
-	Item _items[CAPACITY];
+	Item _items[CAPACITY] {};
 };
 
 //------------------------------------------------------------------------------

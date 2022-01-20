@@ -8,12 +8,12 @@ template <typename TArgs,
 		  typename... TSubStates>
 struct FFSM2_EMPTY_BASES C_
 	: S_<INVALID_STATE_ID, TArgs, THead>
-	, CS_<0, TArgs, 0, TSubStates...>
+	, CS_<0, TArgs, 0, TL_<TSubStates...>>
 {
 	using Args			= TArgs;
 
 	using HeadState		= S_<INVALID_STATE_ID, Args, THead>;
-	using SubStates		= CS_<0, Args, 0, TSubStates...>;
+	using SubStates		= CS_<0, Args, 0, TL_<TSubStates...>>;
 
 	using StateList		= typename Args::StateList;
 
@@ -42,11 +42,17 @@ struct FFSM2_EMPTY_BASES C_
 	FFSM2_CONSTEXPR(14)	bool deepEntryGuard		  (GuardControl& control)  noexcept;
 
 	FFSM2_CONSTEXPR(14)	void deepEnter			  (PlanControl&  control)  noexcept;
+	FFSM2_CONSTEXPR(14)	void deepReenter		  (PlanControl&  control)  noexcept;
 
 	FFSM2_CONSTEXPR(14)	void deepUpdate			  (FullControl&  control)  noexcept;
+	FFSM2_CONSTEXPR(14)	void deepReverseUpdate	  (FullControl&  control)  noexcept;
 
 	template <typename TEvent>
 	FFSM2_CONSTEXPR(14)	void deepReact			  (FullControl&  control,
+												   const TEvent& event)    noexcept;
+
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void deepReverseReact	  (FullControl&  control,
 												   const TEvent& event)    noexcept;
 
 	FFSM2_CONSTEXPR(14)	bool deepForwardExitGuard (GuardControl& control)  noexcept;
