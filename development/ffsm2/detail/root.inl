@@ -14,6 +14,58 @@ R_<TG, TA>::R_(Context& context
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename TG, typename TA>
+FFSM2_CONSTEXPR(11)
+R_<TG, TA>::R_(const PureContext& context
+			 FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
+	: _context{context}
+	FFSM2_IF_LOG_INTERFACE(, _logger{logger})
+{}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <typename TG, typename TA>
+FFSM2_CONSTEXPR(11)
+R_<TG, TA>::R_(PureContext&& context
+			 FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
+	: _context{move(context)}
+	FFSM2_IF_LOG_INTERFACE(, _logger{logger})
+{}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <typename TG, typename TA>
+FFSM2_CONSTEXPR(11)
+R_<TG, TA>::R_(const R_&  other) noexcept
+	: _context {other._context }
+	, _registry{other._registry}
+#if FFSM2_PLANS_AVAILABLE()
+	, _planData{other._planData}
+#endif
+	, _request {other._request }
+#if FFSM2_LOG_INTERFACE_AVAILABLE()
+	, _logger  {other._logger  }
+#endif
+{}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <typename TG, typename TA>
+FFSM2_CONSTEXPR(11)
+R_<TG, TA>::R_(R_&& other) noexcept
+	: _context {move(other._context )}
+	, _registry{move(other._registry)}
+#if FFSM2_PLANS_AVAILABLE()
+	, _planData{move(other._planData)}
+#endif
+	, _request {move(other._request )}
+#if FFSM2_LOG_INTERFACE_AVAILABLE()
+	, _logger  {move(other._logger  )}
+#endif
+{}
+
+//------------------------------------------------------------------------------
+
+template <typename TG, typename TA>
 FFSM2_CONSTEXPR(20)
 R_<TG, TA>::~R_() noexcept {
 	FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
@@ -440,6 +492,58 @@ R_<TG, TA>::cancelledByGuards(const Transition& currentTransition,
 
 ////////////////////////////////////////////////////////////////////////////////
 
+template <FeatureTag NFT, typename TC, typename TV, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
+FFSM2_CONSTEXPR(14)
+RV_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::RV_(Context& context
+														   FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
+	: Base{context
+	FFSM2_IF_LOG_INTERFACE(, logger)}
+{
+	initialEnter();
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <FeatureTag NFT, typename TC, typename TV, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
+FFSM2_CONSTEXPR(14)
+RV_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::RV_(PureContext&& context
+														   FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
+	: Base{move(context)
+	FFSM2_IF_LOG_INTERFACE(, logger)}
+{
+	initialEnter();
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <FeatureTag NFT, typename TC, typename TV, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
+FFSM2_CONSTEXPR(14)
+RV_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::RV_(const RV_& other) noexcept
+	: Base{other}
+{
+	initialEnter();
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <FeatureTag NFT, typename TC, typename TV, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
+FFSM2_CONSTEXPR(14)
+RV_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::RV_(RV_&& other) noexcept
+	: Base{move(other)}
+{
+	initialEnter();
+}
+
+//------------------------------------------------------------------------------
+
+template <FeatureTag NFT, typename TC, typename TV, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
+FFSM2_CONSTEXPR(20)
+RV_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::~RV_() noexcept {
+	finalExit();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 #if FFSM2_TRANSITION_HISTORY_AVAILABLE()
 
 template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
@@ -508,6 +612,55 @@ RP_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateI
 
 #if FFSM2_UTILITY_THEORY_AVAILABLE()
 #endif
+
+////////////////////////////////////////////////////////////////////////////////
+
+template <FeatureTag NFT, typename TC, typename TV, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
+FFSM2_CONSTEXPR(11)
+RC_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::RC_(Context& context
+														   FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
+	: Base{context
+	FFSM2_IF_LOG_INTERFACE(, logger)}
+{}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <FeatureTag NFT, typename TC, typename TV, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
+FFSM2_CONSTEXPR(11)
+RC_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::RC_(PureContext&& context
+														   FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
+	: Base{move(context)
+	FFSM2_IF_LOG_INTERFACE(, logger)}
+{}
+
+////////////////////////////////////////////////////////////////////////////////
+
+template <FeatureTag NFT, typename TC, typename TV, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
+FFSM2_CONSTEXPR(11)
+RC_<G_<NFT, TC*, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::RC_(Context context
+															FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
+	: Base{context
+	FFSM2_IF_LOG_INTERFACE(, logger)}
+{}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+//template <FeatureTag NFT, typename TC, typename TV, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
+//FFSM2_CONSTEXPR(11)
+//RC_<G_<NFT, TC*, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::RC_(const Context& context
+//															FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
+//	: Base{move(context)
+//	FFSM2_IF_LOG_INTERFACE(, logger)}
+//{}
+
+////////////////////////////////////////////////////////////////////////////////
+
+template <FeatureTag NFT, typename TV, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
+FFSM2_CONSTEXPR(11)
+RC_<G_<NFT, EmptyContext, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::RC_(FFSM2_IF_LOG_INTERFACE(Logger* const logger)) noexcept
+	: Base{static_cast<EmptyContext&>(*this)
+	FFSM2_IF_LOG_INTERFACE(, logger)}
+{}
 
 ////////////////////////////////////////////////////////////////////////////////
 

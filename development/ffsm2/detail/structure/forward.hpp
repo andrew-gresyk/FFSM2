@@ -95,6 +95,7 @@ template <typename TContext
 		, typename TPayload>
 struct ArgsT final {
 	using Context		= TContext;
+	using PureContext	= Undecorate<Context>;
 
 #if FFSM2_LOG_INTERFACE_AVAILABLE()
 	using Logger		= typename TConfig::LoggerInterface;
