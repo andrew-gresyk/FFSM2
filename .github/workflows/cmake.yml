@@ -110,7 +110,8 @@ jobs:
           - {
               OS: ubuntu-latest,
               CC: clang-13,
-              CXX: clang++-13
+              CXX: clang++-13,
+              VERSION: '13'
             }
           - {
               OS: macos-10.15,
@@ -143,18 +144,21 @@ jobs:
 
     - name: Install Clang on ubuntu
       if: |
-        matrix.PLATFORM.OS == 'ubuntu-20.04' &&
+        matrix.PLATFORM.OS == 'ubuntu-latest' &&
         startsWith(matrix.PLATFORM.CC, 'clang-') &&
         matrix.PLATFORM.VERSION
-      run: |
-        wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
-        echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-${{ matrix.PLATFORM.VERSION }} main universe" | sudo tee /etc/apt/sources.list
-        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-        sudo apt-get update
-        sudo apt-get install ${{ matrix.PLATFORM.CC }} ${{ matrix.PLATFORM.CXX }}
-      # uses: KyleMayes/install-llvm-action@v1
-      # with:
-      #   version: ${{ matrix.PLATFORM.VERSION }}
+      #uses: KyleMayes/install-llvm-action@v1
+      #with:
+      #    version: ${{ matrix.PLATFORM.VERSION }}
+      uses: egor-tensin/setup-clang@v1
+      with:
+          version: ${{ matrix.PLATFORM.VERSION }}
+      #run: |
+      #  wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
+      #  echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-${{ matrix.PLATFORM.VERSION }} main universe" | sudo tee /etc/apt/sources.list
+      #  sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+      #  sudo apt-get update
+      #  sudo apt-get install ${{ matrix.PLATFORM.CC }} ${{ matrix.PLATFORM.CXX }}
 
     # main test
     - name: Configure Test
