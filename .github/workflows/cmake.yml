@@ -114,13 +114,13 @@ jobs:
             }
           - {
               OS: macos-10.15,
-              CC: clang-12,
-              CXX: clang++-12
+              CC: clang,
+              CXX: clang++
             }
           - {
               OS: macos-11,
-              CC: clang-13,
-              CXX: clang++-13
+              CC: clang,
+              CXX: clang++
             }
 
         BUILD_CONFIG: [ Release, Debug ]
