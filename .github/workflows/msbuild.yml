@@ -21,8 +21,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Install VS 2015
+      run: choco install visualstudio2015community
+
     - name: Add MSBuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.2
+      uses: microsoft/setup-msbuild
 
     - name: Build
       working-directory: ${{env.GITHUB_WORKSPACE}}
