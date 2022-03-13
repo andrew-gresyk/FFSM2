@@ -9,9 +9,7 @@ enum class Method : uint8_t {
 	ENTER,
 	REENTER,
 	UPDATE,
-	REVERSE_UPDATE,
 	REACT,
-	REVERSE_REACT,
 	EXIT_GUARD,
 	EXIT,
 
@@ -76,9 +74,7 @@ methodName(const Method method)										  noexcept {
 	case Method::ENTER:			 return "enter";
 	case Method::REENTER:		 return "reenter";
 	case Method::UPDATE:		 return "update";
-	case Method::REVERSE_UPDATE: return "reverseUpdate";
 	case Method::REACT:			 return "react";
-	case Method::REVERSE_REACT:	 return "reverseReact";
 	case Method::EXIT_GUARD:	 return "exitGuard";
 	case Method::EXIT:			 return "exit";
 

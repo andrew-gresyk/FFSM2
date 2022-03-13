@@ -224,33 +224,25 @@
 
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-	<Type Name="ffsm2::detail::DBox&lt;*&gt;">
-		<DisplayString>{TYPE}</DisplayString>
-		<Expand HideRawView="true" />
-	</Type>
-
-	<Type Name="ffsm2::detail::SBox&lt;*&gt;">
-		<DisplayString>{TYPE}</DisplayString>
-		<Expand HideRawView="true" />
-	</Type>
-
-	<!-- ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ -->
-
 	<Type Name="ffsm2::detail::S_&lt;*&gt;">
-		<DisplayString>{_headBox}</DisplayString>
+		<DisplayString Optional="true">{TYPE}</DisplayString>
 		<Expand HideRawView="true" />
 	</Type>
 
 	<!-- ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ -->
 
 	<Type Name="ffsm2::detail::C_&lt;*&gt;">
-		<DisplayString>({_headState})</DisplayString>
+		<DisplayString>({(HeadState) *this})</DisplayString>
 	</Type>
 
 	<Type Name="ffsm2::detail::CS_&lt;*&gt;">
-		<DisplayString Optional="true">{{ {lHalf} {rHalf} }}</DisplayString>
-		<DisplayString Optional="true">{{{state}}}</DisplayString>
+		<DisplayString Optional="true">{(LHalf) *this} {(RHalf) *this}</DisplayString>
+		<DisplayString Optional="true">{(Single) *this}</DisplayString>
 	</Type>
+
+	<!-- ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ -->
+
+	<!-- ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ -->
 
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 

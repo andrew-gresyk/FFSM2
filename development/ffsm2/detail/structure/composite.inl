@@ -88,26 +88,6 @@ C_<TA, TH, TS...>::deepUpdate(FullControl& control) noexcept {
 	}
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-template <typename TA, typename TH, typename... TS>
-FFSM2_CONSTEXPR(14)
-void
-C_<TA, TH, TS...>::deepReverseUpdate(FullControl& control) noexcept {
-	const Short active = control._registry.active;
-	FFSM2_ASSERT(active != INVALID_SHORT);
-
-	FFSM2_IF_PLANS(const Status subStatus =)
-		SubStates::wideReverseUpdate(control, active);
-
-	HeadState::deepReverseUpdate(control);
-
-	#if FFSM2_PLANS_AVAILABLE()
-		if (subStatus && control._planData.planExists)
-			control.updatePlan((HeadState&) *this, subStatus);
-	#endif
-}
-
 //------------------------------------------------------------------------------
 
 template <typename TA, typename TH, typename... TS>
@@ -135,29 +115,6 @@ C_<TA, TH, TS...>::deepReact(FullControl& control,
 			control.updatePlan((HeadState&) *this, subStatus);
 	#endif
 	}
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-template <typename TA, typename TH, typename... TS>
-template <typename TEvent>
-FFSM2_CONSTEXPR(14)
-void
-C_<TA, TH, TS...>::deepReverseReact(FullControl& control,
-									const TEvent& event) noexcept
-{
-	const Short active = control._registry.active;
-	FFSM2_ASSERT(active != INVALID_SHORT);
-
-	FFSM2_IF_PLANS(const Status subStatus =)
-		SubStates::wideReverseReact(control, event, active);
-
-	HeadState::deepReverseReact(control, event);
-
-	#if FFSM2_PLANS_AVAILABLE()
-		if (subStatus && control._planData.planExists)
-			control.updatePlan((HeadState&) *this, subStatus);
-	#endif
 }
 
 //------------------------------------------------------------------------------

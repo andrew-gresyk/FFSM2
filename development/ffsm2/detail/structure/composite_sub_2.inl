@@ -54,19 +54,6 @@ CS_<NN, TA, NI, TL_<T>>::wideUpdate(FullControl& control,
 	return State::deepUpdate(control);
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-template <StateID NN, typename TA, Short NI, typename T>
-FFSM2_CONSTEXPR(14)
-Status
-CS_<NN, TA, NI, TL_<T>>::wideReverseUpdate(FullControl& control,
-										   const Short FFSM2_IF_ASSERT(prong)) noexcept
-{
-	FFSM2_ASSERT(prong == PRONG_INDEX);
-
-	return State::deepReverseUpdate(control);
-}
-
 //------------------------------------------------------------------------------
 
 template <StateID NN, typename TA, Short NI, typename T>
@@ -80,21 +67,6 @@ CS_<NN, TA, NI, TL_<T>>::wideReact(FullControl& control,
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
 	return State::deepReact(control, event);
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-template <StateID NN, typename TA, Short NI, typename T>
-template <typename TEvent>
-FFSM2_CONSTEXPR(14)
-Status
-CS_<NN, TA, NI, TL_<T>>::wideReverseReact(FullControl& control,
-										  const TEvent& event,
-										  const Short FFSM2_IF_ASSERT(prong)) noexcept
-{
-	FFSM2_ASSERT(prong == PRONG_INDEX);
-
-	return State::deepReverseReact(control, event);
 }
 
 //------------------------------------------------------------------------------
