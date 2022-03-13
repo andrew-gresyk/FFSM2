@@ -150,7 +150,7 @@ jobs:
 
     - name: Install Clang on ubuntu
       if: |
-        matrix.PLATFORM.OS == 'ubuntu-latest' &&
+        startsWith(matrix.PLATFORM.OS, 'ubuntu-') &&
         startsWith(matrix.PLATFORM.CC, 'clang-') &&
         matrix.PLATFORM.VERSION
       #uses: KyleMayes/install-llvm-action@v1
