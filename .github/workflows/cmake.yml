@@ -108,14 +108,19 @@ jobs:
               CXX: clang++-12
             }
           - {
+              OS: ubuntu-latest,
+              CC: clang-13,
+              CXX: clang++-13
+            }
+          - {
               OS: macos-10.15,
-              CC: clang,
-              CXX: clang++
+              CC: clang-12,
+              CXX: clang++-12
             }
           - {
               OS: macos-11,
-              CC: clang,
-              CXX: clang++
+              CC: clang-13,
+              CXX: clang++-13
             }
 
         BUILD_CONFIG: [ Release, Debug ]
