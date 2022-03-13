@@ -21,9 +21,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Install VS 2015
-      run: choco install visualcppbuildtools
-
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@master
 
