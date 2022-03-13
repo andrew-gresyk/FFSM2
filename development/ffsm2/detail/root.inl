@@ -98,33 +98,6 @@ R_<TG, TA>::update() noexcept {
 	FFSM2_IF_TRANSITION_HISTORY(_previousTransition = currentTransition);
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-template <typename TG, typename TA>
-FFSM2_CONSTEXPR(14)
-void
-R_<TG, TA>::reverseUpdate() noexcept {
-	FFSM2_ASSERT(_registry.isActive());
-
-	FullControl control{_context
-					  , _registry
-					  , _request
-					  FFSM2_IF_PLANS(, _planData)
-					  FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
-					  FFSM2_IF_LOG_INTERFACE(, _logger)};
-
-	_apex.deepReverseUpdate(control);
-
-	FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
-
-	Transition currentTransition;
-
-	if (_request)
-		processTransitions(currentTransition);
-
-	FFSM2_IF_TRANSITION_HISTORY(_previousTransition = currentTransition);
-}
-
 //------------------------------------------------------------------------------
 
 template <typename TG, typename TA>
@@ -142,34 +115,6 @@ R_<TG, TA>::react(const TEvent& event) noexcept {
 					  FFSM2_IF_LOG_INTERFACE(, _logger)};
 
 	_apex.deepReact(control, event);
-
-	FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
-
-	Transition currentTransition;
-
-	if (_request)
-		processTransitions(currentTransition);
-
-	FFSM2_IF_TRANSITION_HISTORY(_previousTransition = currentTransition);
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-template <typename TG, typename TA>
-template <typename TEvent>
-FFSM2_CONSTEXPR(14)
-void
-R_<TG, TA>::reverseReact(const TEvent& event) noexcept {
-	FFSM2_ASSERT(_registry.isActive());
-
-	FullControl control{_context
-					  , _registry
-					  , _request
-					  FFSM2_IF_PLANS(, _planData)
-					  FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
-					  FFSM2_IF_LOG_INTERFACE(, _logger)};
-
-	_apex.deepReverseReact(control, event);
 
 	FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
 

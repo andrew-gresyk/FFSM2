@@ -71,24 +71,6 @@ S_<NN, TA, TH>::deepUpdate(FullControl& control) noexcept {
 	return control._status;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-template <StateID NN, typename TA, typename TH>
-FFSM2_CONSTEXPR(14)
-Status
-S_<NN, TA, TH>::deepReverseUpdate(FullControl& control) noexcept {
-	FFSM2_LOG_STATE_METHOD(&Head::reverseUpdate,
-						   Method::REVERSE_UPDATE);
-
-	ScopedOrigin origin{control, STATE_ID};
-
-	Head:: widePreReverseUpdate(control.context());
-	Head::		  reverseUpdate(control);
-	Head::widePostReverseUpdate(control.context());
-
-	return control._status;
-}
-
 //------------------------------------------------------------------------------
 
 template <StateID NN, typename TA, typename TH>
@@ -110,30 +92,6 @@ S_<NN, TA, TH>::deepReact(FullControl& control,
 	Head::widePostReact(event, control.context());
 
 	return control._status;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-template <StateID NN, typename TA, typename TH>
-template <typename TEvent>
-FFSM2_CONSTEXPR(14)
-Status
-S_<NN, TA, TH>::deepReverseReact(FullControl& control,
-								 const TEvent& event) noexcept
-{
-	auto reaction = static_cast<void (Head::*)(const TEvent&, FullControl&)>(&Head::reverseReact);
-
-	FFSM2_LOG_STATE_METHOD(reaction,
-						   Method::REVERSE_REACT);
-
-	ScopedOrigin origin{control, STATE_ID};
-
-	Head:: widePreReverseReact(event, control.context());
-	(this->*reaction)		  (event, control);
-	Head::widePostReverseReact(event, control.context());
-
-	return control._status;
-
 }
 
 //------------------------------------------------------------------------------

@@ -107,23 +107,12 @@ public:
 	///   on all active states, then process requested transitions)
 	FFSM2_CONSTEXPR(14)	void update()														  noexcept;
 
-	/// @brief Trigger FSM update cycle (recursively call 'update()' in reverse order, from the leaf states to the root,
-	///   on all active states, then process requested transitions)
-	FFSM2_CONSTEXPR(14)	void reverseUpdate()												  noexcept;
-
 	/// @brief Have FSM react to an event (recursively call matching 'react<>()' from the root down to the leaf states,
 	///   on all active states, then process requested transitions)
 	/// @tparam TEvent Event type
 	/// @param event Event to react to
 	template <typename TEvent>
 	FFSM2_CONSTEXPR(14)	void react(const TEvent& event)										  noexcept;
-
-	/// @brief Have FSM react to an event (recursively call matching 'react<>()' in reverse order, from the leaf states to the root,
-	///   on all active states, then process requested transitions)
-	/// @tparam TEvent Event type
-	/// @param event Event to react to
-	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	void reverseReact(const TEvent& event)								  noexcept;
 
 	//----------------------------------------------------------------------
 

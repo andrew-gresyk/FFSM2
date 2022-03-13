@@ -45,14 +45,9 @@ struct FFSM2_EMPTY_BASES C_
 	FFSM2_CONSTEXPR(14)	void deepReenter		  (PlanControl&  control)  noexcept;
 
 	FFSM2_CONSTEXPR(14)	void deepUpdate			  (FullControl&  control)  noexcept;
-	FFSM2_CONSTEXPR(14)	void deepReverseUpdate	  (FullControl&  control)  noexcept;
 
 	template <typename TEvent>
 	FFSM2_CONSTEXPR(14)	void deepReact			  (FullControl&  control,
-												   const TEvent& event)    noexcept;
-
-	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	void deepReverseReact	  (FullControl&  control,
 												   const TEvent& event)    noexcept;
 
 	FFSM2_CONSTEXPR(14)	bool deepForwardExitGuard (GuardControl& control)  noexcept;
