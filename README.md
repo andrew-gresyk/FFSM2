@@ -33,7 +33,8 @@ Header-only flat FSM framework in C++11, with fully statically-defined structure
 
 ## Quick Start
 
-- **[Tutorial](examples/snippets/wiki_tutorial.cpp)**
+- **[Minimal Example](wiki/Overview-Minimal-Example)**
+- **[Extended Tutorial](wiki/Overview-Extended-Tutorial)**
 
 ---
 
@@ -45,8 +46,7 @@ Header-only flat FSM framework in C++11, with fully statically-defined structure
 
 ## Documentation
 
-- GitBook: **[flatdoc.hfsm.dev](https://flatdoc.hfsm.dev/)** (WIP)
-- In-line comments
+- **[Wiki](wiki)**
 
 ---
 
