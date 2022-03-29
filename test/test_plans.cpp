@@ -49,9 +49,9 @@ public:
 		++_totalUpdateCount;
 	}
 
-	unsigned entryAttemptCount() const			{ return _entryAttemptCount;	}
+	unsigned entryAttemptCount()  const			{ return _entryAttemptCount;	}
 	unsigned currentUpdateCount() const			{ return _currentUpdateCount;	}
-	unsigned totalUpdateCount() const			{ return _totalUpdateCount;		}
+	unsigned totalUpdateCount()   const			{ return _totalUpdateCount;		}
 
 private:
 	unsigned _entryAttemptCount	 = 0;

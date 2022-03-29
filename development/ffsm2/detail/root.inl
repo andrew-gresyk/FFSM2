@@ -35,7 +35,7 @@ R_<TG, TA>::R_(PureContext&& context
 
 template <typename TG, typename TA>
 FFSM2_CONSTEXPR(11)
-R_<TG, TA>::R_(const R_&  other) noexcept
+R_<TG, TA>::R_(const R_& other) noexcept
 	: _context {other._context }
 	, _registry{other._registry}
 #if FFSM2_PLANS_AVAILABLE()
