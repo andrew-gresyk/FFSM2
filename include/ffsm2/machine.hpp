@@ -3405,7 +3405,7 @@ public:
 
 	/// @brief Access plan
 	/// @return Plan
-	FFSM2_CONSTEXPR(14)	  Plan plan()							  noexcept	{ return  Plan{_planData};						}
+	FFSM2_CONSTEXPR(14)	  Plan plan()									  noexcept	{ return  Plan{_planData};				}
 
 // COMMON
 // COMMON
@@ -6154,13 +6154,13 @@ public:
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
 	FFSM2_CONSTEXPR(14)	void changeWith(const StateID stateId,
-										const Payload &payload)								  noexcept;
+										const Payload& payload)								  noexcept;
 
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
 	FFSM2_CONSTEXPR(14)	void changeWith(const StateID stateId,
-											Payload&& payload)								  noexcept;
+											 Payload&& payload)								  noexcept;
 
 	/// @brief Transition into a state
 	/// @tparam TState Destination state type
@@ -6172,7 +6172,7 @@ public:
 	/// @tparam TState Destination state type
 	/// @param payload Payload
 	template <typename TState>
-	FFSM2_CONSTEXPR(14)	void changeWith(Payload&& payload)									  noexcept	{ changeWith(stateId<TState>(), move(payload));	}
+	FFSM2_CONSTEXPR(14)	void changeWith(	 Payload&& payload)								  noexcept	{ changeWith(stateId<TState>(), move(payload));	}
 
 	// COMMON
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -6407,7 +6407,7 @@ R_<TG, TA>::R_(PureContext&& context
 
 template <typename TG, typename TA>
 FFSM2_CONSTEXPR(11)
-R_<TG, TA>::R_(const R_&  other) noexcept
+R_<TG, TA>::R_(const R_& other) noexcept
 	: _context {other._context }
 	, _registry{other._registry}
 #if FFSM2_PLANS_AVAILABLE()

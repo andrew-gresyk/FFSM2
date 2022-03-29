@@ -162,7 +162,7 @@ jobs:
       run: cmake -B ./build -DCMAKE_BUILD_TYPE=${{ matrix.BUILD_CONFIG }}
       working-directory: ${{ github.workspace }}
 
-    - name: Build Text
+    - name: Build Test
       run: cmake --build ./build --config ${{ matrix.BUILD_CONFIG }}
       working-directory: ${{ github.workspace }}
 

@@ -99,6 +99,9 @@
     <ClInclude Include="..\..\development\ffsm2\detail\structure\state.hpp">
       <Filter>ffsm2\detail\structure</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\test\wiki_class_member.hpp">
+      <Filter>test</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\test\main.cpp">
@@ -147,6 +150,15 @@
       <Filter>test</Filter>
     </ClCompile>
     <ClCompile Include="..\..\test\test_access.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\wiki_minimal.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\wiki_tutorial.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\wiki_class_member.cpp">
       <Filter>test</Filter>
     </ClCompile>
   </ItemGroup>

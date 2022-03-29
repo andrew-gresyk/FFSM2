@@ -19,7 +19,8 @@ struct Context {
 };
 
 // (Optional) Define type config:
-using Config = ffsm2::Config::ContextT<Context>;
+using Config = ffsm2::Config
+                    ::ContextT<Context&>;
 
 // (Optional, recommended) Define ffsm2::Machine for convenience:
 using M = ffsm2::MachineT<Config>;

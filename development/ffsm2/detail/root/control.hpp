@@ -166,7 +166,7 @@ public:
 
 	/// @brief Access plan
 	/// @return Plan
-	FFSM2_CONSTEXPR(14)	  Plan plan()							  noexcept	{ return  Plan{_planData};						}
+	FFSM2_CONSTEXPR(14)	  Plan plan()									  noexcept	{ return  Plan{_planData};				}
 
 // COMMON
 // COMMON

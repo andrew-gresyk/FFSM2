@@ -43,6 +43,9 @@
     <ClCompile Include="..\..\test\test_transitions.cpp" />
     <ClCompile Include="..\..\test\test_transitions_payloads.cpp" />
     <ClCompile Include="..\..\test\test_transitions_verbose.cpp" />
+    <ClCompile Include="..\..\test\wiki_class_member.cpp" />
+    <ClCompile Include="..\..\test\wiki_minimal.cpp" />
+    <ClCompile Include="..\..\test\wiki_tutorial.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\development\ffsm2\detail\containers\array.hpp" />
@@ -68,6 +71,7 @@
     <ClInclude Include="..\..\development\ffsm2\detail\structure\state.hpp" />
     <ClInclude Include="..\..\development\ffsm2\machine_dev.hpp" />
     <ClInclude Include="..\..\test\tools.hpp" />
+    <ClInclude Include="..\..\test\wiki_class_member.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\development\ffsm2\detail\containers\array.inl" />

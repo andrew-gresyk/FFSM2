@@ -391,13 +391,13 @@ public:
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
 	FFSM2_CONSTEXPR(14)	void changeWith(const StateID stateId,
-										const Payload &payload)								  noexcept;
+										const Payload& payload)								  noexcept;
 
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
 	FFSM2_CONSTEXPR(14)	void changeWith(const StateID stateId,
-											Payload&& payload)								  noexcept;
+											 Payload&& payload)								  noexcept;
 
 	/// @brief Transition into a state
 	/// @tparam TState Destination state type
@@ -409,7 +409,7 @@ public:
 	/// @tparam TState Destination state type
 	/// @param payload Payload
 	template <typename TState>
-	FFSM2_CONSTEXPR(14)	void changeWith(Payload&& payload)									  noexcept	{ changeWith(stateId<TState>(), move(payload));	}
+	FFSM2_CONSTEXPR(14)	void changeWith(	 Payload&& payload)								  noexcept	{ changeWith(stateId<TState>(), move(payload));	}
 
 	// COMMON
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
