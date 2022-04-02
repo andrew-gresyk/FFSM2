@@ -1,5 +1,5 @@
 // FFSM2 (flat state machine for games and interactive applications)
-// 1.4.0 (2022-03-13)
+// 2.0.0 (2022-04-02)
 //
 // Created by Andrew Gresyk
 //
@@ -31,8 +31,8 @@
 
 #pragma once
 
-#define FFSM2_VERSION_MAJOR 1
-#define FFSM2_VERSION_MINOR 4
+#define FFSM2_VERSION_MAJOR 2
+#define FFSM2_VERSION_MINOR 0
 #define FFSM2_VERSION_PATCH 0
 
 #define FFSM2_VERSION (10000 * FFSM2_VERSION_MAJOR + 100 * FFSM2_VERSION_MINOR + FFSM2_VERSION_PATCH)
@@ -69,9 +69,10 @@
 #include "detail/root/plan_data.hpp"
 #include "detail/root/plan.hpp"
 #include "detail/root/registry.hpp"
+#include "detail/root/core.hpp"
 #include "detail/root/control.hpp"
 
-#include "detail/structure/injections.hpp"
+#include "detail/structure/ancestors.hpp"
 #include "detail/structure/state.hpp"
 #include "detail/structure/forward.hpp"
 #include "detail/structure/composite_sub.hpp"

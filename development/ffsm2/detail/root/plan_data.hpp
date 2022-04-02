@@ -1,9 +1,57 @@
-#if FFSM2_PLANS_AVAILABLE()
-
 namespace ffsm2 {
 namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
+
+#pragma pack(push, 1)
+
+struct Status final {
+	enum class Result {
+		NONE,
+		SUCCESS,
+		FAILURE
+	};
+
+	Result result = Result::NONE;
+
+	FFSM2_CONSTEXPR(11)	Status(const Result result_ = Result::NONE)	  noexcept
+		: result{result_}
+	{}
+
+	FFSM2_CONSTEXPR(11)	explicit operator bool()				const noexcept	{ return result != Result::NONE;	}
+
+	FFSM2_CONSTEXPR(14)	void clear()								  noexcept;
+};
+
+#pragma pack(pop)
+
+//------------------------------------------------------------------------------
+
+FFSM2_CONSTEXPR(14)
+Status
+operator | (Status& lhs, const Status rhs)							  noexcept	{
+	const Status::Result result = lhs.result > rhs.result ?
+		lhs.result : rhs.result;
+
+	return Status{result};
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+FFSM2_CONSTEXPR(14)
+Status&
+operator |= (Status& lhs, const Status rhs)							  noexcept	{
+	const Status::Result result = lhs.result > rhs.result ?
+		lhs.result : rhs.result;
+
+	lhs = Status{result};
+
+	return lhs;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+#if FFSM2_PLANS_AVAILABLE()
 
 #pragma pack(push, 1)
 
@@ -21,7 +69,7 @@ struct Bounds final {
 
 #pragma pack(pop)
 
-//------------------------------------------------------------------------------
+////////////////////////////////////////////////////////////////////////////////
 
 template <typename
 		, typename
@@ -73,9 +121,12 @@ struct PlanDataT<ArgsT<TContext
 	TasksBits tasksSuccesses;
 	TasksBits tasksFailures;
 	bool planExists;
+	Status subStatus;
 
 	FFSM2_CONSTEXPR(14)	void clearTaskStatus(const StateID stateId)			  noexcept;
 	FFSM2_CONSTEXPR(14)	void verifyEmptyStatus(const StateID stateId)	const noexcept;
+
+	FFSM2_CONSTEXPR(14)	void clearRegionStatuses()							  noexcept;
 
 #if FFSM2_ASSERT_AVAILABLE()
 	FFSM2_CONSTEXPR(14)	void verifyPlans()								const noexcept	{ FFSM2_ASSERT(tasks.count() == verifyPlan());	}
@@ -116,9 +167,12 @@ struct PlanDataT<ArgsT<TContext
 	TasksBits tasksSuccesses;
 	TasksBits tasksFailures;
 	bool planExists;
+	Status subStatus;
 
-	FFSM2_CONSTEXPR(14)	void clearTaskStatus(const StateID stateId)			  noexcept;
+	FFSM2_CONSTEXPR(14)	void clearTaskStatus  (const StateID stateId)		  noexcept;
 	FFSM2_CONSTEXPR(14)	void verifyEmptyStatus(const StateID stateId)	const noexcept;
+
+	FFSM2_CONSTEXPR(14)	void clearRegionStatuses()							  noexcept;
 
 #if FFSM2_ASSERT_AVAILABLE()
 	FFSM2_CONSTEXPR(14)	void verifyPlans()								const noexcept	{ FFSM2_ASSERT(tasks.count() == verifyPlan());	}
@@ -127,11 +181,11 @@ struct PlanDataT<ArgsT<TContext
 };
 
 //------------------------------------------------------------------------------
+
+#endif
 ////////////////////////////////////////////////////////////////////////////////
 
 }
 }
 
 #include "plan_data.inl"
-
-#endif

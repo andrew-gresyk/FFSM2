@@ -46,15 +46,15 @@ static_assert(FSM::stateId<E>() == 4, "");
 ////////////////////////////////////////////////////////////////////////////////
 
 class Tracked
-	: public FSM::Injection
+	: public FSM::State
 {
 public:
-	void preEntryGuard(Context&) {
+	void entryGuard(GuardControl&) {
 		++_entryAttemptCount;
 		_currentUpdateCount = 0;
 	}
 
-	void preUpdate(Context&) {
+	void preUpdate(FullControl&) {
 		++_currentUpdateCount;
 		++_totalUpdateCount;
 	}
@@ -94,9 +94,9 @@ struct B
 //------------------------------------------------------------------------------
 
 struct C
-	: FSM::StateT<Tracked>
+	: FSM::AncestorsT<Tracked>
 {
-	using Base = FSM::StateT<Tracked>;
+	using Base = FSM::AncestorsT<Tracked>;
 
 	void entryGuard(GuardControl& control) {
 		switch (entryAttemptCount()) {
@@ -160,8 +160,14 @@ void step2(FSM::Instance& machine, Logger& logger) {
 	logger.assertSequence({
 		{							Event::Type::CHANGE,	FSM::stateId<A>() },
 
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::PRE_UPDATE },
+		{ FSM::stateId<A>(),		Event::Type::PRE_UPDATE },
+
 		{ ffsm2::INVALID_STATE_ID,	Event::Type::UPDATE },
 		{ FSM::stateId<A>(),		Event::Type::UPDATE },
+
+		{ FSM::stateId<A>(),		Event::Type::POST_UPDATE },
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::POST_UPDATE },
 
 		{ FSM::stateId<A>(),		Event::Type::EXIT_GUARD },
 		{ FSM::stateId<A>(),		Event::Type::ENTRY_GUARD },
@@ -181,8 +187,14 @@ void step3(FSM::Instance& machine, Logger& logger) {
 	logger.assertSequence({
 		{							Event::Type::CHANGE,	FSM::stateId<B>() },
 
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::PRE_UPDATE },
+		{ FSM::stateId<A>(),		Event::Type::PRE_UPDATE },
+
 		{ ffsm2::INVALID_STATE_ID,	Event::Type::UPDATE },
 		{ FSM::stateId<A>(),		Event::Type::UPDATE },
+
+		{ FSM::stateId<A>(),		Event::Type::POST_UPDATE },
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::POST_UPDATE },
 
 		{ FSM::stateId<A>(),		Event::Type::EXIT_GUARD },
 		{ FSM::stateId<B>(),		Event::Type::ENTRY_GUARD },
@@ -200,10 +212,16 @@ void step4(FSM::Instance& machine, Logger& logger) {
 	machine.update();
 
 	logger.assertSequence({
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::PRE_UPDATE },
+		{ FSM::stateId<B>(),		Event::Type::PRE_UPDATE },
+
 		{ ffsm2::INVALID_STATE_ID,	Event::Type::UPDATE },
 		{ FSM::stateId<B>(),		Event::Type::UPDATE },
 
 		{ FSM::stateId<B>(),		Event::Type::CHANGE,	FSM::stateId<C>() },
+
+		{ FSM::stateId<B>(),		Event::Type::POST_UPDATE },
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::POST_UPDATE },
 
 		{ FSM::stateId<B>(),		Event::Type::EXIT_GUARD },
 
@@ -220,10 +238,16 @@ void step5(FSM::Instance& machine, Logger& logger) {
 	machine.react(Action{});
 
 	logger.assertSequence({
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::PRE_REACT },
+		{ FSM::stateId<B>(),		Event::Type::PRE_REACT },
+
 		{ ffsm2::INVALID_STATE_ID,	Event::Type::REACT },
 		{ FSM::stateId<B>(),		Event::Type::REACT },
 
 		{ FSM::stateId<B>(),		Event::Type::CHANGE,	FSM::stateId<C>() },
+
+		{ FSM::stateId<B>(),		Event::Type::POST_REACT },
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::POST_REACT },
 
 		{ FSM::stateId<B>(),		Event::Type::EXIT_GUARD },
 		{ FSM::stateId<C>(),		Event::Type::ENTRY_GUARD },

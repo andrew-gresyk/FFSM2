@@ -3,41 +3,6 @@ namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#pragma pack(push, 1)
-
-struct Status final {
-	enum class Result {
-		NONE,
-		SUCCESS,
-		FAILURE
-	};
-
-	Result result = Result::NONE;
-
-	FFSM2_CONSTEXPR(11)	Status(const Result result_ = Result::NONE)	  noexcept
-		: result{result_}
-	{}
-
-	FFSM2_CONSTEXPR(11)	explicit operator bool()				const noexcept	{ return result != Result::NONE;	}
-
-	FFSM2_CONSTEXPR(14)	void clear()								  noexcept	{ result = Result::NONE;			}
-};
-
-#pragma pack(pop)
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-FFSM2_CONSTEXPR(14)
-Status
-combine(const Status lhs, const Status rhs)							  noexcept	{
-	const Status::Result result = lhs.result > rhs.result ?
-									  lhs.result : rhs.result;
-
-	return {result};
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 #if FFSM2_PLANS_AVAILABLE()
 
 template <typename TArgs>
@@ -93,7 +58,7 @@ private:
 	{}
 
 	template <typename T>
-	static constexpr StateID  stateId()							  noexcept	{ return			index<StateList , T>();	}
+	static constexpr StateID  stateId()							  noexcept	{ return		index<StateList , T>();		}
 
 public:
 	FFSM2_CONSTEXPR(14)	explicit operator bool()			const noexcept;

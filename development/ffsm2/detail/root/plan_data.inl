@@ -1,9 +1,17 @@
-#if FFSM2_PLANS_AVAILABLE()
-
 namespace ffsm2 {
 namespace detail {
 
+//------------------------------------------------------------------------------
+
+FFSM2_CONSTEXPR(14)
+void
+Status::clear() noexcept {
+	result = Result::NONE;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
+
+#if FFSM2_PLANS_AVAILABLE()
 
 template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
 FFSM2_CONSTEXPR(14)
@@ -29,6 +37,15 @@ PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::veri
 	}
 
 #endif
+}
+
+//------------------------------------------------------------------------------
+
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
+FFSM2_CONSTEXPR(14)
+void
+PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::clearRegionStatuses() noexcept {
+	subStatus .clear();
 }
 
 //------------------------------------------------------------------------------
@@ -108,6 +125,15 @@ PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::ver
 
 //------------------------------------------------------------------------------
 
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC>
+FFSM2_CONSTEXPR(14)
+void
+PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::clearRegionStatuses() noexcept {
+	subStatus .clear();
+}
+
+//------------------------------------------------------------------------------
+
 #if FFSM2_ASSERT_AVAILABLE()
 
 //------------------------------------------------------------------------------
@@ -152,10 +178,9 @@ PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::ver
 }
 
 #endif
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 
 }
 }
-
-#endif

@@ -238,22 +238,22 @@
 	#define FFSM2_LOG_INTERFACE_MASK									(1 << 8)
 
 	#define FFSM2_LOG_TRANSITION(CONTEXT, ORIGIN, DESTINATION)				   \
-		if (_logger)														   \
-			_logger->recordTransition(CONTEXT, ORIGIN, DESTINATION)
+		if (_core.logger)													   \
+			_core.logger->recordTransition(CONTEXT, ORIGIN, DESTINATION)
 
 #if FFSM2_PLANS_AVAILABLE()
 	#define FFSM2_LOG_TASK_STATUS(CONTEXT, ORIGIN, STATUS)					   \
-		if (_logger)														   \
-			_logger->recordTaskStatus(CONTEXT, ORIGIN, STATUS)
+		if (_core.logger)													   \
+			_core.logger->recordTaskStatus(CONTEXT, ORIGIN, STATUS)
 
 	#define FFSM2_LOG_PLAN_STATUS(CONTEXT, STATUS)							   \
-		if (_logger)														   \
-			_logger->recordPlanStatus(CONTEXT, STATUS)
+		if (_core.logger)													   \
+			_core.logger->recordPlanStatus(CONTEXT, STATUS)
 #endif
 
 	#define FFSM2_LOG_CANCELLED_PENDING(CONTEXT, ORIGIN)					   \
-		if (_logger)														   \
-			_logger->recordCancelledPending(CONTEXT, ORIGIN)
+		if (_core.logger)													   \
+			_core.logger->recordCancelledPending(CONTEXT, ORIGIN)
 
 #else
 
@@ -277,13 +277,13 @@
 #if FFSM2_VERBOSE_DEBUG_LOG_AVAILABLE()
 
 	#define FFSM2_LOG_STATE_METHOD(METHOD, METHOD_ID)						   \
-		if (auto* const logger = control._logger)							   \
+		if (auto* const logger = control._core.logger)						   \
 			logger->recordMethod(control.context(), STATE_ID, METHOD_ID)
 
 #elif FFSM2_LOG_INTERFACE_AVAILABLE()
 
 	#define FFSM2_LOG_STATE_METHOD(METHOD, METHOD_ID)						   \
-		if (auto* const logger = control._logger)							   \
+		if (auto* const logger = control._core.logger)						   \
 			log(METHOD, *logger, control.context(), METHOD_ID)
 
 #else

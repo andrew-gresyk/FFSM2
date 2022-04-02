@@ -19,12 +19,14 @@ protected:
 
 	using StateList			= typename TArgs::StateList;
 
+	using Core				= CoreT<TArgs>;
+
 	using Payload			= typename TArgs::Payload;
 	using Transition		= TransitionT<Payload>;
 
 #if FFSM2_PLANS_AVAILABLE()
 	using PlanData			= PlanDataT<TArgs>;
-	using CPlan				= CPlanT<TArgs>;
+	using CPlan				= CPlanT   <TArgs>;
 #endif
 
 #if FFSM2_LOG_INTERFACE_AVAILABLE()
@@ -45,18 +47,8 @@ protected:
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(11)	ControlT(Context& context
-							   , Registry& registry
-							   , Transition& request
-							   FFSM2_IF_PLANS(, PlanData& planData)
-							   FFSM2_IF_TRANSITION_HISTORY(, const Transition& previousTransition)
-							   FFSM2_IF_LOG_INTERFACE(, Logger* const logger))		  noexcept
-		: _context{context}
-		, _registry{registry}
-		, _request{request}
-		FFSM2_IF_PLANS(, _planData{planData})
-		FFSM2_IF_TRANSITION_HISTORY(, _previousTransition{previousTransition})
-		FFSM2_IF_LOG_INTERFACE(, _logger{logger})
+	FFSM2_CONSTEXPR(11)	ControlT(Core& core)							  noexcept
+		: _core{core}
 	{}
 
 public:
@@ -70,28 +62,28 @@ public:
 	/// @brief Access FSM context (data shared between states and/or data interface between FSM and external code)
 	/// @return context
 	/// @see Control::context()
-	FFSM2_CONSTEXPR(14)		  Context& _()								  noexcept	{ return _context;						}
+	FFSM2_CONSTEXPR(14)		  Context& _()								  noexcept	{ return _core.context;					}
 
 	/// @brief Access FSM context (data shared between states and/or data interface between FSM and external code)
 	/// @return context
 	/// @see Control::context()
-	FFSM2_CONSTEXPR(11)	const Context& _()							const noexcept	{ return _context;						}
+	FFSM2_CONSTEXPR(11)	const Context& _()							const noexcept	{ return _core.context;					}
 
 	/// @brief Access FSM context (data shared between states and/or data interface between FSM and external code)
 	/// @return context
 	/// @see Control::_()
-	FFSM2_CONSTEXPR(14)		  Context& context()						  noexcept	{ return _context;						}
+	FFSM2_CONSTEXPR(14)		  Context& context()						  noexcept	{ return _core.context;					}
 
 	/// @brief Access FSM context (data shared between states and/or data interface between FSM and external code)
 	/// @return context
 	/// @see Control::_()
-	FFSM2_CONSTEXPR(11)	const Context& context()					const noexcept	{ return _context;						}
+	FFSM2_CONSTEXPR(11)	const Context& context()					const noexcept	{ return _core.context;					}
 
-	//----------------------------------------------------------------------
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	/// @brief Inspect current transition request
 	/// @return Transition requests
-	FFSM2_CONSTEXPR(11)	const Transition& request()					const noexcept	{ return _request;						}
+	FFSM2_CONSTEXPR(11)	const Transition& request()					const noexcept	{ return _core.request;					}
 
 	//----------------------------------------------------------------------
 	//----------------------------------------------------------------------
@@ -100,30 +92,25 @@ public:
 
 	/// @brief Access read-only plan
 	/// @return Plan
-	FFSM2_CONSTEXPR(11)	CPlan plan()								const noexcept	{ return CPlan{_planData};				}
+	FFSM2_CONSTEXPR(11)	CPlan plan()								const noexcept	{ return CPlan{_core.planData};			}
 
 #endif
 
-	//----------------------------------------------------------------------
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #if FFSM2_TRANSITION_HISTORY_AVAILABLE()
 
 	/// @brief Get transitions processed during last 'update()', 'react()' or 'replayTransition()'
 	/// @return Array of last transition requests
-	FFSM2_CONSTEXPR(11)	const Transition& previousTransitions()		const noexcept	{ return _previousTransition;			}
+	FFSM2_CONSTEXPR(11)	const Transition& previousTransitions()		const noexcept	{ return _core.previousTransition;		}
 
 #endif
 
-	//----------------------------------------------------------------------
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 protected:
-	Context& _context;
-	Registry& _registry;
-	Transition& _request;
+	Core& _core;
 	StateID _originId = INVALID_STATE_ID;
-	FFSM2_IF_PLANS(PlanData& _planData);
-	FFSM2_IF_TRANSITION_HISTORY(const Transition& _previousTransition);
-	FFSM2_IF_LOG_INTERFACE(Logger* _logger);
 };
 
 //------------------------------------------------------------------------------
@@ -156,24 +143,38 @@ protected:
 	using Plan			= PlanT<TArgs>;
 #endif
 
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	struct Region {
+		FFSM2_CONSTEXPR(14)	Region(PlanControlT& control)		  noexcept;
+
+		FFSM2_CONSTEXPR(20)	~Region()							  noexcept;
+
+		PlanControlT& control;
+	};
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 	using Control::Control;
+
+	FFSM2_CONSTEXPR(14)	void   setRegion()						  noexcept;
+	FFSM2_CONSTEXPR(14)	void resetRegion()						  noexcept;
 
 public:
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #if FFSM2_PLANS_AVAILABLE()
-// COMMON
 
 	/// @brief Access plan
 	/// @return Plan
-	FFSM2_CONSTEXPR(14)	  Plan plan()									  noexcept	{ return  Plan{_planData};				}
+	FFSM2_CONSTEXPR(14)	  Plan plan()							  noexcept	{ return  Plan{_core.planData};		}
 
 // COMMON
 // COMMON
 
 	/// @brief Access read-only plan
 	/// @return Read-only plan
-	FFSM2_CONSTEXPR(11)	CPlan plan()								const noexcept	{ return CPlan{_planData};				}
+	FFSM2_CONSTEXPR(11)	CPlan plan()						const noexcept	{ return CPlan{_core.planData};		}
 
 // COMMON
 #endif
@@ -181,8 +182,7 @@ public:
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 protected:
-	FFSM2_IF_PLANS(using Control::_planData);
-	FFSM2_IF_LOG_INTERFACE(using Control::_logger);
+	using Control::_core;
 
 	Status _status;
 };
@@ -246,7 +246,7 @@ public:
 #if FFSM2_UTILITY_THEORY_AVAILABLE()
 #endif
 
-	//----------------------------------------------------------------------
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #if FFSM2_PLANS_AVAILABLE()
 
@@ -258,12 +258,10 @@ public:
 
 #endif
 
-	//----------------------------------------------------------------------
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 protected:
-	using PlanControl::_request;
-	FFSM2_IF_PLANS(using PlanControl::_planData);
-	FFSM2_IF_LOG_INTERFACE(using PlanControl::_logger);
+	using PlanControl::_core;
 
 	using PlanControl::_originId;
 	using PlanControl::_status;
@@ -271,12 +269,12 @@ protected:
 	bool _locked = false;
 };
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//------------------------------------------------------------------------------
 
 template <typename TArgs>
 class FullControlT;
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//------------------------------------------------------------------------------
 
 template <typename TContext
 		, typename TConfig
@@ -368,7 +366,7 @@ public:
 	/// @tparam TState Destination state type
 	/// @param payload Payload
 	template <typename TState>
-	FFSM2_CONSTEXPR(14)	void changeWith(const Payload& payload)		  noexcept	{ changeWith(FullControlBase::template stateId<TState>(),			payload );	}
+	FFSM2_CONSTEXPR(14)	void changeWith(const Payload& payload)		  noexcept	{ changeWith(FullControlBase::template stateId<TState>(),	   payload );	}
 
 	/// @brief Transition into a state
 	/// @tparam TState Destination state type
@@ -381,26 +379,18 @@ public:
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	//------------------------------------------------------------------------------
-
 #if FFSM2_UTILITY_THEORY_AVAILABLE()
 #endif
 
-	//------------------------------------------------------------------------------
-
 protected:
-	using FullControlBase::_request;
-	FFSM2_IF_PLANS(using FullControlBase::_planData);
-	FFSM2_IF_PLANS(using FullControlBase::_registry);
-	FFSM2_IF_LOG_INTERFACE(using FullControlBase::_logger);
+	using FullControlBase::_core;
 
 	using FullControlBase::_originId;
 	using FullControlBase::_status;
-
 	using FullControlBase::_locked;
 };
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//------------------------------------------------------------------------------
 
 template <typename TContext
 		, typename TConfig
@@ -468,8 +458,7 @@ public:
 	FFSM2_IF_PLANS(using FullControlBase::plan);
 
 protected:
-	FFSM2_IF_PLANS(using FullControlBase::_registry);
-	FFSM2_IF_PLANS(using FullControlBase::_planData);
+	FFSM2_IF_PLANS(using FullControlBase::_core);
 
 	using FullControlBase::_status;
 };
@@ -492,6 +481,7 @@ class GuardControlT final
 	using FullControl	= FullControlT<TArgs>;
 
 	using typename FullControl::Context;
+	using typename FullControl::Core;
 
 	using typename FullControl::Transition;
 
@@ -505,20 +495,10 @@ class GuardControlT final
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(11)	GuardControlT(Context& context
-									, Registry& registry
-									, Transition& request
-									, const Transition& currentTransition
-									, const Transition& pendingTransition
-									FFSM2_IF_PLANS(, PlanData& planData)
-									FFSM2_IF_TRANSITION_HISTORY(, const Transition& previousTransition)
-									FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
-		: FullControl{context
-					, registry
-					, request
-					FFSM2_IF_PLANS(, planData)
-					FFSM2_IF_TRANSITION_HISTORY(, previousTransition)
-					FFSM2_IF_LOG_INTERFACE(, logger)}
+	FFSM2_CONSTEXPR(11)	GuardControlT(Core& core,
+									  const Transition& currentTransition,
+									  const Transition& pendingTransition) noexcept
+		: FullControl{core}
 		, _currentTransition{currentTransition}
 		, _pendingTransition{pendingTransition}
 	{}
@@ -533,21 +513,19 @@ public:
 
 	/// @brief Get current transition request
 	/// @return Current transition request
-	FFSM2_CONSTEXPR(11)	const Transition& currentTransitions()		const noexcept	{ return _currentTransition;			}
+	FFSM2_CONSTEXPR(11)	const Transition& currentTransitions()	const noexcept	{ return _currentTransition;	}
 
 	/// @brief Get pending transition request
 	/// @return Pending transition request
-	FFSM2_CONSTEXPR(11)	const Transition& pendingTransition()		const noexcept	{ return _pendingTransition;			}
+	FFSM2_CONSTEXPR(11)	const Transition& pendingTransition()	const noexcept	{ return _pendingTransition;	}
 
 	/// @brief Cancel pending transition request
-	///		(can be used to substitute a transition into the current state with a different one)
+	///   (can be used to substitute a transition into the current state with a different one)
 	FFSM2_CONSTEXPR(14)	void cancelPendingTransition()				  noexcept;
 
 private:
-	using FullControl::_registry;
+	using FullControl::_core;
 	using FullControl::_originId;
-
-	FFSM2_IF_LOG_INTERFACE(using FullControl::_logger);
 
 	const Transition& _currentTransition;
 	const Transition& _pendingTransition;

@@ -19,8 +19,12 @@ struct Event final {
 		ENTRY_GUARD,
 		ENTER,
 		REENTER,
+		PRE_UPDATE,
 		UPDATE,
+		POST_UPDATE,
+		PRE_REACT,
 		REACT,
+		POST_REACT,
 		EXIT_GUARD,
 		EXIT,
 

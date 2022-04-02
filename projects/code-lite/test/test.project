@@ -7,9 +7,6 @@
         <File Name="../../../development/ffsm2/detail/root.inl"/>
         <File Name="../../../development/ffsm2/detail/root.hpp"/>
         <VirtualDirectory Name="structure">
-          <File Name="../../../development/ffsm2/detail/structure/injections_2.inl"/>
-          <File Name="../../../development/ffsm2/detail/structure/injections_1.inl"/>
-          <File Name="../../../development/ffsm2/detail/structure/injections.hpp"/>
           <File Name="../../../development/ffsm2/detail/structure/state.inl"/>
           <File Name="../../../development/ffsm2/detail/structure/state.hpp"/>
           <File Name="../../../development/ffsm2/detail/structure/forward.hpp"/>
@@ -18,6 +15,9 @@
           <File Name="../../../development/ffsm2/detail/structure/composite_sub.hpp"/>
           <File Name="../../../development/ffsm2/detail/structure/composite.inl"/>
           <File Name="../../../development/ffsm2/detail/structure/composite.hpp"/>
+          <File Name="../../../development/ffsm2/detail/structure/ancestors_2.inl"/>
+          <File Name="../../../development/ffsm2/detail/structure/ancestors_1.inl"/>
+          <File Name="../../../development/ffsm2/detail/structure/ancestors.hpp"/>
         </VirtualDirectory>
         <VirtualDirectory Name="shared">
           <File Name="../../../development/ffsm2/detail/shared/utility.hpp"/>
@@ -34,6 +34,8 @@
           <File Name="../../../development/ffsm2/detail/root/plan_data.hpp"/>
           <File Name="../../../development/ffsm2/detail/root/plan.inl"/>
           <File Name="../../../development/ffsm2/detail/root/plan.hpp"/>
+          <File Name="../../../development/ffsm2/detail/root/core.inl"/>
+          <File Name="../../../development/ffsm2/detail/root/core.hpp"/>
           <File Name="../../../development/ffsm2/detail/root/control.inl"/>
           <File Name="../../../development/ffsm2/detail/root/control.hpp"/>
         </VirtualDirectory>
@@ -62,7 +64,11 @@
     <Topleveldir>/Work/FFSM2</Topleveldir>
   </Reconciliation>
   <VirtualDirectory Name="test">
-    <File Name="../../../test/test_injections.cpp"/>
+    <File Name="../../../test/wiki_tutorial.cpp"/>
+    <File Name="../../../test/wiki_minimal.cpp"/>
+    <File Name="../../../test/wiki_class_member.hpp"/>
+    <File Name="../../../test/wiki_class_member.cpp"/>
+    <File Name="../../../test/test_ancestors.cpp"/>
     <File Name="../../../test/test_access.cpp"/>
     <File Name="../../../test/tools.inl"/>
     <File Name="../../../test/tools.hpp"/>

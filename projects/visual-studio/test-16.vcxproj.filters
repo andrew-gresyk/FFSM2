@@ -78,9 +78,6 @@
     <ClInclude Include="..\..\development\ffsm2\detail\structure\forward.hpp">
       <Filter>ffsm2\detail\structure</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\development\ffsm2\detail\structure\injections.hpp">
-      <Filter>ffsm2\detail\structure</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\development\ffsm2\detail\structure\state.hpp">
       <Filter>ffsm2\detail\structure</Filter>
     </ClInclude>
@@ -98,6 +95,12 @@
     </ClInclude>
     <ClInclude Include="..\..\development\ffsm2\detail\containers\task_list.hpp">
       <Filter>ffsm2\detail\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\development\ffsm2\detail\root\core.hpp">
+      <Filter>ffsm2\detail\root</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\development\ffsm2\detail\structure\ancestors.hpp">
+      <Filter>ffsm2\detail\structure</Filter>
     </ClInclude>
     <ClInclude Include="..\..\test\wiki_class_member.hpp">
       <Filter>test</Filter>
@@ -146,19 +149,19 @@
     <ClCompile Include="..\..\test\test_replication.cpp">
       <Filter>test</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\test\test_injections.cpp">
+    <ClCompile Include="..\..\test\test_access.cpp">
       <Filter>test</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\test\test_access.cpp">
+    <ClCompile Include="..\..\test\test_ancestors.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\wiki_class_member.cpp">
       <Filter>test</Filter>
     </ClCompile>
     <ClCompile Include="..\..\test\wiki_minimal.cpp">
       <Filter>test</Filter>
     </ClCompile>
     <ClCompile Include="..\..\test\wiki_tutorial.cpp">
-      <Filter>test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\test\wiki_class_member.cpp">
       <Filter>test</Filter>
     </ClCompile>
   </ItemGroup>
@@ -202,11 +205,14 @@
     <None Include="..\..\development\ffsm2\detail\containers\task_list.inl">
       <Filter>ffsm2\detail\containers</Filter>
     </None>
-    <None Include="..\..\development\ffsm2\detail\structure\injections_2.inl">
+    <None Include="..\..\development\ffsm2\detail\structure\ancestors_2.inl">
       <Filter>ffsm2\detail\structure</Filter>
     </None>
-    <None Include="..\..\development\ffsm2\detail\structure\injections_1.inl">
+    <None Include="..\..\development\ffsm2\detail\structure\ancestors_1.inl">
       <Filter>ffsm2\detail\structure</Filter>
+    </None>
+    <None Include="..\..\development\ffsm2\detail\root\core.inl">
+      <Filter>ffsm2\detail\root</Filter>
     </None>
   </ItemGroup>
 </Project>
