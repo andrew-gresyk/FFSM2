@@ -25,6 +25,8 @@ protected:
 	static_assert(Args::STATE_COUNT <  (unsigned) -1, "Too many states in the FSM. Change 'Short' type.");
 	static_assert(Args::STATE_COUNT == (unsigned) StateList::SIZE, "STATE_COUNT != StateList::SIZE");
 
+	using Core					= CoreT<Args>;
+
 	using Apex					= MaterialT<0, Args, TApex>;
 
 	using Control				= ControlT	   <Args>;
@@ -45,7 +47,7 @@ protected:
 
 public:
 	/// @brief Transition
-	using Transition			= typename Control::Transition;
+	using Transition			= typename Core::Transition;
 
 #if FFSM2_LOG_INTERFACE_AVAILABLE()
 	using Logger				= typename TConfig::LoggerInterface;
@@ -58,14 +60,11 @@ public:
 	FFSM2_CONSTEXPR(11)	explicit R_(Context& context
 								  FFSM2_IF_LOG_INTERFACE(, Logger* const logger = nullptr))	  noexcept;
 
-	FFSM2_CONSTEXPR(11)	explicit R_(const PureContext& context
-								  FFSM2_IF_LOG_INTERFACE(, Logger* const logger = nullptr))	  noexcept;
-
 	FFSM2_CONSTEXPR(11)	explicit R_(PureContext&& context
 								  FFSM2_IF_LOG_INTERFACE(, Logger* const logger = nullptr))	  noexcept;
 
-	FFSM2_CONSTEXPR(11) R_(const R_&  other)												  noexcept;
-	FFSM2_CONSTEXPR(11) R_(		 R_&& other)												  noexcept;
+	FFSM2_CONSTEXPR(NO) R_(const R_& )														  noexcept = default;
+	FFSM2_CONSTEXPR(NO) R_(		 R_&&)														  noexcept = default;
 
 	FFSM2_CONSTEXPR(20)	~R_()																  noexcept;
 
@@ -73,11 +72,11 @@ public:
 
 	/// @brief Access context
 	/// @return context
-	FFSM2_CONSTEXPR(14)		  Context& context()											  noexcept	{ return _context;								}
+	FFSM2_CONSTEXPR(14)		  Context& context()											  noexcept	{ return _core.context;							}
 
 	/// @brief Access context
 	/// @return context
-	FFSM2_CONSTEXPR(11)	const Context& context()										const noexcept	{ return _context;								}
+	FFSM2_CONSTEXPR(11)	const Context& context()										const noexcept	{ return _core.context;							}
 
 	//----------------------------------------------------------------------
 
@@ -118,20 +117,20 @@ public:
 
 	/// @brief Get current active state ID
 	/// @return Current active state ID
-	FFSM2_CONSTEXPR(11)	StateID activeStateId()											const noexcept	{ return _registry.active;						}
+	FFSM2_CONSTEXPR(11)	StateID activeStateId()											const noexcept	{ return _core.registry.active;							}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	/// @brief Check if a state is active
 	/// @param stateId Destination state identifier
 	/// @return State active status
-	FFSM2_CONSTEXPR(11)	bool isActive(const StateID stateId)							const noexcept	{ return _registry.active == stateId;			}
+	FFSM2_CONSTEXPR(11)	bool isActive(const StateID stateId)							const noexcept	{ return _core.registry.active == stateId;				}
 
 	/// @brief Check if a state is active
 	/// @tparam TState Destination state type
 	/// @return State active status
 	template <typename TState>
-	FFSM2_CONSTEXPR(11)	bool isActive()													const noexcept	{ return _registry.active == stateId<TState>();	}
+	FFSM2_CONSTEXPR(11)	bool isActive()													const noexcept	{ return _core.registry.active == stateId<TState>();	}
 
 	//----------------------------------------------------------------------
 	// COMMON
@@ -143,7 +142,7 @@ public:
 	/// @brief Transition into a state
 	/// @tparam TState Destination state type
 	template <typename TState>
-	FFSM2_CONSTEXPR(14)	void changeTo		 ()												  noexcept	{ changeTo (stateId<TState>());					}
+	FFSM2_CONSTEXPR(14)	void changeTo		 ()												  noexcept	{ changeTo (stateId<TState>());							}
 
 	// COMMON
 	//----------------------------------------------------------------------
@@ -174,7 +173,7 @@ public:
 	/// @brief Get the transition recorded during last 'update()' / 'react()'
 	/// @return Array of last recorded transitions
 	/// @see FFSM2_ENABLE_TRANSITION_HISTORY
-	FFSM2_CONSTEXPR(11)	const Transition& previousTransition()							const noexcept	{ return _previousTransition;					}
+	FFSM2_CONSTEXPR(11)	const Transition& previousTransition()							const noexcept	{ return _core.previousTransition;	}
 
 	/// @brief Force process a transition (skips 'guard()' calls)
 	///   Can be used to synchronize multiple FSMs
@@ -194,7 +193,7 @@ public:
 	/// @brief Attach logger
 	/// @param logger A logger implementing 'ffsm2::LoggerInterfaceT<>' interface
 	/// @see FFSM2_ENABLE_LOG_INTERFACE
-	FFSM2_CONSTEXPR(14)	void attachLogger(Logger* const logger)								  noexcept	{ _logger = logger;								}
+	FFSM2_CONSTEXPR(14)	void attachLogger(Logger* const logger)								  noexcept	{ _core.logger = logger;			}
 
 #endif
 
@@ -204,6 +203,7 @@ protected:
 	FFSM2_CONSTEXPR(14)	void initialEnter()													  noexcept;
 	FFSM2_CONSTEXPR(14)	void finalExit()													  noexcept;
 
+	FFSM2_CONSTEXPR(14)	void processRequest()												  noexcept;
 	FFSM2_CONSTEXPR(14)	void processTransitions(Transition& currentTransition)				  noexcept;
 
 	FFSM2_CONSTEXPR(14)	bool applyRequest(const Transition& currentTransition,
@@ -215,20 +215,8 @@ protected:
 	FFSM2_CONSTEXPR(14)	bool cancelledByGuards(const Transition& currentTransition,
 											   const Transition& pendingTransition)			  noexcept;
 
-#if FFSM2_TRANSITION_HISTORY_AVAILABLE()
-	Transition _previousTransition;
-#endif
-
-	Context _context;
-
-	Registry _registry;
-	FFSM2_IF_PLANS(PlanData _planData);
-
-	Transition _request;
-
+	Core _core;
 	Apex _apex;
-
-	FFSM2_IF_LOG_INTERFACE(Logger* _logger);
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -273,11 +261,12 @@ public:
 
 	FFSM2_CONSTEXPR(20)	~RV_()																  noexcept;
 
-private:
+protected:
 	using Base::initialEnter;
 	using Base::finalExit;
 
 #if FFSM2_TRANSITION_HISTORY_AVAILABLE()
+	using Base::_core;
 	using Base::_apex;
 #endif
 };
@@ -334,18 +323,8 @@ private:
 
 	using Base::applyRequest;
 
-	using Base::_previousTransition;
-
-	using Base::_context;
+	using Base::_core;
 	using Base::_apex;
-	using Base::_registry;
-	#if FFSM2_PLANS_AVAILABLE()
-		using Base::_planData;
-	#endif
-	using Base::_request;
-	#if FFSM2_LOG_INTERFACE_AVAILABLE()
-		using Base::_logger;
-	#endif
 #endif
 };
 
@@ -391,13 +370,13 @@ public:
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
 	FFSM2_CONSTEXPR(14)	void changeWith(const StateID stateId,
-										const Payload& payload)								  noexcept;
+										const Payload &payload)								  noexcept;
 
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
 	FFSM2_CONSTEXPR(14)	void changeWith(const StateID stateId,
-											 Payload&& payload)								  noexcept;
+											Payload&& payload)								  noexcept;
 
 	/// @brief Transition into a state
 	/// @tparam TState Destination state type
@@ -409,24 +388,20 @@ public:
 	/// @tparam TState Destination state type
 	/// @param payload Payload
 	template <typename TState>
-	FFSM2_CONSTEXPR(14)	void changeWith(	 Payload&& payload)								  noexcept	{ changeWith(stateId<TState>(), move(payload));	}
+	FFSM2_CONSTEXPR(14)	void changeWith(Payload&& payload)									  noexcept	{ changeWith(stateId<TState>(), move(payload));	}
 
 	// COMMON
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #if FFSM2_UTILITY_THEORY_AVAILABLE()
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #endif
+
+	//----------------------------------------------------------------------
 
 protected:
-	using Base::_context;
-	using Base::_registry;
-
-private:
-	using Base::_request;
-
-#if FFSM2_LOG_INTERFACE_AVAILABLE()
-	using Base::_logger;
-#endif
+	using Base::_core;
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -489,13 +464,14 @@ public:
 	FFSM2_CONSTEXPR(11)	explicit RC_(PureContext&& context
 								   FFSM2_IF_LOG_INTERFACE(, Logger* const logger = nullptr))  noexcept;
 
-	using Base::Base;
+	FFSM2_CONSTEXPR(NO) RC_(const RC_& )													  noexcept = default;
+	FFSM2_CONSTEXPR(NO) RC_(	  RC_&&)													  noexcept = default;
 
-	FFSM2_CONSTEXPR(14)	void setContext(const Context&  context)							  noexcept	{ _context =	  context ;	}
-	FFSM2_CONSTEXPR(14)	void setContext(	  Context&& context)							  noexcept	{ _context = move(context);	}
+	FFSM2_CONSTEXPR(14)	void setContext(const Context&  context)							  noexcept { _core.context =	  context ; }
+	FFSM2_CONSTEXPR(14)	void setContext(	  Context&& context)							  noexcept { _core.context = move(context); }
 
 private:
-	using Base::_context;
+	using Base::_core;
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -528,10 +504,10 @@ public:
 public:
 	using Base::Base;
 
-	FFSM2_CONSTEXPR(14)	void setContext(Context context)									  noexcept	{ _context = context; }
+	FFSM2_CONSTEXPR(14)	void setContext(Context context)									  noexcept { _core.context = context; }
 
 private:
-	using Base::_context;
+	using Base::_core;
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -565,10 +541,13 @@ public:
 	FFSM2_CONSTEXPR(11)	explicit RC_(Context context = nullptr
 								   FFSM2_IF_LOG_INTERFACE(, Logger* const logger = nullptr))  noexcept;
 
-	FFSM2_CONSTEXPR(14)	void setContext(Context context)									  noexcept	{ _context = context; }
+	FFSM2_CONSTEXPR(NO)	RC_(const RC_& )													  noexcept = default;
+	FFSM2_CONSTEXPR(NO)	RC_(	  RC_&&)													  noexcept = default;
+
+	FFSM2_CONSTEXPR(14)	void setContext(Context context)									  noexcept { _core.context = context; }
 
 private:
-	using Base::_context;
+	using Base::_core;
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

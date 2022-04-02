@@ -2,7 +2,6 @@ namespace ffsm2 {
 namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
-// COMMON
 
 template <typename TArgs>
 FFSM2_CONSTEXPR(14)
@@ -22,9 +21,46 @@ ControlT<TArgs>::Origin::~Origin() noexcept {
 	control._originId = prevId;
 }
 
-// COMMON
 ////////////////////////////////////////////////////////////////////////////////
-// COMMON
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+template <typename TArgs>
+FFSM2_CONSTEXPR(14)
+PlanControlT<TArgs>::Region::Region(PlanControlT& control_) noexcept
+	: control  {control_}
+{
+	control.setRegion();
+}
+
+//------------------------------------------------------------------------------
+
+template <typename TArgs>
+FFSM2_CONSTEXPR(20)
+PlanControlT<TArgs>::Region::~Region() noexcept {
+	control.resetRegion();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+template <typename TArgs>
+FFSM2_CONSTEXPR(14)
+void
+PlanControlT<TArgs>::setRegion() noexcept
+{
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <typename TArgs>
+FFSM2_CONSTEXPR(14)
+void
+PlanControlT<TArgs>::resetRegion() noexcept
+{
+	_status.clear();
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 template <typename TArgs>
 FFSM2_CONSTEXPR(14)
@@ -44,22 +80,20 @@ FullControlBaseT<TArgs>::Lock::~Lock() noexcept	{
 		control->_locked = false;
 }
 
-// COMMON
+////////////////////////////////////////////////////////////////////////////////
 //------------------------------------------------------------------------------
-// COMMON
 
 template <typename TArgs>
 FFSM2_CONSTEXPR(14)
 void
 FullControlBaseT<TArgs>::changeTo(const StateID stateId) noexcept {
 	if (!_locked) {
-		_request = Transition{_originId, stateId};
+		_core.request = Transition{_originId, stateId};
 
 		FFSM2_LOG_TRANSITION(context(), _originId, stateId);
 	}
 }
 
-// COMMON
 //------------------------------------------------------------------------------
 
 #if FFSM2_PLANS_AVAILABLE()
@@ -70,7 +104,7 @@ void
 FullControlBaseT<TArgs>::succeed() noexcept {
 	_status.result = Status::Result::SUCCESS;
 
-	_planData.tasksSuccesses.set(_originId);
+	_core.planData.tasksSuccesses.set(_originId);
 
 	FFSM2_LOG_TASK_STATUS(context(), _originId, StatusEvent::SUCCEEDED);
 }
@@ -83,7 +117,7 @@ void
 FullControlBaseT<TArgs>::fail() noexcept {
 	_status.result = Status::Result::FAILURE;
 
-	_planData.tasksFailures.set(_originId);
+	_core.planData.tasksFailures.set(_originId);
 
 	FFSM2_LOG_TASK_STATUS(context(), _originId, StatusEvent::FAILED);
 }
@@ -91,6 +125,7 @@ FullControlBaseT<TArgs>::fail() noexcept {
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
+
 #if FFSM2_PLANS_AVAILABLE()
 
 template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
@@ -112,13 +147,13 @@ FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::u
 	} else if (subStatus.result == Status::Result::SUCCESS) {
 		if (Plan p = plan()) {
 			for (auto it = p.first(); it; ++it)
-				if (_registry.active == it->origin &&
-					_planData.tasksSuccesses.get(it->origin))
+				if (_core.registry.active == it->origin &&
+					_core.planData.tasksSuccesses.get(it->origin))
 				{
 					Origin origin{*this, it->origin};
 					changeTo(it->destination);
 
-					_planData.tasksSuccesses.clear(it->origin);
+					_core.planData.tasksSuccesses.clear(it->origin);
 					it.remove();
 
 					break;
@@ -133,7 +168,6 @@ FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::u
 #endif
 
 //------------------------------------------------------------------------------
-// COMMON
 
 template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL FFSM2_IF_PLANS(, Long NTC), typename TTP>
 FFSM2_CONSTEXPR(14)
@@ -142,7 +176,7 @@ FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL FFSM2_IF_PLANS
 																										   const Payload& payload) noexcept
 {
 	if (!_locked) {
-		_request = Transition{_originId, stateId, payload};
+		_core.request = Transition{_originId, stateId, payload};
 
 		FFSM2_LOG_TRANSITION(context(), _originId, stateId);
 	}
@@ -157,14 +191,20 @@ FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL FFSM2_IF_PLANS
 																										   Payload&& payload) noexcept
 {
 	if (!_locked) {
-		_request = Transition{_originId, stateId, move(payload)};
+		_core.request = Transition{_originId, stateId, move(payload)};
 
 		FFSM2_LOG_TRANSITION(context(), _originId, stateId);
 	}
 }
 
-// COMMON
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+////////////////////////////////////////////////////////////////////////////////
 
 #if FFSM2_PLANS_AVAILABLE()
 
@@ -187,13 +227,13 @@ FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::
 	} else if (subStatus.result == Status::Result::SUCCESS) {
 		if (Plan p = plan()) {
 			for (auto it = p.first(); it; ++it)
-				if (_registry.active == it->origin &&
-					_planData.tasksSuccesses.get(it->origin))
+				if (_core.registry.active == it->origin &&
+					_core.planData.tasksSuccesses.get(it->origin))
 				{
 					Origin origin{*this, it->origin};
 					changeTo(it->destination);
 
-					_planData.tasksSuccesses.clear(it->origin);
+					_core.planData.tasksSuccesses.clear(it->origin);
 					it.remove();
 
 					break;

@@ -12,7 +12,7 @@ CS_<NN, TA, NI, TL_<T>>::wideEntryGuard(GuardControl& control,
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
-	return State::deepEntryGuard(control);
+	return Single::deepEntryGuard(control);
 }
 
 //------------------------------------------------------------------------------
@@ -25,7 +25,7 @@ CS_<NN, TA, NI, TL_<T>>::wideEnter(PlanControl& control,
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
-	State::deepEnter(control);
+	Single::deepEnter(control);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -38,10 +38,23 @@ CS_<NN, TA, NI, TL_<T>>::wideReenter(PlanControl& control,
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
-	State::deepReenter(control);
+	Single::deepReenter(control);
 }
 
 //------------------------------------------------------------------------------
+
+template <StateID NN, typename TA, Short NI, typename T>
+FFSM2_CONSTEXPR(14)
+Status
+CS_<NN, TA, NI, TL_<T>>::widePreUpdate(FullControl& control,
+									   const Short FFSM2_IF_ASSERT(prong)) noexcept
+{
+	FFSM2_ASSERT(prong == PRONG_INDEX);
+
+	return Single::deepPreUpdate(control);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <StateID NN, typename TA, Short NI, typename T>
 FFSM2_CONSTEXPR(14)
@@ -51,10 +64,38 @@ CS_<NN, TA, NI, TL_<T>>::wideUpdate(FullControl& control,
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
-	return State::deepUpdate(control);
+	return Single::deepUpdate(control);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <StateID NN, typename TA, Short NI, typename T>
+FFSM2_CONSTEXPR(14)
+Status
+CS_<NN, TA, NI, TL_<T>>::widePostUpdate(FullControl& control,
+										const Short FFSM2_IF_ASSERT(prong)) noexcept
+{
+	FFSM2_ASSERT(prong == PRONG_INDEX);
+
+	return Single::deepPostUpdate(control);
 }
 
 //------------------------------------------------------------------------------
+
+template <StateID NN, typename TA, Short NI, typename T>
+template <typename TEvent>
+FFSM2_CONSTEXPR(14)
+Status
+CS_<NN, TA, NI, TL_<T>>::widePreReact(FullControl& control,
+									  const TEvent& event,
+									  const Short FFSM2_IF_ASSERT(prong)) noexcept
+{
+	FFSM2_ASSERT(prong == PRONG_INDEX);
+
+	return Single::deepPreReact(control, event);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <StateID NN, typename TA, Short NI, typename T>
 template <typename TEvent>
@@ -66,7 +107,22 @@ CS_<NN, TA, NI, TL_<T>>::wideReact(FullControl& control,
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
-	return State::deepReact(control, event);
+	return Single::deepReact(control, event);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <StateID NN, typename TA, Short NI, typename T>
+template <typename TEvent>
+FFSM2_CONSTEXPR(14)
+Status
+CS_<NN, TA, NI, TL_<T>>::widePostReact(FullControl& control,
+									   const TEvent& event,
+									   const Short FFSM2_IF_ASSERT(prong)) noexcept
+{
+	FFSM2_ASSERT(prong == PRONG_INDEX);
+
+	return Single::deepPostReact(control, event);
 }
 
 //------------------------------------------------------------------------------
@@ -80,7 +136,7 @@ CS_<NN, TA, NI, TL_<T>>::wideExitGuard(GuardControl& control,
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
-	return State::deepExitGuard(control);
+	return Single::deepExitGuard(control);
 }
 
 //------------------------------------------------------------------------------
@@ -93,7 +149,7 @@ CS_<NN, TA, NI, TL_<T>>::wideExit(PlanControl& control,
 {
 	FFSM2_ASSERT(prong == PRONG_INDEX);
 
-	State::deepExit(control);
+	Single::deepExit(control);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

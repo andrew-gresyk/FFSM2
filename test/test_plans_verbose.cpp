@@ -43,15 +43,15 @@ static_assert(FSM::stateId<D>() == 3, "");
 ////////////////////////////////////////////////////////////////////////////////
 
 class Tracked
-	: public FSM::Injection
+	: public FSM::State
 {
 public:
-	void preEntryGuard(Context&) {
+	void entryGuard(GuardControl&) {
 		++_entryAttemptCount;
 		_currentUpdateCount = 0;
 	}
 
-	void preUpdate(Context&) {
+	void preUpdate(FullControl&) {
 		++_currentUpdateCount;
 		++_totalUpdateCount;
 	}
@@ -143,7 +143,7 @@ struct B
 //------------------------------------------------------------------------------
 
 struct C
-	: FSM::StateT<Tracked>
+	: FSM::AncestorsT<Tracked>
 {
 	void update(FullControl& control) {
 		control.succeed();
@@ -180,10 +180,17 @@ void step2(FSM::Instance& machine, Logger& logger) {
 	machine.update();
 
 	logger.assertSequence({
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::PRE_UPDATE },
+		{ FSM::stateId<A>(),		Event::Type::PRE_UPDATE },
+
 		{ ffsm2::INVALID_STATE_ID,	Event::Type::UPDATE },
 		{ FSM::stateId<A>(),		Event::Type::UPDATE },
 
 		{ FSM::stateId<A>(),		Event::Type::TASK_SUCCESS },
+
+		{ FSM::stateId<A>(),		Event::Type::POST_UPDATE },
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::POST_UPDATE },
+
 		{ FSM::stateId<A>(),		Event::Type::CHANGE,	FSM::stateId<B>() },
 
 		{ FSM::stateId<A>(),		Event::Type::EXIT_GUARD },
@@ -202,12 +209,18 @@ void step3(FSM::Instance& machine, Logger& logger) {
 	machine.react(Interruption{});
 
 	logger.assertSequence({
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::PRE_REACT },
+		{ FSM::stateId<B>(),		Event::Type::PRE_REACT },
+
 		{ ffsm2::INVALID_STATE_ID,	Event::Type::REACT },
 		{ FSM::stateId<B>(),		Event::Type::REACT },
 
 		{ FSM::stateId<B>(),		Event::Type::TASK_FAILURE },
-		{ ffsm2::INVALID_STATE_ID,	Event::Type::PLAN_FAILED },
 
+		{ FSM::stateId<B>(),		Event::Type::POST_REACT },
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::POST_REACT },
+
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::PLAN_FAILED },
 		{							Event::Type::CHANGE,	FSM::stateId<D>() },
 
 		{ FSM::stateId<B>(),		Event::Type::EXIT_GUARD },
@@ -223,10 +236,17 @@ void step4(FSM::Instance& machine, Logger& logger) {
 	machine.update();
 
 	logger.assertSequence({
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::PRE_UPDATE },
+		{ FSM::stateId<B>(),		Event::Type::PRE_UPDATE },
+
 		{ ffsm2::INVALID_STATE_ID,	Event::Type::UPDATE },
 		{ FSM::stateId<B>(),		Event::Type::UPDATE },
 
 		{ FSM::stateId<B>(),		Event::Type::TASK_SUCCESS },
+
+		{ FSM::stateId<B>(),		Event::Type::POST_UPDATE },
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::POST_UPDATE },
+
 		{ FSM::stateId<B>(),		Event::Type::CHANGE,	FSM::stateId<C>() },
 
 		{ FSM::stateId<B>(),		Event::Type::EXIT_GUARD },
@@ -245,10 +265,17 @@ void step5(FSM::Instance& machine, Logger& logger) {
 	machine.update();
 
 	logger.assertSequence({
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::PRE_UPDATE },
+		{ FSM::stateId<C>(),		Event::Type::PRE_UPDATE },
+
 		{ ffsm2::INVALID_STATE_ID,	Event::Type::UPDATE },
 		{ FSM::stateId<C>(),		Event::Type::UPDATE },
 
 		{ FSM::stateId<C>(),		Event::Type::TASK_SUCCESS },
+
+		{ FSM::stateId<C>(),		Event::Type::POST_UPDATE },
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::POST_UPDATE },
+
 		{ FSM::stateId<C>(),		Event::Type::CHANGE,	FSM::stateId<C>() },
 
 		{ FSM::stateId<C>(),		Event::Type::EXIT_GUARD },
@@ -266,10 +293,17 @@ void step6(FSM::Instance& machine, Logger& logger) {
 	machine.update();
 
 	logger.assertSequence({
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::PRE_UPDATE },
+		{ FSM::stateId<C>(),		Event::Type::PRE_UPDATE },
+
 		{ ffsm2::INVALID_STATE_ID,	Event::Type::UPDATE },
 		{ FSM::stateId<C>(),		Event::Type::UPDATE },
 
 		{ FSM::stateId<C>(),		Event::Type::TASK_SUCCESS },
+
+		{ FSM::stateId<C>(),		Event::Type::POST_UPDATE },
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::POST_UPDATE },
+
 		{ FSM::stateId<C>(),		Event::Type::CHANGE,	FSM::stateId<D>() },
 
 		{ FSM::stateId<C>(),		Event::Type::EXIT_GUARD },
@@ -288,10 +322,17 @@ void step7(FSM::Instance& machine, Logger& logger) {
 	machine.update();
 
 	logger.assertSequence({
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::PRE_UPDATE },
+		{ FSM::stateId<D>(),		Event::Type::PRE_UPDATE },
+
 		{ ffsm2::INVALID_STATE_ID,	Event::Type::UPDATE },
 		{ FSM::stateId<D>(),		Event::Type::UPDATE },
 
 		{ FSM::stateId<D>(),		Event::Type::TASK_SUCCESS },
+
+		{ FSM::stateId<D>(),		Event::Type::POST_UPDATE },
+		{ ffsm2::INVALID_STATE_ID,	Event::Type::POST_UPDATE },
+
 		{ ffsm2::INVALID_STATE_ID,	Event::Type::PLAN_SUCCEEDED },
 	});
 

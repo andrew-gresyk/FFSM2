@@ -207,14 +207,12 @@ struct RF_ final {
 	using FullControl	= FullControlT <Args>;
 	using GuardControl	= GuardControlT<Args>;
 
-	using Injection		= InjectionT<Args>;
-
 	//----------------------------------------------------------------------
 
 	using State			= EmptyT<Args>;
 
 	template <typename... TInjections>
-	using StateT		= B_<TInjections...>;
+	using AncestorsT	= A_<TInjections...>;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

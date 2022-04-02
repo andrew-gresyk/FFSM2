@@ -15,8 +15,8 @@ S_<NN, TA, TH>::deepEntryGuard(GuardControl& control) noexcept {
 
 	const bool cancelledBefore = control._cancelled;
 
-	Head::widePreEntryGuard(control.context());
-	Head::		 entryGuard(control);
+	Head::wideEntryGuard(control);
+	Head::	  entryGuard(control);
 
 	return !cancelledBefore && control._cancelled;
 }
@@ -32,8 +32,8 @@ S_<NN, TA, TH>::deepEnter(PlanControl& control) noexcept {
 
 	ScopedOrigin origin{control, STATE_ID};
 
-	Head::widePreEnter(control.context());
-	Head::		 enter(control);
+	Head::wideEnter(control);
+	Head::	  enter(control);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -42,18 +42,35 @@ template <StateID NN, typename TA, typename TH>
 FFSM2_CONSTEXPR(14)
 void
 S_<NN, TA, TH>::deepReenter(PlanControl& control) noexcept {
-	FFSM2_IF_PLANS(control._planData.verifyEmptyStatus(STATE_ID));
+	FFSM2_IF_PLANS(control._core.planData.verifyEmptyStatus(STATE_ID));
 
 	FFSM2_LOG_STATE_METHOD(&Head::reenter,
 						   Method::REENTER);
 
 	ScopedOrigin origin{control, STATE_ID};
 
-	Head::widePreReenter(control.context());
-	Head::		 reenter(control);
+	Head::wideReenter(control);
+	Head::	  reenter(control);
 }
 
 //------------------------------------------------------------------------------
+
+template <StateID NN, typename TA, typename TH>
+FFSM2_CONSTEXPR(14)
+Status
+S_<NN, TA, TH>::deepPreUpdate(FullControl& control) noexcept {
+	FFSM2_LOG_STATE_METHOD(&Head::preUpdate,
+						   Method::PRE_UPDATE);
+
+	ScopedOrigin origin{control, STATE_ID};
+
+	Head::widePreUpdate(control);
+	Head::	  preUpdate(control);
+
+	return control._status;
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <StateID NN, typename TA, typename TH>
 FFSM2_CONSTEXPR(14)
@@ -64,14 +81,52 @@ S_<NN, TA, TH>::deepUpdate(FullControl& control) noexcept {
 
 	ScopedOrigin origin{control, STATE_ID};
 
-	Head:: widePreUpdate(control.context());
-	Head::		  update(control);
-	Head::widePostUpdate(control.context());
+	Head::wideUpdate(control);
+	Head::	  update(control);
+
+	return control._status;
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <StateID NN, typename TA, typename TH>
+FFSM2_CONSTEXPR(14)
+Status
+S_<NN, TA, TH>::deepPostUpdate(FullControl& control) noexcept {
+	FFSM2_LOG_STATE_METHOD(&Head::postUpdate,
+						   Method::POST_UPDATE);
+
+	ScopedOrigin origin{control, STATE_ID};
+
+	Head::	  postUpdate(control);
+	Head::widePostUpdate(control);
 
 	return control._status;
 }
 
 //------------------------------------------------------------------------------
+
+template <StateID NN, typename TA, typename TH>
+template <typename TEvent>
+FFSM2_CONSTEXPR(14)
+Status
+S_<NN, TA, TH>::deepPreReact(FullControl& control,
+							 const TEvent& event) noexcept
+{
+	auto reaction = static_cast<void (Head::*)(const TEvent&, FullControl&)>(&Head::preReact);
+
+	FFSM2_LOG_STATE_METHOD(reaction,
+						   Method::PRE_REACT);
+
+	ScopedOrigin origin{control, STATE_ID};
+
+	Head::widePreReact(event, control);
+	(this->*reaction) (event, control);
+
+	return control._status;
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <StateID NN, typename TA, typename TH>
 template <typename TEvent>
@@ -87,9 +142,30 @@ S_<NN, TA, TH>::deepReact(FullControl& control,
 
 	ScopedOrigin origin{control, STATE_ID};
 
-	Head:: widePreReact(event, control.context());
+	Head::  wideReact(event, control);
+	(this->*reaction)(event, control);
+
+	return control._status;
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <StateID NN, typename TA, typename TH>
+template <typename TEvent>
+FFSM2_CONSTEXPR(14)
+Status
+S_<NN, TA, TH>::deepPostReact(FullControl& control,
+							  const TEvent& event) noexcept
+{
+	auto reaction = static_cast<void (Head::*)(const TEvent&, FullControl&)>(&Head::postReact);
+
+	FFSM2_LOG_STATE_METHOD(reaction,
+						   Method::POST_REACT);
+
+	ScopedOrigin origin{control, STATE_ID};
+
 	(this->*reaction)  (event, control);
-	Head::widePostReact(event, control.context());
+	Head::widePostReact(event, control);
 
 	return control._status;
 }
@@ -107,8 +183,8 @@ S_<NN, TA, TH>::deepExitGuard(GuardControl& control) noexcept {
 
 	const bool cancelledBefore = control._cancelled;
 
-	Head::widePreExitGuard(control.context());
-	Head::		 exitGuard(control);
+	Head::	  exitGuard(control);
+	Head::wideExitGuard(control);
 
 	return !cancelledBefore && control._cancelled;
 }
@@ -129,11 +205,11 @@ S_<NN, TA, TH>::deepExit(PlanControl& control) noexcept {
 	// Clang - error : no member named 'exit' in 'Blah'
 	//
 	// .. inherit state 'Blah' from ffsm2::Machine::Instance::State
-	Head::		  exit(control);
-	Head::widePostExit(control.context());
+	Head::	  exit(control);
+	Head::wideExit(control);
 
 #if FFSM2_PLANS_AVAILABLE()
-	control._planData.clearTaskStatus(STATE_ID);
+	control._core.planData.clearTaskStatus(STATE_ID);
 #endif
 }
 

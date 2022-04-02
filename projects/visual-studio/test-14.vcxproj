@@ -24,8 +24,8 @@
     <ClCompile Include="..\..\test\shared\test_bit_stream.cpp" />
     <ClCompile Include="..\..\test\shared\test_task_list.cpp" />
     <ClCompile Include="..\..\test\test_access.cpp" />
+    <ClCompile Include="..\..\test\test_ancestors.cpp" />
     <ClCompile Include="..\..\test\test_contexts.cpp" />
-    <ClCompile Include="..\..\test\test_injections.cpp" />
     <ClCompile Include="..\..\test\test_manual_activation.cpp" />
     <ClCompile Include="..\..\test\test_plans.cpp" />
     <ClCompile Include="..\..\test\test_plans_payloads.cpp" />
@@ -47,6 +47,7 @@
     <ClInclude Include="..\..\development\ffsm2\detail\features\logger_interface.hpp" />
     <ClInclude Include="..\..\development\ffsm2\detail\root.hpp" />
     <ClInclude Include="..\..\development\ffsm2\detail\root\control.hpp" />
+    <ClInclude Include="..\..\development\ffsm2\detail\root\core.hpp" />
     <ClInclude Include="..\..\development\ffsm2\detail\root\plan.hpp" />
     <ClInclude Include="..\..\development\ffsm2\detail\root\plan_data.hpp" />
     <ClInclude Include="..\..\development\ffsm2\detail\root\registry.hpp" />
@@ -56,10 +57,10 @@
     <ClInclude Include="..\..\development\ffsm2\detail\shared\macros_on.hpp" />
     <ClInclude Include="..\..\development\ffsm2\detail\shared\type_list.hpp" />
     <ClInclude Include="..\..\development\ffsm2\detail\shared\utility.hpp" />
+    <ClInclude Include="..\..\development\ffsm2\detail\structure\ancestors.hpp" />
     <ClInclude Include="..\..\development\ffsm2\detail\structure\composite.hpp" />
     <ClInclude Include="..\..\development\ffsm2\detail\structure\composite_sub.hpp" />
     <ClInclude Include="..\..\development\ffsm2\detail\structure\forward.hpp" />
-    <ClInclude Include="..\..\development\ffsm2\detail\structure\injections.hpp" />
     <ClInclude Include="..\..\development\ffsm2\detail\structure\state.hpp" />
     <ClInclude Include="..\..\development\ffsm2\machine_dev.hpp" />
     <ClInclude Include="..\..\test\tools.hpp" />
@@ -71,14 +72,15 @@
     <None Include="..\..\development\ffsm2\detail\containers\task_list.inl" />
     <None Include="..\..\development\ffsm2\detail\root.inl" />
     <None Include="..\..\development\ffsm2\detail\root\control.inl" />
+    <None Include="..\..\development\ffsm2\detail\root\core.inl" />
     <None Include="..\..\development\ffsm2\detail\root\plan.inl" />
     <None Include="..\..\development\ffsm2\detail\root\plan_data.inl" />
     <None Include="..\..\development\ffsm2\detail\shared\bit_stream.inl" />
+    <None Include="..\..\development\ffsm2\detail\structure\ancestors_1.inl" />
+    <None Include="..\..\development\ffsm2\detail\structure\ancestors_2.inl" />
     <None Include="..\..\development\ffsm2\detail\structure\composite.inl" />
     <None Include="..\..\development\ffsm2\detail\structure\composite_sub_1.inl" />
     <None Include="..\..\development\ffsm2\detail\structure\composite_sub_2.inl" />
-    <None Include="..\..\development\ffsm2\detail\structure\injections_1.inl" />
-    <None Include="..\..\development\ffsm2\detail\structure\injections_2.inl" />
     <None Include="..\..\development\ffsm2\detail\structure\state.inl" />
     <None Include="..\..\test\tools.inl" />
   </ItemGroup>

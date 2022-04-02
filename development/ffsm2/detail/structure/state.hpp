@@ -39,32 +39,43 @@ struct S_
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(14)	bool	deepEntryGuard		 (GuardControl& control)  noexcept;
+	FFSM2_CONSTEXPR(14)	bool	deepEntryGuard		 (GuardControl&	control)						  noexcept;
 
-	FFSM2_CONSTEXPR(14)	void	deepEnter			 (PlanControl&  control)  noexcept;
-	FFSM2_CONSTEXPR(14)	void	deepReenter			 (PlanControl&  control)  noexcept;
+	FFSM2_CONSTEXPR(14)	void	deepEnter			 ( PlanControl& control)						  noexcept;
+	FFSM2_CONSTEXPR(14)	void	deepReenter			 ( PlanControl& control)						  noexcept;
 
-	FFSM2_CONSTEXPR(14)	Status	deepUpdate			 (FullControl&  control)  noexcept;
+	FFSM2_CONSTEXPR(14)	Status	deepPreUpdate		 ( FullControl& control)						  noexcept;
+	FFSM2_CONSTEXPR(14)	Status	deepUpdate			 ( FullControl& control)						  noexcept;
+	FFSM2_CONSTEXPR(14)	Status	deepPostUpdate		 ( FullControl& control)						  noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	Status	deepReact			 (FullControl&  control,
-													  const TEvent& event)	  noexcept;
+	FFSM2_CONSTEXPR(14)	Status	deepPreReact		 ( FullControl& control, const TEvent&	event)	  noexcept;
 
-	FFSM2_CONSTEXPR(14)	bool	deepExitGuard		 (GuardControl& control)  noexcept;
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	Status	deepReact			 ( FullControl& control, const TEvent&	event)	  noexcept;
 
-	FFSM2_CONSTEXPR(14)	void	deepExit			 (PlanControl&  control)  noexcept;
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	Status	deepPostReact		 ( FullControl& control, const TEvent&	event)	  noexcept;
+
+	FFSM2_CONSTEXPR(14)	bool	deepExitGuard		 (GuardControl&	control)						  noexcept;
+
+	FFSM2_CONSTEXPR(14)	void	deepExit			 ( PlanControl& control)						  noexcept;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #if FFSM2_PLANS_AVAILABLE()
-	FFSM2_CONSTEXPR(14)	void	wrapPlanSucceeded	 (FullControl&  control)  noexcept;
-	FFSM2_CONSTEXPR(14)	void	wrapPlanFailed		 (FullControl&  control)  noexcept;
+	FFSM2_CONSTEXPR(14)	void	wrapPlanSucceeded	 ( FullControl& control)						  noexcept;
+	FFSM2_CONSTEXPR(14)	void	wrapPlanFailed		 ( FullControl& control)						  noexcept;
 #endif
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(14)	void	deepChangeToRequested(Control&)				  noexcept	{}
+	FFSM2_CONSTEXPR(14)	void	deepChangeToRequested(Control&)										  noexcept	{}
 
+	//----------------------------------------------------------------------
+	//----------------------------------------------------------------------
 	//----------------------------------------------------------------------
 
 #if FFSM2_DEBUG_STATE_TYPE_AVAILABLE() || FFSM2_STRUCTURE_REPORT_AVAILABLE() || FFSM2_LOG_INTERFACE_AVAILABLE()
@@ -88,7 +99,7 @@ struct S_
 	void log(TReturn (THost::*)(TParams...),
 			 Logger& logger,
 			 Context& context,
-			 const Method method)										const noexcept
+			 const Method method)																const noexcept
 	{
 		logger.recordMethod(context, STATE_ID, method);
 	}
@@ -100,10 +111,12 @@ struct S_
 	void log(TReturn (Empty::*)(TParams...),
 			 Logger&,
 			 Context&,
-			 const Method)												const noexcept
+			 const Method)																		const noexcept
 	{}
 
 #endif
+
+	//----------------------------------------------------------------------
 };
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -25,12 +25,28 @@ LoggerT<TConfig>::recordMethod(Context& /*context*/,
 			history.emplace_back(origin, Event::Type::REENTER);
 			break;
 
+		case Method::PRE_UPDATE:
+			history.emplace_back(origin, Event::Type::PRE_UPDATE);
+			break;
+
 		case Method::UPDATE:
 			history.emplace_back(origin, Event::Type::UPDATE);
 			break;
 
+		case Method::POST_UPDATE:
+			history.emplace_back(origin, Event::Type::POST_UPDATE);
+			break;
+
+		case Method::PRE_REACT:
+			history.emplace_back(origin, Event::Type::PRE_REACT);
+			break;
+
 		case Method::REACT:
 			history.emplace_back(origin, Event::Type::REACT);
+			break;
+
+		case Method::POST_REACT:
+			history.emplace_back(origin, Event::Type::POST_REACT);
 			break;
 
 		case Method::EXIT_GUARD:

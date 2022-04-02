@@ -46,15 +46,15 @@ static_assert(FSM::stateId<E>() == 4, "");
 ////////////////////////////////////////////////////////////////////////////////
 
 class Tracked
-	: public FSM::Injection
+	: public FSM::State
 {
 public:
-	void preEntryGuard(Context&) {
+	void entryGuard(GuardControl&) {
 		++_entryAttemptCount;
 		_currentUpdateCount = 0;
 	}
 
-	void preUpdate(Context&) {
+	void preUpdate(FullControl&) {
 		++_currentUpdateCount;
 		++_totalUpdateCount;
 	}
@@ -99,9 +99,9 @@ struct B
 //------------------------------------------------------------------------------
 
 struct C
-	: FSM::StateT<Tracked>
+	: FSM::AncestorsT<Tracked>
 {
-	using Base = FSM::StateT<Tracked>;
+	using Base = FSM::AncestorsT<Tracked>;
 
 	void entryGuard(GuardControl& control) {
 		switch (entryAttemptCount()) {
@@ -231,9 +231,12 @@ void step5(FSM::Instance& machine, Logger& logger) {
 	machine.react(Action{});
 
 	logger.assertSequence({
+		{ FSM::stateId<B>(),		Event::Type::PRE_REACT },
 		{ FSM::stateId<B>(),		Event::Type::REACT },
 
 		{ FSM::stateId<B>(),		Event::Type::CHANGE,	FSM::stateId<C>() },
+
+		{ FSM::stateId<B>(),		Event::Type::POST_REACT },
 
 		{ FSM::stateId<C>(),		Event::Type::ENTRY_GUARD },
 

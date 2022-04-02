@@ -8,8 +8,12 @@ enum class Method : uint8_t {
 	ENTRY_GUARD,
 	ENTER,
 	REENTER,
+	PRE_UPDATE,
 	UPDATE,
+	POST_UPDATE,
+	PRE_REACT,
 	REACT,
+	POST_REACT,
 	EXIT_GUARD,
 	EXIT,
 
@@ -73,8 +77,12 @@ methodName(const Method method)										  noexcept {
 	case Method::ENTRY_GUARD:	 return "entryGuard";
 	case Method::ENTER:			 return "enter";
 	case Method::REENTER:		 return "reenter";
+	case Method::PRE_UPDATE:	 return "preUpdate";
 	case Method::UPDATE:		 return "update";
+	case Method::POST_UPDATE:	 return "postUpdate";
+	case Method::PRE_REACT:		 return "preReact";
 	case Method::REACT:			 return "react";
+	case Method::POST_REACT:	 return "postReact";
 	case Method::EXIT_GUARD:	 return "exitGuard";
 	case Method::EXIT:			 return "exit";
 

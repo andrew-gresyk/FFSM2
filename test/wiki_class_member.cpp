@@ -10,7 +10,7 @@
 namespace actor_fsm {
 
 using Config = ffsm2::Config
-::ContextT<Actor::Context&>;
+					::ContextT<Actor::Context&>;
 
 using M = ffsm2::MachineT<Config>;
 

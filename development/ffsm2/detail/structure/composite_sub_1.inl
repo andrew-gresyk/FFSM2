@@ -55,6 +55,21 @@ CS_<NN, TA, NI, TL_<TS...>>::wideReenter(PlanControl& control,
 template <StateID NN, typename TA, Short NI, typename... TS>
 FFSM2_CONSTEXPR(14)
 Status
+CS_<NN, TA, NI, TL_<TS...>>::widePreUpdate(FullControl& control,
+										   const Short prong) noexcept
+{
+	FFSM2_ASSERT(prong != INVALID_SHORT);
+
+	return prong < R_PRONG ?
+		LHalf::widePreUpdate(control, prong) :
+		RHalf::widePreUpdate(control, prong);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <StateID NN, typename TA, Short NI, typename... TS>
+FFSM2_CONSTEXPR(14)
+Status
 CS_<NN, TA, NI, TL_<TS...>>::wideUpdate(FullControl& control,
 										const Short prong) noexcept
 {
@@ -65,7 +80,39 @@ CS_<NN, TA, NI, TL_<TS...>>::wideUpdate(FullControl& control,
 		RHalf::wideUpdate(control, prong);
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <StateID NN, typename TA, Short NI, typename... TS>
+FFSM2_CONSTEXPR(14)
+Status
+CS_<NN, TA, NI, TL_<TS...>>::widePostUpdate(FullControl& control,
+											const Short prong) noexcept
+{
+	FFSM2_ASSERT(prong != INVALID_SHORT);
+
+	return prong < R_PRONG ?
+		LHalf::widePostUpdate(control, prong) :
+		RHalf::widePostUpdate(control, prong);
+}
+
 //------------------------------------------------------------------------------
+
+template <StateID NN, typename TA, Short NI, typename... TS>
+template <typename TEvent>
+FFSM2_CONSTEXPR(14)
+Status
+CS_<NN, TA, NI, TL_<TS...>>::widePreReact(FullControl& control,
+										  const TEvent& event,
+										  const Short prong) noexcept
+{
+	FFSM2_ASSERT(prong != INVALID_SHORT);
+
+	return prong < R_PRONG ?
+		LHalf::widePreReact(control, event, prong) :
+		RHalf::widePreReact(control, event, prong);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <StateID NN, typename TA, Short NI, typename... TS>
 template <typename TEvent>
@@ -82,8 +129,24 @@ CS_<NN, TA, NI, TL_<TS...>>::wideReact(FullControl& control,
 		RHalf::wideReact(control, event, prong);
 }
 
-//------------------------------------------------------------------------------
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+template <StateID NN, typename TA, Short NI, typename... TS>
+template <typename TEvent>
+FFSM2_CONSTEXPR(14)
+Status
+CS_<NN, TA, NI, TL_<TS...>>::widePostReact(FullControl& control,
+										   const TEvent& event,
+										   const Short prong) noexcept
+{
+	FFSM2_ASSERT(prong != INVALID_SHORT);
+
+	return prong < R_PRONG ?
+		LHalf::widePostReact(control, event, prong) :
+		RHalf::widePostReact(control, event, prong);
+}
+
+//------------------------------------------------------------------------------
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // COMMON
 

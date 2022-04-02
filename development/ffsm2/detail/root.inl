@@ -7,18 +7,8 @@ template <typename TG, typename TA>
 FFSM2_CONSTEXPR(11)
 R_<TG, TA>::R_(Context& context
 			 FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
-	: _context{context}
-	FFSM2_IF_LOG_INTERFACE(, _logger{logger})
-{}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-template <typename TG, typename TA>
-FFSM2_CONSTEXPR(11)
-R_<TG, TA>::R_(const PureContext& context
-			 FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
-	: _context{context}
-	FFSM2_IF_LOG_INTERFACE(, _logger{logger})
+	: _core{context
+		  FFSM2_IF_LOG_INTERFACE(, logger)}
 {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -27,48 +17,16 @@ template <typename TG, typename TA>
 FFSM2_CONSTEXPR(11)
 R_<TG, TA>::R_(PureContext&& context
 			 FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
-	: _context{move(context)}
-	FFSM2_IF_LOG_INTERFACE(, _logger{logger})
+	: _core{move(context)
+		  FFSM2_IF_LOG_INTERFACE(, logger)}
 {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-template <typename TG, typename TA>
-FFSM2_CONSTEXPR(11)
-R_<TG, TA>::R_(const R_& other) noexcept
-	: _context {other._context }
-	, _registry{other._registry}
-#if FFSM2_PLANS_AVAILABLE()
-	, _planData{other._planData}
-#endif
-	, _request {other._request }
-#if FFSM2_LOG_INTERFACE_AVAILABLE()
-	, _logger  {other._logger  }
-#endif
-{}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-template <typename TG, typename TA>
-FFSM2_CONSTEXPR(11)
-R_<TG, TA>::R_(R_&& other) noexcept
-	: _context {move(other._context )}
-	, _registry{move(other._registry)}
-#if FFSM2_PLANS_AVAILABLE()
-	, _planData{move(other._planData)}
-#endif
-	, _request {move(other._request )}
-#if FFSM2_LOG_INTERFACE_AVAILABLE()
-	, _logger  {move(other._logger  )}
-#endif
-{}
-
-//------------------------------------------------------------------------------
 
 template <typename TG, typename TA>
 FFSM2_CONSTEXPR(20)
 R_<TG, TA>::~R_() noexcept {
-	FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
+	FFSM2_IF_ASSERT(FFSM2_IF_PLANS(_core.planData.verifyPlans()));
 }
 
 //------------------------------------------------------------------------------
@@ -77,25 +35,20 @@ template <typename TG, typename TA>
 FFSM2_CONSTEXPR(14)
 void
 R_<TG, TA>::update() noexcept {
-	FFSM2_ASSERT(_registry.isActive());
+	FFSM2_ASSERT(_core.registry.isActive());
 
-	FullControl control{_context
-					  , _registry
-					  , _request
-					  FFSM2_IF_PLANS(, _planData)
-					  FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
-					  FFSM2_IF_LOG_INTERFACE(, _logger)};
+	FullControl control{_core};
 
-	_apex.deepUpdate(control);
+	_apex. deepPreUpdate(control);
+	_apex.	  deepUpdate(control);
+	_apex.deepPostUpdate(control);
 
-	FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
+#if FFSM2_PLANS_AVAILABLE()
+	_apex.deepUpdatePlans(control);
+	_core.planData.clearRegionStatuses();
+#endif
 
-	Transition currentTransition;
-
-	if (_request)
-		processTransitions(currentTransition);
-
-	FFSM2_IF_TRANSITION_HISTORY(_previousTransition = currentTransition);
+	processRequest();
 }
 
 //------------------------------------------------------------------------------
@@ -105,25 +58,20 @@ template <typename TEvent>
 FFSM2_CONSTEXPR(14)
 void
 R_<TG, TA>::react(const TEvent& event) noexcept {
-	FFSM2_ASSERT(_registry.isActive());
+	FFSM2_ASSERT(_core.registry.isActive());
 
-	FullControl control{_context
-					  , _registry
-					  , _request
-					  FFSM2_IF_PLANS(, _planData)
-					  FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
-					  FFSM2_IF_LOG_INTERFACE(, _logger)};
+	FullControl control{_core};
 
-	_apex.deepReact(control, event);
+	_apex. deepPreReact(control, event);
+	_apex.	  deepReact(control, event);
+	_apex.deepPostReact(control, event);
 
-	FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
+#if FFSM2_PLANS_AVAILABLE()
+	_apex.deepUpdatePlans(control);
+	_core.planData.clearRegionStatuses();
+#endif
 
-	Transition currentTransition;
-
-	if (_request)
-		processTransitions(currentTransition);
-
-	FFSM2_IF_TRANSITION_HISTORY(_previousTransition = currentTransition);
+	processRequest();
 }
 
 //------------------------------------------------------------------------------
@@ -132,11 +80,11 @@ template <typename TG, typename TA>
 FFSM2_CONSTEXPR(14)
 void
 R_<TG, TA>::changeTo(const StateID stateId) noexcept {
-	FFSM2_ASSERT(_registry.isActive());
+	FFSM2_ASSERT(_core.registry.isActive());
 
-	_request = Transition{stateId};
+	_core.request = Transition{stateId};
 
-	FFSM2_LOG_TRANSITION(_context, INVALID_STATE_ID, stateId);
+	FFSM2_LOG_TRANSITION(_core.context, INVALID_STATE_ID, stateId);
 }
 
 //------------------------------------------------------------------------------
@@ -147,18 +95,18 @@ template <typename TG, typename TA>
 FFSM2_CONSTEXPR(14)
 void
 R_<TG, TA>::save(SerialBuffer& _buffer) const noexcept {
-	FFSM2_ASSERT(_registry.isActive());
+	FFSM2_ASSERT(_core.registry.isActive());
 
 	WriteStream stream{_buffer};
 
-	// TODO: save _registry
+	// TODO: save _core.registry
 	// TODO: save _requests
 	// TODO: save _rng						// FFSM2_IF_UTILITY_THEORY()
-	// TODO: save _planData					// FFSM2_IF_PLANS()
-	// TODO: save _previousTransition		// FFSM2_IF_TRANSITION_HISTORY()
+	// TODO: save _core.planData			// FFSM2_IF_PLANS()
+	// TODO: save _core.previousTransition	// FFSM2_IF_TRANSITION_HISTORY()
 	// TODO: save _activityHistory			// FFSM2_IF_STRUCTURE_REPORT()
 
-	_apex.deepSaveActive(_registry, stream);
+	_apex.deepSaveActive(_core.registry, stream);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -167,34 +115,29 @@ template <typename TG, typename TA>
 FFSM2_CONSTEXPR(14)
 void
 R_<TG, TA>::load(const SerialBuffer& buffer) noexcept {
-	FFSM2_ASSERT(_registry.isActive());
+	FFSM2_ASSERT(_core.registry.isActive());
 
-	_request.clear();
+	_core.request.clear();
 
-	PlanControl control{_context
-					  , _registry
-					  , _request
-					  FFSM2_IF_PLANS(, _planData)
-					  FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
-					  FFSM2_IF_LOG_INTERFACE(, _logger)};
+	PlanControl control{_core};
 
 	_apex.deepExit(control);
 
-	FFSM2_IF_TRANSITION_HISTORY(_previousTransition.clear());
+	FFSM2_IF_TRANSITION_HISTORY(_core.previousTransition.clear());
 
-	_registry.clearRequests();
-	_request.clear();
+	_core.registry.clearRequests();
+	_core.request.clear();
 
 	ReadStream stream{buffer};
 
-	// TODO: load _registry
+	// TODO: load _core.registry
 	// TODO: load _requests
-	// TODO: load _rng					// FFSM2_IF_UTILITY_THEORY()
-	// TODO: load _planData				// FFSM2_IF_PLANS()
-	// TODO: load _previousTransition	// FFSM2_IF_TRANSITION_HISTORY()
-	// TODO: load _activityHistory		// FFSM2_IF_STRUCTURE_REPORT()
+	// TODO: load _rng						// FFSM2_IF_UTILITY_THEORY()
+	// TODO: load _core.planData			// FFSM2_IF_PLANS()
+	// TODO: load _core.previousTransition	// FFSM2_IF_TRANSITION_HISTORY()
+	// TODO: load _activityHistory			// FFSM2_IF_STRUCTURE_REPORT()
 
-	_apex.deepLoadRequested(_registry, stream);
+	_apex.deepLoadRequested(_core.registry, stream);
 
 	_apex.deepEnter(control);
 }
@@ -209,29 +152,24 @@ template <typename TG, typename TA>
 FFSM2_CONSTEXPR(14)
 bool
 R_<TG, TA>::replayTransition(const StateID destination) noexcept {
-	FFSM2_ASSERT(_registry.isActive());
+	FFSM2_ASSERT(_core.registry.isActive());
 
-	_previousTransition.clear();
+	_core.previousTransition.clear();
 
 	if (FFSM2_CHECKED(destination != INVALID_SHORT)) {
-		PlanControl control{_context
-						  , _registry
-						  , _request
-						  FFSM2_IF_PLANS(, _planData)
-						  , _previousTransition
-						  FFSM2_IF_LOG_INTERFACE(, _logger)};
+		PlanControl control{_core};
 
 		Transition currentTransition;
 		applyRequest(currentTransition,
 					 destination);
 
-		_previousTransition = Transition{destination};
+		_core.previousTransition = Transition{destination};
 
 		_apex.deepChangeToRequested(control);
 
-		_registry.clearRequests();
+		_core.registry.clearRequests();
 
-		FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
+		FFSM2_IF_ASSERT(FFSM2_IF_PLANS(_core.planData.verifyPlans()));
 
 		return true;
 	}
@@ -247,16 +185,11 @@ template <typename TG, typename TA>
 FFSM2_CONSTEXPR(14)
 void
 R_<TG, TA>::initialEnter() noexcept {
-	FFSM2_ASSERT(!_registry.isActive());
-	FFSM2_ASSERT(!_request);
-	FFSM2_IF_TRANSITION_HISTORY(FFSM2_ASSERT(!_previousTransition));
+	FFSM2_ASSERT(!_core.registry.isActive());
+	FFSM2_ASSERT(!_core.request);
+	FFSM2_IF_TRANSITION_HISTORY(FFSM2_ASSERT(!_core.previousTransition));
 
-	PlanControl control{_context
-					  , _registry
-					  , _request
-					  FFSM2_IF_PLANS(, _planData)
-					  FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
-					  FFSM2_IF_LOG_INTERFACE(, _logger)};
+	PlanControl control{_core};
 
 	Transition currentTransition;
 	Transition pendingTransition;
@@ -267,16 +200,16 @@ R_<TG, TA>::initialEnter() noexcept {
 						   pendingTransition);
 
 	for (Long i = 0;
-		 i < SUBSTITUTION_LIMIT && _request;
+		 i < SUBSTITUTION_LIMIT && _core.request;
 		 ++i)
 	{
 		//backup();
 
 		if (applyRequest(currentTransition,
-						 _request.destination))
+						 _core.request.destination))
 		{
-			pendingTransition = _request;
-			_request.clear();
+			pendingTransition = _core.request;
+			_core.request.clear();
 
 			if (cancelledByEntryGuards(currentTransition,
 									   pendingTransition))
@@ -286,16 +219,16 @@ R_<TG, TA>::initialEnter() noexcept {
 
 			pendingTransition.clear();
 		} else
-			_request.clear();
+			_core.request.clear();
 	}
-	FFSM2_ASSERT(!_request);
-	FFSM2_IF_TRANSITION_HISTORY(_previousTransition = currentTransition);
+	FFSM2_ASSERT(!_core.request);
+	FFSM2_IF_TRANSITION_HISTORY(_core.previousTransition = currentTransition);
 
 	_apex.deepEnter(control);
 
-	_registry.clearRequests();
+	_core.registry.clearRequests();
 
-	FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
+	FFSM2_IF_ASSERT(FFSM2_IF_PLANS(_core.planData.verifyPlans()));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -304,15 +237,10 @@ template <typename TG, typename TA>
 FFSM2_CONSTEXPR(14)
 void
 R_<TG, TA>::finalExit() noexcept {
-	FFSM2_ASSERT(_registry.isActive());
-	FFSM2_ASSERT(!_request);
+	FFSM2_ASSERT(_core.registry.isActive());
+	FFSM2_ASSERT(!_core.request);
 
-	PlanControl control{_context
-					  , _registry
-					  , _request
-					  FFSM2_IF_PLANS(, _planData)
-					  FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
-					  FFSM2_IF_LOG_INTERFACE(, _logger)};
+	PlanControl control{_core};
 
 	_apex.deepExit(control);
 }
@@ -322,29 +250,43 @@ R_<TG, TA>::finalExit() noexcept {
 template <typename TG, typename TA>
 FFSM2_CONSTEXPR(14)
 void
-R_<TG, TA>::processTransitions(Transition& currentTransition) noexcept {
-	FFSM2_ASSERT(_request);
+R_<TG, TA>::processRequest() noexcept {
+	FFSM2_IF_ASSERT(FFSM2_IF_PLANS(_core.planData.verifyPlans()));
 
-	PlanControl control{_context
-					  , _registry
-					  , _request
-					  FFSM2_IF_PLANS(, _planData)
-					  FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
-					  FFSM2_IF_LOG_INTERFACE(, _logger)};
+	Transition currentTransition;
+
+	if (_core.request) {
+		processTransitions(currentTransition);
+
+		FFSM2_IF_ASSERT(FFSM2_IF_PLANS(_core.planData.verifyPlans()));
+	}
+
+	FFSM2_IF_TRANSITION_HISTORY(_core.previousTransition = currentTransition);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <typename TG, typename TA>
+FFSM2_CONSTEXPR(14)
+void
+R_<TG, TA>::processTransitions(Transition& currentTransition) noexcept {
+	FFSM2_ASSERT(_core.request);
+
+	PlanControl control{_core};
 
 	Transition pendingTransition;
 
 	for (Long i = 0;
-		i < SUBSTITUTION_LIMIT && _request;
+		i < SUBSTITUTION_LIMIT && _core.request;
 		++i)
 	{
 		//backup();
 
 		if (applyRequest(currentTransition,
-						 _request.destination))
+						 _core.request.destination))
 		{
-			pendingTransition = _request;
-			_request.clear();
+			pendingTransition = _core.request;
+			_core.request.clear();
 
 			if (cancelledByGuards(currentTransition,
 								  pendingTransition))
@@ -354,16 +296,14 @@ R_<TG, TA>::processTransitions(Transition& currentTransition) noexcept {
 
 			pendingTransition.clear();
 		} else
-			_request.clear();
+			_core.request.clear();
 	}
-	FFSM2_ASSERT(!_request);
+	FFSM2_ASSERT(!_core.request);
 
 	if (currentTransition)
 		_apex.deepChangeToRequested(control);
 
-	_registry.clearRequests();
-
-	FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
+	_core.registry.clearRequests();
 }
 
 // COMMON
@@ -376,7 +316,7 @@ R_<TG, TA>::applyRequest(const Transition& currentTransition,
 						 const StateID destination) noexcept
 {
 	if (currentTransition != Transition{destination}) {
-		_registry.requested = destination;
+		_core.registry.requested = destination;
 
 		return true;
 	} else
@@ -392,14 +332,9 @@ bool
 R_<TG, TA>::cancelledByEntryGuards(const Transition& currentTransition,
 								   const Transition& pendingTransition) noexcept
 {
-	GuardControl guardControl{_context
-							, _registry
-							, _request
+	GuardControl guardControl{_core
 							, currentTransition
-							, pendingTransition
-							FFSM2_IF_PLANS(, _planData)
-							FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
-							FFSM2_IF_LOG_INTERFACE(, _logger)};
+							, pendingTransition};
 
 	return _apex.deepEntryGuard(guardControl);
 }
@@ -412,14 +347,9 @@ bool
 R_<TG, TA>::cancelledByGuards(const Transition& currentTransition,
 							  const Transition& pendingTransition) noexcept
 {
-	GuardControl guardControl{_context
-							, _registry
-							, _request
+	GuardControl guardControl{_core
 							, currentTransition
-							, pendingTransition
-							FFSM2_IF_PLANS(, _planData)
-							FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
-							FFSM2_IF_LOG_INTERFACE(, _logger)};
+							, pendingTransition};
 
 	return _apex.deepForwardExitGuard (guardControl) ||
 		   _apex.deepForwardEntryGuard(guardControl);
@@ -495,28 +425,23 @@ template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_PLANS(, Long NTC), type
 FFSM2_CONSTEXPR(14)
 void
 RV_<G_<NFT, TC, Manual, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::replayEnter(const StateID destination) noexcept {
-	FFSM2_ASSERT(_registry.active == INVALID_SHORT);
-	FFSM2_ASSERT(!_request);
-	FFSM2_IF_TRANSITION_HISTORY(FFSM2_ASSERT(!_previousTransition));
+	FFSM2_ASSERT(_core.registry.active == INVALID_SHORT);
+	FFSM2_ASSERT(!_core.request);
+	FFSM2_IF_TRANSITION_HISTORY(FFSM2_ASSERT(!_core.previousTransition));
 
-	PlanControl control{_context
-					  , _registry
-					  , _request
-					  FFSM2_IF_PLANS(, _planData)
-					  FFSM2_IF_TRANSITION_HISTORY(, _previousTransition)
-					  FFSM2_IF_LOG_INTERFACE(, _logger)};
+	PlanControl control{_core};
 
 	Transition currentTransition;
 	applyRequest(currentTransition,
 				 destination);
 
-	FFSM2_IF_TRANSITION_HISTORY(_previousTransition = Transition{destination});
+	FFSM2_IF_TRANSITION_HISTORY(_core.previousTransition = Transition{destination});
 
 	_apex.deepEnter(control);
 
-	_registry.clearRequests();
+	_core.registry.clearRequests();
 
-	FFSM2_IF_PLANS(FFSM2_IF_ASSERT(_planData.verifyPlans()));
+	FFSM2_IF_ASSERT(FFSM2_IF_PLANS(_core.planData.verifyPlans()));
 }
 
 #endif
@@ -530,11 +455,11 @@ void
 RP_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  stateId,
 																	const Payload& payload) noexcept
 {
-	FFSM2_ASSERT(_registry.isActive());
+	FFSM2_ASSERT(_core.registry.isActive());
 
-	_request = Transition{stateId, payload};
+	_core.request = Transition{stateId, payload};
 
-	FFSM2_LOG_TRANSITION(_context, INVALID_STATE_ID, stateId);
+	FFSM2_LOG_TRANSITION(_core.context, INVALID_STATE_ID, stateId);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -545,11 +470,11 @@ void
 RP_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  stateId,
 																		 Payload&& payload) noexcept
 {
-	FFSM2_ASSERT(_registry.isActive());
+	FFSM2_ASSERT(_core.registry.isActive());
 
-	_request = Transition{stateId, move(payload)};
+	_core.request = Transition{stateId, move(payload)};
 
-	FFSM2_LOG_TRANSITION(_context, INVALID_STATE_ID, stateId);
+	FFSM2_LOG_TRANSITION(_core.context, INVALID_STATE_ID, stateId);
 }
 
 // COMMON
