@@ -10,6 +10,7 @@ ControlT<TArgs>::Origin::Origin(ControlT& control_,
 	: control{control_}
 	, prevId{control._originId}
 {
+	FFSM2_ASSERT(stateId < StateList::SIZE || stateId == INVALID_STATE_ID);
 	control._originId = stateId;
 }
 

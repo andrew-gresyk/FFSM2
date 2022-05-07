@@ -3,12 +3,7 @@
 
 #define FFSM2_ENABLE_VERBOSE_DEBUG_LOG
 #define FFSM2_DISABLE_TYPEINDEX
-#include <ffsm2/machine.hpp>
-
-#include <doctest/doctest.h>
-
-#include <algorithm> // std::max()
-#include <vector>
+#include "tools.hpp"
 
 namespace test_ancestors {
 
@@ -19,7 +14,7 @@ struct Event {
 		ENTRY_GUARD,
 
 		ENTER,
-		PRE_REENTER,
+		REENTER,
 
 		PRE_UPDATE,
 		UPDATE,
@@ -106,27 +101,27 @@ template <typename T>
 struct AncestorT
 	: FSM::State
 {
-	void entryGuard		  (GuardControl& control)	{ control._().emplace_back(FSM::stateId<T>(), Event::Type::ENTRY_GUARD);	}
+	void entryGuard		  (GuardControl& control)	{ control._().emplace_back(control.stateId<T>(), Event::Type::ENTRY_GUARD);	REQUIRE(control.stateId() == control.stateId<T>());	}
 
-	void enter			  ( PlanControl& control)	{ control._().emplace_back(FSM::stateId<T>(), Event::Type::ENTER);			}
-	void reenter		  ( PlanControl& control)	{ control._().emplace_back(FSM::stateId<T>(), Event::Type::PRE_REENTER);	}
+	void enter			  ( PlanControl& control)	{ control._().emplace_back(control.stateId<T>(), Event::Type::ENTER);		REQUIRE(control.stateId() == control.stateId<T>());	}
+	void reenter		  ( PlanControl& control)	{ control._().emplace_back(control.stateId<T>(), Event::Type::REENTER);		REQUIRE(control.stateId() == control.stateId<T>());	}
 
-	void preUpdate		  ( FullControl& control)	{ control._().emplace_back(FSM::stateId<T>(), Event::Type::PRE_UPDATE);		}
-	void update			  ( FullControl& control)	{ control._().emplace_back(FSM::stateId<T>(), Event::Type::UPDATE);			}
-	void postUpdate		  ( FullControl& control)	{ control._().emplace_back(FSM::stateId<T>(), Event::Type::POST_UPDATE);	}
+	void preUpdate		  ( FullControl& control)	{ control._().emplace_back(control.stateId<T>(), Event::Type::PRE_UPDATE);	REQUIRE(control.stateId() == control.stateId<T>());	}
+	void update			  ( FullControl& control)	{ control._().emplace_back(control.stateId<T>(), Event::Type::UPDATE);		REQUIRE(control.stateId() == control.stateId<T>());	}
+	void postUpdate		  ( FullControl& control)	{ control._().emplace_back(control.stateId<T>(), Event::Type::POST_UPDATE);	REQUIRE(control.stateId() == control.stateId<T>());	}
 
 	void preReact		  (const Event&,
-						    FullControl& control)	{ control._().emplace_back(FSM::stateId<T>(), Event::Type::PRE_REACT);		}
+							FullControl& control)	{ control._().emplace_back(control.stateId<T>(), Event::Type::PRE_REACT);	REQUIRE(control.stateId() == control.stateId<T>());	}
 
 	void react			  (const Event&,
-						    FullControl& control)	{ control._().emplace_back(FSM::stateId<T>(), Event::Type::REACT);			}
+							FullControl& control)	{ control._().emplace_back(control.stateId<T>(), Event::Type::REACT);		REQUIRE(control.stateId() == control.stateId<T>());	}
 
 	void postReact		  (const Event&,
-						    FullControl& control)	{ control._().emplace_back(FSM::stateId<T>(), Event::Type::POST_REACT);		}
+							FullControl& control)	{ control._().emplace_back(control.stateId<T>(), Event::Type::POST_REACT);	REQUIRE(control.stateId() == control.stateId<T>());	}
 
-	void exitGuard		  (GuardControl& control)	{ control._().emplace_back(FSM::stateId<T>(), Event::Type::EXIT_GUARD);		}
+	void exitGuard		  (GuardControl& control)	{ control._().emplace_back(control.stateId<T>(), Event::Type::EXIT_GUARD);	REQUIRE(control.stateId() == control.stateId<T>());	}
 
-	void exit			  ( PlanControl& control)	{ control._().emplace_back(FSM::stateId<T>(), Event::Type::EXIT);			}
+	void exit			  ( PlanControl& control)	{ control._().emplace_back(control.stateId<T>(), Event::Type::EXIT);		REQUIRE(control.stateId() == control.stateId<T>());	}
 };
 
 //------------------------------------------------------------------------------
@@ -170,6 +165,7 @@ TEST_CASE("FSM.Ancestors") {
 			{ FSM::stateId<R>(),		Event::Type::ENTER },
 			{ FSM::stateId<B>(),		Event::Type::ENTER },
 		});
+
 		REQUIRE(machine.activeStateId() == FSM::stateId<B>());
 
 		machine.update();
@@ -197,7 +193,8 @@ TEST_CASE("FSM.Ancestors") {
 			{ FSM::stateId<B>(),		Event::Type::EXIT },
 			{ FSM::stateId<R>(),		Event::Type::EXIT },
 		});
-		REQUIRE(machine.activeStateId() == ffsm2::INVALID_STATE_ID);
+
+		REQUIRE(machine.isActive() == false);
 	}
 
 	assertSequence(events, {});

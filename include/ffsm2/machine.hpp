@@ -1,5 +1,5 @@
 ﻿// FFSM2 (flat state machine for games and interactive applications)
-// 2.0.0 (2022-04-02)
+// 2.0.1 (2022-05-07)
 //
 // Created by Andrew Gresyk
 //
@@ -33,7 +33,7 @@
 
 #define FFSM2_VERSION_MAJOR 2
 #define FFSM2_VERSION_MINOR 0
-#define FFSM2_VERSION_PATCH 0
+#define FFSM2_VERSION_PATCH 1
 
 #define FFSM2_VERSION (10000 * FFSM2_VERSION_MAJOR + 100 * FFSM2_VERSION_MINOR + FFSM2_VERSION_PATCH)
 
@@ -3453,6 +3453,10 @@ protected:
 
 public:
 
+	/// @brief Get current state's identifier
+	/// @return Numeric state identifier
+	constexpr StateID stateId()										const noexcept	{ return _originId;						}
+
 	/// @brief Get state identifier for a state type
 	/// @tparam TState State type
 	/// @return Numeric state identifier
@@ -3949,6 +3953,7 @@ ControlT<TArgs>::Origin::Origin(ControlT& control_,
 	: control{control_}
 	, prevId{control._originId}
 {
+	FFSM2_ASSERT(stateId < StateList::SIZE || stateId == INVALID_STATE_ID);
 	control._originId = stateId;
 }
 
@@ -6499,7 +6504,7 @@ public:
 	/// @return Current active state ID
 	FFSM2_CONSTEXPR(11)	StateID activeStateId()											const noexcept	{ return _core.registry.active;							}
 
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	//----------------------------------------------------------------------
 
 	/// @brief Check if a state is active
 	/// @param stateId Destination state identifier
@@ -6676,6 +6681,12 @@ private:
 public:
 	using Base::Base;
 
+	/// @brief Check if FSM is active
+	/// @return FSM active status
+	FFSM2_CONSTEXPR(11)	bool isActive()													const noexcept	{ return _core.registry.isActive();	}
+
+	using Base::isActive;
+
 	/// @brief Manually start the FSM
 	///   Can be used with UE4 to start / stop the FSM in BeginPlay() / EndPlay()
 	FFSM2_CONSTEXPR(14)	void enter()														  noexcept	{ initialEnter();	}
@@ -6694,16 +6705,17 @@ public:
 
 #endif
 
-private:
+protected:
 	using Base::initialEnter;
 	using Base::finalExit;
+
+	using Base::_core;
 
 #if FFSM2_TRANSITION_HISTORY_AVAILABLE()
 	using Apex					= typename Base::Apex;
 
 	using Base::applyRequest;
 
-	using Base::_core;
 	using Base::_apex;
 #endif
 };

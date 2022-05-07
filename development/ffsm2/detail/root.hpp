@@ -119,7 +119,7 @@ public:
 	/// @return Current active state ID
 	FFSM2_CONSTEXPR(11)	StateID activeStateId()											const noexcept	{ return _core.registry.active;							}
 
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	//----------------------------------------------------------------------
 
 	/// @brief Check if a state is active
 	/// @param stateId Destination state identifier
@@ -296,6 +296,12 @@ private:
 public:
 	using Base::Base;
 
+	/// @brief Check if FSM is active
+	/// @return FSM active status
+	FFSM2_CONSTEXPR(11)	bool isActive()													const noexcept	{ return _core.registry.isActive();	}
+
+	using Base::isActive;
+
 	/// @brief Manually start the FSM
 	///   Can be used with UE4 to start / stop the FSM in BeginPlay() / EndPlay()
 	FFSM2_CONSTEXPR(14)	void enter()														  noexcept	{ initialEnter();	}
@@ -314,16 +320,17 @@ public:
 
 #endif
 
-private:
+protected:
 	using Base::initialEnter;
 	using Base::finalExit;
+
+	using Base::_core;
 
 #if FFSM2_TRANSITION_HISTORY_AVAILABLE()
 	using Apex					= typename Base::Apex;
 
 	using Base::applyRequest;
 
-	using Base::_core;
 	using Base::_apex;
 #endif
 };

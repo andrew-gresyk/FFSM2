@@ -53,6 +53,10 @@ protected:
 
 public:
 
+	/// @brief Get current state's identifier
+	/// @return Numeric state identifier
+	constexpr StateID stateId()										const noexcept	{ return _originId;						}
+
 	/// @brief Get state identifier for a state type
 	/// @tparam TState State type
 	/// @return Numeric state identifier
