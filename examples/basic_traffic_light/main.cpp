@@ -58,15 +58,13 @@ struct YellowUpwards;
 struct Green;
 struct Off;
 
+// state machine structure
 using FSM = M::PeerRoot<
-				// sub-machine ..
-				M::Composite<On,
-					// .. with 4 sub-states
-					Red,
-					YellowDownwards,
-					YellowUpwards,
-					Green
-				>,
+				On,
+				Red,
+				YellowDownwards,
+				YellowUpwards,
+				Green
 				Off
 			>;
 
