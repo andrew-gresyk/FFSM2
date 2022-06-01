@@ -124,7 +124,7 @@ public:
 	/// @brief Check if a state is active
 	/// @param stateId Destination state identifier
 	/// @return State active status
-	FFSM2_CONSTEXPR(11)	bool isActive(const StateID stateId)							const noexcept	{ return _core.registry.active == stateId;				}
+	FFSM2_CONSTEXPR(11)	bool isActive(const StateID stateId_)							const noexcept	{ return _core.registry.active == stateId_;				}
 
 	/// @brief Check if a state is active
 	/// @tparam TState Destination state type
@@ -137,7 +137,7 @@ public:
 
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
-	FFSM2_CONSTEXPR(14)	void changeTo		 (const StateID stateId)						  noexcept;
+	FFSM2_CONSTEXPR(14)	void changeTo		 (const StateID stateId_)						  noexcept;
 
 	/// @brief Transition into a state
 	/// @tparam TState Destination state type
@@ -376,13 +376,13 @@ public:
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
-	FFSM2_CONSTEXPR(14)	void changeWith(const StateID stateId,
+	FFSM2_CONSTEXPR(14)	void changeWith(const StateID stateId_,
 										const Payload &payload)								  noexcept;
 
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
-	FFSM2_CONSTEXPR(14)	void changeWith(const StateID stateId,
+	FFSM2_CONSTEXPR(14)	void changeWith(const StateID stateId_,
 											Payload&& payload)								  noexcept;
 
 	/// @brief Transition into a state

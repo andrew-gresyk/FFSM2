@@ -79,12 +79,12 @@ R_<TG, TA>::react(const TEvent& event) noexcept {
 template <typename TG, typename TA>
 FFSM2_CONSTEXPR(14)
 void
-R_<TG, TA>::changeTo(const StateID stateId) noexcept {
+R_<TG, TA>::changeTo(const StateID stateId_) noexcept {
 	FFSM2_ASSERT(_core.registry.isActive());
 
-	_core.request = Transition{stateId};
+	_core.request = Transition{stateId_};
 
-	FFSM2_LOG_TRANSITION(_core.context, INVALID_STATE_ID, stateId);
+	FFSM2_LOG_TRANSITION(_core.context, INVALID_STATE_ID, stateId_);
 }
 
 //------------------------------------------------------------------------------
@@ -452,14 +452,14 @@ RV_<G_<NFT, TC, Manual, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::replayEnter(const S
 template <FeatureTag NFT, typename TC, typename TV, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
 FFSM2_CONSTEXPR(14)
 void
-RP_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  stateId,
+RP_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  stateId_,
 																	const Payload& payload) noexcept
 {
 	FFSM2_ASSERT(_core.registry.isActive());
 
-	_core.request = Transition{stateId, payload};
+	_core.request = Transition{stateId_, payload};
 
-	FFSM2_LOG_TRANSITION(_core.context, INVALID_STATE_ID, stateId);
+	FFSM2_LOG_TRANSITION(_core.context, INVALID_STATE_ID, stateId_);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -467,14 +467,14 @@ RP_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateI
 template <FeatureTag NFT, typename TC, typename TV, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
 FFSM2_CONSTEXPR(14)
 void
-RP_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  stateId,
+RP_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  stateId_,
 																		 Payload&& payload) noexcept
 {
 	FFSM2_ASSERT(_core.registry.isActive());
 
-	_core.request = Transition{stateId, move(payload)};
+	_core.request = Transition{stateId_, move(payload)};
 
-	FFSM2_LOG_TRANSITION(_core.context, INVALID_STATE_ID, stateId);
+	FFSM2_LOG_TRANSITION(_core.context, INVALID_STATE_ID, stateId_);
 }
 
 // COMMON
