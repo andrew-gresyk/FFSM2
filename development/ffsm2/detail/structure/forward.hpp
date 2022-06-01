@@ -76,7 +76,7 @@ struct CI_ final {
 	static constexpr Short WIDTH		= sizeof...(TSubStates);
 
 #if FFSM2_SERIALIZATION_AVAILABLE()
-	static constexpr Long  WIDTH_BITS	= (Long) bitWidth(WIDTH);
+	static constexpr Long  WIDTH_BITS	= static_cast<Long>(bitWidth(WIDTH));
 	static constexpr Long  ACTIVE_BITS	= WIDTH_BITS;
 #endif
 
@@ -136,7 +136,7 @@ template <StateID, typename, Short, typename>
 struct CS_;
 
 template <typename, typename>
-class RC_;
+class InstanceT;
 
 //------------------------------------------------------------------------------
 
@@ -201,7 +201,7 @@ struct RF_ final {
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	using Instance		= RC_<TConfig, Apex>;
+	using Instance		= InstanceT<TConfig, Apex>;
 
 	using Control		= ControlT	   <Args>;
 	using FullControl	= FullControlT <Args>;

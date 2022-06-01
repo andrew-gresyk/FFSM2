@@ -213,7 +213,7 @@ C_<TA, TH, TS...>::deepUpdatePlans(FullControl& control) noexcept {
 	const bool planExists = control._core.planData.planExists;
 
 	if (s && planExists)
-		control.updatePlan((HeadState&) *this, s);
+		control.updatePlan(static_cast<HeadState&>(*this), s);
 }
 
 #endif

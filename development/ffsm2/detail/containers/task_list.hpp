@@ -8,7 +8,7 @@ namespace detail {
 #pragma pack(push, 1)
 
 struct TaskBase {
-	FFSM2_CONSTEXPR(11)	TaskBase()								  noexcept {}
+	FFSM2_CONSTEXPR(11)	TaskBase()								  noexcept	{}
 
 	FFSM2_CONSTEXPR(11)	TaskBase(const StateID origin_,
 								 const StateID destination_)	  noexcept
@@ -53,16 +53,16 @@ struct TaskT final
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(14)	TaskT()									  noexcept {
+	FFSM2_CONSTEXPR(14)	TaskT()									  noexcept	{
 		new (&storage) Payload{};
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(14)	TaskT(const StateID origin,
-							  const StateID destination,
+	FFSM2_CONSTEXPR(14)	TaskT(const StateID origin_,
+							  const StateID destination_,
 							  const Payload& payload)			  noexcept
-		: TaskBase{origin, destination}
+		: TaskBase{origin_, destination_}
 		, payloadSet{true}
 	{
 		new (&storage) Payload{payload};
@@ -70,10 +70,10 @@ struct TaskT final
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(14)	TaskT(const StateID origin,
-							  const StateID destination,
+	FFSM2_CONSTEXPR(14)	TaskT(const StateID origin_,
+							  const StateID destination_,
 							  Payload&& payload)				  noexcept
-		: TaskBase{origin, destination}
+		: TaskBase{origin_, destination_}
 		, payloadSet{true}
 	{
 		new (&storage) Payload{move(payload)};

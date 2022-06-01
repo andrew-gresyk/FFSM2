@@ -22,8 +22,8 @@ protected:
 	using Args					= typename Forward::Args;
 	using PureContext			= typename Args::PureContext;
 
-	static_assert(Args::STATE_COUNT <  (unsigned) -1, "Too many states in the FSM. Change 'Short' type.");
-	static_assert(Args::STATE_COUNT == (unsigned) StateList::SIZE, "STATE_COUNT != StateList::SIZE");
+	static_assert(Args::STATE_COUNT <  static_cast<unsigned>(-1), "Too many states in the FSM. Change 'Short' type.");
+	static_assert(Args::STATE_COUNT == static_cast<unsigned>(StateList::SIZE), "STATE_COUNT != StateList::SIZE");
 
 	using Core					= CoreT<Args>;
 
@@ -124,7 +124,7 @@ public:
 	/// @brief Check if a state is active
 	/// @param stateId Destination state identifier
 	/// @return State active status
-	FFSM2_CONSTEXPR(11)	bool isActive(const StateID stateId)							const noexcept	{ return _core.registry.active == stateId;				}
+	FFSM2_CONSTEXPR(11)	bool isActive(const StateID stateId_)							const noexcept	{ return _core.registry.active == stateId_;				}
 
 	/// @brief Check if a state is active
 	/// @tparam TState Destination state type
@@ -137,7 +137,7 @@ public:
 
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
-	FFSM2_CONSTEXPR(14)	void changeTo		 (const StateID stateId)						  noexcept;
+	FFSM2_CONSTEXPR(14)	void changeTo		 (const StateID stateId_)						  noexcept;
 
 	/// @brief Transition into a state
 	/// @tparam TState Destination state type
@@ -376,13 +376,13 @@ public:
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
-	FFSM2_CONSTEXPR(14)	void changeWith(const StateID stateId,
+	FFSM2_CONSTEXPR(14)	void changeWith(const StateID stateId_,
 										const Payload &payload)								  noexcept;
 
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
-	FFSM2_CONSTEXPR(14)	void changeWith(const StateID stateId,
+	FFSM2_CONSTEXPR(14)	void changeWith(const StateID stateId_,
 											Payload&& payload)								  noexcept;
 
 	/// @brief Transition into a state
@@ -434,7 +434,7 @@ public:
 /// @tparam Cfg Type configuration
 /// @tparam TApex Root region type
 template <typename, typename>
-class RC_;
+class InstanceT;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // TContext
@@ -449,7 +449,7 @@ template <FeatureTag NFeatureTag
 		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload
 		, typename TApex>
-class RC_			<G_<NFeatureTag, TContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
+class InstanceT		<G_<NFeatureTag, TContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
 	: public	 RP_<G_<NFeatureTag, TContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
 {
 	using Base = RP_<G_<NFeatureTag, TContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
@@ -465,17 +465,14 @@ public:
 #endif
 
 public:
-	FFSM2_CONSTEXPR(11)	explicit RC_(Context& context
-								   FFSM2_IF_LOG_INTERFACE(, Logger* const logger = nullptr))  noexcept;
+	FFSM2_CONSTEXPR(11)	explicit InstanceT(Context& context
+										 FFSM2_IF_LOG_INTERFACE(, Logger* const logger = nullptr))	  noexcept;
 
-	FFSM2_CONSTEXPR(11)	explicit RC_(PureContext&& context
-								   FFSM2_IF_LOG_INTERFACE(, Logger* const logger = nullptr))  noexcept;
+	FFSM2_CONSTEXPR(11)	explicit InstanceT(PureContext&& context
+										 FFSM2_IF_LOG_INTERFACE(, Logger* const logger = nullptr))	  noexcept;
 
-	FFSM2_CONSTEXPR(NO) RC_(const RC_& )													  noexcept = default;
-	FFSM2_CONSTEXPR(NO) RC_(	  RC_&&)													  noexcept = default;
-
-	FFSM2_CONSTEXPR(14)	void setContext(const Context&  context)							  noexcept { _core.context =	  context ; }
-	FFSM2_CONSTEXPR(14)	void setContext(	  Context&& context)							  noexcept { _core.context = move(context); }
+	FFSM2_CONSTEXPR(NO) InstanceT(const InstanceT& )												  noexcept = default;
+	FFSM2_CONSTEXPR(NO) InstanceT(		InstanceT&&)												  noexcept = default;
 
 private:
 	using Base::_core;
@@ -494,7 +491,7 @@ template <FeatureTag NFeatureTag
 		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload
 		, typename TApex>
-class RC_			<G_<NFeatureTag, TContext&, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
+class InstanceT		<G_<NFeatureTag, TContext&, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
 	: public	 RP_<G_<NFeatureTag, TContext&, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
 {
 	using Base = RP_<G_<NFeatureTag, TContext&, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
@@ -510,8 +507,6 @@ public:
 
 public:
 	using Base::Base;
-
-	FFSM2_CONSTEXPR(14)	void setContext(Context context)									  noexcept { _core.context = context; }
 
 private:
 	using Base::_core;
@@ -530,7 +525,7 @@ template <FeatureTag NFeatureTag
 		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload
 		, typename TApex>
-class RC_			<G_<NFeatureTag, TContext*, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
+class InstanceT		<G_<NFeatureTag, TContext*, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
 	: public	 RP_<G_<NFeatureTag, TContext*, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
 {
 	using Base = RP_<G_<NFeatureTag, TContext*, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
@@ -545,13 +540,13 @@ public:
 #endif
 
 public:
-	FFSM2_CONSTEXPR(11)	explicit RC_(Context context = nullptr
-								   FFSM2_IF_LOG_INTERFACE(, Logger* const logger = nullptr))  noexcept;
+	FFSM2_CONSTEXPR(11)	explicit InstanceT(Context context = nullptr
+										 FFSM2_IF_LOG_INTERFACE(, Logger* const logger = nullptr))	  noexcept;
 
-	FFSM2_CONSTEXPR(NO)	RC_(const RC_& )													  noexcept = default;
-	FFSM2_CONSTEXPR(NO)	RC_(	  RC_&&)													  noexcept = default;
+	FFSM2_CONSTEXPR(NO)	InstanceT(const InstanceT& )												  noexcept = default;
+	FFSM2_CONSTEXPR(NO)	InstanceT(		InstanceT&&)												  noexcept = default;
 
-	FFSM2_CONSTEXPR(14)	void setContext(Context context)									  noexcept { _core.context = context; }
+	FFSM2_CONSTEXPR(14)	void setContext(Context context)											  noexcept	{ _core.context = context; }
 
 private:
 	using Base::_core;
@@ -569,11 +564,11 @@ template <FeatureTag NFeatureTag
 		FFSM2_IF_PLANS(, Long NTaskCapacity)
 		, typename TPayload
 		, typename TApex>
-class FFSM2_EMPTY_BASES RC_<G_<NFeatureTag, EmptyContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
-	: public			RP_<G_<NFeatureTag, EmptyContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
+class FFSM2_EMPTY_BASES InstanceT<G_<NFeatureTag, EmptyContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex> final
+	: public				  RP_<G_<NFeatureTag, EmptyContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
 	, EmptyContext
 {
-	using Base		  = RP_<G_<NFeatureTag, EmptyContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
+	using Base				= RP_<G_<NFeatureTag, EmptyContext, TActivation, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
 
 public:
 	static constexpr FeatureTag FEATURE_TAG = Base::FEATURE_TAG;
@@ -583,7 +578,7 @@ public:
 #endif
 
 public:
-	FFSM2_CONSTEXPR(11)	explicit RC_(FFSM2_IF_LOG_INTERFACE(Logger* const logger = nullptr))  noexcept;
+	FFSM2_CONSTEXPR(11)	explicit InstanceT(FFSM2_IF_LOG_INTERFACE(Logger* const logger = nullptr))  noexcept;
 
 	using Base::Base;
 };
