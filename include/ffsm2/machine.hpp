@@ -2994,7 +2994,7 @@ protected:
 
 	struct Origin final {
 		FFSM2_CONSTEXPR(14)	Origin(ControlT& control_,
-								   const StateID stateId)				  noexcept;
+								   const StateID stateId_)				  noexcept;
 
 		FFSM2_CONSTEXPR(20)	~Origin()									  noexcept;
 
@@ -3161,7 +3161,7 @@ public:
 
 	/// @brief Transition into a state
 	/// @param stateId State identifier
-	FFSM2_CONSTEXPR(14)	void changeTo(const StateID stateId)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void changeTo(const StateID stateId_)	  noexcept;
 
 	/// @brief Transition into a state
 	/// @tparam TState State type
@@ -3265,13 +3265,13 @@ public:
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
-	FFSM2_CONSTEXPR(14)	void changeWith   (const StateID  stateId,
+	FFSM2_CONSTEXPR(14)	void changeWith   (const StateID  stateId_,
 										   const Payload& payload)	  noexcept;
 
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
-	FFSM2_CONSTEXPR(14)	void changeWith   (const StateID  stateId,
+	FFSM2_CONSTEXPR(14)	void changeWith   (const StateID  stateId_,
 												Payload&& payload)	  noexcept;
 
 	/// @brief Transition into a state
@@ -3436,12 +3436,12 @@ namespace detail {
 template <typename TArgs>
 FFSM2_CONSTEXPR(14)
 ControlT<TArgs>::Origin::Origin(ControlT& control_,
-								const StateID stateId) noexcept
+								const StateID stateId_) noexcept
 	: control{control_}
 	, prevId{control._originId}
 {
-	FFSM2_ASSERT(stateId < StateList::SIZE || stateId == INVALID_STATE_ID);
-	control._originId = stateId;
+	FFSM2_ASSERT(stateId_ < StateList::SIZE || stateId_ == INVALID_STATE_ID);
+	control._originId = stateId_;
 }
 
 template <typename TArgs>
@@ -3498,11 +3498,11 @@ FullControlBaseT<TArgs>::Lock::~Lock() noexcept	{
 template <typename TArgs>
 FFSM2_CONSTEXPR(14)
 void
-FullControlBaseT<TArgs>::changeTo(const StateID stateId) noexcept {
+FullControlBaseT<TArgs>::changeTo(const StateID stateId_) noexcept {
 	if (!_locked) {
-		_core.request = Transition{_originId, stateId};
+		_core.request = Transition{_originId, stateId_};
 
-		FFSM2_LOG_TRANSITION(context(), _originId, stateId);
+		FFSM2_LOG_TRANSITION(context(), _originId, stateId_);
 	}
 }
 
@@ -3576,26 +3576,26 @@ FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::u
 template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL FFSM2_IF_PLANS(, Long NTC), typename TTP>
 FFSM2_CONSTEXPR(14)
 void
-FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL FFSM2_IF_PLANS(, NTC), TTP>>::changeWith(const StateID  stateId,
+FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL FFSM2_IF_PLANS(, NTC), TTP>>::changeWith(const StateID  stateId_,
 																										   const Payload& payload) noexcept
 {
 	if (!_locked) {
-		_core.request = Transition{_originId, stateId, payload};
+		_core.request = Transition{_originId, stateId_, payload};
 
-		FFSM2_LOG_TRANSITION(context(), _originId, stateId);
+		FFSM2_LOG_TRANSITION(context(), _originId, stateId_);
 	}
 }
 
 template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL FFSM2_IF_PLANS(, Long NTC), typename TTP>
 FFSM2_CONSTEXPR(14)
 void
-FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL FFSM2_IF_PLANS(, NTC), TTP>>::changeWith(const StateID  stateId,
+FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL FFSM2_IF_PLANS(, NTC), TTP>>::changeWith(const StateID  stateId_,
 																										   Payload&& payload) noexcept
 {
 	if (!_locked) {
-		_core.request = Transition{_originId, stateId, move(payload)};
+		_core.request = Transition{_originId, stateId_, move(payload)};
 
-		FFSM2_LOG_TRANSITION(context(), _originId, stateId);
+		FFSM2_LOG_TRANSITION(context(), _originId, stateId_);
 	}
 }
 

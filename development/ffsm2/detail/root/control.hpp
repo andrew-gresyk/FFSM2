@@ -37,7 +37,7 @@ protected:
 
 	struct Origin final {
 		FFSM2_CONSTEXPR(14)	Origin(ControlT& control_,
-								   const StateID stateId)				  noexcept;
+								   const StateID stateId_)				  noexcept;
 
 		FFSM2_CONSTEXPR(20)	~Origin()									  noexcept;
 
@@ -237,7 +237,7 @@ public:
 
 	/// @brief Transition into a state
 	/// @param stateId State identifier
-	FFSM2_CONSTEXPR(14)	void changeTo(const StateID stateId)	  noexcept;
+	FFSM2_CONSTEXPR(14)	void changeTo(const StateID stateId_)	  noexcept;
 
 	/// @brief Transition into a state
 	/// @tparam TState State type
@@ -357,13 +357,13 @@ public:
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
-	FFSM2_CONSTEXPR(14)	void changeWith   (const StateID  stateId,
+	FFSM2_CONSTEXPR(14)	void changeWith   (const StateID  stateId_,
 										   const Payload& payload)	  noexcept;
 
 	/// @brief Transition into a state
 	/// @param stateId Destination state identifier
 	/// @param payload Payload
-	FFSM2_CONSTEXPR(14)	void changeWith   (const StateID  stateId,
+	FFSM2_CONSTEXPR(14)	void changeWith   (const StateID  stateId_,
 												Payload&& payload)	  noexcept;
 
 	/// @brief Transition into a state
