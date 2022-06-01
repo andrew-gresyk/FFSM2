@@ -20,16 +20,16 @@ TEST_CASE("Shared.List<>") {
 
 	WHEN("fill, delete and re-insert an element") {
 		for (List::Index i = 0; i < CAPACITY; ++i) {
-			const auto index = list.emplace((ffsm2::Long) i,
-											(ffsm2::Long) i);
+			const auto index = list.emplace(static_cast<ffsm2::Long>(i),
+											static_cast<ffsm2::Long>(i));
 
 			REQUIRE(index == i); //-V521
 			REQUIRE(list.count() == i + 1); //-V521
 		}
 
 		for (List::Index i = 0; i < CAPACITY; ++i)
-			REQUIRE(list[i] == ffsm2::detail::TaskBase{(ffsm2::Long) i,
-													   (ffsm2::Long) i}); //-V521
+			REQUIRE(list[i] == ffsm2::detail::TaskBase{static_cast<ffsm2::Long>(i),
+													   static_cast<ffsm2::Long>(i)}); //-V521
 
 		THEN("at the start") {
 			REQUIRE(list.count() == CAPACITY); //-V521
@@ -37,8 +37,8 @@ TEST_CASE("Shared.List<>") {
 			list.remove(0);
 			REQUIRE(list.count() == CAPACITY - 1); //-V521
 
-			const auto index = list.emplace((ffsm2::Long) 0u,
-											(ffsm2::Long) 0u);
+			const auto index = list.emplace(static_cast<ffsm2::Long>(0u),
+											static_cast<ffsm2::Long>(0u));
 			REQUIRE(index == 0); //-V521
 			REQUIRE(list.count() == CAPACITY); //-V521
 		}
@@ -50,8 +50,8 @@ TEST_CASE("Shared.List<>") {
 			list.remove(mid);
 			REQUIRE(list.count() == CAPACITY - 1); //-V521
 
-			const auto index = list.emplace((ffsm2::Long) mid,
-											(ffsm2::Long) mid);
+			const auto index = list.emplace(static_cast<ffsm2::Long>(mid),
+											static_cast<ffsm2::Long>(mid));
 			REQUIRE(index == mid); //-V521
 			REQUIRE(list.count() == CAPACITY); //-V521
 		}
@@ -63,8 +63,8 @@ TEST_CASE("Shared.List<>") {
 			list.remove(end);
 			REQUIRE(list.count() == CAPACITY - 1); //-V521
 
-			const auto index = list.emplace((ffsm2::Long) end,
-											(ffsm2::Long) end);
+			const auto index = list.emplace(static_cast<ffsm2::Long>(end),
+											static_cast<ffsm2::Long>(end));
 			REQUIRE(index == end); //-V521
 			REQUIRE(list.count() == CAPACITY); //-V521
 		}
@@ -72,16 +72,16 @@ TEST_CASE("Shared.List<>") {
 
 	WHEN("fill, delete all and re-insert all elements") {
 		for (List::Index i = 0; i < CAPACITY; ++i) {
-			const auto index = list.emplace((ffsm2::Long) i,
-											(ffsm2::Long) i);
+			const auto index = list.emplace(static_cast<ffsm2::Long>(i),
+											static_cast<ffsm2::Long>(i));
 
 			REQUIRE(index == i); //-V521
 			REQUIRE(list.count() == i + 1); //-V521
 		}
 
 		for (List::Index i = 0; i < CAPACITY; ++i)
-			REQUIRE(list[i] == ffsm2::detail::TaskBase{(ffsm2::Long) i,
-													   (ffsm2::Long) i}); //-V521
+			REQUIRE(list[i] == ffsm2::detail::TaskBase{static_cast<ffsm2::Long>(i),
+													   static_cast<ffsm2::Long>(i)}); //-V521
 
 		THEN("from the start") {
 			REQUIRE(list.count() == CAPACITY); //-V521
@@ -92,8 +92,8 @@ TEST_CASE("Shared.List<>") {
 			}
 
 			for (List::Index i = 0; i < CAPACITY; ++i) {
-				const auto index = list.emplace((ffsm2::Long) i,
-												(ffsm2::Long) i);
+				const auto index = list.emplace(static_cast<ffsm2::Long>(i),
+												static_cast<ffsm2::Long>(i));
 
 				REQUIRE(index == CAPACITY - 1 - i); //-V521
 				REQUIRE(list.count() == i + 1); //-V521
@@ -113,8 +113,8 @@ TEST_CASE("Shared.List<>") {
 			}
 
 			for (List::Index i = 0; i < CAPACITY; ++i) {
-				const auto index = list.emplace((ffsm2::Long) i,
-												(ffsm2::Long) i);
+				const auto index = list.emplace(static_cast<ffsm2::Long>(i),
+												static_cast<ffsm2::Long>(i));
 
 				REQUIRE(index == i); //-V521
 				REQUIRE(list.count() == i + 1); //-V521

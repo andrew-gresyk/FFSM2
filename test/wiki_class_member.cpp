@@ -16,9 +16,9 @@ using M = ffsm2::MachineT<Config>;
 
 #define S(s) struct s
 using FSM = M::PeerRoot<
-	S(Off),
-	S(On)
->;
+				S(Off),
+				S(On)
+			>;
 #undef S
 
 struct Off : FSM::State { /* .. */ };
@@ -39,5 +39,5 @@ Actor::Actor() {
 }
 
 Actor::~Actor() {
-	actor_fsm::fsm(_fsmHost).~RC_();
+	actor_fsm::fsm(_fsmHost).~InstanceT();
 }

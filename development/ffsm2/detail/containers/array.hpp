@@ -56,7 +56,7 @@ struct StaticArrayT<T, 0> final {
 	using Item		= T;
 
 	FFSM2_CONSTEXPR(11)	StaticArrayT() = default;
-	FFSM2_CONSTEXPR(11)	StaticArrayT(const Item) noexcept {}
+	FFSM2_CONSTEXPR(11)	StaticArrayT(const Item)							  noexcept	{}
 };
 
 ////////////////////////////////////////////////////////////////////////////////
