@@ -1,5 +1,5 @@
 ﻿// FFSM2 (flat state machine for games and interactive applications)
-// 2.0.2 (2022-06-01)
+// 2.0.3 (2022-06-12)
 //
 // Created by Andrew Gresyk
 //
@@ -33,7 +33,7 @@
 
 #define FFSM2_VERSION_MAJOR 2
 #define FFSM2_VERSION_MINOR 0
-#define FFSM2_VERSION_PATCH 2
+#define FFSM2_VERSION_PATCH 3
 
 #define FFSM2_VERSION (10000 * FFSM2_VERSION_MAJOR + 100 * FFSM2_VERSION_MINOR + FFSM2_VERSION_PATCH)
 
@@ -103,22 +103,6 @@
 	#define FFSM2_EMPTY_BASES							 __declspec(empty_bases)
 #else
 	#define FFSM2_EMPTY_BASES
-#endif
-
-#define FFSM2_ARCHITECTURE(A)							FFSM2_ARCHITECTURE_##A()
-
-#if INTPTR_MAX == INT64_MAX
-	#define FFSM2_ARCHITECTURE_64()											true
-	#define FFSM2_ARCHITECTURE_32()										   false
-
-	#define FFSM2_64BIT_OR_32BIT(p64, p32)									 p64
-#elif INTPTR_MAX == INT32_MAX
-	#define FFSM2_ARCHITECTURE_64()										   false
-	#define FFSM2_ARCHITECTURE_32()											true
-
-	#define FFSM2_64BIT_OR_32BIT(p64, p32)									 p32
-#else
-	#error
 #endif
 
 #if defined _DEBUG && defined _MSC_VER
@@ -6550,11 +6534,6 @@ InstanceT<G_<NFT, EmptyContext, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::Instanc
 #undef FFSM2_CONSTEXPR_14
 #undef FFSM2_CONSTEXPR_17
 #undef FFSM2_CONSTEXPR_20
-
-#undef FFSM2_ARCHITECTURE
-#undef FFSM2_ARCHITECTURE_64
-#undef FFSM2_ARCHITECTURE_32
-#undef FFSM2_64BIT_OR_32BIT
 
 //#undef FFSM2_BREAK
 #undef FFSM2_BREAK_AVAILABLE

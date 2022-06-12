@@ -60,7 +60,7 @@ const Types all = {
 TEST_CASE("FSM.Replication") {
 	Logger logger;
 
-	//------------------------------------------------------------------------------
+	//----------------------------------------------------------------------
 
 	FSM::Instance authority {&logger};
 	FSM::Instance replicated{&logger};
@@ -72,7 +72,7 @@ TEST_CASE("FSM.Replication") {
 		REQUIRE(!replicated.previousTransition());
 	}
 
-	//------------------------------------------------------------------------------
+	//----------------------------------------------------------------------
 
 	authority .enter();
 	REQUIRE(authority.activeStateId() == FSM::stateId<A>());
@@ -82,13 +82,13 @@ TEST_CASE("FSM.Replication") {
 	authority.update();
 	REQUIRE(authority.activeStateId() == FSM::stateId<B>());
 
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	replicated.replayEnter(authority.previousTransition().destination);
 	REQUIRE(replicated.activeStateId() == FSM::stateId<B>());
 	REQUIRE(replicated.previousTransition() == FSM::Transition{FSM::stateId<B>()});
 
-	//------------------------------------------------------------------------------
+	//----------------------------------------------------------------------
 
 	authority.changeTo<C>();
 	authority.update();
@@ -97,7 +97,7 @@ TEST_CASE("FSM.Replication") {
 	REQUIRE(replicated.replayTransition(authority.previousTransition().destination));
 	REQUIRE(replicated.activeStateId() == FSM::stateId<C>());
 
-	//------------------------------------------------------------------------------
+	//----------------------------------------------------------------------
 }
 
 ////////////////////////////////////////////////////////////////////////////////
