@@ -10,6 +10,7 @@ file(GLOB SOURCE_FILES "test/*.cpp" "test/shared/*.cpp")
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE
+	"${CMAKE_CURRENT_LIST_DIR}/development"
 	"${CMAKE_CURRENT_LIST_DIR}/external"
 	"${CMAKE_CURRENT_LIST_DIR}/include")
 
