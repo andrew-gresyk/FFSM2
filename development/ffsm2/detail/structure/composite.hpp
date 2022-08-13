@@ -17,13 +17,14 @@ struct FFSM2_EMPTY_BASES C_
 
 	using StateList		= typename Args::StateList;
 
-	using Control		= ControlT<Args>;
+	using ConstControl	= ConstControlT<Args>;
+	using Control		= ControlT	   <Args>;
 	using ScopedOrigin	= typename Control::Origin;
 
-	using PlanControl	= PlanControlT<Args>;
+	using PlanControl	= PlanControlT <Args>;
 	using ScopedRegion	= typename PlanControl::Region;
 
-	using FullControl	= FullControlT<Args>;
+	using FullControl	= FullControlT <Args>;
 	using ControlLock	= typename FullControl::Lock;
 
 	using GuardControl	= GuardControlT<Args>;
@@ -41,57 +42,63 @@ struct FFSM2_EMPTY_BASES C_
 	static constexpr Short WIDTH_BITS	  = Info::WIDTH_BITS;
 #endif
 
-	//----------------------------------------------------------------------
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(11)	static Short&	compoRequested		  (		Control& control)	  noexcept	{ return control._core.registry.requested;	}
-	FFSM2_CONSTEXPR(11)	static Short&	compoActive			  (		Control& control)	  noexcept	{ return control._core.registry.active;		}
+	FFSM2_CONSTEXPR(11)	static Short&	compoRequested		  (		Control& control)	noexcept	{ return control._core.registry.requested;	}
+
+	FFSM2_CONSTEXPR(11)	static Short&	compoActive			  (		Control& control)	noexcept	{ return control._core.registry.active;		}
+	FFSM2_CONSTEXPR(11)	static Short	compoActive			  (ConstControl& control)	noexcept	{ return control._core.registry.active;		}
 
 #if FFSM2_PLANS_AVAILABLE()
-	FFSM2_CONSTEXPR(11)	static Status&	subStatus			  (		Control& control)	  noexcept	{ return control._core.planData.subStatus;	}
+	FFSM2_CONSTEXPR(11)	static Status&	headStatus			  (		Control& control)	noexcept	{ return control._core.planData.headStatus;	}
+	FFSM2_CONSTEXPR(11)	static Status&	subStatus			  (		Control& control)	noexcept	{ return control._core.planData.subStatus;	}
 #endif
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(14)	bool	deepForwardEntryGuard		  (GuardControl& control)							  noexcept;
-	FFSM2_CONSTEXPR(14)	bool	deepEntryGuard				  (GuardControl& control)							  noexcept;
+	FFSM2_CONSTEXPR(14)	bool	deepForwardEntryGuard		  (GuardControl& control					 )			noexcept;
+	FFSM2_CONSTEXPR(14)	bool	deepEntryGuard				  (GuardControl& control					 )			noexcept;
 
-	FFSM2_CONSTEXPR(14)	void	deepEnter					  ( PlanControl& control)							  noexcept;
-	FFSM2_CONSTEXPR(14)	void	deepReenter					  ( PlanControl& control)							  noexcept;
+	FFSM2_CONSTEXPR(14)	void	deepEnter					  ( PlanControl& control					 )			noexcept;
+	FFSM2_CONSTEXPR(14)	void	deepReenter					  ( PlanControl& control					 )			noexcept;
 
-	FFSM2_CONSTEXPR(14)	void	deepPreUpdate				  ( FullControl& control)							  noexcept;
-	FFSM2_CONSTEXPR(14)	void	deepUpdate					  ( FullControl& control)							  noexcept;
-	FFSM2_CONSTEXPR(14)	void	deepPostUpdate				  ( FullControl& control)							  noexcept;
-
-	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	void	deepPreReact				  ( FullControl& control, const TEvent& event)		  noexcept;
+	FFSM2_CONSTEXPR(14)	void	deepPreUpdate				  ( FullControl& control					 )			noexcept;
+	FFSM2_CONSTEXPR(14)	void	deepUpdate					  ( FullControl& control					 )			noexcept;
+	FFSM2_CONSTEXPR(14)	void	deepPostUpdate				  ( FullControl& control					 )			noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	void	deepReact					  ( FullControl& control, const TEvent& event)		  noexcept;
+	FFSM2_CONSTEXPR(14)	void	deepPreReact				  ( FullControl& control, const TEvent& event)			noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	void	deepPostReact				  ( FullControl& control, const TEvent& event)		  noexcept;
+	FFSM2_CONSTEXPR(14)	void	deepReact					  ( FullControl& control, const TEvent& event)			noexcept;
+
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void	deepPostReact				  ( FullControl& control, const TEvent& event)			noexcept;
+
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void	deepQuery					  (ConstControl& control,		TEvent& event)	  const noexcept;
 
 #if FFSM2_PLANS_AVAILABLE()
-	FFSM2_CONSTEXPR(14)	void	deepUpdatePlans				  ( FullControl& control)							  noexcept;
+	FFSM2_CONSTEXPR(14)	void	deepUpdatePlans				  ( FullControl& control					 )			noexcept;
 #endif
 
-	FFSM2_CONSTEXPR(14)	bool	deepForwardExitGuard		  (GuardControl& control)							  noexcept;
-	FFSM2_CONSTEXPR(14)	bool	deepExitGuard				  (GuardControl& control)							  noexcept;
+	FFSM2_CONSTEXPR(14)	bool	deepForwardExitGuard		  (GuardControl& control					 )			noexcept;
+	FFSM2_CONSTEXPR(14)	bool	deepExitGuard				  (GuardControl& control					 )			noexcept;
 
-	FFSM2_CONSTEXPR(14)	void	deepExit					  ( PlanControl& control)							  noexcept;
+	FFSM2_CONSTEXPR(14)	void	deepExit					  ( PlanControl& control					 )			noexcept;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(14)	void deepChangeToRequested( PlanControl& control)  noexcept;
+	FFSM2_CONSTEXPR(14)	void	deepChangeToRequested		  ( PlanControl& control					 )			noexcept;
 
-	//----------------------------------------------------------------------
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #if FFSM2_SERIALIZATION_AVAILABLE()
 	using WriteStream	= typename Args::WriteStream;
 	using ReadStream	= typename Args::ReadStream;
 
-	FFSM2_CONSTEXPR(14)	void deepSaveActive		  (const Registry& registry, WriteStream& stream) const noexcept;
-	FFSM2_CONSTEXPR(14)	void deepLoadRequested	  (		 Registry& registry, ReadStream&  stream) const noexcept;
+	FFSM2_CONSTEXPR(14)	void	deepSaveActive				  (const Registry& registry, WriteStream& stream) const noexcept;
+	FFSM2_CONSTEXPR(14)	void	deepLoadRequested			  (		 Registry& registry, ReadStream&  stream) const noexcept;
 #endif
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

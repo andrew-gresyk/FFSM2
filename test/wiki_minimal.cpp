@@ -38,8 +38,7 @@ TEST_CASE("Wiki.Minimal Example") {
 	Context context;
 	FSM::Instance machine{context};
 
-	machine.changeTo<On>();
-	machine.update();
+	machine.immediateChangeTo<On>();
 
 	REQUIRE(context.on == true);
 }

@@ -61,9 +61,12 @@
     <Extensions>
       <![CDATA[*.cpp;*.hpp;*.inl]]>
     </Extensions>
-    <Topleveldir>/Work/FFSM2</Topleveldir>
+    <Topleveldir>/Work/FFSM2-experimental</Topleveldir>
   </Reconciliation>
   <VirtualDirectory Name="test">
+    <File Name="../../../test/test_query.cpp"/>
+    <File Name="../../../test/test_plan_external_payloads.cpp"/>
+    <File Name="../../../test/test_plan_external.cpp"/>
     <File Name="../../../test/wiki_tutorial.cpp"/>
     <File Name="../../../test/wiki_minimal.cpp"/>
     <File Name="../../../test/wiki_class_member.hpp"/>

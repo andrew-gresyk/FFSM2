@@ -60,7 +60,7 @@ const Types all = {
 TEST_CASE("FSM.Replication") {
 	Logger logger;
 
-	//----------------------------------------------------------------------
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	FSM::Instance authority {&logger};
 	FSM::Instance replicated{&logger};
@@ -72,14 +72,13 @@ TEST_CASE("FSM.Replication") {
 		REQUIRE(!replicated.previousTransition());
 	}
 
-	//----------------------------------------------------------------------
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	authority .enter();
 	REQUIRE(authority.activeStateId() == FSM::stateId<A>());
 	REQUIRE(!authority.previousTransition());
 
-	authority.changeTo<B>();
-	authority.update();
+	authority.immediateChangeTo<B>();
 	REQUIRE(authority.activeStateId() == FSM::stateId<B>());
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -88,16 +87,15 @@ TEST_CASE("FSM.Replication") {
 	REQUIRE(replicated.activeStateId() == FSM::stateId<B>());
 	REQUIRE(replicated.previousTransition() == FSM::Transition{FSM::stateId<B>()});
 
-	//----------------------------------------------------------------------
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	authority.changeTo<C>();
-	authority.update();
+	authority.immediateChangeTo<C>();
 	REQUIRE(authority.activeStateId() == FSM::stateId<C>());
 
 	REQUIRE(replicated.replayTransition(authority.previousTransition().destination));
 	REQUIRE(replicated.activeStateId() == FSM::stateId<C>());
 
-	//----------------------------------------------------------------------
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
 
 ////////////////////////////////////////////////////////////////////////////////

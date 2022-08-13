@@ -1,4 +1,9 @@
-theme: jekyll-theme-minimal
 title: FFSM2
 description: High-Performance Flat Finite State Machine Framework
+url: "http://flat.hfsm.dev"
+twitter_username: andrew_gresyk
+github_username:  andrew-gresyk
+google_analytics: G-8CBZLEMT7W
+
+theme: jekyll-theme-minimal # https://github.com/pages-themes/minimal / https://pages.github.com/themes/
 logo: assets/logos/ffsm2-logo-jekyll.png

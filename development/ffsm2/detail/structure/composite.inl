@@ -75,12 +75,12 @@ C_<TA, TH, TS...>::deepPreUpdate(FullControl& control) noexcept {
 
 	ScopedRegion region{control};
 
-	HeadState::deepPreUpdate(control);
+	FFSM2_IF_PLANS(const Status h =)
+		HeadState::deepPreUpdate(control);
+	FFSM2_IF_PLANS(headStatus(control) |= h);
 
-#if FFSM2_PLANS_AVAILABLE()
-	subStatus(control) =
-#endif
-	SubStates::widePreUpdate(control, active);
+	FFSM2_IF_PLANS(subStatus(control) |=)
+		SubStates::widePreUpdate(control, active);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -96,12 +96,12 @@ C_<TA, TH, TS...>::deepUpdate(FullControl& control) noexcept {
 
 	ScopedRegion region{control};
 
-	HeadState::deepUpdate(control);
+	FFSM2_IF_PLANS(const Status h =)
+		HeadState::deepUpdate(control);
+	FFSM2_IF_PLANS(headStatus(control) |= h);
 
-#if FFSM2_PLANS_AVAILABLE()
-	subStatus(control) |=
-#endif
-	SubStates::wideUpdate(control, active);
+	FFSM2_IF_PLANS(subStatus(control) |=)
+		SubStates::wideUpdate(control, active);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -117,12 +117,12 @@ C_<TA, TH, TS...>::deepPostUpdate(FullControl& control) noexcept {
 
 	ScopedRegion region{control};
 
-#if FFSM2_PLANS_AVAILABLE()
-	subStatus(control) |=
-#endif
-	SubStates::widePostUpdate(control, active);
+	FFSM2_IF_PLANS(subStatus(control) |=)
+		SubStates::widePostUpdate(control, active);
 
-	HeadState::deepPostUpdate(control);
+	FFSM2_IF_PLANS(const Status h =)
+		HeadState::deepPostUpdate(control);
+	FFSM2_IF_PLANS(headStatus(control) |= h);
 }
 
 //------------------------------------------------------------------------------
@@ -141,12 +141,12 @@ C_<TA, TH, TS...>::deepPreReact(FullControl& control,
 
 	ScopedRegion region{control};
 
-	HeadState::deepPreReact(control, event);
+	FFSM2_IF_PLANS(const Status h =)
+		HeadState::deepPreReact(control, event);
+	FFSM2_IF_PLANS(headStatus(control) |= h);
 
-#if FFSM2_PLANS_AVAILABLE()
-	subStatus(control) =
-#endif
-	SubStates::widePreReact(control, event, active);
+	FFSM2_IF_PLANS(subStatus(control) |=)
+		SubStates::widePreReact(control, event, active);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -165,12 +165,12 @@ C_<TA, TH, TS...>::deepReact(FullControl& control,
 
 	ScopedRegion region{control};
 
-	HeadState::deepReact(control, event);
+	FFSM2_IF_PLANS(const Status h =)
+		HeadState::deepReact(control, event);
+	FFSM2_IF_PLANS(headStatus(control) |= h);
 
-#if FFSM2_PLANS_AVAILABLE()
-	subStatus(control) |=
-#endif
-	SubStates::wideReact(control, event, active);
+	FFSM2_IF_PLANS(subStatus(control) |=)
+		SubStates::wideReact(control, event, active);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -189,12 +189,28 @@ C_<TA, TH, TS...>::deepPostReact(FullControl& control,
 
 	ScopedRegion region{control};
 
-#if FFSM2_PLANS_AVAILABLE()
-	subStatus(control) |=
-#endif
-	SubStates::widePostReact(control, event, active);
+	FFSM2_IF_PLANS(subStatus(control) |=)
+		SubStates::widePostReact(control, event, active);
 
-	HeadState::deepPostReact(control, event);
+	FFSM2_IF_PLANS(const Status h =)
+		HeadState::deepPostReact(control, event);
+	FFSM2_IF_PLANS(headStatus(control) |= h);
+}
+
+//------------------------------------------------------------------------------
+
+template <typename TA, typename TH, typename... TS>
+template <typename TEvent>
+FFSM2_CONSTEXPR(14)
+void
+C_<TA, TH, TS...>::deepQuery(ConstControl& control,
+							 TEvent& event) const noexcept
+{
+	const Short  active = compoActive(control);
+	FFSM2_ASSERT(active < WIDTH);
+
+	HeadState::deepQuery(control, event);
+	SubStates::wideQuery(control, event, active);
 }
 
 //------------------------------------------------------------------------------
@@ -206,9 +222,12 @@ FFSM2_CONSTEXPR(14)
 void
 C_<TA, TH, TS...>::deepUpdatePlans(FullControl& control) noexcept {
 	FFSM2_ASSERT(compoRequested(control) == INVALID_SHORT);
-	FFSM2_ASSERT(compoActive   (control)  < WIDTH);
 
-	const Status s =	 subStatus(control);
+	const Short  active = compoActive(control);
+	FFSM2_ASSERT(active < WIDTH);
+
+	const Status s =	 subStatus(control) |
+		SubStates::wideUpdatePlans(control, active);
 
 	const bool planExists = control._core.planData.planExists;
 

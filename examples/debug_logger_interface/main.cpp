@@ -85,7 +85,7 @@ static_assert(FSM::stateId<To>()	==  1, "");
 struct Logger
 	: ffsm2::LoggerInterface
 {
-	void recordMethod(Context& /*context*/,
+	void recordMethod(const Context& /*context*/,
 					  const ffsm2::StateID /*origin*/,
 					  const Method method) noexcept override
 	{
@@ -93,7 +93,7 @@ struct Logger
 				  << ffsm2::methodName(method) << "()\n";
 	}
 
-	void recordTransition(Context& /*context*/,
+	void recordTransition(const Context& /*context*/,
 						  const ffsm2::StateID /*origin*/,
 						  const ffsm2::StateID /*target*/) noexcept override
 	{

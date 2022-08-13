@@ -25,9 +25,12 @@ struct S_
 	using Logger		= typename TArgs::Logger;
 #endif
 
-	using Control		= ControlT<TArgs>;
+	using ConstControl	= ConstControlT<TArgs>;
+	using ScopedCOrigin	= typename ConstControl::Origin;
 
-	using PlanControl	= PlanControlT<TArgs>;
+	using Control		= ControlT	   <TArgs>;
+
+	using PlanControl	= PlanControlT <TArgs>;
 	using ScopedOrigin	= typename PlanControl::Origin;
 
 	using FullControl	= FullControlT <TArgs>;
@@ -35,62 +38,67 @@ struct S_
 
 	using Head			= THead;
 
-	//----------------------------------------------------------------------
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(14)	bool	deepEntryGuard		 (GuardControl&	control)						  noexcept;
+	FFSM2_CONSTEXPR(14)	bool	deepEntryGuard		 (GuardControl&	control						 )			noexcept;
 
-	FFSM2_CONSTEXPR(14)	void	deepEnter			 ( PlanControl& control)						  noexcept;
-	FFSM2_CONSTEXPR(14)	void	deepReenter			 ( PlanControl& control)						  noexcept;
+	FFSM2_CONSTEXPR(14)	void	deepEnter			 ( PlanControl& control						 )			noexcept;
+	FFSM2_CONSTEXPR(14)	void	deepReenter			 ( PlanControl& control						 )			noexcept;
 
-	FFSM2_CONSTEXPR(14)	Status	deepPreUpdate		 ( FullControl& control)						  noexcept;
-	FFSM2_CONSTEXPR(14)	Status	deepUpdate			 ( FullControl& control)						  noexcept;
-	FFSM2_CONSTEXPR(14)	Status	deepPostUpdate		 ( FullControl& control)						  noexcept;
-
-	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	Status	deepPreReact		 ( FullControl& control, const TEvent&	event)	  noexcept;
+	FFSM2_CONSTEXPR(14)	Status	deepPreUpdate		 ( FullControl& control						 )			noexcept;
+	FFSM2_CONSTEXPR(14)	Status	deepUpdate			 ( FullControl& control						 )			noexcept;
+	FFSM2_CONSTEXPR(14)	Status	deepPostUpdate		 ( FullControl& control						 )			noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	Status	deepReact			 ( FullControl& control, const TEvent&	event)	  noexcept;
+	FFSM2_CONSTEXPR(14)	Status	deepPreReact		 ( FullControl& control, const TEvent&	event)			noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	Status	deepPostReact		 ( FullControl& control, const TEvent&	event)	  noexcept;
+	FFSM2_CONSTEXPR(14)	Status	deepReact			 ( FullControl& control, const TEvent&	event)			noexcept;
 
-	FFSM2_CONSTEXPR(14)	bool	deepExitGuard		 (GuardControl&	control)						  noexcept;
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	Status	deepPostReact		 ( FullControl& control, const TEvent&	event)			noexcept;
 
-	FFSM2_CONSTEXPR(14)	void	deepExit			 ( PlanControl& control)						  noexcept;
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void	deepQuery			 (ConstControl& control,	   TEvent&  event)	  const noexcept;
+
+#if FFSM2_PLANS_AVAILABLE()
+	FFSM2_CONSTEXPR(14)	Status	deepUpdatePlans		 ( FullControl& control)								noexcept;
+#endif
+
+	FFSM2_CONSTEXPR(14)	bool	deepExitGuard		 (GuardControl&	control						 )			noexcept;
+
+	FFSM2_CONSTEXPR(14)	void	deepExit			 ( PlanControl& control						 )			noexcept;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #if FFSM2_PLANS_AVAILABLE()
-	FFSM2_CONSTEXPR(14)	void	wrapPlanSucceeded	 ( FullControl& control)						  noexcept;
-	FFSM2_CONSTEXPR(14)	void	wrapPlanFailed		 ( FullControl& control)						  noexcept;
+	FFSM2_CONSTEXPR(14)	void	wrapPlanSucceeded	 ( FullControl& control						 )			noexcept;
+	FFSM2_CONSTEXPR(14)	void	wrapPlanFailed		 ( FullControl& control						 )			noexcept;
 #endif
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(14)	void	deepChangeToRequested(Control&)										  noexcept	{}
+	FFSM2_CONSTEXPR(14)	void	deepChangeToRequested(	   Control&								 )			noexcept	{}
 
-	//----------------------------------------------------------------------
-	//----------------------------------------------------------------------
-	//----------------------------------------------------------------------
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #if FFSM2_DEBUG_STATE_TYPE_AVAILABLE() || FFSM2_STRUCTURE_REPORT_AVAILABLE() || FFSM2_LOG_INTERFACE_AVAILABLE()
 
 	using Empty			= EmptyT<TArgs>;
 
-	static FFSM2_CONSTEXPR(11)	bool isBare() noexcept	{ return std::is_base_of<Head, Empty>::value;	}
+	static FFSM2_CONSTEXPR(11)	bool isBare()																noexcept	{ return std::is_base_of<Head, Empty>::value;	}
 
 	FFSM2_IF_TYPEINDEX(const std::type_index TYPE = isBare() ? typeid(None) : typeid(Head));
 
-	static constexpr Long NAME_COUNT = isBare() ? 0 : 1;
-
 #endif
 
-	//----------------------------------------------------------------------
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #if FFSM2_LOG_INTERFACE_AVAILABLE()
 
@@ -98,8 +106,18 @@ struct S_
 	FFSM2_CONSTEXPR(14)
 	void log(TReturn (THost::*)(TParams...),
 			 Logger& logger,
-			 Context& context,
-			 const Method method)																const noexcept
+			 const Context& context,
+			 const Method method)																	  const noexcept
+	{
+		logger.recordMethod(context, STATE_ID, method);
+	}
+
+	template <typename TReturn, typename THost, typename... TParams>
+	FFSM2_CONSTEXPR(14)
+	void log(TReturn (THost::*)(TParams...) const,
+			 Logger& logger,
+			 const Context& context,
+			 const Method method)																	  const noexcept
 	{
 		logger.recordMethod(context, STATE_ID, method);
 	}
@@ -110,13 +128,21 @@ struct S_
 	FFSM2_CONSTEXPR(14)
 	void log(TReturn (Empty::*)(TParams...),
 			 Logger&,
-			 Context&,
-			 const Method)																		const noexcept
+			 const Context&,
+			 const Method)																			  const noexcept
+	{}
+
+	template <typename TReturn, typename... TParams>
+	FFSM2_CONSTEXPR(14)
+	void log(TReturn (Empty::*)(TParams...) const,
+			 Logger&,
+			 const Context&,
+			 const Method)																			  const noexcept
 	{}
 
 #endif
 
-	//----------------------------------------------------------------------
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 };
 
 ////////////////////////////////////////////////////////////////////////////////

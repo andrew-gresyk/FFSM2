@@ -14,40 +14,19 @@ struct Status final {
 
 	Result result = Result::NONE;
 
-	FFSM2_CONSTEXPR(11)	Status(const Result result_ = Result::NONE)	  noexcept
-		: result{result_}
-	{}
+	FFSM2_CONSTEXPR(11)	Status(const Result result_ = Result::NONE)		noexcept;
 
-	FFSM2_CONSTEXPR(11)	explicit operator bool()				const noexcept	{ return result != Result::NONE;	}
+	FFSM2_CONSTEXPR(11)	explicit operator bool()				  const noexcept;
 
-	FFSM2_CONSTEXPR(14)	void clear()								  noexcept;
+	FFSM2_CONSTEXPR(14)	void clear()									noexcept;
 };
 
 #pragma pack(pop)
 
 //------------------------------------------------------------------------------
 
-FFSM2_CONSTEXPR(14)
-Status
-operator | (Status& lhs, const Status rhs)							  noexcept	{
-	const Status::Result result = lhs.result > rhs.result ?
-		lhs.result : rhs.result;
-
-	return Status{result};
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-FFSM2_CONSTEXPR(14)
-Status&
-operator |= (Status& lhs, const Status rhs)							  noexcept	{
-	const Status::Result result = lhs.result > rhs.result ?
-		lhs.result : rhs.result;
-
-	lhs = Status{result};
-
-	return lhs;
-}
+FFSM2_CONSTEXPR(14) Status  operator |  (Status& lhs, const Status rhs)	noexcept;
+FFSM2_CONSTEXPR(14) Status& operator |= (Status& lhs, const Status rhs)	noexcept;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -100,17 +79,18 @@ struct PlanDataT<ArgsT<TContext
 					 , NTaskCapacity
 					 , TPayload>> final
 {
-	using StateList		= TStateList;
-	using Payload		= TPayload;
+	using StateList		 = TStateList;
+	using Payload		 = TPayload;
 
+	static constexpr Long  STATE_COUNT	 = StateList::SIZE;
 	static constexpr Short TASK_CAPACITY = NTaskCapacity;
 
-	using Task			= TaskT<Payload>;
-	using Tasks			= TaskListT<Payload, TASK_CAPACITY>;
-	using TaskLinks		= StaticArrayT<TaskLink, TASK_CAPACITY>;
-	using Payloads		= StaticArrayT<Payload,  TASK_CAPACITY>;
+	using Task			 = TaskT<Payload>;
+	using Tasks			 = TaskListT   <Payload,  TASK_CAPACITY>;
+	using TaskLinks		 = StaticArrayT<TaskLink, TASK_CAPACITY>;
+	using Payloads		 = StaticArrayT<Payload,  TASK_CAPACITY>;
 
-	using TasksBits		= BitArrayT<StateList::SIZE>;
+	using TasksBits		 = BitArrayT<STATE_COUNT>;
 
 	Tasks tasks;
 	TaskLinks taskLinks;
@@ -121,16 +101,17 @@ struct PlanDataT<ArgsT<TContext
 	TasksBits tasksSuccesses;
 	TasksBits tasksFailures;
 	bool planExists;
+	Status headStatus;
 	Status subStatus;
 
-	FFSM2_CONSTEXPR(14)	void clearTaskStatus(const StateID stateId)			  noexcept;
-	FFSM2_CONSTEXPR(14)	void verifyEmptyStatus(const StateID stateId)	const noexcept;
+	FFSM2_CONSTEXPR(14)	void clearTaskStatus  (const StateID stateId)		noexcept;
+	FFSM2_CONSTEXPR(14)	void verifyEmptyStatus(const StateID stateId) const noexcept;
 
-	FFSM2_CONSTEXPR(14)	void clearRegionStatuses()							  noexcept;
+	FFSM2_CONSTEXPR(14)	void clearRegionStatuses()							noexcept;
 
 #if FFSM2_ASSERT_AVAILABLE()
-	FFSM2_CONSTEXPR(14)	void verifyPlans()								const noexcept	{ FFSM2_ASSERT(tasks.count() == verifyPlan());	}
-	FFSM2_CONSTEXPR(14)	Long verifyPlan()								const noexcept;
+	FFSM2_CONSTEXPR(14)	void verifyPlans()							  const noexcept	{ FFSM2_ASSERT(tasks.count() == verifyPlan());	}
+	FFSM2_CONSTEXPR(14)	Long verifyPlan()							  const noexcept;
 #endif
 };
 
@@ -152,13 +133,14 @@ struct PlanDataT<ArgsT<TContext
 {
 	using StateList		= TStateList;
 
+	static constexpr Long  STATE_COUNT	 = StateList::SIZE;
 	static constexpr Short TASK_CAPACITY = NTaskCapacity;
 
 	using Task			= TaskT<void>;
-	using Tasks			= TaskListT<void, TASK_CAPACITY>;
+	using Tasks			= TaskListT	  <void,	 TASK_CAPACITY>;
 	using TaskLinks		= StaticArrayT<TaskLink, TASK_CAPACITY>;
 
-	using TasksBits		= BitArrayT<StateList::SIZE>;
+	using TasksBits		= BitArrayT<STATE_COUNT>;
 
 	Tasks tasks;
 	TaskLinks taskLinks;
@@ -167,16 +149,17 @@ struct PlanDataT<ArgsT<TContext
 	TasksBits tasksSuccesses;
 	TasksBits tasksFailures;
 	bool planExists;
+	Status headStatus;
 	Status subStatus;
 
-	FFSM2_CONSTEXPR(14)	void clearTaskStatus  (const StateID stateId)		  noexcept;
-	FFSM2_CONSTEXPR(14)	void verifyEmptyStatus(const StateID stateId)	const noexcept;
+	FFSM2_CONSTEXPR(14)	void clearTaskStatus  (const StateID stateId)		noexcept;
+	FFSM2_CONSTEXPR(14)	void verifyEmptyStatus(const StateID stateId) const noexcept;
 
-	FFSM2_CONSTEXPR(14)	void clearRegionStatuses()							  noexcept;
+	FFSM2_CONSTEXPR(14)	void clearRegionStatuses()							noexcept;
 
 #if FFSM2_ASSERT_AVAILABLE()
-	FFSM2_CONSTEXPR(14)	void verifyPlans()								const noexcept	{ FFSM2_ASSERT(tasks.count() == verifyPlan());	}
-	FFSM2_CONSTEXPR(14)	Long verifyPlan()								const noexcept;
+	FFSM2_CONSTEXPR(14)	void verifyPlans()							  const noexcept	{ FFSM2_ASSERT(tasks.count() == verifyPlan());	}
+	FFSM2_CONSTEXPR(14)	Long verifyPlan()							  const noexcept;
 #endif
 };
 

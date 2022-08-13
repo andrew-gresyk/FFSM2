@@ -18,17 +18,18 @@ struct LoggerInterfaceT {
 
 	FFSM2_CONSTEXPR(NO)
 	virtual
-	void recordMethod(Context& FFSM2_UNUSED(context),
-					  const StateID FFSM2_UNUSED(origin),
-					  const Method FFSM2_UNUSED(method))			  noexcept
+	void
+	recordMethod(const Context& FFSM2_UNUSED(context),
+				 const StateID FFSM2_UNUSED(origin),
+				 const Method FFSM2_UNUSED(method))						noexcept
 	{}
 
 	FFSM2_CONSTEXPR(NO)
 	virtual
 	void
-	recordTransition(Context& FFSM2_UNUSED(context),
+	recordTransition(const Context& FFSM2_UNUSED(context),
 					 const StateID FFSM2_UNUSED(origin),
-					 const StateID FFSM2_UNUSED(target))			  noexcept
+					 const StateID FFSM2_UNUSED(target))				noexcept
 	{}
 
 #if FFSM2_PLANS_AVAILABLE()
@@ -36,16 +37,16 @@ struct LoggerInterfaceT {
 	FFSM2_CONSTEXPR(NO)
 	virtual
 	void
-	recordTaskStatus(Context& FFSM2_UNUSED(context),
+	recordTaskStatus(const Context& FFSM2_UNUSED(context),
 					 const StateID FFSM2_UNUSED(origin),
-					 const StatusEvent FFSM2_UNUSED(event))			  noexcept
+					 const StatusEvent FFSM2_UNUSED(event))				noexcept
 	{}
 
 	FFSM2_CONSTEXPR(NO)
 	virtual
 	void
-	recordPlanStatus(Context& FFSM2_UNUSED(context),
-					 const StatusEvent FFSM2_UNUSED(event))			  noexcept
+	recordPlanStatus(const Context& FFSM2_UNUSED(context),
+					 const StatusEvent FFSM2_UNUSED(event))				noexcept
 	{}
 
 #endif
@@ -53,8 +54,8 @@ struct LoggerInterfaceT {
 	FFSM2_CONSTEXPR(NO)
 	virtual
 	void
-	recordCancelledPending(Context& FFSM2_UNUSED(context),
-						   const StateID FFSM2_UNUSED(origin))		  noexcept
+	recordCancelledPending(const Context& FFSM2_UNUSED(context),
+						   const StateID FFSM2_UNUSED(origin))			noexcept
 	{}
 
 };

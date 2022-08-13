@@ -130,8 +130,7 @@ TEST_CASE("FSM.Serialization") {
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-		authority.changeTo<server::C>();
-		authority.update();
+		authority.immediateChangeTo<server::C>();
 		REQUIRE(authority .activeStateId() == server::FSM::stateId<server::C>());
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

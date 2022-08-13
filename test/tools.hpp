@@ -86,26 +86,26 @@ struct LoggerT final
 	using StatusEvent	  = typename Interface::StatusEvent;
 #endif
 
-	void recordMethod(Context& context,
+	void recordMethod(const Context& context,
 					  const StateID origin,
 					  const Method method) noexcept override;
 
-	void recordTransition(Context& context,
+	void recordTransition(const Context& context,
 						  const StateID origin,
 						  const StateID target) noexcept override;
 
 #if FFSM2_PLANS_AVAILABLE()
 
-	void recordTaskStatus(Context& context,
+	void recordTaskStatus(const Context& context,
 						  const StateID origin,
 						  const StatusEvent event) noexcept override;
 
-	void recordPlanStatus(Context& context,
+	void recordPlanStatus(const Context& context,
 						  const StatusEvent event) noexcept override;
 
 #endif
 
-	void recordCancelledPending(Context& context,
+	void recordCancelledPending(const Context& context,
 								const StateID origin) noexcept override;
 
 	void assertSequence(const Events& reference) noexcept;

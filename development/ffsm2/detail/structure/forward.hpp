@@ -171,10 +171,14 @@ struct RF_ final {
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static constexpr Long  SUBSTITUTION_LIMIT = TConfig::SUBSTITUTION_LIMIT;
+	using StateList		= typename Apex::StateList;
+
+	static constexpr Long  STATE_COUNT			= Apex::STATE_COUNT;
+
+	static constexpr Long  SUBSTITUTION_LIMIT	= TConfig::SUBSTITUTION_LIMIT;
 
 #if FFSM2_PLANS_AVAILABLE()
-	static constexpr Long  TASK_CAPACITY	  = TConfig::TASK_CAPACITY != INVALID_LONG ?
+	static constexpr Long  TASK_CAPACITY		= TConfig::TASK_CAPACITY != INVALID_LONG ?
 													  TConfig::TASK_CAPACITY : Apex::STATE_COUNT;
 #endif
 
@@ -189,8 +193,6 @@ struct RF_ final {
 	static constexpr Long  ACTIVE_BITS			= Apex::ACTIVE_BITS;
 #endif
 
-	using StateList		= typename Apex::StateList;
-
 	using Args			= ArgsT<Context
 							  , TConfig
 							  , StateList
@@ -203,16 +205,17 @@ struct RF_ final {
 
 	using Instance		= InstanceT<TConfig, Apex>;
 
+	using ConstControl	= ConstControlT<Args>;
 	using Control		= ControlT	   <Args>;
 	using FullControl	= FullControlT <Args>;
 	using GuardControl	= GuardControlT<Args>;
 
-	//----------------------------------------------------------------------
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	using State			= EmptyT<Args>;
 
 	template <typename... TInjections>
-	using AncestorsT	= A_<TInjections...>;
+	using StateT		= A_<TInjections...>;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -220,13 +223,13 @@ struct RF_ final {
 	using Logger		= typename TConfig::LoggerInterface;
 #endif
 
-	//----------------------------------------------------------------------
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	template <typename T>
-	static constexpr bool	 contains() noexcept	{ return contains<StateList, T>();	}
+	template <typename TState>
+	static constexpr bool	  contains()		noexcept	{ return					contains<StateList , TState>() ;	}
 
-	template <typename T>
-	static constexpr StateID  stateId() noexcept	{ return index	 <StateList, T>();	}
+	template <typename TState>
+	static constexpr StateID  stateId()			noexcept	{ return					   index<StateList , TState>() ;	}
 };
 
 ////////////////////////////////////////////////////////////////////////////////
