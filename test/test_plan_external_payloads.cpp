@@ -1,10 +1,11 @@
-// FFSM2 (flat state machine for games and interactive applications)
+﻿// FFSM2 (flat state machine for games and interactive applications)
 // Created by Andrew Gresyk
 
+#define FFSM2_DISABLE_TYPEINDEX
 #define FFSM2_ENABLE_PLANS
 #include "tools.hpp"
 
-namespace test_plans_payloads {
+namespace test_plan_external_payloads {
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -16,8 +17,6 @@ using Config = ffsm2::Config
 using M = ffsm2::MachineT<Config>;
 
 struct Interruption {};
-
-using Logger = LoggerT<Config>;
 
 //------------------------------------------------------------------------------
 
@@ -55,9 +54,9 @@ public:
 		++_totalUpdateCount;
 	}
 
-	unsigned entryAttemptCount() const			{ return _entryAttemptCount;	}
+	unsigned entryAttemptCount()  const			{ return _entryAttemptCount;	}
 	unsigned currentUpdateCount() const			{ return _currentUpdateCount;	}
-	unsigned totalUpdateCount() const			{ return _totalUpdateCount;		}
+	unsigned totalUpdateCount()   const			{ return _totalUpdateCount;		}
 
 private:
 	unsigned _entryAttemptCount	 = 0;
@@ -70,13 +69,6 @@ private:
 struct Apex
 	: FSM::State
 {
-	void entryGuard(GuardControl& control) {
-		auto plan = control.plan();
-
-		plan.changeWith<A, B>(Payload{});
-		plan.changeWith<B, D>(Payload{});
-	}
-
 	void planSucceeded(FullControl& control) {
 		REQUIRE(!control.plan());
 	}
@@ -93,7 +85,7 @@ struct Apex
 struct A
 	: FSM::State
 {
-	void enter(PlanControl& control) {
+	void update(FullControl& control) {
 		const auto plan = control.plan();
 
 		auto it = plan.first();
@@ -106,9 +98,7 @@ struct A
 
 		++it;
 		REQUIRE(!it);
-	}
 
-	void update(FullControl& control) {
 		control.succeed();
 	}
 };
@@ -118,14 +108,6 @@ struct A
 struct B
 	: FSM::State
 {
-	void update(FullControl& control) {
-		control.succeed();
-	}
-
-	void react(const Interruption&, FullControl& control) {
-		control.fail();
-	}
-
 	void exitGuard(GuardControl& control) {
 		auto plan = control.plan();
 
@@ -143,36 +125,21 @@ struct B
 
 struct C
 	: FSM::StateT<Tracked>
-{
-	void update(FullControl& control) {
-		control.succeed();
-	}
-};
+{};
 
 //------------------------------------------------------------------------------
 
 struct D
 	: FSM::State
-{
-	void update(FullControl& control) {
-		control.succeed();
-	}
-};
+{};
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void step1(FSM::Instance& machine, Logger& logger) {
-	logger.assertSequence({
-		{ ffsm2::INVALID_STATE_ID,	Event::Type::ENTRY_GUARD },
-		{ FSM::stateId<A>(),		Event::Type::ENTER },
-	});
-
-	REQUIRE(machine.activeStateId() == FSM::stateId<A>());
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 void step2(FSM::Instance& machine, Logger& logger) {
+	auto plan = machine.plan();
+	plan.changeWith<A, B>(Payload{});
+	plan.changeWith<B, D>(Payload{});
+
 	machine.update();
 
 	logger.assertSequence({
@@ -188,16 +155,17 @@ void step2(FSM::Instance& machine, Logger& logger) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 void step3(FSM::Instance& machine, Logger& logger) {
+	machine.fail<B>();
 	machine.react(Interruption{});
 
 	logger.assertSequence({
+		{ FSM::stateId<B>(),		Event::Type::TASK_FAILURE },
+
 		{ ffsm2::INVALID_STATE_ID,	Event::Type::PRE_REACT },
 		{ FSM::stateId<B>(),		Event::Type::PRE_REACT },
 
 		{ ffsm2::INVALID_STATE_ID,	Event::Type::REACT },
 		{ FSM::stateId<B>(),		Event::Type::REACT },
-
-		{ FSM::stateId<B>(),		Event::Type::TASK_FAILURE },
 
 		{ FSM::stateId<B>(),		Event::Type::POST_REACT },
 		{ ffsm2::INVALID_STATE_ID,	Event::Type::POST_REACT },
@@ -215,11 +183,10 @@ void step3(FSM::Instance& machine, Logger& logger) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 void step4(FSM::Instance& machine, Logger& logger) {
+	machine.succeed<B>();
 	machine.update();
 
 	logger.assertSequence({
-		{ FSM::stateId<B>(),		Event::Type::UPDATE },
-
 		{ FSM::stateId<B>(),		Event::Type::TASK_SUCCESS },
 		{ FSM::stateId<B>(),		Event::Type::CHANGE,	FSM::stateId<C>() },
 
@@ -235,13 +202,14 @@ void step4(FSM::Instance& machine, Logger& logger) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 void step5(FSM::Instance& machine, Logger& logger) {
+	machine.succeed<C>();
 	machine.update();
 
 	logger.assertSequence({
+		{ FSM::stateId<C>(),		Event::Type::TASK_SUCCESS },
+
 		{ FSM::stateId<C>(),		Event::Type::PRE_UPDATE },
 		{ FSM::stateId<C>(),		Event::Type::UPDATE },
-
-		{ FSM::stateId<C>(),		Event::Type::TASK_SUCCESS },
 
 		{ FSM::stateId<C>(),		Event::Type::POST_UPDATE },
 		{ FSM::stateId<C>(),		Event::Type::CHANGE,	FSM::stateId<C>() },
@@ -258,13 +226,14 @@ void step5(FSM::Instance& machine, Logger& logger) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 void step6(FSM::Instance& machine, Logger& logger) {
+	machine.succeed<C>();
 	machine.update();
 
 	logger.assertSequence({
+		{ FSM::stateId<C>(),		Event::Type::TASK_SUCCESS },
+
 		{ FSM::stateId<C>(),		Event::Type::PRE_UPDATE },
 		{ FSM::stateId<C>(),		Event::Type::UPDATE },
-
-		{ FSM::stateId<C>(),		Event::Type::TASK_SUCCESS },
 
 		{ FSM::stateId<C>(),		Event::Type::POST_UPDATE },
 		{ FSM::stateId<C>(),		Event::Type::CHANGE,	FSM::stateId<D>() },
@@ -280,12 +249,12 @@ void step6(FSM::Instance& machine, Logger& logger) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 void step7(FSM::Instance& machine, Logger& logger) {
+	machine.succeed<D>();
 	machine.update();
 
 	logger.assertSequence({
-		{ FSM::stateId<D>(),		Event::Type::UPDATE },
-
 		{ FSM::stateId<D>(),		Event::Type::TASK_SUCCESS },
+
 		{ ffsm2::INVALID_STATE_ID,	Event::Type::PLAN_SUCCEEDED },
 	});
 
@@ -294,13 +263,12 @@ void step7(FSM::Instance& machine, Logger& logger) {
 
 //------------------------------------------------------------------------------
 
-TEST_CASE("FSM.Plans Payloads") {
+TEST_CASE("FSM.Plans") {
 	Logger logger;
 
 	{
 		FSM::Instance machine{&logger};
 
-		step1(machine, logger);
 		step2(machine, logger);
 		step3(machine, logger);
 		step4(machine, logger);

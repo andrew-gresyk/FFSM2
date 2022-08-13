@@ -1,12 +1,54 @@
 namespace ffsm2 {
 namespace detail {
 
+////////////////////////////////////////////////////////////////////////////////
+
+FFSM2_CONSTEXPR(11)
+Status::Status(const Result result_) noexcept
+	: result{result_}
+{}
+
+//------------------------------------------------------------------------------
+
+FFSM2_CONSTEXPR(11)
+Status::operator bool() const noexcept {
+	return result != Result::NONE;
+}
+
 //------------------------------------------------------------------------------
 
 FFSM2_CONSTEXPR(14)
 void
 Status::clear() noexcept {
 	result = Result::NONE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+FFSM2_CONSTEXPR(14)
+Status
+operator | (Status& lhs,
+			const Status rhs) noexcept
+{
+	const Status::Result result = lhs.result > rhs.result ?
+		lhs.result : rhs.result;
+
+	return Status{result};
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+FFSM2_CONSTEXPR(14)
+Status&
+operator |= (Status& lhs,
+			 const Status rhs) noexcept
+{
+	const Status::Result result = lhs.result > rhs.result ?
+		lhs.result : rhs.result;
+
+	lhs = Status{result};
+
+	return lhs;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -45,6 +87,7 @@ template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long N
 FFSM2_CONSTEXPR(14)
 void
 PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::clearRegionStatuses() noexcept {
+	headStatus.clear();
 	subStatus .clear();
 }
 
@@ -129,6 +172,7 @@ template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long N
 FFSM2_CONSTEXPR(14)
 void
 PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::clearRegionStatuses() noexcept {
+	headStatus.clear();
 	subStatus .clear();
 }
 

@@ -126,6 +126,39 @@ CS_<NN, TA, NI, TL_<T>>::widePostReact(FullControl& control,
 }
 
 //------------------------------------------------------------------------------
+
+template <StateID NN, typename TA, Short NI, typename T>
+template <typename TEvent>
+FFSM2_CONSTEXPR(14)
+void
+CS_<NN, TA, NI, TL_<T>>::wideQuery(ConstControl& control,
+								   TEvent& event,
+								   const Short FFSM2_IF_ASSERT(prong)) const noexcept
+{
+	FFSM2_ASSERT(prong == PRONG_INDEX);
+
+	return Single::deepQuery(control, event);
+}
+
+//------------------------------------------------------------------------------
+
+#if FFSM2_PLANS_AVAILABLE()
+
+template <StateID NN, typename TA, Short NI, typename T>
+FFSM2_CONSTEXPR(14)
+Status
+CS_<NN, TA, NI, TL_<T>>::wideUpdatePlans(FullControl& control,
+										 const Short FFSM2_IF_ASSERT(prong)) noexcept
+{
+	FFSM2_ASSERT(prong == PRONG_INDEX);
+
+	return Single::deepUpdatePlans(control);
+}
+
+#endif
+
+//------------------------------------------------------------------------------
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // COMMON
 
 template <StateID NN, typename TA, Short NI, typename T>

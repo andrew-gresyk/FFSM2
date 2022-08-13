@@ -5,7 +5,7 @@
 
 template <typename TConfig>
 void
-LoggerT<TConfig>::recordMethod(Context& /*context*/,
+LoggerT<TConfig>::recordMethod(const Context& /*context*/,
 							   const StateID origin,
 							   const Method method) noexcept
 {
@@ -78,7 +78,7 @@ LoggerT<TConfig>::recordMethod(Context& /*context*/,
 
 template <typename TConfig>
 void
-LoggerT<TConfig>::recordTransition(Context& /*context*/,
+LoggerT<TConfig>::recordTransition(const Context& /*context*/,
 								   const StateID origin,
 								   const StateID target) noexcept
 {
@@ -91,7 +91,7 @@ LoggerT<TConfig>::recordTransition(Context& /*context*/,
 
 template <typename TConfig>
 void
-LoggerT<TConfig>::recordTaskStatus(Context& /*context*/,
+LoggerT<TConfig>::recordTaskStatus(const Context& /*context*/,
 								   const StateID origin,
 								   const StatusEvent event) noexcept
 {
@@ -113,7 +113,7 @@ LoggerT<TConfig>::recordTaskStatus(Context& /*context*/,
 
 template <typename TConfig>
 void
-LoggerT<TConfig>::recordPlanStatus(Context& /*context*/,
+LoggerT<TConfig>::recordPlanStatus(const Context& /*context*/,
 								   const StatusEvent event) noexcept
 {
 	switch (event) {
@@ -137,7 +137,7 @@ LoggerT<TConfig>::recordPlanStatus(Context& /*context*/,
 
 template <typename TConfig>
 void
-LoggerT<TConfig>::recordCancelledPending(Context& /*context*/,
+LoggerT<TConfig>::recordCancelledPending(const Context& /*context*/,
 										 const StateID origin) noexcept
 {
 	history.emplace_back(origin, Event::Type::CANCEL_PENDING);

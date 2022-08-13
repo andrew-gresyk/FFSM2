@@ -1,5 +1,5 @@
 // FFSM2 (flat state machine for games and interactive applications)
-// 2.0.3 (2022-06-12)
+// 2.1.0 (2022-08-13)
 //
 // Created by Andrew Gresyk
 //
@@ -32,8 +32,8 @@
 #pragma once
 
 #define FFSM2_VERSION_MAJOR 2
-#define FFSM2_VERSION_MINOR 0
-#define FFSM2_VERSION_PATCH 3
+#define FFSM2_VERSION_MINOR 1
+#define FFSM2_VERSION_PATCH 0
 
 #define FFSM2_VERSION (10000 * FFSM2_VERSION_MAJOR + 100 * FFSM2_VERSION_MINOR + FFSM2_VERSION_PATCH)
 
@@ -66,9 +66,9 @@
 #include "detail/containers/bit_array.hpp"
 #include "detail/containers/task_list.hpp"
 
+#include "detail/root/registry.hpp"
 #include "detail/root/plan_data.hpp"
 #include "detail/root/plan.hpp"
-#include "detail/root/registry.hpp"
 #include "detail/root/core.hpp"
 #include "detail/root/control.hpp"
 
@@ -171,7 +171,7 @@ struct M_	   <G_<NFeatureTag, TContext, TActivation, NSubstitutionLimit FFSM2_IF
 #if FFSM2_UTILITY_THEORY_AVAILABLE()
 #endif
 
-	//----------------------------------------------------------------------
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	// COMMON
 
 	/// @brief Root

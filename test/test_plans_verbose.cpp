@@ -83,7 +83,7 @@ struct Apex
 	}
 
 	void planFailed(FullControl& control) {
-		REQUIRE(!control.plan());
+		REQUIRE(control.plan());
 
 		control.changeTo<D>();
 	}
@@ -143,7 +143,7 @@ struct B
 //------------------------------------------------------------------------------
 
 struct C
-	: FSM::AncestorsT<Tracked>
+	: FSM::StateT<Tracked>
 {
 	void update(FullControl& control) {
 		control.succeed();

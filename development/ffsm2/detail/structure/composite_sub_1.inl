@@ -147,6 +147,42 @@ CS_<NN, TA, NI, TL_<TS...>>::widePostReact(FullControl& control,
 }
 
 //------------------------------------------------------------------------------
+
+template <StateID NN, typename TA, Short NI, typename... TS>
+template <typename TEvent>
+FFSM2_CONSTEXPR(14)
+void
+CS_<NN, TA, NI, TL_<TS...>>::wideQuery(ConstControl& control,
+									   TEvent& event,
+									   const Short prong) const noexcept
+{
+	FFSM2_ASSERT(prong != INVALID_SHORT);
+
+	return prong < R_PRONG ?
+		LHalf::wideQuery(control, event, prong) :
+		RHalf::wideQuery(control, event, prong);
+}
+
+//------------------------------------------------------------------------------
+
+#if FFSM2_PLANS_AVAILABLE()
+
+template <StateID NN, typename TA, Short NI, typename... TS>
+FFSM2_CONSTEXPR(14)
+Status
+CS_<NN, TA, NI, TL_<TS...>>::wideUpdatePlans(FullControl& control,
+											 const Short prong) noexcept
+{
+	FFSM2_ASSERT(prong != INVALID_SHORT);
+
+	return prong < R_PRONG ?
+		LHalf::wideUpdatePlans(control, prong) :
+		RHalf::wideUpdatePlans(control, prong);
+}
+
+#endif
+
+//------------------------------------------------------------------------------
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // COMMON
 

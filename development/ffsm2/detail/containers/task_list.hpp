@@ -8,10 +8,10 @@ namespace detail {
 #pragma pack(push, 1)
 
 struct TaskBase {
-	FFSM2_CONSTEXPR(11)	TaskBase()								  noexcept	{}
+	FFSM2_CONSTEXPR(11)	TaskBase()										noexcept	{}
 
 	FFSM2_CONSTEXPR(11)	TaskBase(const StateID origin_,
-								 const StateID destination_)	  noexcept
+								 const StateID destination_)			noexcept
 		: origin{origin_}
 		, destination{destination_}
 	{}
@@ -34,7 +34,7 @@ struct TaskBase {
 FFSM2_CONSTEXPR(11)
 bool
 operator == (const TaskBase& lhs,
-			 const TaskBase& rhs)								  noexcept
+			 const TaskBase& rhs)										noexcept
 {
 	return lhs.origin	   == rhs.origin &&
 		   lhs.destination == rhs.destination;
@@ -53,7 +53,7 @@ struct TaskT final
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(14)	TaskT()									  noexcept	{
+	FFSM2_CONSTEXPR(14)	TaskT()											noexcept	{
 		new (&storage) Payload{};
 	}
 
@@ -61,22 +61,11 @@ struct TaskT final
 
 	FFSM2_CONSTEXPR(14)	TaskT(const StateID origin_,
 							  const StateID destination_,
-							  const Payload& payload)			  noexcept
+							  const Payload& payload)					noexcept
 		: TaskBase{origin_, destination_}
 		, payloadSet{true}
 	{
 		new (&storage) Payload{payload};
-	}
-
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	FFSM2_CONSTEXPR(14)	TaskT(const StateID origin_,
-							  const StateID destination_,
-							  Payload&& payload)				  noexcept
-		: TaskBase{origin_, destination_}
-		, payloadSet{true}
-	{
-		new (&storage) Payload{move(payload)};
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -112,17 +101,17 @@ private:
 
 public:
 	template <typename... TArgs>
-	FFSM2_CONSTEXPR(14)	Index emplace(TArgs&&... args)							  noexcept;
+	FFSM2_CONSTEXPR(14)	Index emplace(TArgs&&... args)							noexcept;
 
-	FFSM2_CONSTEXPR(14)	void remove(const Index i)								  noexcept;
+	FFSM2_CONSTEXPR(14)	void remove(const Index i)								noexcept;
 
-	FFSM2_CONSTEXPR(14)		  Item& operator[] (const Index i)					  noexcept;
-	FFSM2_CONSTEXPR(11)	const Item& operator[] (const Index i)				const noexcept;
+	FFSM2_CONSTEXPR(14)		  Item& operator[] (const Index i)					noexcept;
+	FFSM2_CONSTEXPR(11)	const Item& operator[] (const Index i)			  const noexcept;
 
-	FFSM2_CONSTEXPR(11)	Index count()										const noexcept	{ return _count;	}
+	FFSM2_CONSTEXPR(11)	Index count()									  const noexcept	{ return _count;	}
 
 private:
-	FFSM2_IF_ASSERT(void verifyStructure(const Index occupied = INVALID)	const noexcept);
+	FFSM2_IF_ASSERT(void verifyStructure(const Index occupied = INVALID)  const noexcept);
 
 private:
 	Index _vacantHead = 0;

@@ -77,6 +77,46 @@ R_<TG, TA>::react(const TEvent& event) noexcept {
 //------------------------------------------------------------------------------
 
 template <typename TG, typename TA>
+template <typename TEvent>
+FFSM2_CONSTEXPR(14)
+void
+R_<TG, TA>::query(TEvent& event) const noexcept {
+	FFSM2_ASSERT(_core.registry.isActive());
+
+	ConstControl control{_core};
+
+	_apex.deepQuery(control, event);
+}
+
+//------------------------------------------------------------------------------
+
+#if FFSM2_PLANS_AVAILABLE()
+
+template <typename TG, typename TA>
+FFSM2_CONSTEXPR(14)
+void
+R_<TG, TA>::succeed(const StateID stateId_) noexcept {
+	_core.planData.tasksSuccesses.set(stateId_);
+
+	FFSM2_LOG_TASK_STATUS(_core.context, stateId_, StatusEvent::SUCCEEDED);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <typename TG, typename TA>
+FFSM2_CONSTEXPR(14)
+void
+R_<TG, TA>::fail(const StateID stateId_) noexcept {
+	_core.planData.tasksFailures.set(stateId_);
+
+	FFSM2_LOG_TASK_STATUS(_core.context, stateId_, StatusEvent::FAILED);
+}
+
+#endif
+
+//------------------------------------------------------------------------------
+
+template <typename TG, typename TA>
 FFSM2_CONSTEXPR(14)
 void
 R_<TG, TA>::changeTo(const StateID stateId_) noexcept {
@@ -89,6 +129,15 @@ R_<TG, TA>::changeTo(const StateID stateId_) noexcept {
 
 //------------------------------------------------------------------------------
 
+template <typename TG, typename TA>
+FFSM2_CONSTEXPR(14)
+void
+R_<TG, TA>::immediateChangeTo(const StateID stateId_) noexcept {
+	changeTo(stateId_);
+
+	processRequest();
+}
+//------------------------------------------------------------------------------
 #if FFSM2_SERIALIZATION_AVAILABLE()
 
 template <typename TG, typename TA>
@@ -395,9 +444,7 @@ template <FeatureTag NFT, typename TC, typename TV, Long NSL FFSM2_IF_PLANS(, Lo
 FFSM2_CONSTEXPR(14)
 RV_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::RV_(const RV_& other) noexcept
 	: Base{other}
-{
-	initialEnter();
-}
+{}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -405,9 +452,7 @@ template <FeatureTag NFT, typename TC, typename TV, Long NSL FFSM2_IF_PLANS(, Lo
 FFSM2_CONSTEXPR(14)
 RV_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::RV_(RV_&& other) noexcept
 	: Base{move(other)}
-{
-	initialEnter();
-}
+{}
 
 //------------------------------------------------------------------------------
 
@@ -462,26 +507,24 @@ RP_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateI
 	FFSM2_LOG_TRANSITION(_core.context, INVALID_STATE_ID, stateId_);
 }
 
+// COMMON
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+#if FFSM2_UTILITY_THEORY_AVAILABLE()
+#endif
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <FeatureTag NFT, typename TC, typename TV, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
 FFSM2_CONSTEXPR(14)
 void
-RP_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::changeWith(const StateID  stateId_,
-																		 Payload&& payload) noexcept
+RP_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::immediateChangeWith(const StateID  stateId_,
+																			 const Payload& payload) noexcept
 {
-	FFSM2_ASSERT(_core.registry.isActive());
+	changeWith(stateId_, payload);
 
-	_core.request = Transition{stateId_, move(payload)};
-
-	FFSM2_LOG_TRANSITION(_core.context, INVALID_STATE_ID, stateId_);
+	processRequest();
 }
-
-// COMMON
-//------------------------------------------------------------------------------
-
-#if FFSM2_UTILITY_THEORY_AVAILABLE()
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 

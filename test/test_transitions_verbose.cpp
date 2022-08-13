@@ -94,9 +94,9 @@ struct B
 //------------------------------------------------------------------------------
 
 struct C
-	: FSM::AncestorsT<Tracked>
+	: FSM::StateT<Tracked>
 {
-	using Base = FSM::AncestorsT<Tracked>;
+	using Base = FSM::StateT<Tracked>;
 
 	void entryGuard(GuardControl& control) {
 		switch (entryAttemptCount()) {
@@ -154,20 +154,10 @@ void step1(FSM::Instance& machine, Logger& logger) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 void step2(FSM::Instance& machine, Logger& logger) {
-	machine.changeTo<A>();
-	machine.update();
+	machine.immediateChangeTo<A>();
 
 	logger.assertSequence({
 		{							Event::Type::CHANGE,	FSM::stateId<A>() },
-
-		{ ffsm2::INVALID_STATE_ID,	Event::Type::PRE_UPDATE },
-		{ FSM::stateId<A>(),		Event::Type::PRE_UPDATE },
-
-		{ ffsm2::INVALID_STATE_ID,	Event::Type::UPDATE },
-		{ FSM::stateId<A>(),		Event::Type::UPDATE },
-
-		{ FSM::stateId<A>(),		Event::Type::POST_UPDATE },
-		{ ffsm2::INVALID_STATE_ID,	Event::Type::POST_UPDATE },
 
 		{ FSM::stateId<A>(),		Event::Type::EXIT_GUARD },
 		{ FSM::stateId<A>(),		Event::Type::ENTRY_GUARD },
@@ -181,20 +171,10 @@ void step2(FSM::Instance& machine, Logger& logger) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 void step3(FSM::Instance& machine, Logger& logger) {
-	machine.changeTo<B>();
-	machine.update();
+	machine.immediateChangeTo<B>();
 
 	logger.assertSequence({
 		{							Event::Type::CHANGE,	FSM::stateId<B>() },
-
-		{ ffsm2::INVALID_STATE_ID,	Event::Type::PRE_UPDATE },
-		{ FSM::stateId<A>(),		Event::Type::PRE_UPDATE },
-
-		{ ffsm2::INVALID_STATE_ID,	Event::Type::UPDATE },
-		{ FSM::stateId<A>(),		Event::Type::UPDATE },
-
-		{ FSM::stateId<A>(),		Event::Type::POST_UPDATE },
-		{ ffsm2::INVALID_STATE_ID,	Event::Type::POST_UPDATE },
 
 		{ FSM::stateId<A>(),		Event::Type::EXIT_GUARD },
 		{ FSM::stateId<B>(),		Event::Type::ENTRY_GUARD },
