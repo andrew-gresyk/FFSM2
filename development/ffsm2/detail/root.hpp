@@ -152,7 +152,7 @@ public:
 
 	/// @brief Access plan
 	/// @return Plan
-	FFSM2_CONSTEXPR(14)	 Plan plan()														noexcept	{ return  Plan{_core.planData};		}
+	FFSM2_CONSTEXPR(14)	  Plan plan()														noexcept	{ return  Plan{_core.planData};		}
 
 	/// @brief Access read-only plan
 	/// @return Read-only plan

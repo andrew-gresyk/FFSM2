@@ -1,5 +1,5 @@
 ﻿// FFSM2 (flat state machine for games and interactive applications)
-// 2.1.0 (2022-08-13)
+// 2.1.1 (2022-08-15)
 //
 // Created by Andrew Gresyk
 //
@@ -33,7 +33,7 @@
 
 #define FFSM2_VERSION_MAJOR 2
 #define FFSM2_VERSION_MINOR 1
-#define FFSM2_VERSION_PATCH 0
+#define FFSM2_VERSION_PATCH 1
 
 #define FFSM2_VERSION (10000 * FFSM2_VERSION_MAJOR + 100 * FFSM2_VERSION_MINOR + FFSM2_VERSION_PATCH)
 
@@ -959,7 +959,7 @@ stateName(const std::type_index stateType)								noexcept	{
 
 	#if defined(_MSC_VER)
 
-		auto first =
+		Short first =
 			raw[0] == 's' ? 7 : // Struct
 			raw[0] == 'c' ? 6 : // Class
 							0;
@@ -1070,11 +1070,11 @@ struct alignas(4) TransitionBase {
 #endif
 
 template <typename TPayload>
-struct alignas(4) TransitionT final
+struct TransitionT final
 	: TransitionBase
 {
 	using Payload = TPayload;
-	using Storage = typename std::aligned_storage<sizeof(Payload), 4>::type;
+	using Storage = uint8_t[sizeof(Payload)];
 
 	using TransitionBase::TransitionBase;
 
@@ -1125,8 +1125,18 @@ struct alignas(4) TransitionT final
 			reinterpret_cast<const Payload*>(&storage) : nullptr;
 	}
 
+#ifdef _MSC_VER
+	#pragma warning(push)
+	#pragma warning(disable: 4324) // structure was padded due to alignment specifier
+#endif
+
+	alignas(Payload) Storage storage;
+
+#ifdef _MSC_VER
+	#pragma warning(pop)
+#endif
+
 	bool payloadSet = false;
-	Storage storage;
 };
 
 template <>
@@ -1596,7 +1606,7 @@ struct TaskT final
 	: TaskBase
 {
 	using Payload = TPayload;
-	using Storage = typename std::aligned_storage<sizeof(Payload), 2>::type;
+	using Storage = uint8_t[sizeof(Payload)];
 
 	using TaskBase::TaskBase;
 
@@ -1613,7 +1623,17 @@ struct TaskT final
 		new (&storage) Payload{payload};
 	}
 
-	Storage storage;
+#ifdef _MSC_VER
+	#pragma warning(push)
+	#pragma warning(disable: 4324) // structure was padded due to alignment specifier
+#endif
+
+	alignas(Payload) Storage storage;
+
+#ifdef _MSC_VER
+	#pragma warning(pop)
+#endif
+
 	bool payloadSet = false;
 };
 
@@ -2106,7 +2126,7 @@ PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::veri
 	if (bounds.first != INVALID_LONG) {
 		FFSM2_ASSERT(bounds.last != INVALID_LONG);
 
-		for (auto slow = bounds.first, fast = slow; ; ) {
+		for (Long slow = bounds.first, fast = slow; ; ) {
 			++length;
 			const TaskLink& task = taskLinks[slow];
 
@@ -2712,12 +2732,12 @@ PlanBaseT<TArgs>::linkTask(const Long index) noexcept	{
 			FFSM2_ASSERT(_bounds.first < TaskLinks::CAPACITY);
 			FFSM2_ASSERT(_bounds.last  < TaskLinks::CAPACITY);
 
-			auto& lastLink = _planData.taskLinks[_bounds.last];
+			TaskLink& lastLink = _planData.taskLinks[_bounds.last];
 			FFSM2_ASSERT(lastLink.next == INVALID_LONG);
 
 			lastLink.next  = index;
 
-			auto& currLink = _planData.taskLinks[index];
+			TaskLink& currLink = _planData.taskLinks[index];
 			FFSM2_ASSERT(currLink.prev == INVALID_LONG);
 
 			currLink.prev  = _bounds.last;
@@ -2743,7 +2763,7 @@ PlanBaseT<TArgs>::clearTasks() noexcept	{
 		{
 			FFSM2_ASSERT(index < TaskLinks::CAPACITY);
 
-			const auto& link = _planData.taskLinks[index];
+			const TaskLink& link = _planData.taskLinks[index];
 			FFSM2_ASSERT(index == _bounds.first ?
 						 link.prev == INVALID_LONG :
 						 link.prev <  TaskLinks::CAPACITY);
@@ -4201,7 +4221,7 @@ template <StateID NStateId,
 struct S_
 	: THead
 {
-	static constexpr auto STATE_ID	 = NStateId;
+	static constexpr StateID STATE_ID = NStateId;
 
 	using Context		= typename TArgs::Context;
 
@@ -5339,6 +5359,10 @@ struct FFSM2_EMPTY_BASES C_
 	using PlanControl	= PlanControlT <Args>;
 	using ScopedRegion	= typename PlanControl::Region;
 
+#if FFSM2_PLANS_AVAILABLE()
+	using Plan			= typename PlanControl::Plan;
+#endif
+
 	using FullControl	= FullControlT <Args>;
 	using ControlLock	= typename FullControl::Lock;
 
@@ -5663,7 +5687,7 @@ C_<TA, TH, TS...>::deepExit(PlanControl& control) noexcept {
 	active = INVALID_SHORT;
 
 #if FFSM2_PLANS_AVAILABLE()
-	auto plan = control.plan();
+	Plan plan = control.plan();
 	plan.clear();
 #endif
 }
@@ -5976,7 +6000,7 @@ public:
 
 	/// @brief Access plan
 	/// @return Plan
-	FFSM2_CONSTEXPR(14)	 Plan plan()														noexcept	{ return  Plan{_core.planData};		}
+	FFSM2_CONSTEXPR(14)	  Plan plan()														noexcept	{ return  Plan{_core.planData};		}
 
 	/// @brief Access read-only plan
 	/// @return Read-only plan

@@ -107,7 +107,7 @@ PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::veri
 	if (bounds.first != INVALID_LONG) {
 		FFSM2_ASSERT(bounds.last != INVALID_LONG);
 
-		for (auto slow = bounds.first, fast = slow; ; ) {
+		for (Long slow = bounds.first, fast = slow; ; ) {
 			++length;
 			const TaskLink& task = taskLinks[slow];
 
