@@ -1016,7 +1016,7 @@ namespace detail {
 	#pragma warning(disable: 4324) // structure was padded due to alignment specifier
 #endif
 
-struct alignas(4) TransitionBase {
+struct TransitionBase {
 	FFSM2_CONSTEXPR(11)
 	TransitionBase() noexcept = default;
 
@@ -1140,7 +1140,7 @@ struct TransitionT final
 };
 
 template <>
-struct alignas(4) TransitionT<void> final
+struct TransitionT<void> final
 	: TransitionBase
 {
 	using TransitionBase::TransitionBase;
