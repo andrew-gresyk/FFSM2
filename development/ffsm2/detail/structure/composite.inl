@@ -281,7 +281,7 @@ C_<TA, TH, TS...>::deepExit(PlanControl& control) noexcept {
 	active = INVALID_SHORT;
 
 #if FFSM2_PLANS_AVAILABLE()
-	auto plan = control.plan();
+	Plan plan = control.plan();
 	plan.clear();
 #endif
 }

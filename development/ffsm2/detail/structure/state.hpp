@@ -17,7 +17,7 @@ template <StateID NStateId,
 struct S_
 	: THead
 {
-	static constexpr auto STATE_ID	 = NStateId;
+	static constexpr StateID STATE_ID = NStateId;
 
 	using Context		= typename TArgs::Context;
 

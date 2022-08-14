@@ -24,6 +24,10 @@ struct FFSM2_EMPTY_BASES C_
 	using PlanControl	= PlanControlT <Args>;
 	using ScopedRegion	= typename PlanControl::Region;
 
+#if FFSM2_PLANS_AVAILABLE()
+	using Plan			= typename PlanControl::Plan;
+#endif
+
 	using FullControl	= FullControlT <Args>;
 	using ControlLock	= typename FullControl::Lock;
 
