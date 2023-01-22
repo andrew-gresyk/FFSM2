@@ -41,19 +41,29 @@ jobs:
               INSTALL: true
             }
           - {
-              OS: ubuntu-18.04,
+              OS: ubuntu-22.04,
               CC: gcc-9,
               CXX: g++-9
             }
           - {
-              OS: ubuntu-20.04,
+              OS: ubuntu-22.04,
               CC: gcc-10,
               CXX: g++-10
             }
           - {
-              OS: ubuntu-20.04,
+              OS: ubuntu-22.04,
               CC: gcc-11,
-              CXX: g++-11,
+              CXX: g++-11
+            }
+          - {
+              OS: ubuntu-22.04,
+              CC: gcc-12,
+              CXX: g++-12
+            }
+          - {
+              OS: ubuntu-22.04,
+              CC: gcc-13,
+              CXX: g++-13,
               INSTALL: true
             }
           - {
@@ -75,25 +85,25 @@ jobs:
               VERSION: '5.0'
             }
           - {
-              OS: ubuntu-latest,
+              OS: ubuntu-20.04,
               CC: clang-6.0,
               CXX: clang++-6.0,
               VERSION: '6.0'
             }
           - {
-              OS: ubuntu-latest,
+              OS: ubuntu-20.04,
               CC: clang-7,
               CXX: clang++-7,
               VERSION: '7'
             }
           - {
-              OS: ubuntu-latest,
+              OS: ubuntu-20.04,
               CC: clang-8,
               CXX: clang++-8,
               VERSION: '8'
             }
           - {
-              OS: ubuntu-latest,
+              OS: ubuntu-20.04,
               CC: clang-9,
               CXX: clang++-9,
               VERSION: '9'
@@ -101,23 +111,35 @@ jobs:
           - {
               OS: ubuntu-20.04,
               CC: clang-10,
-              CXX: clang++-10
+              CXX: clang++-10,
+              VERSION: '10'
             }
           - {
               OS: ubuntu-20.04,
               CC: clang-11,
-              CXX: clang++-11
+              CXX: clang++-11,
+              VERSION: '11'
             }
           - {
-              OS: ubuntu-latest,
+              OS: ubuntu-22.04,
               CC: clang-12,
               CXX: clang++-12
             }
           - {
-              OS: ubuntu-latest,
+              OS: ubuntu-22.04,
               CC: clang-13,
-              CXX: clang++-13,
-              VERSION: '13'
+              CXX: clang++-13
+            }
+          - {
+              OS: ubuntu-22.04,
+              CC: clang-14,
+              CXX: clang++-14
+            }
+          - {
+              OS: ubuntu-22.04,
+              CC: clang-15,
+              CXX: clang++-15,
+              VERSION: '15'
             }
           - {
               OS: macos-10.15,
@@ -129,11 +151,16 @@ jobs:
               CC: clang,
               CXX: clang++
             }
+          - {
+              OS: macos-12,
+              CC: clang,
+              CXX: clang++
+            }
 
         BUILD_CONFIG: [ Release, Debug ]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     # install dependencies
     - name: Install GCC on ubuntu
