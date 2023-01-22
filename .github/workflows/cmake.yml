@@ -61,12 +61,6 @@ jobs:
               CXX: g++-12
             }
           - {
-              OS: ubuntu-22.04,
-              CC: gcc-13,
-              CXX: g++-13,
-              INSTALL: true
-            }
-          - {
               OS: ubuntu-18.04,
               CC: clang-3.9,
               CXX: clang++-3.9,

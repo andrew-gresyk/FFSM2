@@ -22,7 +22,7 @@ Header-only flat FSM framework in C++11, with fully statically-defined structure
 ## Compiler Support
 
 - Visual Studio: 2015, **2017, 2019, 2022**
-- GCC: **5, 6, 7, 8, 9, 10, 11, 12, 13**
+- GCC: **5, 6, 7, 8, 9, 10, 11, 12**
 - ARM GCC: **9**
 - Clang: **3.9, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15**
 - AppleClang: **12, 13, 13**
@@ -41,6 +41,7 @@ Header-only flat FSM framework in C++11, with fully statically-defined structure
 ## See Also
 
 - **[HFSM2](https://hfsm.dev)**: High-Performance **Hierarchical** Finite State Machine
+- **[HFSM Mono](https://font.hfsm.dev/)**: Monospaced bitmap Unicode fonts for HFSM2 and FFSM2 libraries
 
 ---
 
@@ -59,11 +60,13 @@ Header-only flat FSM framework in C++11, with fully statically-defined structure
 - Fully static, no dynamic allocations
 - Uses inline-friendly compile-time polymorphism, no virtual methods are used
 - Type-safe transitions: `FSM.changeTo<TargetState>()` with optional payloads
+- Flexible configuration using `FFSM2_ENABLE_*` macros
 - Scaleable, supports robust state re-use via state injections
 - Gamedev-friendly, supports explicit `State::update()`
 - Also supports traditional event-based workflow with `State::react()`
 - Inspect anything: previous and current transitions, state activation status, and more!
 - Game AI-friendly with dynamic planning support
+- **[Debug-assisted](https://gresyk.dev/features/2018/01/15/hfsm-magic.html)**, includes automatic structure and activity visualization API
 - Built-in logging support
 
 ---
@@ -77,7 +80,7 @@ Header-only flat FSM framework in C++11, with fully statically-defined structure
 ## Get In Touch
 
 - Twitter: **[@andrew_gresyk](https://www.twitter.com/andrew_gresyk)**
-- Discord: **[HFSM.dev](https://discord.gg/v4t3tzh)**
+- Discord: **[HFSM.dev](https://discord.gg/ZfWjhFj)**
 - Gitter: **[andrew-gresyk/FFSM2](https://gitter.im/andrew-gresyk/FFSM2)**
 
 ---
