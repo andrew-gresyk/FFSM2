@@ -277,6 +277,9 @@ protected:
 	using Control		= ControlT<TArgs>;
 
 	using typename Control::StateList;
+	using typename Control::Core;
+
+	using Transition	= typename Core::Transition;
 
 #if FFSM2_PLANS_AVAILABLE()
 	using typename Control::PlanData;
@@ -285,19 +288,23 @@ protected:
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	struct Region {
-		FFSM2_CONSTEXPR(14)	Region(PlanControlT& control)				noexcept;
+		FFSM2_CONSTEXPR(14)	Region(PlanControlT& control)					noexcept;
 
-		FFSM2_CONSTEXPR(20)	~Region()									noexcept;
+		FFSM2_CONSTEXPR(20)	~Region()										noexcept;
 
 		PlanControlT& control;
 	};
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	using Control::Control;
+	FFSM2_CONSTEXPR(11)	PlanControlT(Core& core,
+									 const Transition& currentTransition)	noexcept
+		: Control{core}
+		, _currentTransition{currentTransition}
+	{}
 
-	FFSM2_CONSTEXPR(14)	void   setRegion()								noexcept;
-	FFSM2_CONSTEXPR(14)	void resetRegion()								noexcept;
+	FFSM2_CONSTEXPR(14)	void   setRegion()									noexcept;
+	FFSM2_CONSTEXPR(14)	void resetRegion()									noexcept;
 
 public:
 	using Control::isActive;
@@ -311,23 +318,30 @@ public:
 
 	/// @brief Access plan
 	/// @return Plan
-	FFSM2_CONSTEXPR(14)	  Plan plan()									noexcept	{ return  Plan{_core.planData};		}
+	FFSM2_CONSTEXPR(14)	  Plan plan()										noexcept	{ return  Plan{_core.planData};		}
 
 // COMMON
 // COMMON
 
 	/// @brief Access read-only plan
 	/// @return Read-only plan
-	FFSM2_CONSTEXPR(11)	CPlan plan()							  const noexcept	{ return CPlan{_core.planData};		}
+	FFSM2_CONSTEXPR(11)	CPlan plan()								  const noexcept	{ return CPlan{_core.planData};		}
 
 // COMMON
 #endif
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+	/// @brief Get current transition request
+	/// @return Current transition request
+	FFSM2_CONSTEXPR(11)	const Transition& currentTransition()		  const noexcept	{ return _currentTransition;	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 protected:
 	using Control::_core;
 
+	const Transition& _currentTransition;
 	Status _status;
 };
 
@@ -652,8 +666,7 @@ class GuardControlT final
 	FFSM2_CONSTEXPR(11)	GuardControlT(Core& core,
 									  const Transition& currentTransition,
 									  const Transition& pendingTransition) noexcept
-		: FullControl{core}
-		, _currentTransition{currentTransition}
+		: FullControl{core, currentTransition}
 		, _pendingTransition{pendingTransition}
 	{}
 
@@ -664,10 +677,6 @@ public:
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	// COMMON
-
-	/// @brief Get current transition request
-	/// @return Current transition request
-	FFSM2_CONSTEXPR(11)	const Transition& currentTransitions()	  const noexcept	{ return _currentTransition;	}
 
 	/// @brief Get pending transition request
 	/// @return Pending transition request
@@ -681,7 +690,6 @@ private:
 	using FullControl::_core;
 	using FullControl::_originId;
 
-	const Transition& _currentTransition;
 	const Transition& _pendingTransition;
 	bool _cancelled = false;
 };

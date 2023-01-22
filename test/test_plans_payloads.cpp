@@ -8,7 +8,9 @@ namespace test_plans_payloads {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-struct Payload {};
+struct Payload {
+	int value;
+};
 
 using Config = ffsm2::Config
 					::PayloadT<Payload>;
@@ -55,9 +57,9 @@ public:
 		++_totalUpdateCount;
 	}
 
-	unsigned entryAttemptCount() const			{ return _entryAttemptCount;	}
+	unsigned entryAttemptCount()  const			{ return _entryAttemptCount;	}
 	unsigned currentUpdateCount() const			{ return _currentUpdateCount;	}
-	unsigned totalUpdateCount() const			{ return _totalUpdateCount;		}
+	unsigned totalUpdateCount()   const			{ return _totalUpdateCount;		}
 
 private:
 	unsigned _entryAttemptCount	 = 0;
@@ -73,8 +75,8 @@ struct Apex
 	void entryGuard(GuardControl& control) {
 		auto plan = control.plan();
 
-		plan.changeWith<A, B>(Payload{});
-		plan.changeWith<B, D>(Payload{});
+		plan.changeWith<A, B>(Payload{1});
+		plan.changeWith<B, D>(Payload{2});
 	}
 
 	void planSucceeded(FullControl& control) {
@@ -84,7 +86,7 @@ struct Apex
 	void planFailed(FullControl& control) {
 		REQUIRE(control.plan());
 
-		control.changeWith<D>(Payload{});
+		control.changeWith<D>(Payload{3});
 	}
 };
 
@@ -118,6 +120,18 @@ struct A
 struct B
 	: FSM::State
 {
+	void entryGuard(GuardControl& control) {
+		REQUIRE(control.pendingTransition().payload());
+		REQUIRE(control.pendingTransition().payload()->value == 1);
+
+		REQUIRE(control.currentTransition().payload() == nullptr);
+	}
+
+	void enter(PlanControl& control) {
+		REQUIRE(control.currentTransition().payload());
+		REQUIRE(control.currentTransition().payload()->value == 1);
+	}
+
 	void update(FullControl& control) {
 		control.succeed();
 	}
@@ -132,9 +146,9 @@ struct B
 		if (!plan) {
 			control.cancelPendingTransition();
 
-			plan.changeWith<B, C>(Payload{});
-			plan.changeWith<C>(stateId<C>(), Payload{});
-			plan.changeWith(stateId<C>(), stateId<D>(), Payload{});
+			plan.changeWith<B, C>(Payload{4});
+			plan.changeWith<C>(stateId<C>(), Payload{5});
+			plan.changeWith(stateId<C>(), stateId<D>(), Payload{6});
 		}
 	}
 };
@@ -144,6 +158,30 @@ struct B
 struct C
 	: FSM::StateT<Tracked>
 {
+	void entryGuard(GuardControl& control) {
+		switch (entryAttemptCount()) {
+		case 1:
+			REQUIRE(control.pendingTransition().payload());
+			REQUIRE(control.pendingTransition().payload()->value == 4);
+			break;
+
+		case 2:
+			REQUIRE(control.pendingTransition().payload());
+			REQUIRE(control.pendingTransition().payload()->value == 5);
+			break;
+
+		default:
+			FFSM2_BREAK();
+		}
+
+		REQUIRE(control.currentTransition().payload() == nullptr);
+	}
+
+	void enter(PlanControl& control) {
+		REQUIRE(control.currentTransition().payload());
+		REQUIRE(control.currentTransition().payload()->value == 4);
+	}
+
 	void update(FullControl& control) {
 		control.succeed();
 	}
@@ -154,6 +192,18 @@ struct C
 struct D
 	: FSM::State
 {
+	void entryGuard(GuardControl& control) {
+		REQUIRE(control.pendingTransition().payload());
+		REQUIRE(control.pendingTransition().payload()->value == 6);
+
+		REQUIRE(control.currentTransition().payload() == nullptr);
+	}
+
+	void enter(PlanControl& control) {
+		REQUIRE(control.currentTransition().payload());
+		REQUIRE(control.currentTransition().payload()->value == 6);
+	}
+
 	void update(FullControl& control) {
 		control.succeed();
 	}
@@ -180,6 +230,9 @@ void step2(FSM::Instance& machine, Logger& logger) {
 
 		{ FSM::stateId<A>(),		Event::Type::TASK_SUCCESS },
 		{ FSM::stateId<A>(),		Event::Type::CHANGE,	FSM::stateId<B>() },
+
+		{ FSM::stateId<B>(),		Event::Type::ENTRY_GUARD },
+		{ FSM::stateId<B>(),		Event::Type::ENTER },
 	});
 
 	REQUIRE(machine.activeStateId() == FSM::stateId<B>());
@@ -270,8 +323,10 @@ void step6(FSM::Instance& machine, Logger& logger) {
 		{ FSM::stateId<C>(),		Event::Type::CHANGE,	FSM::stateId<D>() },
 
 		{ FSM::stateId<C>(),		Event::Type::EXIT_GUARD },
+		{ FSM::stateId<D>(),		Event::Type::ENTRY_GUARD },
 
 		{ FSM::stateId<C>(),		Event::Type::EXIT },
+		{ FSM::stateId<D>(),		Event::Type::ENTER },
 	});
 
 	REQUIRE(machine.activeStateId() == FSM::stateId<D>());

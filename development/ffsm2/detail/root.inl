@@ -37,7 +37,8 @@ void
 R_<TG, TA>::update() noexcept {
 	FFSM2_ASSERT(_core.registry.isActive());
 
-	FullControl control{_core};
+	Transition emptyTransition;
+	FullControl control{_core, emptyTransition};
 
 	_apex. deepPreUpdate(control);
 	_apex.	  deepUpdate(control);
@@ -60,7 +61,8 @@ void
 R_<TG, TA>::react(const TEvent& event) noexcept {
 	FFSM2_ASSERT(_core.registry.isActive());
 
-	FullControl control{_core};
+	Transition emptyTransition;
+	FullControl control{_core, emptyTransition};
 
 	_apex. deepPreReact(control, event);
 	_apex.	  deepReact(control, event);
@@ -168,7 +170,8 @@ R_<TG, TA>::load(const SerialBuffer& buffer) noexcept {
 
 	_core.request.clear();
 
-	PlanControl control{_core};
+	Transition emptyTransition;
+	PlanControl control{_core, emptyTransition};
 
 	_apex.deepExit(control);
 
@@ -206,9 +209,9 @@ R_<TG, TA>::replayTransition(const StateID destination) noexcept {
 	_core.previousTransition.clear();
 
 	if (FFSM2_CHECKED(destination != INVALID_SHORT)) {
-		PlanControl control{_core};
-
 		Transition currentTransition;
+		PlanControl control{_core, currentTransition};
+
 		applyRequest(currentTransition,
 					 destination);
 
@@ -238,11 +241,10 @@ R_<TG, TA>::initialEnter() noexcept {
 	FFSM2_ASSERT(!_core.request);
 	FFSM2_IF_TRANSITION_HISTORY(FFSM2_ASSERT(!_core.previousTransition));
 
-	PlanControl control{_core};
-
 	Transition currentTransition;
 	Transition pendingTransition;
 
+	PlanControl control{_core, currentTransition};
 	applyRequest(currentTransition, 0);
 
 	cancelledByEntryGuards(currentTransition,
@@ -289,7 +291,8 @@ R_<TG, TA>::finalExit() noexcept {
 	FFSM2_ASSERT(_core.registry.isActive());
 	FFSM2_ASSERT(!_core.request);
 
-	PlanControl control{_core};
+	Transition emptyTransition;
+	PlanControl control{_core, emptyTransition};
 
 	_apex.deepExit(control);
 }
@@ -321,7 +324,7 @@ void
 R_<TG, TA>::processTransitions(Transition& currentTransition) noexcept {
 	FFSM2_ASSERT(_core.request);
 
-	PlanControl control{_core};
+	PlanControl control{_core, currentTransition};
 
 	Transition pendingTransition;
 
@@ -474,9 +477,9 @@ RV_<G_<NFT, TC, Manual, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::replayEnter(const S
 	FFSM2_ASSERT(!_core.request);
 	FFSM2_IF_TRANSITION_HISTORY(FFSM2_ASSERT(!_core.previousTransition));
 
-	PlanControl control{_core};
-
 	Transition currentTransition;
+	PlanControl control{_core, currentTransition};
+
 	applyRequest(currentTransition,
 				 destination);
 

@@ -1,5 +1,5 @@
 ﻿// FFSM2 (flat state machine for games and interactive applications)
-// 2.1.1 (2022-08-15)
+// 2.1.2 (2023-08-15)
 //
 // Created by Andrew Gresyk
 //
@@ -9,7 +9,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022
+// Copyright (c) 2023
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@
 
 #define FFSM2_VERSION_MAJOR 2
 #define FFSM2_VERSION_MINOR 1
-#define FFSM2_VERSION_PATCH 1
+#define FFSM2_VERSION_PATCH 2
 
 #define FFSM2_VERSION (10000 * FFSM2_VERSION_MAJOR + 100 * FFSM2_VERSION_MINOR + FFSM2_VERSION_PATCH)
 
@@ -1488,7 +1488,7 @@ public:
 	FFSM2_CONSTEXPR(14)	void clear(const TIndex index)					noexcept;
 
 private:
-	uint8_t _storage[UNIT_COUNT];
+	uint8_t _storage[UNIT_COUNT] {};
 };
 
 template <>
@@ -1623,6 +1623,13 @@ struct TaskT final
 		new (&storage) Payload{payload};
 	}
 
+	FFSM2_CONSTEXPR(11)
+	const Payload*
+	payload()													  const noexcept	{
+		return payloadSet ?
+			reinterpret_cast<const Payload*>(&storage) : nullptr;
+	}
+
 #ifdef _MSC_VER
 	#pragma warning(push)
 	#pragma warning(disable: 4324) // structure was padded due to alignment specifier
@@ -1677,7 +1684,7 @@ private:
 	Index _vacantTail = 0;
 	Index _last  = 0;
 	Index _count = 0;
-	Item _items[CAPACITY];
+	Item _items[CAPACITY] {};
 };
 
 template <typename TItem>
@@ -3195,23 +3202,30 @@ protected:
 	using Control		= ControlT<TArgs>;
 
 	using typename Control::StateList;
+	using typename Control::Core;
+
+	using Transition	= typename Core::Transition;
 
 #if FFSM2_PLANS_AVAILABLE()
 	using typename Control::PlanData;
 #endif
 
 	struct Region {
-		FFSM2_CONSTEXPR(14)	Region(PlanControlT& control)				noexcept;
+		FFSM2_CONSTEXPR(14)	Region(PlanControlT& control)					noexcept;
 
-		FFSM2_CONSTEXPR(20)	~Region()									noexcept;
+		FFSM2_CONSTEXPR(20)	~Region()										noexcept;
 
 		PlanControlT& control;
 	};
 
-	using Control::Control;
+	FFSM2_CONSTEXPR(11)	PlanControlT(Core& core,
+									 const Transition& currentTransition)	noexcept
+		: Control{core}
+		, _currentTransition{currentTransition}
+	{}
 
-	FFSM2_CONSTEXPR(14)	void   setRegion()								noexcept;
-	FFSM2_CONSTEXPR(14)	void resetRegion()								noexcept;
+	FFSM2_CONSTEXPR(14)	void   setRegion()									noexcept;
+	FFSM2_CONSTEXPR(14)	void resetRegion()									noexcept;
 
 public:
 	using Control::isActive;
@@ -3223,17 +3237,22 @@ public:
 
 	/// @brief Access plan
 	/// @return Plan
-	FFSM2_CONSTEXPR(14)	  Plan plan()									noexcept	{ return  Plan{_core.planData};		}
+	FFSM2_CONSTEXPR(14)	  Plan plan()										noexcept	{ return  Plan{_core.planData};		}
 
 	/// @brief Access read-only plan
 	/// @return Read-only plan
-	FFSM2_CONSTEXPR(11)	CPlan plan()							  const noexcept	{ return CPlan{_core.planData};		}
+	FFSM2_CONSTEXPR(11)	CPlan plan()								  const noexcept	{ return CPlan{_core.planData};		}
 
 #endif
+
+	/// @brief Get current transition request
+	/// @return Current transition request
+	FFSM2_CONSTEXPR(11)	const Transition& currentTransition()		  const noexcept	{ return _currentTransition;	}
 
 protected:
 	using Control::_core;
 
+	const Transition& _currentTransition;
 	Status _status;
 };
 
@@ -3520,17 +3539,12 @@ class GuardControlT final
 	FFSM2_CONSTEXPR(11)	GuardControlT(Core& core,
 									  const Transition& currentTransition,
 									  const Transition& pendingTransition) noexcept
-		: FullControl{core}
-		, _currentTransition{currentTransition}
+		: FullControl{core, currentTransition}
 		, _pendingTransition{pendingTransition}
 	{}
 
 public:
 	using FullControl::context;
-
-	/// @brief Get current transition request
-	/// @return Current transition request
-	FFSM2_CONSTEXPR(11)	const Transition& currentTransitions()	  const noexcept	{ return _currentTransition;	}
 
 	/// @brief Get pending transition request
 	/// @return Pending transition request
@@ -3544,7 +3558,6 @@ private:
 	using FullControl::_core;
 	using FullControl::_originId;
 
-	const Transition& _currentTransition;
 	const Transition& _pendingTransition;
 	bool _cancelled = false;
 };
@@ -3695,7 +3708,11 @@ FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::u
 					_core.planData.tasksSuccesses.get(it->origin))
 				{
 					Origin origin{*this, it->origin};
-					changeTo(it->destination);
+
+					if (const Payload* const payload = it->payload())
+						changeWith(it->destination, *it->payload());
+					else
+						changeTo  (it->destination);
 
 					_core.planData.tasksSuccesses.clear(it->origin);
 					it.remove();
@@ -6485,7 +6502,8 @@ void
 R_<TG, TA>::update() noexcept {
 	FFSM2_ASSERT(_core.registry.isActive());
 
-	FullControl control{_core};
+	Transition emptyTransition;
+	FullControl control{_core, emptyTransition};
 
 	_apex. deepPreUpdate(control);
 	_apex.	  deepUpdate(control);
@@ -6506,7 +6524,8 @@ void
 R_<TG, TA>::react(const TEvent& event) noexcept {
 	FFSM2_ASSERT(_core.registry.isActive());
 
-	FullControl control{_core};
+	Transition emptyTransition;
+	FullControl control{_core, emptyTransition};
 
 	_apex. deepPreReact(control, event);
 	_apex.	  deepReact(control, event);
@@ -6601,7 +6620,8 @@ R_<TG, TA>::load(const SerialBuffer& buffer) noexcept {
 
 	_core.request.clear();
 
-	PlanControl control{_core};
+	Transition emptyTransition;
+	PlanControl control{_core, emptyTransition};
 
 	_apex.deepExit(control);
 
@@ -6637,9 +6657,9 @@ R_<TG, TA>::replayTransition(const StateID destination) noexcept {
 	_core.previousTransition.clear();
 
 	if (FFSM2_CHECKED(destination != INVALID_SHORT)) {
-		PlanControl control{_core};
-
 		Transition currentTransition;
+		PlanControl control{_core, currentTransition};
+
 		applyRequest(currentTransition,
 					 destination);
 
@@ -6667,11 +6687,10 @@ R_<TG, TA>::initialEnter() noexcept {
 	FFSM2_ASSERT(!_core.request);
 	FFSM2_IF_TRANSITION_HISTORY(FFSM2_ASSERT(!_core.previousTransition));
 
-	PlanControl control{_core};
-
 	Transition currentTransition;
 	Transition pendingTransition;
 
+	PlanControl control{_core, currentTransition};
 	applyRequest(currentTransition, 0);
 
 	cancelledByEntryGuards(currentTransition,
@@ -6716,7 +6735,8 @@ R_<TG, TA>::finalExit() noexcept {
 	FFSM2_ASSERT(_core.registry.isActive());
 	FFSM2_ASSERT(!_core.request);
 
-	PlanControl control{_core};
+	Transition emptyTransition;
+	PlanControl control{_core, emptyTransition};
 
 	_apex.deepExit(control);
 }
@@ -6744,7 +6764,7 @@ void
 R_<TG, TA>::processTransitions(Transition& currentTransition) noexcept {
 	FFSM2_ASSERT(_core.request);
 
-	PlanControl control{_core};
+	PlanControl control{_core, currentTransition};
 
 	Transition pendingTransition;
 
@@ -6873,9 +6893,9 @@ RV_<G_<NFT, TC, Manual, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::replayEnter(const S
 	FFSM2_ASSERT(!_core.request);
 	FFSM2_IF_TRANSITION_HISTORY(FFSM2_ASSERT(!_core.previousTransition));
 
-	PlanControl control{_core};
-
 	Transition currentTransition;
+	PlanControl control{_core, currentTransition};
+
 	applyRequest(currentTransition,
 				 destination);
 
