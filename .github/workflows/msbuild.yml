@@ -22,7 +22,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Add MSBuild to PATH
-      uses: microsoft/setup-msbuild@master
+      uses: microsoft/setup-msbuild@main
 
     - name: Build
       working-directory: ${{env.GITHUB_WORKSPACE}}
