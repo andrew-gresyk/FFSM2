@@ -1,6 +1,5 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![GitHub Release Date](https://img.shields.io/github/release-date/andrew-gresyk/FFSM2)](https://github.com/andrew-gresyk/FFSM2/releases)  
-[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/andrew-gresyk/FFSM2.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/andrew-gresyk/FFSM2/context:cpp)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/4617/badge)](https://bestpractices.coreinfrastructure.org/projects/4617)  
 [![GCC, Clang](https://github.com/andrew-gresyk/FFSM2/actions/workflows/cmake.yml/badge.svg)](https://github.com/andrew-gresyk/FFSM2/actions/workflows/cmake.yml)
 [![ARM GCC](https://github.com/andrew-gresyk/FFSM2/actions/workflows/cmake-qemu-arm.yml/badge.svg)](https://github.com/andrew-gresyk/FFSM2/actions/workflows/cmake-qemu-arm.yml)
