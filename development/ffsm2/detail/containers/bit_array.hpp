@@ -28,7 +28,7 @@ public:
 	FFSM2_CONSTEXPR(14)	void clear(const TIndex index)					noexcept;
 
 private:
-	uint8_t _storage[UNIT_COUNT];
+	uint8_t _storage[UNIT_COUNT] {};
 };
 
 //------------------------------------------------------------------------------

@@ -70,6 +70,15 @@ struct TaskT final
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+	FFSM2_CONSTEXPR(11)
+	const Payload*
+	payload()													  const noexcept	{
+		return payloadSet ?
+			reinterpret_cast<const Payload*>(&storage) : nullptr;
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 #ifdef _MSC_VER
 	#pragma warning(push)
 	#pragma warning(disable: 4324) // structure was padded due to alignment specifier
@@ -128,7 +137,7 @@ private:
 	Index _vacantTail = 0;
 	Index _last  = 0;
 	Index _count = 0;
-	Item _items[CAPACITY];
+	Item _items[CAPACITY] {};
 };
 
 //------------------------------------------------------------------------------

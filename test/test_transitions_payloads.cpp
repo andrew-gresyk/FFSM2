@@ -8,7 +8,10 @@ namespace test_transitions_payloads {
 ////////////////////////////////////////////////////////////////////////////////
 
 struct Context {};
-struct Payload {};
+
+struct Payload {
+	int value;
+};
 
 using Config = ffsm2::Config
 					::ContextT<Context>
@@ -29,8 +32,7 @@ using FSM = M::PeerRoot<
 				S(A),
 				S(B),
 				S(C),
-				S(D),
-				S(E)
+				S(D)
 			>;
 
 #undef S
@@ -41,7 +43,6 @@ static_assert(FSM::stateId<A>() == 0, "");
 static_assert(FSM::stateId<B>() == 1, "");
 static_assert(FSM::stateId<C>() == 2, "");
 static_assert(FSM::stateId<D>() == 3, "");
-static_assert(FSM::stateId<E>() == 4, "");
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -59,9 +60,9 @@ public:
 		++_totalUpdateCount;
 	}
 
-	unsigned entryAttemptCount() const			{ return _entryAttemptCount;	}
+	unsigned entryAttemptCount()  const			{ return _entryAttemptCount;	}
 	unsigned currentUpdateCount() const			{ return _currentUpdateCount;	}
-	unsigned totalUpdateCount() const			{ return _totalUpdateCount;		}
+	unsigned totalUpdateCount()   const			{ return _totalUpdateCount;		}
 
 private:
 	unsigned _entryAttemptCount	 = 0;
@@ -74,10 +75,10 @@ private:
 struct A
 	: FSM::State
 {
-	void enter(PlanControl&)													{}
+	void enter	(PlanControl&)													{}
 	void reenter(PlanControl&)													{}
-	void update(FullControl&)													{}
-	void exit(PlanControl&)														{}
+	void update	(FullControl&)													{}
+	void exit	(PlanControl&)													{}
 };
 
 //------------------------------------------------------------------------------
@@ -85,12 +86,24 @@ struct A
 struct B
 	: FSM::State
 {
+	void entryGuard(GuardControl& control) {
+		REQUIRE(control.pendingTransition().payload());
+		REQUIRE(control.pendingTransition().payload()->value == 5);
+
+		REQUIRE(control.currentTransition().payload() == nullptr);
+	}
+
+	void enter(PlanControl& control) {
+		REQUIRE(control.currentTransition().payload());
+		REQUIRE(control.currentTransition().payload()->value == 5);
+	}
+
 	void update(FullControl& control) {
-		control.changeWith<C>(Payload{});
+		control.changeWith<C>(Payload{1});
 	}
 
 	void react(const Action&, FullControl& control) {
-		control.changeWith<C>(Payload{});
+		control.changeWith<C>(Payload{2});
 	}
 
 	using FSM::State::react;
@@ -106,15 +119,35 @@ struct C
 	void entryGuard(GuardControl& control) {
 		switch (entryAttemptCount()) {
 		case 1:
+			REQUIRE(control.pendingTransition().payload());
+			REQUIRE(control.pendingTransition().payload()->value == 1);
+
 			control.cancelPendingTransition();
 			break;
 
 		case 2:
+			REQUIRE(control.pendingTransition().payload());
+			REQUIRE(control.pendingTransition().payload()->value == 2);
+
 			control.cancelPendingTransition();
-			control.changeWith<D>(Payload{});
+			control.changeWith<D>(Payload{3});
 			break;
 
-		case 3:
+		default:
+			FFSM2_BREAK();
+		}
+	}
+
+	void enter(PlanControl& control) {
+		switch (entryAttemptCount()) {
+		case 1:
+			REQUIRE(control.currentTransition().payload());
+			REQUIRE(control.currentTransition().payload()->value == 1);
+			break;
+
+		case 2:
+			REQUIRE(control.currentTransition().payload());
+			REQUIRE(control.currentTransition().payload()->value == 2);
 			break;
 
 		default:
@@ -131,14 +164,18 @@ struct C
 
 struct D
 	: FSM::State
-{};
-
-//------------------------------------------------------------------------------
-
-struct E
-	: FSM::State
 {
-	//void exitGuard(GuardControl&)												{}
+	void entryGuard(GuardControl& control) {
+		REQUIRE(control.pendingTransition().payload());
+		REQUIRE(control.pendingTransition().payload()->value == 3);
+
+		REQUIRE(control.currentTransition().payload() == nullptr);
+	}
+
+	void enter(PlanControl& control) {
+		REQUIRE(control.currentTransition().payload());
+		REQUIRE(control.currentTransition().payload()->value == 3);
+	}
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -154,7 +191,7 @@ void step1(FSM::Instance& machine, Logger& logger) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 void step2(FSM::Instance& machine, Logger& logger) {
-	machine.immediateChangeWith<A>(Payload{});
+	machine.immediateChangeWith<A>(Payload{4});
 
 	logger.assertSequence({
 		{							Event::Type::CHANGE,	FSM::stateId<A>() },
@@ -168,12 +205,15 @@ void step2(FSM::Instance& machine, Logger& logger) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 void step3(FSM::Instance& machine, Logger& logger) {
-	machine.immediateChangeWith<B>(Payload{});
+	machine.immediateChangeWith<B>(Payload{5});
 
 	logger.assertSequence({
 		{							Event::Type::CHANGE,	FSM::stateId<B>() },
 
+		{ FSM::stateId<B>(),		Event::Type::ENTRY_GUARD },
+
 		{ FSM::stateId<A>(),		Event::Type::EXIT },
+		{ FSM::stateId<B>(),		Event::Type::ENTER },
 	});
 
 	REQUIRE(machine.activeStateId() == FSM::stateId<B>());
@@ -213,6 +253,9 @@ void step5(FSM::Instance& machine, Logger& logger) {
 
 		{ FSM::stateId<C>(),		Event::Type::CANCEL_PENDING },
 		{ FSM::stateId<C>(),		Event::Type::CHANGE,	FSM::stateId<D>() },
+
+		{ FSM::stateId<D>(),		Event::Type::ENTRY_GUARD },
+		{ FSM::stateId<D>(),		Event::Type::ENTER },
 	});
 
 	REQUIRE(machine.activeStateId() == FSM::stateId<D>());

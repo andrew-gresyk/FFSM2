@@ -171,7 +171,11 @@ FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::u
 					_core.planData.tasksSuccesses.get(it->origin))
 				{
 					Origin origin{*this, it->origin};
-					changeTo(it->destination);
+
+					if (const Payload* const payload = it->payload())
+						changeWith(it->destination, *it->payload());
+					else
+						changeTo  (it->destination);
 
 					_core.planData.tasksSuccesses.clear(it->origin);
 					it.remove();
