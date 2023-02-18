@@ -32,8 +32,8 @@ Header-only flat FSM framework in C++11, with fully statically-defined structure
 
 ## Quick Start
 
-- **[Minimal Example](../../wiki/Overview-Minimal-Example)**
-- **[Extended Tutorial](../../wiki/Overview-Extended-Tutorial)**
+- **[Minimal Example](https://github.com/andrew-gresyk/FFSM2/wiki/Overview-Minimal-Example)**
+- **[Extended Tutorial](https://github.com/andrew-gresyk/FFSM2/wiki/Overview-Extended-Tutorial)**
 
 ---
 
@@ -46,7 +46,7 @@ Header-only flat FSM framework in C++11, with fully statically-defined structure
 
 ## Documentation
 
-- **[Wiki](../../wiki)**
+- **[Wiki](https://github.com/andrew-gresyk/FFSM2/wiki)**
 
 ---
 
