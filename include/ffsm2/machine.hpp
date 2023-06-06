@@ -647,15 +647,19 @@ public:
 	static constexpr Long BIT_CAPACITY	= NBitCapacity;
 	static constexpr Long BYTE_COUNT	= contain(BIT_CAPACITY, 8u);
 
-	using Data = uint8_t[BYTE_COUNT];
+	using StreamBuffer	= StreamBufferT<BIT_CAPACITY>;
+	using Data			= uint8_t	   [BYTE_COUNT	];
 
 	FFSM2_CONSTEXPR(14)	void clear()									noexcept	{ fill(_data, 0);	}
 
 	FFSM2_CONSTEXPR(14)		  Data& data()								noexcept	{ return _data;		}
 	FFSM2_CONSTEXPR(11)	const Data& data()						  const noexcept	{ return _data;		}
 
+	FFSM2_CONSTEXPR(14) bool operator == (const StreamBuffer& s)  const noexcept;
+	FFSM2_CONSTEXPR(14) bool operator != (const StreamBuffer& s)  const noexcept;
+
 private:
-	Data _data;
+	Data _data {};
 };
 
 template <Long NBitCapacity>
@@ -720,6 +724,28 @@ namespace ffsm2 {
 namespace detail {
 
 template <Long NBC>
+FFSM2_CONSTEXPR(14)
+bool
+StreamBufferT<NBC>::operator == (const StreamBuffer& buffer) const noexcept {
+	for (Long i = 0; i < BYTE_COUNT; ++i)
+		if (_data[i] != buffer._data[i])
+			return false;
+
+	return true;
+}
+
+template <Long NBC>
+FFSM2_CONSTEXPR(14)
+bool
+StreamBufferT<NBC>::operator != (const StreamBuffer& buffer) const noexcept {
+	for (Long i = 0; i < BYTE_COUNT; ++i)
+		if (_data[i] != buffer._data[i])
+			return true;
+
+	return false;
+}
+
+template <Long NBC>
 template <Short NBitWidth>
 FFSM2_CONSTEXPR(14)
 void
@@ -757,30 +783,29 @@ BitReadStreamT<NBC>::read() noexcept {
 	constexpr Short BIT_WIDTH = NBitWidth;
 	static_assert(BIT_WIDTH > 0, "STATIC ASSERT");
 
-	FFSM2_ASSERT(_cursor <= BIT_CAPACITY);
+	FFSM2_ASSERT(_cursor + BIT_WIDTH <= BIT_CAPACITY);
 
 	using Item = UBitWidth<BIT_WIDTH>;
 
 	Item item = 0;
-	Short itemCursor = 0;
 
-	for (Short itemWidth = BIT_WIDTH; itemWidth; )
-		if (FFSM2_CHECKED(_cursor + itemWidth <= BIT_CAPACITY)) {
-			const Long	byteIndex		= _cursor >> 3;
-			const uint8_t& byte			= _buffer._data[byteIndex];
+	for (Short itemCursor = 0, itemWidth = BIT_WIDTH; itemWidth; ) {
+		const Long	byteIndex		= _cursor >> 3;
+		const uint8_t& byte			= _buffer._data[byteIndex];
 
-			const Short byteChunkStart	= _cursor & 0x7;
-			const Short byteDataWidth	= 8 - byteChunkStart;
-			const Short byteChunkWidth	= min(byteDataWidth, itemWidth);
-			const Short byteChunkMask	= (1 << byteChunkWidth) - 1;
-			const Item	byteChunk		= (byte >> byteChunkStart) & byteChunkMask;
-			const Item	itemChunk		= byteChunk << itemCursor;
+		const Short byteChunkStart	= _cursor & 0x7;
+		const Short byteDataWidth	= 8 - byteChunkStart;
+		const Short byteChunkWidth	= min(byteDataWidth, itemWidth);
+		const Short byteChunkMask	= (1 << byteChunkWidth) - 1;
 
-			item		|= itemChunk;
-			itemCursor	+= byteChunkWidth;
-			itemWidth	-= byteChunkWidth;
-			_cursor		+= byteChunkWidth;
-		}
+		const Item	byteChunk		= (byte >> byteChunkStart) & byteChunkMask;
+		const Item	itemChunk		= byteChunk << itemCursor;
+
+		item		|= itemChunk;
+		itemCursor	+= byteChunkWidth;
+		itemWidth	-= byteChunkWidth;
+		_cursor		+= byteChunkWidth;
+	}
 
 	return item;
 }
@@ -1231,6 +1256,20 @@ using LoggerInterface = LoggerInterfaceT<>;
 namespace ffsm2 {
 namespace detail {
 
+template <typename T>
+FFSM2_CONSTEXPR(11)
+T
+filler()																noexcept	{
+	return T{};
+}
+
+template <>
+FFSM2_CONSTEXPR(11)
+Short
+filler<Short>()															noexcept	{
+	return INVALID_SHORT;
+}
+
 template <typename T, Long NCapacity>
 class StaticArrayT final {
 	template <typename>
@@ -1258,7 +1297,8 @@ public:
 	FFSM2_CONSTEXPR(11)	Index count()							  const noexcept	{ return CAPACITY;					}
 
 	FFSM2_CONSTEXPR(14)	void fill(const Item filler)					noexcept;
-	FFSM2_CONSTEXPR(14)	void clear()									noexcept	{ fill(INVALID_SHORT);				}
+	FFSM2_CONSTEXPR(14)	void clear()									noexcept	{ fill(filler<Item>());				}
+	FFSM2_CONSTEXPR(14)	bool empty()							  const noexcept;
 
 	FFSM2_CONSTEXPR(14)	 Iterator  begin()								noexcept	{ return  Iterator(*this, first());	}
 	FFSM2_CONSTEXPR(11)	CIterator  begin()						  const noexcept	{ return CIterator(*this, first());	}
@@ -1300,8 +1340,6 @@ public:
 	static constexpr Index CAPACITY	= NCapacity;
 
 public:
-	FFSM2_CONSTEXPR(14)	 void clear()										noexcept	{ _count = 0;						}
-
 	template <typename... TArgs>
 	FFSM2_CONSTEXPR(14)	Index emplace(const TArgs &... args)				noexcept;
 
@@ -1315,6 +1353,9 @@ public:
 	FFSM2_CONSTEXPR(14)	const Item& operator[] (const N index)		  const noexcept;
 
 	FFSM2_CONSTEXPR(11)	Index  count()								  const noexcept	{ return _count;					}
+
+	FFSM2_CONSTEXPR(14)	 void clear()										noexcept	{ _count = 0;						}
+	FFSM2_CONSTEXPR(11)	 bool empty()								  const noexcept	{ return _count == 0;				}
 
 	FFSM2_CONSTEXPR(14)	ArrayT& operator += (const Item & item)				noexcept;
 	FFSM2_CONSTEXPR(14)	ArrayT& operator += (	   Item&& item)				noexcept;
@@ -1382,6 +1423,17 @@ void
 StaticArrayT<T, NC>::fill(const Item filler) noexcept {
 	for (Item& item : _items)
 		item = filler;
+}
+
+template <typename T, Long NC>
+FFSM2_CONSTEXPR(14)
+bool
+StaticArrayT<T, NC>::empty() const noexcept {
+	for (const Item& item : _items)
+		if (item != filler<Item>())
+			return false;
+
+	return true;
 }
 
 template <typename T, Long NC>
@@ -1478,6 +1530,8 @@ public:
 
 	FFSM2_CONSTEXPR(14)	void clear()									noexcept;
 
+	FFSM2_CONSTEXPR(14)	bool empty()							  const noexcept;
+
 	template <typename TIndex>
 	FFSM2_CONSTEXPR(14)	bool get  (const TIndex index)			  const noexcept;
 
@@ -1495,6 +1549,8 @@ template <>
 class BitArrayT<0> final {
 public:
 	FFSM2_CONSTEXPR(14)	void clear()									noexcept	{}
+
+	FFSM2_CONSTEXPR(11)	bool empty()							  const noexcept	{ return true;	}
 };
 
 }
@@ -1514,6 +1570,17 @@ void
 BitArrayT<NCapacity>::clear() noexcept {
 	for (uint8_t& unit : _storage)
 		unit = uint8_t{0};
+}
+
+template <unsigned NCapacity>
+FFSM2_CONSTEXPR(14)
+bool
+BitArrayT<NCapacity>::empty() const noexcept {
+	for (const uint8_t& unit : _storage)
+		if (unit != uint8_t{0})
+			return false;
+
+	return true;
 }
 
 template <unsigned NCapacity>
@@ -1666,6 +1733,8 @@ private:
 	using Item		= TaskT<Payload>;
 
 public:
+	FFSM2_CONSTEXPR(14)	 void clear()											noexcept;
+
 	template <typename... TArgs>
 	FFSM2_CONSTEXPR(14)	Index emplace(TArgs&&... args)							noexcept;
 
@@ -1674,7 +1743,8 @@ public:
 	FFSM2_CONSTEXPR(14)		  Item& operator[] (const Index i)					noexcept;
 	FFSM2_CONSTEXPR(11)	const Item& operator[] (const Index i)			  const noexcept;
 
-	FFSM2_CONSTEXPR(11)	Index count()									  const noexcept	{ return _count;	}
+	FFSM2_CONSTEXPR(11)	Index count()									  const noexcept	{ return _count;		}
+	FFSM2_CONSTEXPR(11)	bool  empty()									  const noexcept	{ return _count == 0;	}
 
 private:
 	FFSM2_IF_ASSERT(void verifyStructure(const Index occupied = INVALID)  const noexcept);
@@ -1682,8 +1752,8 @@ private:
 private:
 	Index _vacantHead = 0;
 	Index _vacantTail = 0;
-	Index _last  = 0;
-	Index _count = 0;
+	Index _last		  = 0;
+	Index _count	  = 0;
 	Item _items[CAPACITY] {};
 };
 
@@ -1698,6 +1768,16 @@ class TaskListT<TItem, 0> {};
 
 namespace ffsm2 {
 namespace detail {
+
+template <typename TP, Long NC>
+FFSM2_CONSTEXPR(14)
+void
+TaskListT<TP, NC>::clear() noexcept {
+	_vacantHead	= 0;
+	_vacantTail	= 0;
+	_last		= 0;
+	_count		= 0;
+}
 
 template <typename TP, Long NC>
 template <typename... TA>
@@ -1878,7 +1958,10 @@ struct ArgsT;
 struct Registry final {
 	FFSM2_CONSTEXPR(11)	bool isActive()							  const noexcept	{ return active != INVALID_SHORT;	}
 
-	FFSM2_CONSTEXPR(14)	void clearRequests()							noexcept	{ requested = INVALID_SHORT;		}
+	FFSM2_CONSTEXPR(14)	void clearRequests			()					noexcept	{		 requested  = INVALID_SHORT;							}
+	FFSM2_CONSTEXPR(14)	void clear					()					noexcept	{		 requested  = INVALID_SHORT;   active  = INVALID_SHORT;	}
+
+	FFSM2_CONSTEXPR(11)	bool empty					()			  const noexcept	{ return requested == INVALID_SHORT && active == INVALID_SHORT;	}
 
 	Short requested	= INVALID_SHORT;
 	Short active	= INVALID_SHORT;
@@ -1925,6 +2008,8 @@ struct TaskLink final {
 struct Bounds final {
 	Long first		= INVALID_LONG;
 	Long last		= INVALID_LONG;
+
+	FFSM2_CONSTEXPR(14) void clear()									noexcept	{ first = INVALID_LONG; last = INVALID_LONG;	}
 };
 
 #pragma pack(pop)
@@ -1962,7 +2047,7 @@ struct PlanDataT<ArgsT<TContext
 	static constexpr Long  STATE_COUNT	 = StateList::SIZE;
 	static constexpr Short TASK_CAPACITY = NTaskCapacity;
 
-	using Task			 = TaskT<Payload>;
+	using Task			 = TaskT	   <Payload>;
 	using Tasks			 = TaskListT   <Payload,  TASK_CAPACITY>;
 	using TaskLinks		 = StaticArrayT<TaskLink, TASK_CAPACITY>;
 	using Payloads		 = StaticArrayT<Payload,  TASK_CAPACITY>;
@@ -1985,6 +2070,7 @@ struct PlanDataT<ArgsT<TContext
 	FFSM2_CONSTEXPR(14)	void verifyEmptyStatus(const StateID stateId) const noexcept;
 
 	FFSM2_CONSTEXPR(14)	void clearRegionStatuses()							noexcept;
+	FFSM2_CONSTEXPR(14)	void clear()										noexcept;
 
 #if FFSM2_ASSERT_AVAILABLE()
 	FFSM2_CONSTEXPR(14)	void verifyPlans()							  const noexcept	{ FFSM2_ASSERT(tasks.count() == verifyPlan());	}
@@ -2008,8 +2094,8 @@ struct PlanDataT<ArgsT<TContext
 {
 	using StateList		= TStateList;
 
-	static constexpr Long  STATE_COUNT	 = StateList::SIZE;
-	static constexpr Short TASK_CAPACITY = NTaskCapacity;
+	static constexpr Long STATE_COUNT	= StateList::SIZE;
+	static constexpr Long TASK_CAPACITY	= NTaskCapacity;
 
 	using Task			= TaskT<void>;
 	using Tasks			= TaskListT	  <void,	 TASK_CAPACITY>;
@@ -2031,6 +2117,7 @@ struct PlanDataT<ArgsT<TContext
 	FFSM2_CONSTEXPR(14)	void verifyEmptyStatus(const StateID stateId) const noexcept;
 
 	FFSM2_CONSTEXPR(14)	void clearRegionStatuses()							noexcept;
+	FFSM2_CONSTEXPR(14)	void clear()										noexcept;
 
 #if FFSM2_ASSERT_AVAILABLE()
 	FFSM2_CONSTEXPR(14)	void verifyPlans()							  const noexcept	{ FFSM2_ASSERT(tasks.count() == verifyPlan());	}
@@ -2121,6 +2208,23 @@ PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::clea
 	subStatus .clear();
 }
 
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
+FFSM2_CONSTEXPR(14)
+void
+PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::clear() noexcept {
+	tasks		  .clear();
+	taskLinks	  .clear();
+	taskPayloads  .clear();
+	payloadExists .clear();
+
+	tasksBounds	  .clear();
+	tasksSuccesses.clear();
+	tasksFailures .clear();
+	planExists	 = false;
+
+	clearRegionStatuses();
+}
+
 #if FFSM2_ASSERT_AVAILABLE()
 
 template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
@@ -2194,6 +2298,21 @@ void
 PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::clearRegionStatuses() noexcept {
 	headStatus.clear();
 	subStatus .clear();
+}
+
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC>
+FFSM2_CONSTEXPR(14)
+void
+PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::clear() noexcept {
+	tasks		  .clear();
+	taskLinks	  .clear();
+
+	tasksBounds	  .clear();
+	tasksSuccesses.clear();
+	tasksFailures .clear();
+	planExists	 = false;
+
+	clearRegionStatuses();
 }
 
 #if FFSM2_ASSERT_AVAILABLE()
@@ -3703,10 +3822,11 @@ FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::u
 		plan().clear();
 	} else if (subStatus.result == Status::Result::SUCCESS) {
 		if (Plan p = plan()) {
-			for (auto it = p.first(); it; ++it)
-				if (isActive(it->origin) &&
-					_core.planData.tasksSuccesses.get(it->origin))
-				{
+			for (auto it = p.first();
+				 it && isActive(it->origin);
+				 ++it)
+			{
+				if (_core.planData.tasksSuccesses.get(it->origin)) {
 					Origin origin{*this, it->origin};
 
 					if (const Payload* const payload = it->payload())
@@ -3719,6 +3839,7 @@ FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::u
 
 					break;
 				}
+			}
 		} else {
 			_status.result = Status::Result::SUCCESS;
 			headState.wrapPlanSucceeded(*this);
@@ -3761,10 +3882,11 @@ FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::
 		plan().clear();
 	} else if (subStatus.result == Status::Result::SUCCESS) {
 		if (Plan p = plan()) {
-			for (auto it = p.first(); it; ++it)
-				if (isActive(it->origin) &&
-					_core.planData.tasksSuccesses.get(it->origin))
-				{
+			for (auto it = p.first();
+				 it && isActive(it->origin);
+				 ++it)
+			{
+				if (_core.planData.tasksSuccesses.get(it->origin)) {
 					Origin origin{*this, it->origin};
 					changeTo(it->destination);
 
@@ -3773,6 +3895,7 @@ FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::
 
 					break;
 				}
+			}
 		} else {
 			_status.result = Status::Result::SUCCESS;
 			headState.wrapPlanSucceeded(*this);
@@ -4776,12 +4899,13 @@ struct RF_ final {
 
 #if FFSM2_SERIALIZATION_AVAILABLE()
 	static constexpr Long  ACTIVE_BITS			= Apex::ACTIVE_BITS;
+	static constexpr Long  SERIAL_BITS			= 1 + ACTIVE_BITS;
 #endif
 
 	using Args			= ArgsT<Context
 							  , TConfig
 							  , StateList
-							  FFSM2_IF_SERIALIZATION(, ACTIVE_BITS)
+							  FFSM2_IF_SERIALIZATION(, SERIAL_BITS)
 							  , SUBSTITUTION_LIMIT
 							  FFSM2_IF_PLANS(, TASK_CAPACITY)
 							  , Payload>;
@@ -6052,6 +6176,9 @@ public:
 	template <typename TState>
 	FFSM2_CONSTEXPR(14)	void changeTo			()											noexcept	{ changeTo (stateId<TState>());		}
 
+#if FFSM2_UTILITY_THEORY_AVAILABLE()
+#endif
+
 	/// @brief Transition into a state
 	///   (if transitioning into a region, acts depending on the region type)
 	/// @param stateId Destination state identifier
@@ -6061,25 +6188,6 @@ public:
 	/// @tparam TState Destination state type
 	template <typename TState>
 	FFSM2_CONSTEXPR(14)	void immediateChangeTo	()											noexcept	{ immediateChangeTo	(stateId<TState>());			}
-
-#if FFSM2_SERIALIZATION_AVAILABLE()
-
-	/// @brief Buffer for serialization
-	/// @see https://doc.hfsm.dev/user-guide/debugging-and-tools/serialization
-	/// @see FFSM2_ENABLE_SERIALIZATION
-	using SerialBuffer			= typename Args::SerialBuffer;
-
-	/// @brief Serialize FSM into 'buffer'
-	/// @param buffer 'SerialBuffer' to serialize to
-	/// @see FFSM2_ENABLE_SERIALIZATION
-	FFSM2_CONSTEXPR(14)	void save(		SerialBuffer& buffer)						  const noexcept;
-
-	/// @brief De-serialize FSM from 'buffer'
-	/// @param buffer 'SerialBuffer' to de-serialize from
-	/// @see FFSM2_ENABLE_SERIALIZATION
-	FFSM2_CONSTEXPR(14)	void load(const SerialBuffer& buffer)								noexcept;
-
-#endif
 
 #if FFSM2_TRANSITION_HISTORY_AVAILABLE()
 
@@ -6122,6 +6230,11 @@ protected:
 	FFSM2_CONSTEXPR(14)	bool cancelledByGuards(const Transition& currentTransition,
 											   const Transition& pendingTransition)			noexcept;
 
+#if FFSM2_SERIALIZATION_AVAILABLE()
+	FFSM2_CONSTEXPR(14)	void save(WriteStream& stream)								  const noexcept;
+	FFSM2_CONSTEXPR(14)	void load( ReadStream& stream)										noexcept;
+#endif
+
 protected:
 	Core _core;
 	Apex _apex;
@@ -6150,6 +6263,12 @@ protected:
 	using typename Base::Context;
 	using typename Base::PureContext;
 
+#if FFSM2_SERIALIZATION_AVAILABLE()
+	using typename Base::Args;
+	using typename Base::WriteStream;
+	using typename Base::ReadStream;
+#endif
+
 #if FFSM2_LOG_INTERFACE_AVAILABLE()
 	using typename Base::Logger;
 #endif
@@ -6166,10 +6285,35 @@ public:
 
 	FFSM2_CONSTEXPR(20)	~RV_()																	noexcept;
 
-protected:
+#if FFSM2_SERIALIZATION_AVAILABLE()
+
+	/// @brief Buffer for serialization
+	/// @see `FFSM2_ENABLE_SERIALIZATION`
+	using SerialBuffer			= typename Args::SerialBuffer;
+
+	/// @brief Serialize FSM into 'buffer'
+	/// @param buffer `SerialBuffer` to serialize to
+	/// @see `FFSM2_ENABLE_SERIALIZATION`
+	FFSM2_CONSTEXPR(14)	void save(		SerialBuffer& buffer)							  const noexcept;
+
+	/// @brief De-serialize FSM from 'buffer'
+	/// @param buffer `SerialBuffer` to de-serialize from
+	/// @see `FFSM2_ENABLE_SERIALIZATION`
+	FFSM2_CONSTEXPR(14)	void load(const SerialBuffer& buffer)									noexcept;
+
+#endif
+
+private:
+#if FFSM2_SERIALIZATION_AVAILABLE()
+	using Base::save;
+	using Base::load;
+#endif
+
+private:
 	using Base::initialEnter;
 	using Base::finalExit;
 
+protected:
 #if FFSM2_TRANSITION_HISTORY_AVAILABLE()
 	using Base::_core;
 	using Base::_apex;
@@ -6188,6 +6332,15 @@ class RV_		   <G_<NFeatureTag, TContext, Manual, NSubstitutionLimit FFSM2_IF_PLA
 	: public	 R_<G_<NFeatureTag, TContext, Manual, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>
 {
 	using Base = R_<G_<NFeatureTag, TContext, Manual, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
+
+protected:
+#if FFSM2_SERIALIZATION_AVAILABLE()
+	using typename Base::PlanControl;
+
+	using typename Base::Args;
+	using typename Base::WriteStream;
+	using typename Base::ReadStream;
+#endif
 
 public:
 	using typename Base::Transition;
@@ -6214,6 +6367,24 @@ public:
 	///   Can be used with UE4 to start / stop the FSM in BeginPlay() / EndPlay()
 	FFSM2_CONSTEXPR(14)	void exit()															noexcept	{ finalExit();		}
 
+#if FFSM2_SERIALIZATION_AVAILABLE()
+
+	/// @brief Buffer for serialization
+	/// @see `FFSM2_ENABLE_SERIALIZATION`
+	using SerialBuffer			= typename Args::SerialBuffer;
+
+	/// @brief Serialize FSM into 'buffer'
+	/// @param buffer `SerialBuffer` to serialize to
+	/// @see `FFSM2_ENABLE_SERIALIZATION`
+	FFSM2_CONSTEXPR(14)	void save(		SerialBuffer& buffer)							  const noexcept;
+
+	/// @brief De-serialize FSM from 'buffer'
+	/// @param buffer `SerialBuffer` to de-serialize from
+	/// @see `FFSM2_ENABLE_SERIALIZATION`
+	FFSM2_CONSTEXPR(14)	void load(const SerialBuffer& buffer)									noexcept;
+
+#endif
+
 #if FFSM2_TRANSITION_HISTORY_AVAILABLE()
 
 	/// @brief Start the FSM from a specific state
@@ -6224,18 +6395,26 @@ public:
 
 #endif
 
+private:
+#if FFSM2_SERIALIZATION_AVAILABLE()
+	using Base::save;
+	using Base::load;
+
+	FFSM2_CONSTEXPR(14)	void loadEnter(ReadStream& stream)										noexcept;
+#endif
+
 protected:
 	using Base::initialEnter;
 	using Base::finalExit;
 
 	using Base::_core;
 
-#if FFSM2_TRANSITION_HISTORY_AVAILABLE()
-	using Apex					= typename Base::Apex;
-
-	using Base::applyRequest;
-
+#if FFSM2_SERIALIZATION_AVAILABLE() || FFSM2_TRANSITION_HISTORY_AVAILABLE()
 	using Base::_apex;
+#endif
+
+#if FFSM2_TRANSITION_HISTORY_AVAILABLE()
+	using Base::applyRequest;
 #endif
 };
 
@@ -6592,59 +6771,6 @@ R_<TG, TA>::immediateChangeTo(const StateID stateId_) noexcept {
 
 	processRequest();
 }
-#if FFSM2_SERIALIZATION_AVAILABLE()
-
-template <typename TG, typename TA>
-FFSM2_CONSTEXPR(14)
-void
-R_<TG, TA>::save(SerialBuffer& _buffer) const noexcept {
-	FFSM2_ASSERT(_core.registry.isActive());
-
-	WriteStream stream{_buffer};
-
-	// TODO: save _core.registry
-	// TODO: save _requests
-	// TODO: save _rng						// FFSM2_IF_UTILITY_THEORY()
-	// TODO: save _core.planData			// FFSM2_IF_PLANS()
-	// TODO: save _core.previousTransition	// FFSM2_IF_TRANSITION_HISTORY()
-	// TODO: save _activityHistory			// FFSM2_IF_STRUCTURE_REPORT()
-
-	_apex.deepSaveActive(_core.registry, stream);
-}
-
-template <typename TG, typename TA>
-FFSM2_CONSTEXPR(14)
-void
-R_<TG, TA>::load(const SerialBuffer& buffer) noexcept {
-	FFSM2_ASSERT(_core.registry.isActive());
-
-	_core.request.clear();
-
-	Transition emptyTransition;
-	PlanControl control{_core, emptyTransition};
-
-	_apex.deepExit(control);
-
-	FFSM2_IF_TRANSITION_HISTORY(_core.previousTransition.clear());
-
-	_core.registry.clearRequests();
-	_core.request.clear();
-
-	ReadStream stream{buffer};
-
-	// TODO: load _core.registry
-	// TODO: load _requests
-	// TODO: load _rng						// FFSM2_IF_UTILITY_THEORY()
-	// TODO: load _core.planData			// FFSM2_IF_PLANS()
-	// TODO: load _core.previousTransition	// FFSM2_IF_TRANSITION_HISTORY()
-	// TODO: load _activityHistory			// FFSM2_IF_STRUCTURE_REPORT()
-
-	_apex.deepLoadRequested(_core.registry, stream);
-
-	_apex.deepEnter(control);
-}
-
-#endif
 
 #if FFSM2_TRANSITION_HISTORY_AVAILABLE()
 
@@ -6739,6 +6865,17 @@ R_<TG, TA>::finalExit() noexcept {
 	PlanControl control{_core, emptyTransition};
 
 	_apex.deepExit(control);
+
+	_core.registry.clear();
+	_core.request .clear();
+
+#if FFSM2_PLANS_AVAILABLE()
+	_core.planData.clear();
+#endif
+
+#if FFSM2_TRANSITION_HISTORY_AVAILABLE()
+	_core.previousTransition.clear();
+#endif
 }
 
 template <typename TG, typename TA>
@@ -6839,6 +6976,65 @@ R_<TG, TA>::cancelledByGuards(const Transition& currentTransition,
 		   _apex.deepForwardEntryGuard(guardControl);
 }
 
+#if FFSM2_SERIALIZATION_AVAILABLE()
+
+template <typename TG, typename TA>
+FFSM2_CONSTEXPR(14)
+void
+R_<TG, TA>::save(WriteStream& stream) const noexcept {
+	FFSM2_ASSERT(_core.registry.isActive());
+
+	_apex.deepSaveActive(_core.registry, stream);
+
+	// TODO: save(stream, _core.requests);
+
+#if FFSM2_PLANS_AVAILABLE()
+	// TODO: save(stream, _core.planData);
+#endif
+
+#if FFSM2_UTILITY_THEORY_AVAILABLE()
+	// TODO: save(stream, _core.rng);
+#endif
+
+#if FFSM2_TRANSITION_HISTORY_AVAILABLE()
+	// TODO: save(stream, _core.transitionTarget);
+	// TODO: save(stream, _core.previousTransition);
+#endif
+}
+
+template <typename TG, typename TA>
+FFSM2_CONSTEXPR(14)
+void
+R_<TG, TA>::load(ReadStream& stream) noexcept {
+	FFSM2_ASSERT(_core.registry.isActive());
+
+	_core.registry.clearRequests();
+	_apex.deepLoadRequested(_core.registry, stream);
+
+	_core.request.clear();
+	// TODO: load(stream, _core.requests);
+
+#if FFSM2_PLANS_AVAILABLE()
+	_core.planData.clear();
+	// TODO: load(stream, _core.planData);
+#endif
+
+#if FFSM2_UTILITY_THEORY_AVAILABLE()
+	// TODO: load(stream, _core.rng);
+#endif
+
+#if FFSM2_TRANSITION_HISTORY_AVAILABLE()
+	_core.previousTransition.clear();
+#endif
+
+	Transition emptyTransition;
+	PlanControl control{_core, emptyTransition};
+
+	_apex.deepChangeToRequested(control);
+}
+
+#endif
+
 #if FFSM2_STRUCTURE_REPORT_AVAILABLE()
 #endif
 
@@ -6883,6 +7079,66 @@ RV_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::~RV_() noexcept {
 	finalExit();
 }
 
+#if FFSM2_SERIALIZATION_AVAILABLE()
+
+template <FeatureTag NFT, typename TC, typename TV, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
+FFSM2_CONSTEXPR(14)
+void
+RV_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::save(SerialBuffer& buffer) const noexcept {
+	WriteStream stream{buffer};
+
+	stream.template write<1>(1);
+	save(stream);
+}
+
+template <FeatureTag NFT, typename TC, typename TV, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
+FFSM2_CONSTEXPR(14)
+void
+RV_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::load(const SerialBuffer& buffer) noexcept {
+	ReadStream stream{buffer};
+
+	if (FFSM2_CHECKED(stream.template read<1>()))
+		Base::load(stream);
+}
+
+#endif
+
+#if FFSM2_SERIALIZATION_AVAILABLE()
+
+template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
+FFSM2_CONSTEXPR(14)
+void
+RV_<G_<NFT, TC, Manual, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::save(SerialBuffer& buffer) const noexcept {
+	WriteStream stream{buffer};
+
+	if (isActive()) {
+		stream.template write<1>(1);
+
+		save(stream);
+	}
+	else
+		stream.template write<1>(0);
+}
+
+template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
+FFSM2_CONSTEXPR(14)
+void
+RV_<G_<NFT, TC, Manual, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::load(const SerialBuffer& buffer) noexcept {
+	ReadStream stream{buffer};
+
+	if (stream.template read<1>()) {
+		if (isActive())
+			Base::load(stream);
+		else
+			loadEnter (stream);
+	}
+	else
+		if (isActive())
+			finalExit();
+}
+
+#endif
+
 #if FFSM2_TRANSITION_HISTORY_AVAILABLE()
 
 template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
@@ -6906,6 +7162,34 @@ RV_<G_<NFT, TC, Manual, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::replayEnter(const S
 	_core.registry.clearRequests();
 
 	FFSM2_IF_ASSERT(FFSM2_IF_PLANS(_core.planData.verifyPlans()));
+}
+
+#endif
+
+#if FFSM2_SERIALIZATION_AVAILABLE()
+
+template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
+FFSM2_CONSTEXPR(14)
+void
+RV_<G_<NFT, TC, Manual, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::loadEnter(ReadStream& stream) noexcept {
+	FFSM2_ASSERT(_core.registry.empty());
+	_apex.deepLoadRequested(_core.registry, stream);
+
+	FFSM2_ASSERT(!_core.request);
+
+#if FFSM2_PLANS_AVAILABLE()
+	FFSM2_ASSERT(_core.planData.empty() == 0);
+#endif
+
+#if FFSM2_TRANSITION_HISTORY_AVAILABLE()
+	FFSM2_ASSERT(_core.transitionTargets  .empty());
+	FFSM2_ASSERT(_core.previousTransitions.empty());
+#endif
+
+	Transition emptyTransition;
+	PlanControl control{_core, emptyTransition};
+
+	_apex.deepEnter(control);
 }
 
 #endif

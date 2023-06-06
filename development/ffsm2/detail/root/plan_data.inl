@@ -91,6 +91,25 @@ PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::clea
 	subStatus .clear();
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC, typename TTP>
+FFSM2_CONSTEXPR(14)
+void
+PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::clear() noexcept {
+	tasks		  .clear();
+	taskLinks	  .clear();
+	taskPayloads  .clear();
+	payloadExists .clear();
+
+	tasksBounds	  .clear();
+	tasksSuccesses.clear();
+	tasksFailures .clear();
+	planExists	 = false;
+
+	clearRegionStatuses();
+}
+
 //------------------------------------------------------------------------------
 
 #if FFSM2_ASSERT_AVAILABLE()
@@ -174,6 +193,23 @@ void
 PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::clearRegionStatuses() noexcept {
 	headStatus.clear();
 	subStatus .clear();
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <typename TC, typename TG, typename TSL FFSM2_IF_SERIALIZATION(, Long NSB), Long NSL, Long NTC>
+FFSM2_CONSTEXPR(14)
+void
+PlanDataT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::clear() noexcept {
+	tasks		  .clear();
+	taskLinks	  .clear();
+
+	tasksBounds	  .clear();
+	tasksSuccesses.clear();
+	tasksFailures .clear();
+	planExists	 = false;
+
+	clearRegionStatuses();
 }
 
 //------------------------------------------------------------------------------

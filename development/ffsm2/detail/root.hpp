@@ -62,7 +62,6 @@ public:
 #endif
 
 public:
-
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	FFSM2_CONSTEXPR(11)	explicit R_(Context& context
@@ -193,6 +192,13 @@ public:
 	// COMMON
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#if FFSM2_UTILITY_THEORY_AVAILABLE()
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#endif
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	// COMMON
 
 	/// @brief Transition into a state
@@ -207,26 +213,6 @@ public:
 
 	// COMMON
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-#if FFSM2_SERIALIZATION_AVAILABLE()
-
-	/// @brief Buffer for serialization
-	/// @see https://doc.hfsm.dev/user-guide/debugging-and-tools/serialization
-	/// @see FFSM2_ENABLE_SERIALIZATION
-	using SerialBuffer			= typename Args::SerialBuffer;
-
-	/// @brief Serialize FSM into 'buffer'
-	/// @param buffer 'SerialBuffer' to serialize to
-	/// @see FFSM2_ENABLE_SERIALIZATION
-	FFSM2_CONSTEXPR(14)	void save(		SerialBuffer& buffer)						  const noexcept;
-
-	/// @brief De-serialize FSM from 'buffer'
-	/// @param buffer 'SerialBuffer' to de-serialize from
-	/// @see FFSM2_ENABLE_SERIALIZATION
-	FFSM2_CONSTEXPR(14)	void load(const SerialBuffer& buffer)								noexcept;
-
-#endif
-
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #if FFSM2_TRANSITION_HISTORY_AVAILABLE()
@@ -276,6 +262,10 @@ protected:
 	FFSM2_CONSTEXPR(14)	bool cancelledByGuards(const Transition& currentTransition,
 											   const Transition& pendingTransition)			noexcept;
 
+#if FFSM2_SERIALIZATION_AVAILABLE()
+	FFSM2_CONSTEXPR(14)	void save(WriteStream& stream)								  const noexcept;
+	FFSM2_CONSTEXPR(14)	void load( ReadStream& stream)										noexcept;
+#endif
 
 protected:
 	Core _core;
@@ -308,6 +298,12 @@ protected:
 	using typename Base::Context;
 	using typename Base::PureContext;
 
+#if FFSM2_SERIALIZATION_AVAILABLE()
+	using typename Base::Args;
+	using typename Base::WriteStream;
+	using typename Base::ReadStream;
+#endif
+
 #if FFSM2_LOG_INTERFACE_AVAILABLE()
 	using typename Base::Logger;
 #endif
@@ -324,10 +320,39 @@ public:
 
 	FFSM2_CONSTEXPR(20)	~RV_()																	noexcept;
 
-protected:
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+#if FFSM2_SERIALIZATION_AVAILABLE()
+
+	/// @brief Buffer for serialization
+	/// @see `FFSM2_ENABLE_SERIALIZATION`
+	using SerialBuffer			= typename Args::SerialBuffer;
+
+	/// @brief Serialize FSM into 'buffer'
+	/// @param buffer `SerialBuffer` to serialize to
+	/// @see `FFSM2_ENABLE_SERIALIZATION`
+	FFSM2_CONSTEXPR(14)	void save(		SerialBuffer& buffer)							  const noexcept;
+
+	/// @brief De-serialize FSM from 'buffer'
+	/// @param buffer `SerialBuffer` to de-serialize from
+	/// @see `FFSM2_ENABLE_SERIALIZATION`
+	FFSM2_CONSTEXPR(14)	void load(const SerialBuffer& buffer)									noexcept;
+
+#endif
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+private:
+#if FFSM2_SERIALIZATION_AVAILABLE()
+	using Base::save;
+	using Base::load;
+#endif
+
+private:
 	using Base::initialEnter;
 	using Base::finalExit;
 
+protected:
 #if FFSM2_TRANSITION_HISTORY_AVAILABLE()
 	using Base::_core;
 	using Base::_apex;
@@ -348,6 +373,15 @@ class RV_		   <G_<NFeatureTag, TContext, Manual, NSubstitutionLimit FFSM2_IF_PLA
 {
 	using Base = R_<G_<NFeatureTag, TContext, Manual, NSubstitutionLimit FFSM2_IF_PLANS(, NTaskCapacity), TPayload>, TApex>;
 
+protected:
+#if FFSM2_SERIALIZATION_AVAILABLE()
+	using typename Base::PlanControl;
+
+	using typename Base::Args;
+	using typename Base::WriteStream;
+	using typename Base::ReadStream;
+#endif
+
 public:
 	using typename Base::Transition;
 
@@ -359,11 +393,15 @@ private:
 public:
 	using Base::Base;
 
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 	/// @brief Check if FSM is active
 	/// @return FSM active status
 	FFSM2_CONSTEXPR(11)	bool isActive()												  const noexcept	{ return _core.registry.isActive();	}
 
 	using Base::isActive;
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	/// @brief Manually start the FSM
 	///   Can be used with UE4 to start / stop the FSM in BeginPlay() / EndPlay()
@@ -372,6 +410,28 @@ public:
 	/// @brief Manually stop the FSM
 	///   Can be used with UE4 to start / stop the FSM in BeginPlay() / EndPlay()
 	FFSM2_CONSTEXPR(14)	void exit()															noexcept	{ finalExit();		}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+#if FFSM2_SERIALIZATION_AVAILABLE()
+
+	/// @brief Buffer for serialization
+	/// @see `FFSM2_ENABLE_SERIALIZATION`
+	using SerialBuffer			= typename Args::SerialBuffer;
+
+	/// @brief Serialize FSM into 'buffer'
+	/// @param buffer `SerialBuffer` to serialize to
+	/// @see `FFSM2_ENABLE_SERIALIZATION`
+	FFSM2_CONSTEXPR(14)	void save(		SerialBuffer& buffer)							  const noexcept;
+
+	/// @brief De-serialize FSM from 'buffer'
+	/// @param buffer `SerialBuffer` to de-serialize from
+	/// @see `FFSM2_ENABLE_SERIALIZATION`
+	FFSM2_CONSTEXPR(14)	void load(const SerialBuffer& buffer)									noexcept;
+
+#endif
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #if FFSM2_TRANSITION_HISTORY_AVAILABLE()
 
@@ -383,18 +443,28 @@ public:
 
 #endif
 
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+private:
+#if FFSM2_SERIALIZATION_AVAILABLE()
+	using Base::save;
+	using Base::load;
+
+	FFSM2_CONSTEXPR(14)	void loadEnter(ReadStream& stream)										noexcept;
+#endif
+
 protected:
 	using Base::initialEnter;
 	using Base::finalExit;
 
 	using Base::_core;
 
-#if FFSM2_TRANSITION_HISTORY_AVAILABLE()
-	using Apex					= typename Base::Apex;
-
-	using Base::applyRequest;
-
+#if FFSM2_SERIALIZATION_AVAILABLE() || FFSM2_TRANSITION_HISTORY_AVAILABLE()
 	using Base::_apex;
+#endif
+
+#if FFSM2_TRANSITION_HISTORY_AVAILABLE()
+	using Base::applyRequest;
 #endif
 };
 
