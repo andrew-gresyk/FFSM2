@@ -250,8 +250,6 @@ R_<TG, TA>::finalExit() noexcept {
 #if FFSM2_TRANSITION_HISTORY_AVAILABLE()
 	_core.previousTransition.clear();
 #endif
-
-	FFSM2_IF_STRUCTURE_REPORT(udpateActivity());
 }
 
 //------------------------------------------------------------------------------
@@ -431,8 +429,6 @@ R_<TG, TA>::load(ReadStream& stream) noexcept {
 	PlanControl control{_core, emptyTransition};
 
 	_apex.deepChangeToRequested(control);
-
-	FFSM2_IF_STRUCTURE_REPORT(udpateActivity());
 }
 
 #endif
@@ -622,8 +618,6 @@ RV_<G_<NFT, TC, Manual, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::loadEnter(ReadStrea
 	PlanControl control{_core, emptyTransition};
 
 	_apex.deepEnter(control);
-
-	FFSM2_IF_STRUCTURE_REPORT(udpateActivity());
 }
 
 #endif
