@@ -191,12 +191,13 @@ struct RF_ final {
 
 #if FFSM2_SERIALIZATION_AVAILABLE()
 	static constexpr Long  ACTIVE_BITS			= Apex::ACTIVE_BITS;
+	static constexpr Long  SERIAL_BITS			= 1 + ACTIVE_BITS;
 #endif
 
 	using Args			= ArgsT<Context
 							  , TConfig
 							  , StateList
-							  FFSM2_IF_SERIALIZATION(, ACTIVE_BITS)
+							  FFSM2_IF_SERIALIZATION(, SERIAL_BITS)
 							  , SUBSTITUTION_LIMIT
 							  FFSM2_IF_PLANS(, TASK_CAPACITY)
 							  , Payload>;

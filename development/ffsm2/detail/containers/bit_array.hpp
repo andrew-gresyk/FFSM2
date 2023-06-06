@@ -18,6 +18,8 @@ public:
 
 	FFSM2_CONSTEXPR(14)	void clear()									noexcept;
 
+	FFSM2_CONSTEXPR(14)	bool empty()							  const noexcept;
+
 	template <typename TIndex>
 	FFSM2_CONSTEXPR(14)	bool get  (const TIndex index)			  const noexcept;
 
@@ -37,6 +39,8 @@ template <>
 class BitArrayT<0> final {
 public:
 	FFSM2_CONSTEXPR(14)	void clear()									noexcept	{}
+
+	FFSM2_CONSTEXPR(11)	bool empty()							  const noexcept	{ return true;	}
 };
 
 ////////////////////////////////////////////////////////////////////////////////

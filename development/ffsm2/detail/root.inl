@@ -139,62 +139,6 @@ R_<TG, TA>::immediateChangeTo(const StateID stateId_) noexcept {
 
 	processRequest();
 }
-//------------------------------------------------------------------------------
-#if FFSM2_SERIALIZATION_AVAILABLE()
-
-template <typename TG, typename TA>
-FFSM2_CONSTEXPR(14)
-void
-R_<TG, TA>::save(SerialBuffer& _buffer) const noexcept {
-	FFSM2_ASSERT(_core.registry.isActive());
-
-	WriteStream stream{_buffer};
-
-	// TODO: save _core.registry
-	// TODO: save _requests
-	// TODO: save _rng						// FFSM2_IF_UTILITY_THEORY()
-	// TODO: save _core.planData			// FFSM2_IF_PLANS()
-	// TODO: save _core.previousTransition	// FFSM2_IF_TRANSITION_HISTORY()
-	// TODO: save _activityHistory			// FFSM2_IF_STRUCTURE_REPORT()
-
-	_apex.deepSaveActive(_core.registry, stream);
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-template <typename TG, typename TA>
-FFSM2_CONSTEXPR(14)
-void
-R_<TG, TA>::load(const SerialBuffer& buffer) noexcept {
-	FFSM2_ASSERT(_core.registry.isActive());
-
-	_core.request.clear();
-
-	Transition emptyTransition;
-	PlanControl control{_core, emptyTransition};
-
-	_apex.deepExit(control);
-
-	FFSM2_IF_TRANSITION_HISTORY(_core.previousTransition.clear());
-
-	_core.registry.clearRequests();
-	_core.request.clear();
-
-	ReadStream stream{buffer};
-
-	// TODO: load _core.registry
-	// TODO: load _requests
-	// TODO: load _rng						// FFSM2_IF_UTILITY_THEORY()
-	// TODO: load _core.planData			// FFSM2_IF_PLANS()
-	// TODO: load _core.previousTransition	// FFSM2_IF_TRANSITION_HISTORY()
-	// TODO: load _activityHistory			// FFSM2_IF_STRUCTURE_REPORT()
-
-	_apex.deepLoadRequested(_core.registry, stream);
-
-	_apex.deepEnter(control);
-}
-
-#endif
 
 //------------------------------------------------------------------------------
 
@@ -295,6 +239,19 @@ R_<TG, TA>::finalExit() noexcept {
 	PlanControl control{_core, emptyTransition};
 
 	_apex.deepExit(control);
+
+	_core.registry.clear();
+	_core.request .clear();
+
+#if FFSM2_PLANS_AVAILABLE()
+	_core.planData.clear();
+#endif
+
+#if FFSM2_TRANSITION_HISTORY_AVAILABLE()
+	_core.previousTransition.clear();
+#endif
+
+	FFSM2_IF_STRUCTURE_REPORT(udpateActivity());
 }
 
 //------------------------------------------------------------------------------
@@ -409,6 +366,79 @@ R_<TG, TA>::cancelledByGuards(const Transition& currentTransition,
 
 //------------------------------------------------------------------------------
 
+#if FFSM2_SERIALIZATION_AVAILABLE()
+
+template <typename TG, typename TA>
+FFSM2_CONSTEXPR(14)
+void
+R_<TG, TA>::save(WriteStream& stream) const noexcept {
+	FFSM2_ASSERT(_core.registry.isActive());
+
+	_apex.deepSaveActive(_core.registry, stream);
+
+	// TODO: save(stream, _core.requests);
+
+#if FFSM2_PLANS_AVAILABLE()
+	// TODO: save(stream, _core.planData);
+#endif
+
+#if FFSM2_UTILITY_THEORY_AVAILABLE()
+	// TODO: save(stream, _core.rng);
+#endif
+
+#if FFSM2_TRANSITION_HISTORY_AVAILABLE()
+	// TODO: save(stream, _core.transitionTarget);
+	// TODO: save(stream, _core.previousTransition);
+#endif
+
+#if FFSM2_STRUCTURE_REPORT_AVAILABLE()
+	// TODO: save(stream, _activityHistory);
+#endif
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <typename TG, typename TA>
+FFSM2_CONSTEXPR(14)
+void
+R_<TG, TA>::load(ReadStream& stream) noexcept {
+	FFSM2_ASSERT(_core.registry.isActive());
+
+	_core.registry.clearRequests();
+	_apex.deepLoadRequested(_core.registry, stream);
+
+	_core.request.clear();
+	// TODO: load(stream, _core.requests);
+
+#if FFSM2_PLANS_AVAILABLE()
+	_core.planData.clear();
+	// TODO: load(stream, _core.planData);
+#endif
+
+#if FFSM2_UTILITY_THEORY_AVAILABLE()
+	// TODO: load(stream, _core.rng);
+#endif
+
+#if FFSM2_TRANSITION_HISTORY_AVAILABLE()
+	_core.previousTransition.clear();
+#endif
+
+#if FFSM2_STRUCTURE_REPORT_AVAILABLE()
+	// TODO: load(stream, _activityHistory);
+#endif
+
+	Transition emptyTransition;
+	PlanControl control{_core, emptyTransition};
+
+	_apex.deepChangeToRequested(control);
+
+	FFSM2_IF_STRUCTURE_REPORT(udpateActivity());
+}
+
+#endif
+
+//------------------------------------------------------------------------------
+
 #if FFSM2_STRUCTURE_REPORT_AVAILABLE()
 #endif
 
@@ -465,7 +495,75 @@ RV_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::~RV_() noexcept {
 	finalExit();
 }
 
+//------------------------------------------------------------------------------
+
+#if FFSM2_SERIALIZATION_AVAILABLE()
+
+template <FeatureTag NFT, typename TC, typename TV, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
+FFSM2_CONSTEXPR(14)
+void
+RV_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::save(SerialBuffer& buffer) const noexcept {
+	WriteStream stream{buffer};
+
+	stream.template write<1>(1);
+	save(stream);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <FeatureTag NFT, typename TC, typename TV, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
+FFSM2_CONSTEXPR(14)
+void
+RV_<G_<NFT, TC, TV, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::load(const SerialBuffer& buffer) noexcept {
+	ReadStream stream{buffer};
+
+	if (FFSM2_CHECKED(stream.template read<1>()))
+		Base::load(stream);
+}
+
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
+
+#if FFSM2_SERIALIZATION_AVAILABLE()
+
+template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
+FFSM2_CONSTEXPR(14)
+void
+RV_<G_<NFT, TC, Manual, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::save(SerialBuffer& buffer) const noexcept {
+	WriteStream stream{buffer};
+
+	if (isActive()) {
+		stream.template write<1>(1);
+
+		save(stream);
+	}
+	else
+		stream.template write<1>(0);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
+FFSM2_CONSTEXPR(14)
+void
+RV_<G_<NFT, TC, Manual, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::load(const SerialBuffer& buffer) noexcept {
+	ReadStream stream{buffer};
+
+	if (stream.template read<1>()) {
+		if (isActive())
+			Base::load(stream);
+		else
+			loadEnter (stream);
+	}
+	else
+		if (isActive())
+			finalExit();
+}
+
+#endif
+
+//------------------------------------------------------------------------------
 
 #if FFSM2_TRANSITION_HISTORY_AVAILABLE()
 
@@ -490,6 +588,42 @@ RV_<G_<NFT, TC, Manual, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::replayEnter(const S
 	_core.registry.clearRequests();
 
 	FFSM2_IF_ASSERT(FFSM2_IF_PLANS(_core.planData.verifyPlans()));
+}
+
+#endif
+
+//------------------------------------------------------------------------------
+
+#if FFSM2_SERIALIZATION_AVAILABLE()
+
+template <FeatureTag NFT, typename TC, Long NSL FFSM2_IF_PLANS(, Long NTC), typename TP, typename TA>
+FFSM2_CONSTEXPR(14)
+void
+RV_<G_<NFT, TC, Manual, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::loadEnter(ReadStream& stream) noexcept {
+	FFSM2_ASSERT(_core.registry.empty());
+	_apex.deepLoadRequested(_core.registry, stream);
+
+	FFSM2_ASSERT(!_core.request);
+
+#if FFSM2_PLANS_AVAILABLE()
+	FFSM2_ASSERT(_core.planData.empty() == 0);
+#endif
+
+#if FFSM2_TRANSITION_HISTORY_AVAILABLE()
+	FFSM2_ASSERT(_core.transitionTargets  .empty());
+	FFSM2_ASSERT(_core.previousTransitions.empty());
+#endif
+
+#if FFSM2_STRUCTURE_REPORT_AVAILABLE()
+	//FFSM2_ASSERT(_activityHistory.empty());
+#endif
+
+	Transition emptyTransition;
+	PlanControl control{_core, emptyTransition};
+
+	_apex.deepEnter(control);
+
+	FFSM2_IF_STRUCTURE_REPORT(udpateActivity());
 }
 
 #endif

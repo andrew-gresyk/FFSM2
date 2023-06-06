@@ -44,6 +44,8 @@ struct TaskLink final {
 struct Bounds final {
 	Long first		= INVALID_LONG;
 	Long last		= INVALID_LONG;
+
+	FFSM2_CONSTEXPR(14) void clear()									noexcept	{ first = INVALID_LONG; last = INVALID_LONG;	}
 };
 
 #pragma pack(pop)
@@ -85,7 +87,7 @@ struct PlanDataT<ArgsT<TContext
 	static constexpr Long  STATE_COUNT	 = StateList::SIZE;
 	static constexpr Short TASK_CAPACITY = NTaskCapacity;
 
-	using Task			 = TaskT<Payload>;
+	using Task			 = TaskT	   <Payload>;
 	using Tasks			 = TaskListT   <Payload,  TASK_CAPACITY>;
 	using TaskLinks		 = StaticArrayT<TaskLink, TASK_CAPACITY>;
 	using Payloads		 = StaticArrayT<Payload,  TASK_CAPACITY>;
@@ -108,6 +110,7 @@ struct PlanDataT<ArgsT<TContext
 	FFSM2_CONSTEXPR(14)	void verifyEmptyStatus(const StateID stateId) const noexcept;
 
 	FFSM2_CONSTEXPR(14)	void clearRegionStatuses()							noexcept;
+	FFSM2_CONSTEXPR(14)	void clear()										noexcept;
 
 #if FFSM2_ASSERT_AVAILABLE()
 	FFSM2_CONSTEXPR(14)	void verifyPlans()							  const noexcept	{ FFSM2_ASSERT(tasks.count() == verifyPlan());	}
@@ -133,8 +136,8 @@ struct PlanDataT<ArgsT<TContext
 {
 	using StateList		= TStateList;
 
-	static constexpr Long  STATE_COUNT	 = StateList::SIZE;
-	static constexpr Short TASK_CAPACITY = NTaskCapacity;
+	static constexpr Long STATE_COUNT	= StateList::SIZE;
+	static constexpr Long TASK_CAPACITY	= NTaskCapacity;
 
 	using Task			= TaskT<void>;
 	using Tasks			= TaskListT	  <void,	 TASK_CAPACITY>;
@@ -156,6 +159,7 @@ struct PlanDataT<ArgsT<TContext
 	FFSM2_CONSTEXPR(14)	void verifyEmptyStatus(const StateID stateId) const noexcept;
 
 	FFSM2_CONSTEXPR(14)	void clearRegionStatuses()							noexcept;
+	FFSM2_CONSTEXPR(14)	void clear()										noexcept;
 
 #if FFSM2_ASSERT_AVAILABLE()
 	FFSM2_CONSTEXPR(14)	void verifyPlans()							  const noexcept	{ FFSM2_ASSERT(tasks.count() == verifyPlan());	}
@@ -163,6 +167,7 @@ struct PlanDataT<ArgsT<TContext
 #endif
 };
 
+//------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 
 #endif

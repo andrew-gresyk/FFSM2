@@ -3,6 +3,24 @@ namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+template <typename T>
+FFSM2_CONSTEXPR(11)
+T
+filler()																noexcept	{
+	return T{};
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <>
+FFSM2_CONSTEXPR(11)
+Short
+filler<Short>()															noexcept	{
+	return INVALID_SHORT;
+}
+
+//------------------------------------------------------------------------------
+
 template <typename T, Long NCapacity>
 class StaticArrayT final {
 	template <typename>
@@ -30,7 +48,8 @@ public:
 	FFSM2_CONSTEXPR(11)	Index count()							  const noexcept	{ return CAPACITY;					}
 
 	FFSM2_CONSTEXPR(14)	void fill(const Item filler)					noexcept;
-	FFSM2_CONSTEXPR(14)	void clear()									noexcept	{ fill(INVALID_SHORT);				}
+	FFSM2_CONSTEXPR(14)	void clear()									noexcept	{ fill(filler<Item>());				}
+	FFSM2_CONSTEXPR(14)	bool empty()							  const noexcept;
 
 	FFSM2_CONSTEXPR(14)	 Iterator  begin()								noexcept	{ return  Iterator(*this, first());	}
 	FFSM2_CONSTEXPR(11)	CIterator  begin()						  const noexcept	{ return CIterator(*this, first());	}
@@ -76,8 +95,6 @@ public:
 	static constexpr Index CAPACITY	= NCapacity;
 
 public:
-	FFSM2_CONSTEXPR(14)	 void clear()										noexcept	{ _count = 0;						}
-
 	template <typename... TArgs>
 	FFSM2_CONSTEXPR(14)	Index emplace(const TArgs &... args)				noexcept;
 
@@ -92,8 +109,13 @@ public:
 
 	FFSM2_CONSTEXPR(11)	Index  count()								  const noexcept	{ return _count;					}
 
+	FFSM2_CONSTEXPR(14)	 void clear()										noexcept	{ _count = 0;						}
+	FFSM2_CONSTEXPR(11)	 bool empty()								  const noexcept	{ return _count == 0;				}
+
+	// SPECIFIC
 	FFSM2_CONSTEXPR(14)	ArrayT& operator += (const Item & item)				noexcept;
 	FFSM2_CONSTEXPR(14)	ArrayT& operator += (	   Item&& item)				noexcept;
+	// SPECIFIC
 
 	template <Long N>
 	FFSM2_CONSTEXPR(14)	ArrayT& operator += (const ArrayT<Item, N>& other)	noexcept;

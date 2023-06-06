@@ -166,10 +166,11 @@ FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::u
 		plan().clear();
 	} else if (subStatus.result == Status::Result::SUCCESS) {
 		if (Plan p = plan()) {
-			for (auto it = p.first(); it; ++it)
-				if (isActive(it->origin) &&
-					_core.planData.tasksSuccesses.get(it->origin))
-				{
+			for (auto it = p.first();
+				 it && isActive(it->origin);
+				 ++it)
+			{
+				if (_core.planData.tasksSuccesses.get(it->origin)) {
 					Origin origin{*this, it->origin};
 
 					if (const Payload* const payload = it->payload())
@@ -182,6 +183,7 @@ FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::u
 
 					break;
 				}
+			}
 		} else {
 			_status.result = Status::Result::SUCCESS;
 			headState.wrapPlanSucceeded(*this);
@@ -208,13 +210,12 @@ FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL FFSM2_IF_PLANS
 	}
 }
 
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ////////////////////////////////////////////////////////////////////////////////
 
 #if FFSM2_PLANS_AVAILABLE()
@@ -235,10 +236,11 @@ FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::
 		plan().clear();
 	} else if (subStatus.result == Status::Result::SUCCESS) {
 		if (Plan p = plan()) {
-			for (auto it = p.first(); it; ++it)
-				if (isActive(it->origin) &&
-					_core.planData.tasksSuccesses.get(it->origin))
-				{
+			for (auto it = p.first();
+				 it && isActive(it->origin);
+				 ++it)
+			{
+				if (_core.planData.tasksSuccesses.get(it->origin)) {
 					Origin origin{*this, it->origin};
 					changeTo(it->destination);
 
@@ -247,6 +249,7 @@ FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::
 
 					break;
 				}
+			}
 		} else {
 			_status.result = Status::Result::SUCCESS;
 			headState.wrapPlanSucceeded(*this);
