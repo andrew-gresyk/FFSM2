@@ -388,10 +388,6 @@ R_<TG, TA>::save(WriteStream& stream) const noexcept {
 	// TODO: save(stream, _core.transitionTarget);
 	// TODO: save(stream, _core.previousTransition);
 #endif
-
-#if FFSM2_STRUCTURE_REPORT_AVAILABLE()
-	// TODO: save(stream, _activityHistory);
-#endif
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -419,10 +415,6 @@ R_<TG, TA>::load(ReadStream& stream) noexcept {
 
 #if FFSM2_TRANSITION_HISTORY_AVAILABLE()
 	_core.previousTransition.clear();
-#endif
-
-#if FFSM2_STRUCTURE_REPORT_AVAILABLE()
-	// TODO: load(stream, _activityHistory);
 #endif
 
 	Transition emptyTransition;
@@ -608,10 +600,6 @@ RV_<G_<NFT, TC, Manual, NSL FFSM2_IF_PLANS(, NTC), TP>, TA>::loadEnter(ReadStrea
 #if FFSM2_TRANSITION_HISTORY_AVAILABLE()
 	FFSM2_ASSERT(_core.transitionTargets  .empty());
 	FFSM2_ASSERT(_core.previousTransitions.empty());
-#endif
-
-#if FFSM2_STRUCTURE_REPORT_AVAILABLE()
-	//FFSM2_ASSERT(_activityHistory.empty());
 #endif
 
 	Transition emptyTransition;
