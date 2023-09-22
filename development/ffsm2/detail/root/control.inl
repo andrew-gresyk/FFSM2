@@ -79,7 +79,7 @@ FFSM2_CONSTEXPR(14)
 void
 PlanControlT<TArgs>::resetRegion() noexcept
 {
-	_status.clear();
+	_taskStatus.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -124,7 +124,7 @@ template <typename TArgs>
 FFSM2_CONSTEXPR(14)
 void
 FullControlBaseT<TArgs>::succeed(const StateID stateId_) noexcept {
-	_status.result = Status::Result::SUCCESS;
+	_taskStatus.result = TaskStatus::SUCCESS;
 
 	_core.planData.tasksSuccesses.set(stateId_);
 
@@ -137,7 +137,7 @@ template <typename TArgs>
 FFSM2_CONSTEXPR(14)
 void
 FullControlBaseT<TArgs>::fail(const StateID stateId_) noexcept {
-	_status.result = Status::Result::FAILURE;
+	_taskStatus.result = TaskStatus::FAILURE;
 
 	_core.planData.tasksFailures.set(stateId_);
 
@@ -155,37 +155,44 @@ template <typename TState>
 FFSM2_CONSTEXPR(14)
 void
 FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::updatePlan(TState& headState,
-																						  const Status subStatus) noexcept
+																						  const TaskStatus subStatus) noexcept
 {
 	FFSM2_ASSERT(subStatus);
 
-	if (subStatus.result == Status::Result::FAILURE) {
-		_status.result = Status::Result::FAILURE;
+	if (subStatus.result == TaskStatus::FAILURE) {
+		_taskStatus.result = TaskStatus::FAILURE;
 		headState.wrapPlanFailed(*this);
 
 		plan().clear();
-	} else if (subStatus.result == Status::Result::SUCCESS) {
+	} else if (subStatus.result == TaskStatus::SUCCESS) {
 		if (Plan p = plan()) {
+			TasksBits successesToClear;
+			successesToClear.set();
+
 			for (auto it = p.first();
 				 it && isActive(it->origin);
 				 ++it)
 			{
 				if (_core.planData.tasksSuccesses.get(it->origin)) {
-					Origin origin{*this, it->origin};
+					Origin origin{*this, it->origin}; // SPECIFIC
 
 					if (const Payload* const payload = it->payload())
 						changeWith(it->destination, *it->payload());
 					else
 						changeTo  (it->destination);
 
-					_core.planData.tasksSuccesses.clear(it->origin);
-					it.remove();
+					if (it->cyclic())
+						_core.planData.tasksSuccesses.clear(it->origin); // SPECIFIC
+					else
+						successesToClear.clear(it->origin);
 
-					break;
+					it.remove();
 				}
 			}
+
+			_core.planData.tasksSuccesses &= successesToClear;
 		} else {
-			_status.result = Status::Result::SUCCESS;
+			_taskStatus.result = TaskStatus::SUCCESS;
 			headState.wrapPlanSucceeded(*this);
 
 			plan().clear();
@@ -225,33 +232,41 @@ template <typename TState>
 FFSM2_CONSTEXPR(14)
 void
 FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::updatePlan(TState& headState,
-																						   const Status subStatus) noexcept
+																						   const TaskStatus subStatus) noexcept
 {
 	FFSM2_ASSERT(subStatus);
 
-	if (subStatus.result == Status::Result::FAILURE) {
-		_status.result = Status::Result::FAILURE;
+	if (subStatus.result == TaskStatus::FAILURE) {
+		_taskStatus.result = TaskStatus::FAILURE;
 		headState.wrapPlanFailed(*this);
 
 		plan().clear();
-	} else if (subStatus.result == Status::Result::SUCCESS) {
+	} else if (subStatus.result == TaskStatus::SUCCESS) {
 		if (Plan p = plan()) {
+			TasksBits successesToClear;
+			successesToClear.set();
+
 			for (auto it = p.first();
 				 it && isActive(it->origin);
 				 ++it)
 			{
 				if (_core.planData.tasksSuccesses.get(it->origin)) {
-					Origin origin{*this, it->origin};
+					Origin origin{*this, it->origin}; // SPECIFIC
+
 					changeTo(it->destination);
 
-					_core.planData.tasksSuccesses.clear(it->origin);
-					it.remove();
+					if (it->cyclic())
+						_core.planData.tasksSuccesses.clear(it->origin); // SPECIFIC
+					else
+						successesToClear.clear(it->origin);
 
-					break;
+					it.remove();
 				}
 			}
+
+			_core.planData.tasksSuccesses &= successesToClear;
 		} else {
-			_status.result = Status::Result::SUCCESS;
+			_taskStatus.result = TaskStatus::SUCCESS;
 			headState.wrapPlanSucceeded(*this);
 
 			plan().clear();

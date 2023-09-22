@@ -1,5 +1,5 @@
 ﻿// FFSM2 (flat state machine for games and interactive applications)
-// 2.3.0 (2023-06-08)
+// 2.3.1 (2023-09-23)
 //
 // Created by Andrew Gresyk
 //
@@ -33,7 +33,7 @@
 
 #define FFSM2_VERSION_MAJOR 2
 #define FFSM2_VERSION_MINOR 3
-#define FFSM2_VERSION_PATCH 0
+#define FFSM2_VERSION_PATCH 1
 
 #define FFSM2_VERSION (10000 * FFSM2_VERSION_MAJOR + 100 * FFSM2_VERSION_MINOR + FFSM2_VERSION_PATCH)
 
@@ -1525,8 +1525,12 @@ public:
 	static constexpr Index CAPACITY   = NCapacity;
 	static constexpr Index UNIT_COUNT = contain(CAPACITY, 8);
 
+	using BitArray	= BitArrayT<CAPACITY>;
+
 public:
 	FFSM2_CONSTEXPR(14)	BitArrayT()										noexcept	{ clear();	}
+
+	FFSM2_CONSTEXPR(14)	void set()										noexcept;
 
 	FFSM2_CONSTEXPR(14)	void clear()									noexcept;
 
@@ -1540,6 +1544,10 @@ public:
 
 	template <typename TIndex>
 	FFSM2_CONSTEXPR(14)	void clear(const TIndex index)					noexcept;
+
+	FFSM2_CONSTEXPR(14)	bool operator &  (const BitArray& other)  const noexcept;
+
+	FFSM2_CONSTEXPR(14)	void operator &= (const BitArray& other)		noexcept;
 
 private:
 	uint8_t _storage[UNIT_COUNT] {};
@@ -1563,6 +1571,14 @@ public:
 
 namespace ffsm2 {
 namespace detail {
+
+template <unsigned NCapacity>
+FFSM2_CONSTEXPR(14)
+void
+BitArrayT<NCapacity>::set() noexcept {
+	for (uint8_t& unit : _storage)
+		unit = UINT8_MAX;
+}
 
 template <unsigned NCapacity>
 FFSM2_CONSTEXPR(14)
@@ -1625,6 +1641,25 @@ BitArrayT<NCapacity>::clear(const TIndex index) noexcept {
 	_storage[unit] &= ~mask;
 }
 
+template <unsigned NCapacity>
+FFSM2_CONSTEXPR(14)
+bool
+BitArrayT<NCapacity>::operator & (const BitArray& other) const noexcept {
+	for (Index i = 0; i < UNIT_COUNT; ++i)
+		if ((_storage[i] & other._storage[i]) == 0)
+			return false;
+
+	return true;
+}
+
+template <unsigned NCapacity>
+FFSM2_CONSTEXPR(14)
+void
+BitArrayT<NCapacity>::operator &= (const BitArray& other) noexcept {
+	for (Index i = 0; i < UNIT_COUNT; ++i)
+		_storage[i] &= other._storage[i];
+}
+
 }
 }
 
@@ -1638,6 +1673,8 @@ namespace detail {
 #pragma pack(push, 1)
 
 struct TaskBase {
+	static_assert(sizeof(Long) == sizeof(StateID), "");
+
 	FFSM2_CONSTEXPR(11)	TaskBase()										noexcept	{}
 
 	FFSM2_CONSTEXPR(11)	TaskBase(const StateID origin_,
@@ -1646,7 +1683,7 @@ struct TaskBase {
 		, destination{destination_}
 	{}
 
-	static_assert(sizeof(Long) == sizeof(StateID), "");
+	FFSM2_CONSTEXPR(11) bool cyclic()							  const noexcept	{ return origin == destination;	}
 
 	union {
 		StateID origin		= INVALID_STATE_ID;
@@ -1975,8 +2012,8 @@ namespace detail {
 
 #pragma pack(push, 1)
 
-struct Status final {
-	enum class Result {
+struct TaskStatus final {
+	enum Result {
 		NONE,
 		SUCCESS,
 		FAILURE
@@ -1984,7 +2021,7 @@ struct Status final {
 
 	Result result = Result::NONE;
 
-	FFSM2_CONSTEXPR(11)	Status(const Result result_ = Result::NONE)		noexcept;
+	FFSM2_CONSTEXPR(11)	TaskStatus(const Result result_ = Result::NONE)	noexcept;
 
 	FFSM2_CONSTEXPR(11)	explicit operator bool()				  const noexcept;
 
@@ -1993,8 +2030,8 @@ struct Status final {
 
 #pragma pack(pop)
 
-FFSM2_CONSTEXPR(14) Status  operator |  (Status& lhs, const Status rhs)	noexcept;
-FFSM2_CONSTEXPR(14) Status& operator |= (Status& lhs, const Status rhs)	noexcept;
+FFSM2_CONSTEXPR(14) TaskStatus  operator |  (TaskStatus& l, const TaskStatus r)	noexcept;
+FFSM2_CONSTEXPR(14) TaskStatus& operator |= (TaskStatus& l, const TaskStatus r)	noexcept;
 
 #if FFSM2_PLANS_AVAILABLE()
 
@@ -2063,8 +2100,8 @@ struct PlanDataT<ArgsT<TContext
 	TasksBits tasksSuccesses;
 	TasksBits tasksFailures;
 	bool planExists;
-	Status headStatus;
-	Status subStatus;
+	TaskStatus headStatus;
+	TaskStatus subStatus;
 
 	FFSM2_CONSTEXPR(14)	void clearTaskStatus  (const StateID stateId)		noexcept;
 	FFSM2_CONSTEXPR(14)	void verifyEmptyStatus(const StateID stateId) const noexcept;
@@ -2110,8 +2147,8 @@ struct PlanDataT<ArgsT<TContext
 	TasksBits tasksSuccesses;
 	TasksBits tasksFailures;
 	bool planExists;
-	Status headStatus;
-	Status subStatus;
+	TaskStatus headStatus;
+	TaskStatus subStatus;
 
 	FFSM2_CONSTEXPR(14)	void clearTaskStatus  (const StateID stateId)		noexcept;
 	FFSM2_CONSTEXPR(14)	void verifyEmptyStatus(const StateID stateId) const noexcept;
@@ -2135,41 +2172,41 @@ namespace ffsm2 {
 namespace detail {
 
 FFSM2_CONSTEXPR(11)
-Status::Status(const Result result_) noexcept
+TaskStatus::TaskStatus(const Result result_) noexcept
 	: result{result_}
 {}
 
 FFSM2_CONSTEXPR(11)
-Status::operator bool() const noexcept {
+TaskStatus::operator bool() const noexcept {
 	return result != Result::NONE;
 }
 
 FFSM2_CONSTEXPR(14)
 void
-Status::clear() noexcept {
+TaskStatus::clear() noexcept {
 	result = Result::NONE;
 }
 
 FFSM2_CONSTEXPR(14)
-Status
-operator | (Status& lhs,
-			const Status rhs) noexcept
+TaskStatus
+operator | (TaskStatus& lhs,
+			const TaskStatus rhs) noexcept
 {
-	const Status::Result result = lhs.result > rhs.result ?
+	const TaskStatus::Result result = lhs.result > rhs.result ?
 		lhs.result : rhs.result;
 
-	return Status{result};
+	return TaskStatus{result};
 }
 
 FFSM2_CONSTEXPR(14)
-Status&
-operator |= (Status& lhs,
-			 const Status rhs) noexcept
+TaskStatus&
+operator |= (TaskStatus& lhs,
+			 const TaskStatus rhs) noexcept
 {
-	const Status::Result result = lhs.result > rhs.result ?
+	const TaskStatus::Result result = lhs.result > rhs.result ?
 		lhs.result : rhs.result;
 
-	lhs = Status{result};
+	lhs = TaskStatus{result};
 
 	return lhs;
 }
@@ -3372,7 +3409,7 @@ protected:
 	using Control::_core;
 
 	const Transition& _currentTransition;
-	Status _status;
+	TaskStatus _taskStatus;
 };
 
 template <typename TArgs>
@@ -3456,7 +3493,7 @@ protected:
 	using PlanControl::_core;
 
 	using PlanControl::_originId;
-	using PlanControl::_status;
+	using PlanControl::_taskStatus;
 
 	bool _locked = false;
 };
@@ -3522,7 +3559,7 @@ protected:
 
 	template <typename TState>
 	FFSM2_CONSTEXPR(14)	void updatePlan(TState& headState,
-										const Status subStatus)			noexcept;
+										const TaskStatus subStatus)		noexcept;
 
 #endif
 
@@ -3553,7 +3590,7 @@ protected:
 	using FullControlBase::_core;
 
 	using FullControlBase::_originId;
-	using FullControlBase::_status;
+	using FullControlBase::_taskStatus;
 	using FullControlBase::_locked;
 };
 
@@ -3611,7 +3648,7 @@ protected:
 
 	template <typename TState>
 	FFSM2_CONSTEXPR(14)	void updatePlan(TState& headState,
-										const Status subStatus)			noexcept;
+										const TaskStatus subStatus)		noexcept;
 
 #endif
 
@@ -3624,7 +3661,7 @@ public:
 protected:
 	FFSM2_IF_PLANS(using FullControlBase::_core);
 
-	using FullControlBase::_status;
+	using FullControlBase::_taskStatus;
 };
 
 template <typename TArgs>
@@ -3748,7 +3785,7 @@ FFSM2_CONSTEXPR(14)
 void
 PlanControlT<TArgs>::resetRegion() noexcept
 {
-	_status.clear();
+	_taskStatus.clear();
 }
 
 template <typename TArgs>
@@ -3784,7 +3821,7 @@ template <typename TArgs>
 FFSM2_CONSTEXPR(14)
 void
 FullControlBaseT<TArgs>::succeed(const StateID stateId_) noexcept {
-	_status.result = Status::Result::SUCCESS;
+	_taskStatus.result = TaskStatus::SUCCESS;
 
 	_core.planData.tasksSuccesses.set(stateId_);
 
@@ -3795,7 +3832,7 @@ template <typename TArgs>
 FFSM2_CONSTEXPR(14)
 void
 FullControlBaseT<TArgs>::fail(const StateID stateId_) noexcept {
-	_status.result = Status::Result::FAILURE;
+	_taskStatus.result = TaskStatus::FAILURE;
 
 	_core.planData.tasksFailures.set(stateId_);
 
@@ -3811,37 +3848,44 @@ template <typename TState>
 FFSM2_CONSTEXPR(14)
 void
 FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::updatePlan(TState& headState,
-																						  const Status subStatus) noexcept
+																						  const TaskStatus subStatus) noexcept
 {
 	FFSM2_ASSERT(subStatus);
 
-	if (subStatus.result == Status::Result::FAILURE) {
-		_status.result = Status::Result::FAILURE;
+	if (subStatus.result == TaskStatus::FAILURE) {
+		_taskStatus.result = TaskStatus::FAILURE;
 		headState.wrapPlanFailed(*this);
 
 		plan().clear();
-	} else if (subStatus.result == Status::Result::SUCCESS) {
+	} else if (subStatus.result == TaskStatus::SUCCESS) {
 		if (Plan p = plan()) {
+			TasksBits successesToClear;
+			successesToClear.set();
+
 			for (auto it = p.first();
 				 it && isActive(it->origin);
 				 ++it)
 			{
 				if (_core.planData.tasksSuccesses.get(it->origin)) {
-					Origin origin{*this, it->origin};
+					Origin origin{*this, it->origin}; // SPECIFIC
 
 					if (const Payload* const payload = it->payload())
 						changeWith(it->destination, *it->payload());
 					else
 						changeTo  (it->destination);
 
-					_core.planData.tasksSuccesses.clear(it->origin);
-					it.remove();
+					if (it->cyclic())
+						_core.planData.tasksSuccesses.clear(it->origin); // SPECIFIC
+					else
+						successesToClear.clear(it->origin);
 
-					break;
+					it.remove();
 				}
 			}
+
+			_core.planData.tasksSuccesses &= successesToClear;
 		} else {
-			_status.result = Status::Result::SUCCESS;
+			_taskStatus.result = TaskStatus::SUCCESS;
 			headState.wrapPlanSucceeded(*this);
 
 			plan().clear();
@@ -3871,33 +3915,41 @@ template <typename TState>
 FFSM2_CONSTEXPR(14)
 void
 FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::updatePlan(TState& headState,
-																						   const Status subStatus) noexcept
+																						   const TaskStatus subStatus) noexcept
 {
 	FFSM2_ASSERT(subStatus);
 
-	if (subStatus.result == Status::Result::FAILURE) {
-		_status.result = Status::Result::FAILURE;
+	if (subStatus.result == TaskStatus::FAILURE) {
+		_taskStatus.result = TaskStatus::FAILURE;
 		headState.wrapPlanFailed(*this);
 
 		plan().clear();
-	} else if (subStatus.result == Status::Result::SUCCESS) {
+	} else if (subStatus.result == TaskStatus::SUCCESS) {
 		if (Plan p = plan()) {
+			TasksBits successesToClear;
+			successesToClear.set();
+
 			for (auto it = p.first();
 				 it && isActive(it->origin);
 				 ++it)
 			{
 				if (_core.planData.tasksSuccesses.get(it->origin)) {
-					Origin origin{*this, it->origin};
+					Origin origin{*this, it->origin}; // SPECIFIC
+
 					changeTo(it->destination);
 
-					_core.planData.tasksSuccesses.clear(it->origin);
-					it.remove();
+					if (it->cyclic())
+						_core.planData.tasksSuccesses.clear(it->origin); // SPECIFIC
+					else
+						successesToClear.clear(it->origin);
 
-					break;
+					it.remove();
 				}
 			}
+
+			_core.planData.tasksSuccesses &= successesToClear;
 		} else {
-			_status.result = Status::Result::SUCCESS;
+			_taskStatus.result = TaskStatus::SUCCESS;
 			headState.wrapPlanSucceeded(*this);
 
 			plan().clear();
@@ -4382,41 +4434,41 @@ struct S_
 
 	using Head			= THead;
 
-	FFSM2_CONSTEXPR(14)	bool	deepEntryGuard		 (GuardControl&	control						 )			noexcept;
+	FFSM2_CONSTEXPR(14)	bool		deepEntryGuard		 (GuardControl&	control						 )			noexcept;
 
-	FFSM2_CONSTEXPR(14)	void	deepEnter			 ( PlanControl& control						 )			noexcept;
-	FFSM2_CONSTEXPR(14)	void	deepReenter			 ( PlanControl& control						 )			noexcept;
+	FFSM2_CONSTEXPR(14)	void		deepEnter			 ( PlanControl& control						 )			noexcept;
+	FFSM2_CONSTEXPR(14)	void		deepReenter			 ( PlanControl& control						 )			noexcept;
 
-	FFSM2_CONSTEXPR(14)	Status	deepPreUpdate		 ( FullControl& control						 )			noexcept;
-	FFSM2_CONSTEXPR(14)	Status	deepUpdate			 ( FullControl& control						 )			noexcept;
-	FFSM2_CONSTEXPR(14)	Status	deepPostUpdate		 ( FullControl& control						 )			noexcept;
-
-	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	Status	deepPreReact		 ( FullControl& control, const TEvent&	event)			noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	deepPreUpdate		 ( FullControl& control						 )			noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	deepUpdate			 ( FullControl& control						 )			noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	deepPostUpdate		 ( FullControl& control						 )			noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	Status	deepReact			 ( FullControl& control, const TEvent&	event)			noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	deepPreReact		 ( FullControl& control, const TEvent&	event)			noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	Status	deepPostReact		 ( FullControl& control, const TEvent&	event)			noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	deepReact			 ( FullControl& control, const TEvent&	event)			noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	void	deepQuery			 (ConstControl& control,	   TEvent&  event)	  const noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	deepPostReact		 ( FullControl& control, const TEvent&	event)			noexcept;
+
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void		deepQuery			 (ConstControl& control,	   TEvent&  event)	  const noexcept;
 
 #if FFSM2_PLANS_AVAILABLE()
-	FFSM2_CONSTEXPR(14)	Status	deepUpdatePlans		 ( FullControl& control)								noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	deepUpdatePlans		 ( FullControl& control)								noexcept;
 #endif
 
-	FFSM2_CONSTEXPR(14)	bool	deepExitGuard		 (GuardControl&	control						 )			noexcept;
+	FFSM2_CONSTEXPR(14)	bool		deepExitGuard		 (GuardControl&	control						 )			noexcept;
 
-	FFSM2_CONSTEXPR(14)	void	deepExit			 ( PlanControl& control						 )			noexcept;
+	FFSM2_CONSTEXPR(14)	void		deepExit			 ( PlanControl& control						 )			noexcept;
 
 #if FFSM2_PLANS_AVAILABLE()
-	FFSM2_CONSTEXPR(14)	void	wrapPlanSucceeded	 ( FullControl& control						 )			noexcept;
-	FFSM2_CONSTEXPR(14)	void	wrapPlanFailed		 ( FullControl& control						 )			noexcept;
+	FFSM2_CONSTEXPR(14)	void		wrapPlanSucceeded	 ( FullControl& control						 )			noexcept;
+	FFSM2_CONSTEXPR(14)	void		wrapPlanFailed		 ( FullControl& control						 )			noexcept;
 #endif
 
-	FFSM2_CONSTEXPR(14)	void	deepChangeToRequested(	   Control&								 )			noexcept	{}
+	FFSM2_CONSTEXPR(14)	void		deepChangeToRequested(	   Control&								 )			noexcept	{}
 
 #if FFSM2_DEBUG_STATE_TYPE_AVAILABLE() || FFSM2_STRUCTURE_REPORT_AVAILABLE() || FFSM2_LOG_INTERFACE_AVAILABLE()
 
@@ -4524,7 +4576,7 @@ S_<NN, TA, TH>::deepReenter(PlanControl& control) noexcept {
 
 template <StateID NN, typename TA, typename TH>
 FFSM2_CONSTEXPR(14)
-Status
+TaskStatus
 S_<NN, TA, TH>::deepPreUpdate(FullControl& control) noexcept {
 	FFSM2_LOG_STATE_METHOD(&Head::preUpdate,
 						   Method::PRE_UPDATE);
@@ -4534,12 +4586,12 @@ S_<NN, TA, TH>::deepPreUpdate(FullControl& control) noexcept {
 	Head::widePreUpdate(control);
 	Head::	  preUpdate(control);
 
-	return control._status;
+	return control._taskStatus;
 }
 
 template <StateID NN, typename TA, typename TH>
 FFSM2_CONSTEXPR(14)
-Status
+TaskStatus
 S_<NN, TA, TH>::deepUpdate(FullControl& control) noexcept {
 	FFSM2_LOG_STATE_METHOD(&Head::update,
 						   Method::UPDATE);
@@ -4549,12 +4601,12 @@ S_<NN, TA, TH>::deepUpdate(FullControl& control) noexcept {
 	Head::wideUpdate(control);
 	Head::	  update(control);
 
-	return control._status;
+	return control._taskStatus;
 }
 
 template <StateID NN, typename TA, typename TH>
 FFSM2_CONSTEXPR(14)
-Status
+TaskStatus
 S_<NN, TA, TH>::deepPostUpdate(FullControl& control) noexcept {
 	FFSM2_LOG_STATE_METHOD(&Head::postUpdate,
 						   Method::POST_UPDATE);
@@ -4564,13 +4616,13 @@ S_<NN, TA, TH>::deepPostUpdate(FullControl& control) noexcept {
 	Head::	  postUpdate(control);
 	Head::widePostUpdate(control);
 
-	return control._status;
+	return control._taskStatus;
 }
 
 template <StateID NN, typename TA, typename TH>
 template <typename TEvent>
 FFSM2_CONSTEXPR(14)
-Status
+TaskStatus
 S_<NN, TA, TH>::deepPreReact(FullControl& control,
 							 const TEvent& event) noexcept
 {
@@ -4584,13 +4636,13 @@ S_<NN, TA, TH>::deepPreReact(FullControl& control,
 	Head::widePreReact(event, control);
 	(this->*method)	  (event, control);
 
-	return control._status;
+	return control._taskStatus;
 }
 
 template <StateID NN, typename TA, typename TH>
 template <typename TEvent>
 FFSM2_CONSTEXPR(14)
-Status
+TaskStatus
 S_<NN, TA, TH>::deepReact(FullControl& control,
 						  const TEvent& event) noexcept
 {
@@ -4604,13 +4656,13 @@ S_<NN, TA, TH>::deepReact(FullControl& control,
 	Head::wideReact(event, control);
 	(this->*method)(event, control);
 
-	return control._status;
+	return control._taskStatus;
 }
 
 template <StateID NN, typename TA, typename TH>
 template <typename TEvent>
 FFSM2_CONSTEXPR(14)
-Status
+TaskStatus
 S_<NN, TA, TH>::deepPostReact(FullControl& control,
 							  const TEvent& event) noexcept
 {
@@ -4624,7 +4676,7 @@ S_<NN, TA, TH>::deepPostReact(FullControl& control,
 	(this->*method)	   (event, control);
 	Head::widePostReact(event, control);
 
-	return control._status;
+	return control._taskStatus;
 }
 
 template <StateID NN, typename TA, typename TH>
@@ -4649,15 +4701,15 @@ S_<NN, TA, TH>::deepQuery(ConstControl& control,
 
 template <StateID NN, typename TA, typename TH>
 FFSM2_CONSTEXPR(14)
-Status
+TaskStatus
 S_<NN, TA, TH>::deepUpdatePlans(FullControl& control) noexcept {
 	if (control._core.planData.tasksFailures .get(STATE_ID))
-		return Status{Status::Result::FAILURE};
+		return TaskStatus{TaskStatus::FAILURE};
 	else
 	if (control._core.planData.tasksSuccesses.get(STATE_ID))
-		return Status{Status::Result::SUCCESS};
+		return TaskStatus{TaskStatus::SUCCESS};
 	else
-		return Status{};
+		return TaskStatus{};
 }
 
 #endif
@@ -5011,36 +5063,36 @@ struct FFSM2_EMPTY_BASES CS_<NStateId,
 								  PRONG_INDEX,
 								  SubStateList>;
 
-	FFSM2_CONSTEXPR(14)	bool	wideEntryGuard		 (GuardControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	bool		wideEntryGuard		 (GuardControl& control,					  const Short prong)		noexcept;
 
-	FFSM2_CONSTEXPR(14)	void	wideEnter			 ( PlanControl& control,					  const Short prong)		noexcept;
-	FFSM2_CONSTEXPR(14)	void	wideReenter			 ( PlanControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	void		wideEnter			 ( PlanControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	void		wideReenter			 ( PlanControl& control,					  const Short prong)		noexcept;
 
-	FFSM2_CONSTEXPR(14)	Status	widePreUpdate		 ( FullControl& control,					  const Short prong)		noexcept;
-	FFSM2_CONSTEXPR(14)	Status	wideUpdate			 ( FullControl& control,					  const Short prong)		noexcept;
-	FFSM2_CONSTEXPR(14)	Status	widePostUpdate		 ( FullControl& control,					  const Short prong)		noexcept;
-
-	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	Status	widePreReact		 ( FullControl& control, const TEvent& event, const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	widePreUpdate		 ( FullControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	wideUpdate			 ( FullControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	widePostUpdate		 ( FullControl& control,					  const Short prong)		noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	Status	wideReact			 ( FullControl& control, const TEvent& event, const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	widePreReact		 ( FullControl& control, const TEvent& event, const Short prong)		noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	Status	widePostReact		 ( FullControl& control, const TEvent& event, const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	wideReact			 ( FullControl& control, const TEvent& event, const Short prong)		noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	void	wideQuery			 (ConstControl& control,	   TEvent& event, const Short prong)  const noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	widePostReact		 ( FullControl& control, const TEvent& event, const Short prong)		noexcept;
+
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void		wideQuery			 (ConstControl& control,	   TEvent& event, const Short prong)  const noexcept;
 
 #if FFSM2_PLANS_AVAILABLE()
-	FFSM2_CONSTEXPR(14)	Status	wideUpdatePlans		 ( FullControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	wideUpdatePlans		 ( FullControl& control,					  const Short prong)		noexcept;
 #endif
 
-	FFSM2_CONSTEXPR(14)	bool	wideExitGuard		 (GuardControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	bool		wideExitGuard		 (GuardControl& control,					  const Short prong)		noexcept;
 
-	FFSM2_CONSTEXPR(14)	void	wideExit			 ( PlanControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	void		wideExit			 ( PlanControl& control,					  const Short prong)		noexcept;
 
-	FFSM2_CONSTEXPR(14)	void	wideChangeToRequested( PlanControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	void		wideChangeToRequested( PlanControl& control,					  const Short prong)		noexcept;
 
 };
 
@@ -5072,36 +5124,36 @@ struct CS_<NStateId,
 									Args,
 									TState>;
 
-	FFSM2_CONSTEXPR(14)	bool	wideEntryGuard		 (GuardControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	bool		wideEntryGuard		 (GuardControl& control,					  const Short prong)		noexcept;
 
-	FFSM2_CONSTEXPR(14)	void	wideEnter			 ( PlanControl& control,					  const Short prong)		noexcept;
-	FFSM2_CONSTEXPR(14)	void	wideReenter			 ( PlanControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	void		wideEnter			 ( PlanControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	void		wideReenter			 ( PlanControl& control,					  const Short prong)		noexcept;
 
-	FFSM2_CONSTEXPR(14)	Status	widePreUpdate		 ( FullControl& control,					  const Short prong)		noexcept;
-	FFSM2_CONSTEXPR(14)	Status	wideUpdate			 ( FullControl& control,					  const Short prong)		noexcept;
-	FFSM2_CONSTEXPR(14)	Status	widePostUpdate		 ( FullControl& control,					  const Short prong)		noexcept;
-
-	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	Status	widePreReact		 ( FullControl& control, const TEvent& event, const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	widePreUpdate		 ( FullControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	wideUpdate			 ( FullControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	widePostUpdate		 ( FullControl& control,					  const Short prong)		noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	Status	wideReact			 ( FullControl& control, const TEvent& event, const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	widePreReact		 ( FullControl& control, const TEvent& event, const Short prong)		noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	Status	widePostReact		 ( FullControl& control, const TEvent& event, const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	wideReact			 ( FullControl& control, const TEvent& event, const Short prong)		noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	void	wideQuery			 (ConstControl& control,	   TEvent& event, const Short prong)  const noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	widePostReact		 ( FullControl& control, const TEvent& event, const Short prong)		noexcept;
+
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void		wideQuery			 (ConstControl& control,	   TEvent& event, const Short prong)  const noexcept;
 
 #if FFSM2_PLANS_AVAILABLE()
-	FFSM2_CONSTEXPR(14)	Status	wideUpdatePlans		 ( FullControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	wideUpdatePlans		 ( FullControl& control,					  const Short prong)		noexcept;
 #endif
 
-	FFSM2_CONSTEXPR(14)	bool	wideExitGuard		 (GuardControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	bool		wideExitGuard		 (GuardControl& control,					  const Short prong)		noexcept;
 
-	FFSM2_CONSTEXPR(14)	void	wideExit			 ( PlanControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	void		wideExit			 ( PlanControl& control,					  const Short prong)		noexcept;
 
-	FFSM2_CONSTEXPR(14)	void	wideChangeToRequested( PlanControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	void		wideChangeToRequested( PlanControl& control,					  const Short prong)		noexcept;
 
 };
 
@@ -5156,7 +5208,7 @@ CS_<NN, TA, NI, TL_<TS...>>::wideReenter(PlanControl& control,
 
 template <StateID NN, typename TA, Short NI, typename... TS>
 FFSM2_CONSTEXPR(14)
-Status
+TaskStatus
 CS_<NN, TA, NI, TL_<TS...>>::widePreUpdate(FullControl& control,
 										   const Short prong) noexcept
 {
@@ -5169,7 +5221,7 @@ CS_<NN, TA, NI, TL_<TS...>>::widePreUpdate(FullControl& control,
 
 template <StateID NN, typename TA, Short NI, typename... TS>
 FFSM2_CONSTEXPR(14)
-Status
+TaskStatus
 CS_<NN, TA, NI, TL_<TS...>>::wideUpdate(FullControl& control,
 										const Short prong) noexcept
 {
@@ -5182,7 +5234,7 @@ CS_<NN, TA, NI, TL_<TS...>>::wideUpdate(FullControl& control,
 
 template <StateID NN, typename TA, Short NI, typename... TS>
 FFSM2_CONSTEXPR(14)
-Status
+TaskStatus
 CS_<NN, TA, NI, TL_<TS...>>::widePostUpdate(FullControl& control,
 											const Short prong) noexcept
 {
@@ -5196,7 +5248,7 @@ CS_<NN, TA, NI, TL_<TS...>>::widePostUpdate(FullControl& control,
 template <StateID NN, typename TA, Short NI, typename... TS>
 template <typename TEvent>
 FFSM2_CONSTEXPR(14)
-Status
+TaskStatus
 CS_<NN, TA, NI, TL_<TS...>>::widePreReact(FullControl& control,
 										  const TEvent& event,
 										  const Short prong) noexcept
@@ -5211,7 +5263,7 @@ CS_<NN, TA, NI, TL_<TS...>>::widePreReact(FullControl& control,
 template <StateID NN, typename TA, Short NI, typename... TS>
 template <typename TEvent>
 FFSM2_CONSTEXPR(14)
-Status
+TaskStatus
 CS_<NN, TA, NI, TL_<TS...>>::wideReact(FullControl& control,
 									   const TEvent& event,
 									   const Short prong) noexcept
@@ -5226,7 +5278,7 @@ CS_<NN, TA, NI, TL_<TS...>>::wideReact(FullControl& control,
 template <StateID NN, typename TA, Short NI, typename... TS>
 template <typename TEvent>
 FFSM2_CONSTEXPR(14)
-Status
+TaskStatus
 CS_<NN, TA, NI, TL_<TS...>>::widePostReact(FullControl& control,
 										   const TEvent& event,
 										   const Short prong) noexcept
@@ -5257,7 +5309,7 @@ CS_<NN, TA, NI, TL_<TS...>>::wideQuery(ConstControl& control,
 
 template <StateID NN, typename TA, Short NI, typename... TS>
 FFSM2_CONSTEXPR(14)
-Status
+TaskStatus
 CS_<NN, TA, NI, TL_<TS...>>::wideUpdatePlans(FullControl& control,
 											 const Short prong) noexcept
 {
@@ -5353,7 +5405,7 @@ CS_<NN, TA, NI, TL_<T>>::wideReenter(PlanControl& control,
 
 template <StateID NN, typename TA, Short NI, typename T>
 FFSM2_CONSTEXPR(14)
-Status
+TaskStatus
 CS_<NN, TA, NI, TL_<T>>::widePreUpdate(FullControl& control,
 									   const Short FFSM2_IF_ASSERT(prong)) noexcept
 {
@@ -5364,7 +5416,7 @@ CS_<NN, TA, NI, TL_<T>>::widePreUpdate(FullControl& control,
 
 template <StateID NN, typename TA, Short NI, typename T>
 FFSM2_CONSTEXPR(14)
-Status
+TaskStatus
 CS_<NN, TA, NI, TL_<T>>::wideUpdate(FullControl& control,
 									const Short FFSM2_IF_ASSERT(prong)) noexcept
 {
@@ -5375,7 +5427,7 @@ CS_<NN, TA, NI, TL_<T>>::wideUpdate(FullControl& control,
 
 template <StateID NN, typename TA, Short NI, typename T>
 FFSM2_CONSTEXPR(14)
-Status
+TaskStatus
 CS_<NN, TA, NI, TL_<T>>::widePostUpdate(FullControl& control,
 										const Short FFSM2_IF_ASSERT(prong)) noexcept
 {
@@ -5387,7 +5439,7 @@ CS_<NN, TA, NI, TL_<T>>::widePostUpdate(FullControl& control,
 template <StateID NN, typename TA, Short NI, typename T>
 template <typename TEvent>
 FFSM2_CONSTEXPR(14)
-Status
+TaskStatus
 CS_<NN, TA, NI, TL_<T>>::widePreReact(FullControl& control,
 									  const TEvent& event,
 									  const Short FFSM2_IF_ASSERT(prong)) noexcept
@@ -5400,7 +5452,7 @@ CS_<NN, TA, NI, TL_<T>>::widePreReact(FullControl& control,
 template <StateID NN, typename TA, Short NI, typename T>
 template <typename TEvent>
 FFSM2_CONSTEXPR(14)
-Status
+TaskStatus
 CS_<NN, TA, NI, TL_<T>>::wideReact(FullControl& control,
 								   const TEvent& event,
 								   const Short FFSM2_IF_ASSERT(prong)) noexcept
@@ -5413,7 +5465,7 @@ CS_<NN, TA, NI, TL_<T>>::wideReact(FullControl& control,
 template <StateID NN, typename TA, Short NI, typename T>
 template <typename TEvent>
 FFSM2_CONSTEXPR(14)
-Status
+TaskStatus
 CS_<NN, TA, NI, TL_<T>>::widePostReact(FullControl& control,
 									   const TEvent& event,
 									   const Short FFSM2_IF_ASSERT(prong)) noexcept
@@ -5440,7 +5492,7 @@ CS_<NN, TA, NI, TL_<T>>::wideQuery(ConstControl& control,
 
 template <StateID NN, typename TA, Short NI, typename T>
 FFSM2_CONSTEXPR(14)
-Status
+TaskStatus
 CS_<NN, TA, NI, TL_<T>>::wideUpdatePlans(FullControl& control,
 										 const Short FFSM2_IF_ASSERT(prong)) noexcept
 {
@@ -5522,55 +5574,55 @@ struct FFSM2_EMPTY_BASES C_
 	static constexpr Short WIDTH_BITS	  = Info::WIDTH_BITS;
 #endif
 
-	FFSM2_CONSTEXPR(11)	static Short&	compoRequested		  (		Control& control)	noexcept	{ return control._core.registry.requested;	}
+	FFSM2_CONSTEXPR(11)	static Short&		compoRequested		  (		Control& control)	noexcept	{ return control._core.registry.requested;	}
 
-	FFSM2_CONSTEXPR(11)	static Short&	compoActive			  (		Control& control)	noexcept	{ return control._core.registry.active;		}
-	FFSM2_CONSTEXPR(11)	static Short	compoActive			  (ConstControl& control)	noexcept	{ return control._core.registry.active;		}
-
-#if FFSM2_PLANS_AVAILABLE()
-	FFSM2_CONSTEXPR(11)	static Status&	headStatus			  (		Control& control)	noexcept	{ return control._core.planData.headStatus;	}
-	FFSM2_CONSTEXPR(11)	static Status&	subStatus			  (		Control& control)	noexcept	{ return control._core.planData.subStatus;	}
-#endif
-
-	FFSM2_CONSTEXPR(14)	bool	deepForwardEntryGuard		  (GuardControl& control					 )			noexcept;
-	FFSM2_CONSTEXPR(14)	bool	deepEntryGuard				  (GuardControl& control					 )			noexcept;
-
-	FFSM2_CONSTEXPR(14)	void	deepEnter					  ( PlanControl& control					 )			noexcept;
-	FFSM2_CONSTEXPR(14)	void	deepReenter					  ( PlanControl& control					 )			noexcept;
-
-	FFSM2_CONSTEXPR(14)	void	deepPreUpdate				  ( FullControl& control					 )			noexcept;
-	FFSM2_CONSTEXPR(14)	void	deepUpdate					  ( FullControl& control					 )			noexcept;
-	FFSM2_CONSTEXPR(14)	void	deepPostUpdate				  ( FullControl& control					 )			noexcept;
-
-	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	void	deepPreReact				  ( FullControl& control, const TEvent& event)			noexcept;
-
-	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	void	deepReact					  ( FullControl& control, const TEvent& event)			noexcept;
-
-	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	void	deepPostReact				  ( FullControl& control, const TEvent& event)			noexcept;
-
-	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	void	deepQuery					  (ConstControl& control,		TEvent& event)	  const noexcept;
+	FFSM2_CONSTEXPR(11)	static Short&		compoActive			  (		Control& control)	noexcept	{ return control._core.registry.active;		}
+	FFSM2_CONSTEXPR(11)	static Short		compoActive			  (ConstControl& control)	noexcept	{ return control._core.registry.active;		}
 
 #if FFSM2_PLANS_AVAILABLE()
-	FFSM2_CONSTEXPR(14)	void	deepUpdatePlans				  ( FullControl& control					 )			noexcept;
+	FFSM2_CONSTEXPR(11)	static TaskStatus&	headStatus			  (		Control& control)	noexcept	{ return control._core.planData.headStatus;	}
+	FFSM2_CONSTEXPR(11)	static TaskStatus&	 subStatus			  (		Control& control)	noexcept	{ return control._core.planData.subStatus;	}
 #endif
 
-	FFSM2_CONSTEXPR(14)	bool	deepForwardExitGuard		  (GuardControl& control					 )			noexcept;
-	FFSM2_CONSTEXPR(14)	bool	deepExitGuard				  (GuardControl& control					 )			noexcept;
+	FFSM2_CONSTEXPR(14)	bool		deepForwardEntryGuard		  (GuardControl& control					 )			noexcept;
+	FFSM2_CONSTEXPR(14)	bool		deepEntryGuard				  (GuardControl& control					 )			noexcept;
 
-	FFSM2_CONSTEXPR(14)	void	deepExit					  ( PlanControl& control					 )			noexcept;
+	FFSM2_CONSTEXPR(14)	void		deepEnter					  ( PlanControl& control					 )			noexcept;
+	FFSM2_CONSTEXPR(14)	void		deepReenter					  ( PlanControl& control					 )			noexcept;
 
-	FFSM2_CONSTEXPR(14)	void	deepChangeToRequested		  ( PlanControl& control					 )			noexcept;
+	FFSM2_CONSTEXPR(14)	void		deepPreUpdate				  ( FullControl& control					 )			noexcept;
+	FFSM2_CONSTEXPR(14)	void		deepUpdate					  ( FullControl& control					 )			noexcept;
+	FFSM2_CONSTEXPR(14)	void		deepPostUpdate				  ( FullControl& control					 )			noexcept;
+
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void		deepPreReact				  ( FullControl& control, const TEvent& event)			noexcept;
+
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void		deepReact					  ( FullControl& control, const TEvent& event)			noexcept;
+
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void		deepPostReact				  ( FullControl& control, const TEvent& event)			noexcept;
+
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void		deepQuery					  (ConstControl& control,		TEvent& event)	  const noexcept;
+
+#if FFSM2_PLANS_AVAILABLE()
+	FFSM2_CONSTEXPR(14)	void		deepUpdatePlans				  ( FullControl& control					 )			noexcept;
+#endif
+
+	FFSM2_CONSTEXPR(14)	bool		deepForwardExitGuard		  (GuardControl& control					 )			noexcept;
+	FFSM2_CONSTEXPR(14)	bool		deepExitGuard				  (GuardControl& control					 )			noexcept;
+
+	FFSM2_CONSTEXPR(14)	void		deepExit					  ( PlanControl& control					 )			noexcept;
+
+	FFSM2_CONSTEXPR(14)	void		deepChangeToRequested		  ( PlanControl& control					 )			noexcept;
 
 #if FFSM2_SERIALIZATION_AVAILABLE()
 	using WriteStream	= typename Args::WriteStream;
 	using ReadStream	= typename Args::ReadStream;
 
-	FFSM2_CONSTEXPR(14)	void	deepSaveActive				  (const Registry& registry, WriteStream& stream) const noexcept;
-	FFSM2_CONSTEXPR(14)	void	deepLoadRequested			  (		 Registry& registry, ReadStream&  stream) const noexcept;
+	FFSM2_CONSTEXPR(14)	void		deepSaveActive				  (const Registry& registry, WriteStream& stream) const noexcept;
+	FFSM2_CONSTEXPR(14)	void		deepLoadRequested			  (		 Registry& registry,  ReadStream& stream) const noexcept;
 #endif
 
 };
@@ -5642,7 +5694,7 @@ C_<TA, TH, TS...>::deepPreUpdate(FullControl& control) noexcept {
 
 	ScopedRegion region{control};
 
-	FFSM2_IF_PLANS(const Status h =)
+	FFSM2_IF_PLANS(const TaskStatus h =)
 		HeadState::deepPreUpdate(control);
 	FFSM2_IF_PLANS(headStatus(control) |= h);
 
@@ -5661,7 +5713,7 @@ C_<TA, TH, TS...>::deepUpdate(FullControl& control) noexcept {
 
 	ScopedRegion region{control};
 
-	FFSM2_IF_PLANS(const Status h =)
+	FFSM2_IF_PLANS(const TaskStatus h =)
 		HeadState::deepUpdate(control);
 	FFSM2_IF_PLANS(headStatus(control) |= h);
 
@@ -5683,7 +5735,7 @@ C_<TA, TH, TS...>::deepPostUpdate(FullControl& control) noexcept {
 	FFSM2_IF_PLANS(subStatus(control) |=)
 		SubStates::widePostUpdate(control, active);
 
-	FFSM2_IF_PLANS(const Status h =)
+	FFSM2_IF_PLANS(const TaskStatus h =)
 		HeadState::deepPostUpdate(control);
 	FFSM2_IF_PLANS(headStatus(control) |= h);
 }
@@ -5702,7 +5754,7 @@ C_<TA, TH, TS...>::deepPreReact(FullControl& control,
 
 	ScopedRegion region{control};
 
-	FFSM2_IF_PLANS(const Status h =)
+	FFSM2_IF_PLANS(const TaskStatus h =)
 		HeadState::deepPreReact(control, event);
 	FFSM2_IF_PLANS(headStatus(control) |= h);
 
@@ -5724,7 +5776,7 @@ C_<TA, TH, TS...>::deepReact(FullControl& control,
 
 	ScopedRegion region{control};
 
-	FFSM2_IF_PLANS(const Status h =)
+	FFSM2_IF_PLANS(const TaskStatus h =)
 		HeadState::deepReact(control, event);
 	FFSM2_IF_PLANS(headStatus(control) |= h);
 
@@ -5749,7 +5801,7 @@ C_<TA, TH, TS...>::deepPostReact(FullControl& control,
 	FFSM2_IF_PLANS(subStatus(control) |=)
 		SubStates::widePostReact(control, event, active);
 
-	FFSM2_IF_PLANS(const Status h =)
+	FFSM2_IF_PLANS(const TaskStatus h =)
 		HeadState::deepPostReact(control, event);
 	FFSM2_IF_PLANS(headStatus(control) |= h);
 }
@@ -5779,7 +5831,7 @@ C_<TA, TH, TS...>::deepUpdatePlans(FullControl& control) noexcept {
 	const Short  active = compoActive(control);
 	FFSM2_ASSERT(active < WIDTH);
 
-	const Status s =	 subStatus(control) |
+	const TaskStatus s =	 subStatus(control) |
 		SubStates::wideUpdatePlans(control, active);
 
 	const bool planExists = control._core.planData.planExists;

@@ -5,8 +5,8 @@ namespace detail {
 
 #pragma pack(push, 1)
 
-struct Status final {
-	enum class Result {
+struct TaskStatus final {
+	enum Result {
 		NONE,
 		SUCCESS,
 		FAILURE
@@ -14,7 +14,7 @@ struct Status final {
 
 	Result result = Result::NONE;
 
-	FFSM2_CONSTEXPR(11)	Status(const Result result_ = Result::NONE)		noexcept;
+	FFSM2_CONSTEXPR(11)	TaskStatus(const Result result_ = Result::NONE)	noexcept;
 
 	FFSM2_CONSTEXPR(11)	explicit operator bool()				  const noexcept;
 
@@ -25,8 +25,8 @@ struct Status final {
 
 //------------------------------------------------------------------------------
 
-FFSM2_CONSTEXPR(14) Status  operator |  (Status& lhs, const Status rhs)	noexcept;
-FFSM2_CONSTEXPR(14) Status& operator |= (Status& lhs, const Status rhs)	noexcept;
+FFSM2_CONSTEXPR(14) TaskStatus  operator |  (TaskStatus& l, const TaskStatus r)	noexcept;
+FFSM2_CONSTEXPR(14) TaskStatus& operator |= (TaskStatus& l, const TaskStatus r)	noexcept;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -103,8 +103,8 @@ struct PlanDataT<ArgsT<TContext
 	TasksBits tasksSuccesses;
 	TasksBits tasksFailures;
 	bool planExists;
-	Status headStatus;
-	Status subStatus;
+	TaskStatus headStatus;
+	TaskStatus subStatus;
 
 	FFSM2_CONSTEXPR(14)	void clearTaskStatus  (const StateID stateId)		noexcept;
 	FFSM2_CONSTEXPR(14)	void verifyEmptyStatus(const StateID stateId) const noexcept;
@@ -152,8 +152,8 @@ struct PlanDataT<ArgsT<TContext
 	TasksBits tasksSuccesses;
 	TasksBits tasksFailures;
 	bool planExists;
-	Status headStatus;
-	Status subStatus;
+	TaskStatus headStatus;
+	TaskStatus subStatus;
 
 	FFSM2_CONSTEXPR(14)	void clearTaskStatus  (const StateID stateId)		noexcept;
 	FFSM2_CONSTEXPR(14)	void verifyEmptyStatus(const StateID stateId) const noexcept;

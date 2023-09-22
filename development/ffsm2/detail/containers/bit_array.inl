@@ -17,6 +17,14 @@ namespace detail {
 ////////////////////////////////////////////////////////////////////////////////
 // COMMON
 
+template <unsigned NCapacity>
+FFSM2_CONSTEXPR(14)
+void
+BitArrayT<NCapacity>::set() noexcept {
+	for (uint8_t& unit : _storage)
+		unit = UINT8_MAX;
+}
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <unsigned NCapacity>
@@ -59,7 +67,7 @@ BitArrayT<NCapacity>::get(const TIndex index) const noexcept {
 	return (_storage[unit] & mask) != 0;
 }
 
-//------------------------------------------------------------------------------
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <unsigned NCapacity>
 template <typename TIndex>
@@ -75,7 +83,7 @@ BitArrayT<NCapacity>::set(const TIndex index) noexcept {
 	_storage[unit] |= mask;
 }
 
-//------------------------------------------------------------------------------
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <unsigned NCapacity>
 template <typename TIndex>
@@ -92,7 +100,28 @@ BitArrayT<NCapacity>::clear(const TIndex index) noexcept {
 }
 
 //------------------------------------------------------------------------------
+
+template <unsigned NCapacity>
+FFSM2_CONSTEXPR(14)
+bool
+BitArrayT<NCapacity>::operator & (const BitArray& other) const noexcept {
+	for (Index i = 0; i < UNIT_COUNT; ++i)
+		if ((_storage[i] & other._storage[i]) == 0)
+			return false;
+
+	return true;
+}
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <unsigned NCapacity>
+FFSM2_CONSTEXPR(14)
+void
+BitArrayT<NCapacity>::operator &= (const BitArray& other) noexcept {
+	for (Index i = 0; i < UNIT_COUNT; ++i)
+		_storage[i] &= other._storage[i];
+}
+
 //------------------------------------------------------------------------------
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //------------------------------------------------------------------------------
