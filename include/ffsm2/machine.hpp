@@ -1525,8 +1525,12 @@ public:
 	static constexpr Index CAPACITY   = NCapacity;
 	static constexpr Index UNIT_COUNT = contain(CAPACITY, 8);
 
+	using BitArray	= BitArrayT<CAPACITY>;
+
 public:
 	FFSM2_CONSTEXPR(14)	BitArrayT()										noexcept	{ clear();	}
+
+	FFSM2_CONSTEXPR(14)	void set()										noexcept;
 
 	FFSM2_CONSTEXPR(14)	void clear()									noexcept;
 
@@ -1540,6 +1544,10 @@ public:
 
 	template <typename TIndex>
 	FFSM2_CONSTEXPR(14)	void clear(const TIndex index)					noexcept;
+
+	FFSM2_CONSTEXPR(14)	bool operator &  (const BitArray& other)  const noexcept;
+
+	FFSM2_CONSTEXPR(14)	void operator &= (const BitArray& other)		noexcept;
 
 private:
 	uint8_t _storage[UNIT_COUNT] {};
@@ -1563,6 +1571,14 @@ public:
 
 namespace ffsm2 {
 namespace detail {
+
+template <unsigned NCapacity>
+FFSM2_CONSTEXPR(14)
+void
+BitArrayT<NCapacity>::set() noexcept {
+	for (uint8_t& unit : _storage)
+		unit = UINT8_MAX;
+}
 
 template <unsigned NCapacity>
 FFSM2_CONSTEXPR(14)
@@ -1625,6 +1641,25 @@ BitArrayT<NCapacity>::clear(const TIndex index) noexcept {
 	_storage[unit] &= ~mask;
 }
 
+template <unsigned NCapacity>
+FFSM2_CONSTEXPR(14)
+bool
+BitArrayT<NCapacity>::operator & (const BitArray& other) const noexcept {
+	for (Index i = 0; i < UNIT_COUNT; ++i)
+		if ((_storage[i] & other._storage[i]) == 0)
+			return false;
+
+	return true;
+}
+
+template <unsigned NCapacity>
+FFSM2_CONSTEXPR(14)
+void
+BitArrayT<NCapacity>::operator &= (const BitArray& other) noexcept {
+	for (Index i = 0; i < UNIT_COUNT; ++i)
+		_storage[i] &= other._storage[i];
+}
+
 }
 }
 
@@ -1638,6 +1673,8 @@ namespace detail {
 #pragma pack(push, 1)
 
 struct TaskBase {
+	static_assert(sizeof(Long) == sizeof(StateID), "");
+
 	FFSM2_CONSTEXPR(11)	TaskBase()										noexcept	{}
 
 	FFSM2_CONSTEXPR(11)	TaskBase(const StateID origin_,
@@ -1646,7 +1683,7 @@ struct TaskBase {
 		, destination{destination_}
 	{}
 
-	static_assert(sizeof(Long) == sizeof(StateID), "");
+	FFSM2_CONSTEXPR(11) bool cyclic()							  const noexcept	{ return origin == destination;	}
 
 	union {
 		StateID origin		= INVALID_STATE_ID;
@@ -3822,24 +3859,31 @@ FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::u
 		plan().clear();
 	} else if (subStatus.result == TaskStatus::SUCCESS) {
 		if (Plan p = plan()) {
+			TasksBits successesToClear;
+			successesToClear.set();
+
 			for (auto it = p.first();
 				 it && isActive(it->origin);
 				 ++it)
 			{
 				if (_core.planData.tasksSuccesses.get(it->origin)) {
-					Origin origin{*this, it->origin};
+					Origin origin{*this, it->origin}; // SPECIFIC
 
 					if (const Payload* const payload = it->payload())
 						changeWith(it->destination, *it->payload());
 					else
 						changeTo  (it->destination);
 
-					_core.planData.tasksSuccesses.clear(it->origin);
-					it.remove();
+					if (it->cyclic())
+						_core.planData.tasksSuccesses.clear(it->origin); // SPECIFIC
+					else
+						successesToClear.clear(it->origin);
 
-					break;
+					it.remove();
 				}
 			}
+
+			_core.planData.tasksSuccesses &= successesToClear;
 		} else {
 			_taskStatus.result = TaskStatus::SUCCESS;
 			headState.wrapPlanSucceeded(*this);
@@ -3882,20 +3926,28 @@ FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::
 		plan().clear();
 	} else if (subStatus.result == TaskStatus::SUCCESS) {
 		if (Plan p = plan()) {
+			TasksBits successesToClear;
+			successesToClear.set();
+
 			for (auto it = p.first();
 				 it && isActive(it->origin);
 				 ++it)
 			{
 				if (_core.planData.tasksSuccesses.get(it->origin)) {
-					Origin origin{*this, it->origin};
+					Origin origin{*this, it->origin}; // SPECIFIC
+
 					changeTo(it->destination);
 
-					_core.planData.tasksSuccesses.clear(it->origin);
-					it.remove();
+					if (it->cyclic())
+						_core.planData.tasksSuccesses.clear(it->origin); // SPECIFIC
+					else
+						successesToClear.clear(it->origin);
 
-					break;
+					it.remove();
 				}
 			}
+
+			_core.planData.tasksSuccesses &= successesToClear;
 		} else {
 			_taskStatus.result = TaskStatus::SUCCESS;
 			headState.wrapPlanSucceeded(*this);

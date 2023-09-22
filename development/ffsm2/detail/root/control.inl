@@ -166,24 +166,31 @@ FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, TTP>>::u
 		plan().clear();
 	} else if (subStatus.result == TaskStatus::SUCCESS) {
 		if (Plan p = plan()) {
+			TasksBits successesToClear;
+			successesToClear.set();
+
 			for (auto it = p.first();
 				 it && isActive(it->origin);
 				 ++it)
 			{
 				if (_core.planData.tasksSuccesses.get(it->origin)) {
-					Origin origin{*this, it->origin};
+					Origin origin{*this, it->origin}; // SPECIFIC
 
 					if (const Payload* const payload = it->payload())
 						changeWith(it->destination, *it->payload());
 					else
 						changeTo  (it->destination);
 
-					_core.planData.tasksSuccesses.clear(it->origin);
-					it.remove();
+					if (it->cyclic())
+						_core.planData.tasksSuccesses.clear(it->origin); // SPECIFIC
+					else
+						successesToClear.clear(it->origin);
 
-					break;
+					it.remove();
 				}
 			}
+
+			_core.planData.tasksSuccesses &= successesToClear;
 		} else {
 			_taskStatus.result = TaskStatus::SUCCESS;
 			headState.wrapPlanSucceeded(*this);
@@ -236,20 +243,28 @@ FullControlT<ArgsT<TC, TG, TSL FFSM2_IF_SERIALIZATION(, NSB), NSL, NTC, void>>::
 		plan().clear();
 	} else if (subStatus.result == TaskStatus::SUCCESS) {
 		if (Plan p = plan()) {
+			TasksBits successesToClear;
+			successesToClear.set();
+
 			for (auto it = p.first();
 				 it && isActive(it->origin);
 				 ++it)
 			{
 				if (_core.planData.tasksSuccesses.get(it->origin)) {
-					Origin origin{*this, it->origin};
+					Origin origin{*this, it->origin}; // SPECIFIC
+
 					changeTo(it->destination);
 
-					_core.planData.tasksSuccesses.clear(it->origin);
-					it.remove();
+					if (it->cyclic())
+						_core.planData.tasksSuccesses.clear(it->origin); // SPECIFIC
+					else
+						successesToClear.clear(it->origin);
 
-					break;
+					it.remove();
 				}
 			}
+
+			_core.planData.tasksSuccesses &= successesToClear;
 		} else {
 			_taskStatus.result = TaskStatus::SUCCESS;
 			headState.wrapPlanSucceeded(*this);

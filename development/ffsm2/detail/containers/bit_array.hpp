@@ -13,8 +13,12 @@ public:
 	static constexpr Index CAPACITY   = NCapacity;
 	static constexpr Index UNIT_COUNT = contain(CAPACITY, 8);
 
+	using BitArray	= BitArrayT<CAPACITY>;
+
 public:
 	FFSM2_CONSTEXPR(14)	BitArrayT()										noexcept	{ clear();	}
+
+	FFSM2_CONSTEXPR(14)	void set()										noexcept;
 
 	FFSM2_CONSTEXPR(14)	void clear()									noexcept;
 
@@ -28,6 +32,10 @@ public:
 
 	template <typename TIndex>
 	FFSM2_CONSTEXPR(14)	void clear(const TIndex index)					noexcept;
+
+	FFSM2_CONSTEXPR(14)	bool operator &  (const BitArray& other)  const noexcept;
+
+	FFSM2_CONSTEXPR(14)	void operator &= (const BitArray& other)		noexcept;
 
 private:
 	uint8_t _storage[UNIT_COUNT] {};
