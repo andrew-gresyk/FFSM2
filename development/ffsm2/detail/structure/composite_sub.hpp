@@ -50,38 +50,38 @@ struct FFSM2_EMPTY_BASES CS_<NStateId,
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(14)	bool	wideEntryGuard		 (GuardControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	bool		wideEntryGuard		 (GuardControl& control,					  const Short prong)		noexcept;
 
-	FFSM2_CONSTEXPR(14)	void	wideEnter			 ( PlanControl& control,					  const Short prong)		noexcept;
-	FFSM2_CONSTEXPR(14)	void	wideReenter			 ( PlanControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	void		wideEnter			 ( PlanControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	void		wideReenter			 ( PlanControl& control,					  const Short prong)		noexcept;
 
-	FFSM2_CONSTEXPR(14)	Status	widePreUpdate		 ( FullControl& control,					  const Short prong)		noexcept;
-	FFSM2_CONSTEXPR(14)	Status	wideUpdate			 ( FullControl& control,					  const Short prong)		noexcept;
-	FFSM2_CONSTEXPR(14)	Status	widePostUpdate		 ( FullControl& control,					  const Short prong)		noexcept;
-
-	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	Status	widePreReact		 ( FullControl& control, const TEvent& event, const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	widePreUpdate		 ( FullControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	wideUpdate			 ( FullControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	widePostUpdate		 ( FullControl& control,					  const Short prong)		noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	Status	wideReact			 ( FullControl& control, const TEvent& event, const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	widePreReact		 ( FullControl& control, const TEvent& event, const Short prong)		noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	Status	widePostReact		 ( FullControl& control, const TEvent& event, const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	wideReact			 ( FullControl& control, const TEvent& event, const Short prong)		noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	void	wideQuery			 (ConstControl& control,	   TEvent& event, const Short prong)  const noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	widePostReact		 ( FullControl& control, const TEvent& event, const Short prong)		noexcept;
+
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void		wideQuery			 (ConstControl& control,	   TEvent& event, const Short prong)  const noexcept;
 
 #if FFSM2_PLANS_AVAILABLE()
-	FFSM2_CONSTEXPR(14)	Status	wideUpdatePlans		 ( FullControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	wideUpdatePlans		 ( FullControl& control,					  const Short prong)		noexcept;
 #endif
 
-	FFSM2_CONSTEXPR(14)	bool	wideExitGuard		 (GuardControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	bool		wideExitGuard		 (GuardControl& control,					  const Short prong)		noexcept;
 
-	FFSM2_CONSTEXPR(14)	void	wideExit			 ( PlanControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	void		wideExit			 ( PlanControl& control,					  const Short prong)		noexcept;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(14)	void	wideChangeToRequested( PlanControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	void		wideChangeToRequested( PlanControl& control,					  const Short prong)		noexcept;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 };
@@ -119,38 +119,38 @@ struct CS_<NStateId,
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(14)	bool	wideEntryGuard		 (GuardControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	bool		wideEntryGuard		 (GuardControl& control,					  const Short prong)		noexcept;
 
-	FFSM2_CONSTEXPR(14)	void	wideEnter			 ( PlanControl& control,					  const Short prong)		noexcept;
-	FFSM2_CONSTEXPR(14)	void	wideReenter			 ( PlanControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	void		wideEnter			 ( PlanControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	void		wideReenter			 ( PlanControl& control,					  const Short prong)		noexcept;
 
-	FFSM2_CONSTEXPR(14)	Status	widePreUpdate		 ( FullControl& control,					  const Short prong)		noexcept;
-	FFSM2_CONSTEXPR(14)	Status	wideUpdate			 ( FullControl& control,					  const Short prong)		noexcept;
-	FFSM2_CONSTEXPR(14)	Status	widePostUpdate		 ( FullControl& control,					  const Short prong)		noexcept;
-
-	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	Status	widePreReact		 ( FullControl& control, const TEvent& event, const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	widePreUpdate		 ( FullControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	wideUpdate			 ( FullControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	widePostUpdate		 ( FullControl& control,					  const Short prong)		noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	Status	wideReact			 ( FullControl& control, const TEvent& event, const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	widePreReact		 ( FullControl& control, const TEvent& event, const Short prong)		noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	Status	widePostReact		 ( FullControl& control, const TEvent& event, const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	wideReact			 ( FullControl& control, const TEvent& event, const Short prong)		noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	void	wideQuery			 (ConstControl& control,	   TEvent& event, const Short prong)  const noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	widePostReact		 ( FullControl& control, const TEvent& event, const Short prong)		noexcept;
+
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void		wideQuery			 (ConstControl& control,	   TEvent& event, const Short prong)  const noexcept;
 
 #if FFSM2_PLANS_AVAILABLE()
-	FFSM2_CONSTEXPR(14)	Status	wideUpdatePlans		 ( FullControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	wideUpdatePlans		 ( FullControl& control,					  const Short prong)		noexcept;
 #endif
 
-	FFSM2_CONSTEXPR(14)	bool	wideExitGuard		 (GuardControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	bool		wideExitGuard		 (GuardControl& control,					  const Short prong)		noexcept;
 
-	FFSM2_CONSTEXPR(14)	void	wideExit			 ( PlanControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	void		wideExit			 ( PlanControl& control,					  const Short prong)		noexcept;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(14)	void	wideChangeToRequested( PlanControl& control,					  const Short prong)		noexcept;
+	FFSM2_CONSTEXPR(14)	void		wideChangeToRequested( PlanControl& control,					  const Short prong)		noexcept;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 };

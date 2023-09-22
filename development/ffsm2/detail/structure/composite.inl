@@ -75,7 +75,7 @@ C_<TA, TH, TS...>::deepPreUpdate(FullControl& control) noexcept {
 
 	ScopedRegion region{control};
 
-	FFSM2_IF_PLANS(const Status h =)
+	FFSM2_IF_PLANS(const TaskStatus h =)
 		HeadState::deepPreUpdate(control);
 	FFSM2_IF_PLANS(headStatus(control) |= h);
 
@@ -96,7 +96,7 @@ C_<TA, TH, TS...>::deepUpdate(FullControl& control) noexcept {
 
 	ScopedRegion region{control};
 
-	FFSM2_IF_PLANS(const Status h =)
+	FFSM2_IF_PLANS(const TaskStatus h =)
 		HeadState::deepUpdate(control);
 	FFSM2_IF_PLANS(headStatus(control) |= h);
 
@@ -120,7 +120,7 @@ C_<TA, TH, TS...>::deepPostUpdate(FullControl& control) noexcept {
 	FFSM2_IF_PLANS(subStatus(control) |=)
 		SubStates::widePostUpdate(control, active);
 
-	FFSM2_IF_PLANS(const Status h =)
+	FFSM2_IF_PLANS(const TaskStatus h =)
 		HeadState::deepPostUpdate(control);
 	FFSM2_IF_PLANS(headStatus(control) |= h);
 }
@@ -141,7 +141,7 @@ C_<TA, TH, TS...>::deepPreReact(FullControl& control,
 
 	ScopedRegion region{control};
 
-	FFSM2_IF_PLANS(const Status h =)
+	FFSM2_IF_PLANS(const TaskStatus h =)
 		HeadState::deepPreReact(control, event);
 	FFSM2_IF_PLANS(headStatus(control) |= h);
 
@@ -165,7 +165,7 @@ C_<TA, TH, TS...>::deepReact(FullControl& control,
 
 	ScopedRegion region{control};
 
-	FFSM2_IF_PLANS(const Status h =)
+	FFSM2_IF_PLANS(const TaskStatus h =)
 		HeadState::deepReact(control, event);
 	FFSM2_IF_PLANS(headStatus(control) |= h);
 
@@ -192,7 +192,7 @@ C_<TA, TH, TS...>::deepPostReact(FullControl& control,
 	FFSM2_IF_PLANS(subStatus(control) |=)
 		SubStates::widePostReact(control, event, active);
 
-	FFSM2_IF_PLANS(const Status h =)
+	FFSM2_IF_PLANS(const TaskStatus h =)
 		HeadState::deepPostReact(control, event);
 	FFSM2_IF_PLANS(headStatus(control) |= h);
 }
@@ -226,7 +226,7 @@ C_<TA, TH, TS...>::deepUpdatePlans(FullControl& control) noexcept {
 	const Short  active = compoActive(control);
 	FFSM2_ASSERT(active < WIDTH);
 
-	const Status s =	 subStatus(control) |
+	const TaskStatus s =	 subStatus(control) |
 		SubStates::wideUpdatePlans(control, active);
 
 	const bool planExists = control._core.planData.planExists;

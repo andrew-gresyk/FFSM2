@@ -42,47 +42,47 @@ struct S_
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(14)	bool	deepEntryGuard		 (GuardControl&	control						 )			noexcept;
+	FFSM2_CONSTEXPR(14)	bool		deepEntryGuard		 (GuardControl&	control						 )			noexcept;
 
-	FFSM2_CONSTEXPR(14)	void	deepEnter			 ( PlanControl& control						 )			noexcept;
-	FFSM2_CONSTEXPR(14)	void	deepReenter			 ( PlanControl& control						 )			noexcept;
+	FFSM2_CONSTEXPR(14)	void		deepEnter			 ( PlanControl& control						 )			noexcept;
+	FFSM2_CONSTEXPR(14)	void		deepReenter			 ( PlanControl& control						 )			noexcept;
 
-	FFSM2_CONSTEXPR(14)	Status	deepPreUpdate		 ( FullControl& control						 )			noexcept;
-	FFSM2_CONSTEXPR(14)	Status	deepUpdate			 ( FullControl& control						 )			noexcept;
-	FFSM2_CONSTEXPR(14)	Status	deepPostUpdate		 ( FullControl& control						 )			noexcept;
-
-	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	Status	deepPreReact		 ( FullControl& control, const TEvent&	event)			noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	deepPreUpdate		 ( FullControl& control						 )			noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	deepUpdate			 ( FullControl& control						 )			noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	deepPostUpdate		 ( FullControl& control						 )			noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	Status	deepReact			 ( FullControl& control, const TEvent&	event)			noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	deepPreReact		 ( FullControl& control, const TEvent&	event)			noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	Status	deepPostReact		 ( FullControl& control, const TEvent&	event)			noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	deepReact			 ( FullControl& control, const TEvent&	event)			noexcept;
 
 	template <typename TEvent>
-	FFSM2_CONSTEXPR(14)	void	deepQuery			 (ConstControl& control,	   TEvent&  event)	  const noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	deepPostReact		 ( FullControl& control, const TEvent&	event)			noexcept;
+
+	template <typename TEvent>
+	FFSM2_CONSTEXPR(14)	void		deepQuery			 (ConstControl& control,	   TEvent&  event)	  const noexcept;
 
 #if FFSM2_PLANS_AVAILABLE()
-	FFSM2_CONSTEXPR(14)	Status	deepUpdatePlans		 ( FullControl& control)								noexcept;
+	FFSM2_CONSTEXPR(14)	TaskStatus	deepUpdatePlans		 ( FullControl& control)								noexcept;
 #endif
 
-	FFSM2_CONSTEXPR(14)	bool	deepExitGuard		 (GuardControl&	control						 )			noexcept;
+	FFSM2_CONSTEXPR(14)	bool		deepExitGuard		 (GuardControl&	control						 )			noexcept;
 
-	FFSM2_CONSTEXPR(14)	void	deepExit			 ( PlanControl& control						 )			noexcept;
+	FFSM2_CONSTEXPR(14)	void		deepExit			 ( PlanControl& control						 )			noexcept;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #if FFSM2_PLANS_AVAILABLE()
-	FFSM2_CONSTEXPR(14)	void	wrapPlanSucceeded	 ( FullControl& control						 )			noexcept;
-	FFSM2_CONSTEXPR(14)	void	wrapPlanFailed		 ( FullControl& control						 )			noexcept;
+	FFSM2_CONSTEXPR(14)	void		wrapPlanSucceeded	 ( FullControl& control						 )			noexcept;
+	FFSM2_CONSTEXPR(14)	void		wrapPlanFailed		 ( FullControl& control						 )			noexcept;
 #endif
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(14)	void	deepChangeToRequested(	   Control&								 )			noexcept	{}
+	FFSM2_CONSTEXPR(14)	void		deepChangeToRequested(	   Control&								 )			noexcept	{}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

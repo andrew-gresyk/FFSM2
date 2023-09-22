@@ -342,7 +342,7 @@ protected:
 	using Control::_core;
 
 	const Transition& _currentTransition;
-	Status _status;
+	TaskStatus _taskStatus;
 };
 
 //------------------------------------------------------------------------------
@@ -442,7 +442,7 @@ protected:
 	using PlanControl::_core;
 
 	using PlanControl::_originId;
-	using PlanControl::_status;
+	using PlanControl::_taskStatus;
 
 	bool _locked = false;
 };
@@ -514,7 +514,7 @@ protected:
 
 	template <typename TState>
 	FFSM2_CONSTEXPR(14)	void updatePlan(TState& headState,
-										const Status subStatus)			noexcept;
+										const TaskStatus subStatus)		noexcept;
 
 #endif
 
@@ -553,7 +553,7 @@ protected:
 	using FullControlBase::_core;
 
 	using FullControlBase::_originId;
-	using FullControlBase::_status;
+	using FullControlBase::_taskStatus;
 	using FullControlBase::_locked;
 };
 
@@ -615,7 +615,7 @@ protected:
 
 	template <typename TState>
 	FFSM2_CONSTEXPR(14)	void updatePlan(TState& headState,
-										const Status subStatus)			noexcept;
+										const TaskStatus subStatus)		noexcept;
 
 #endif
 
@@ -628,7 +628,7 @@ public:
 protected:
 	FFSM2_IF_PLANS(using FullControlBase::_core);
 
-	using FullControlBase::_status;
+	using FullControlBase::_taskStatus;
 };
 
 //------------------------------------------------------------------------------

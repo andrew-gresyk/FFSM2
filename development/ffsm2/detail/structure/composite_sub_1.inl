@@ -54,7 +54,7 @@ CS_<NN, TA, NI, TL_<TS...>>::wideReenter(PlanControl& control,
 
 template <StateID NN, typename TA, Short NI, typename... TS>
 FFSM2_CONSTEXPR(14)
-Status
+TaskStatus
 CS_<NN, TA, NI, TL_<TS...>>::widePreUpdate(FullControl& control,
 										   const Short prong) noexcept
 {
@@ -69,7 +69,7 @@ CS_<NN, TA, NI, TL_<TS...>>::widePreUpdate(FullControl& control,
 
 template <StateID NN, typename TA, Short NI, typename... TS>
 FFSM2_CONSTEXPR(14)
-Status
+TaskStatus
 CS_<NN, TA, NI, TL_<TS...>>::wideUpdate(FullControl& control,
 										const Short prong) noexcept
 {
@@ -84,7 +84,7 @@ CS_<NN, TA, NI, TL_<TS...>>::wideUpdate(FullControl& control,
 
 template <StateID NN, typename TA, Short NI, typename... TS>
 FFSM2_CONSTEXPR(14)
-Status
+TaskStatus
 CS_<NN, TA, NI, TL_<TS...>>::widePostUpdate(FullControl& control,
 											const Short prong) noexcept
 {
@@ -100,7 +100,7 @@ CS_<NN, TA, NI, TL_<TS...>>::widePostUpdate(FullControl& control,
 template <StateID NN, typename TA, Short NI, typename... TS>
 template <typename TEvent>
 FFSM2_CONSTEXPR(14)
-Status
+TaskStatus
 CS_<NN, TA, NI, TL_<TS...>>::widePreReact(FullControl& control,
 										  const TEvent& event,
 										  const Short prong) noexcept
@@ -117,7 +117,7 @@ CS_<NN, TA, NI, TL_<TS...>>::widePreReact(FullControl& control,
 template <StateID NN, typename TA, Short NI, typename... TS>
 template <typename TEvent>
 FFSM2_CONSTEXPR(14)
-Status
+TaskStatus
 CS_<NN, TA, NI, TL_<TS...>>::wideReact(FullControl& control,
 									   const TEvent& event,
 									   const Short prong) noexcept
@@ -134,7 +134,7 @@ CS_<NN, TA, NI, TL_<TS...>>::wideReact(FullControl& control,
 template <StateID NN, typename TA, Short NI, typename... TS>
 template <typename TEvent>
 FFSM2_CONSTEXPR(14)
-Status
+TaskStatus
 CS_<NN, TA, NI, TL_<TS...>>::widePostReact(FullControl& control,
 										   const TEvent& event,
 										   const Short prong) noexcept
@@ -169,7 +169,7 @@ CS_<NN, TA, NI, TL_<TS...>>::wideQuery(ConstControl& control,
 
 template <StateID NN, typename TA, Short NI, typename... TS>
 FFSM2_CONSTEXPR(14)
-Status
+TaskStatus
 CS_<NN, TA, NI, TL_<TS...>>::wideUpdatePlans(FullControl& control,
 											 const Short prong) noexcept
 {
