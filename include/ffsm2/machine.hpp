@@ -939,10 +939,10 @@ struct Find<TL_<Ts...>, T> final
 }
 
 template <typename TList, typename T>
-constexpr Long index   () noexcept	{ return detail::Find<TList, T>::VALUE;						}
+constexpr Long index   () noexcept	{ return detail::Find<TList, T>::VALUE;					}
 
 template <typename TList, typename T>
-constexpr bool contains() noexcept	{ return std::is_base_of<detail::TypeT<T>, TList>::value;	}
+constexpr bool contains() noexcept	{ return detail::Find<TList, T>::VALUE != INVALID_LONG;	}
 
 }
 
