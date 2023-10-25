@@ -1,5 +1,5 @@
 // FFSM2 (flat state machine for games and interactive applications)
-// 2.3.1 (2023-09-23)
+// 2.3.2 (2023-10-25)
 //
 // Created by Andrew Gresyk
 //
@@ -33,7 +33,7 @@
 
 #define FFSM2_VERSION_MAJOR 2
 #define FFSM2_VERSION_MINOR 3
-#define FFSM2_VERSION_PATCH 1
+#define FFSM2_VERSION_PATCH 2
 
 #define FFSM2_VERSION (10000 * FFSM2_VERSION_MAJOR + 100 * FFSM2_VERSION_MINOR + FFSM2_VERSION_PATCH)
 
@@ -44,7 +44,6 @@
 #ifndef FFSM2_DISABLE_TYPEINDEX
 	#include <typeindex>
 #endif
-#include <type_traits>		// is_base_of<>
 
 #if defined _DEBUG && _MSC_VER
 	#include <intrin.h>		// __debugbreak()
