@@ -1,5 +1,5 @@
 ﻿// FFSM2 (flat state machine for games and interactive applications)
-// 2.3.1 (2023-09-23)
+// 2.3.2 (2023-10-25)
 //
 // Created by Andrew Gresyk
 //
@@ -33,7 +33,7 @@
 
 #define FFSM2_VERSION_MAJOR 2
 #define FFSM2_VERSION_MINOR 3
-#define FFSM2_VERSION_PATCH 1
+#define FFSM2_VERSION_PATCH 2
 
 #define FFSM2_VERSION (10000 * FFSM2_VERSION_MAJOR + 100 * FFSM2_VERSION_MINOR + FFSM2_VERSION_PATCH)
 
@@ -44,7 +44,6 @@
 #ifndef FFSM2_DISABLE_TYPEINDEX
 	#include <typeindex>
 #endif
-#include <type_traits>		// is_base_of<>
 
 #if defined _DEBUG && _MSC_VER
 	#include <intrin.h>		// __debugbreak()
@@ -352,6 +351,16 @@ template <bool B,
 		  typename TT,
 		  typename TF>
 using Conditional = typename ConditionalT<B, TT, TF>::Type;
+
+template <typename, typename>
+struct IsSameT final {
+	static constexpr bool Value = false;
+};
+
+template <typename T>
+struct IsSameT<T, T> final {
+	static constexpr bool Value = true;
+};
 
 template <typename T>
 struct RemoveConstT final {
@@ -930,10 +939,10 @@ struct Find<TL_<Ts...>, T> final
 }
 
 template <typename TList, typename T>
-constexpr Long index   () noexcept	{ return detail::Find<TList, T>::VALUE;						}
+constexpr Long index   () noexcept	{ return detail::Find<TList, T>::VALUE;					}
 
 template <typename TList, typename T>
-constexpr bool contains() noexcept	{ return std::is_base_of<detail::TypeT<T>, TList>::value;	}
+constexpr bool contains() noexcept	{ return detail::Find<TList, T>::VALUE != INVALID_LONG;	}
 
 }
 
@@ -4474,7 +4483,7 @@ struct S_
 
 	using Empty			= EmptyT<TArgs>;
 
-	static FFSM2_CONSTEXPR(11)	bool isBare()																noexcept	{ return std::is_base_of<Head, Empty>::value;	}
+	static FFSM2_CONSTEXPR(11)	bool isBare()																noexcept	{ return IsSameT<Head, Empty>::Value;	}
 
 	FFSM2_IF_TYPEINDEX(const std::type_index TYPE = isBare() ? typeid(None) : typeid(Head));
 
