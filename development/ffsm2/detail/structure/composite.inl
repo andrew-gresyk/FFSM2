@@ -9,12 +9,12 @@ namespace detail {
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 
-template <typename TA, typename TH, typename... TS>
+template <typename TA_, typename TH_, typename... TS_>
 FFSM2_CONSTEXPR(14)
 bool
-C_<TA, TH, TS...>::deepForwardEntryGuard(GuardControl& control) noexcept {
-	const Short  requested  = compoRequested(control);
-	FFSM2_ASSERT(requested < WIDTH);
+C_<TA_, TH_, TS_...>::deepForwardEntryGuard(GuardControl& control) noexcept {
+	const Prong	 requested	= compoRequested(control);
+	FFSM2_ASSERT(requested	< WIDTH);
 
 	FFSM2_ASSERT(compoActive(control) < WIDTH);
 
@@ -23,11 +23,11 @@ C_<TA, TH, TS...>::deepForwardEntryGuard(GuardControl& control) noexcept {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename TA, typename TH, typename... TS>
+template <typename TA_, typename TH_, typename... TS_>
 FFSM2_CONSTEXPR(14)
 bool
-C_<TA, TH, TS...>::deepEntryGuard(GuardControl& control) noexcept {
-	const Short  requested = compoRequested(control);
+C_<TA_, TH_, TS_...>::deepEntryGuard(GuardControl& control) noexcept {
+	const Prong  requested = compoRequested(control);
 	FFSM2_ASSERT(requested < WIDTH);
 
 	return HeadState::deepEntryGuard(control) ||
@@ -36,18 +36,18 @@ C_<TA, TH, TS...>::deepEntryGuard(GuardControl& control) noexcept {
 
 //------------------------------------------------------------------------------
 
-template <typename TA, typename TH, typename... TS>
+template <typename TA_, typename TH_, typename... TS_>
 FFSM2_CONSTEXPR(14)
 void
-C_<TA, TH, TS...>::deepEnter(PlanControl& control) noexcept {
-	Short& requested = compoRequested(control);
-	Short& active	 = compoActive	 (control);
+C_<TA_, TH_, TS_...>::deepEnter(PlanControl& control) noexcept {
+	Prong& requested = compoRequested(control);
+	Prong& active	 = compoActive	 (control);
 
 	FFSM2_ASSERT(requested < WIDTH);
-	FFSM2_ASSERT(active	  == INVALID_SHORT);
+	FFSM2_ASSERT(active	  == INVALID_PRONG);
 
 	active	  = requested;
-	requested = INVALID_SHORT;
+	requested = INVALID_PRONG;
 
 	HeadState::deepEnter(control);
 	SubStates::wideEnter(control, active);
@@ -55,22 +55,22 @@ C_<TA, TH, TS...>::deepEnter(PlanControl& control) noexcept {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename TA, typename TH, typename... TS>
+template <typename TA_, typename TH_, typename... TS_>
 FFSM2_CONSTEXPR(14)
 void
-C_<TA, TH, TS...>::deepReenter(PlanControl& /*control*/) noexcept {
+C_<TA_, TH_, TS_...>::deepReenter(PlanControl& FFSM2_UNUSED(control)) noexcept {
 }
 
 //------------------------------------------------------------------------------
 // COMMON
 
-template <typename TA, typename TH, typename... TS>
+template <typename TA_, typename TH_, typename... TS_>
 FFSM2_CONSTEXPR(14)
 void
-C_<TA, TH, TS...>::deepPreUpdate(FullControl& control) noexcept {
-	FFSM2_ASSERT(compoRequested(control) == INVALID_SHORT);
+C_<TA_, TH_, TS_...>::deepPreUpdate(FullControl& control) noexcept {
+	FFSM2_ASSERT(compoRequested(control) == INVALID_PRONG);
 
-	const Short  active = compoActive(control);
+	const Prong  active = compoActive(control);
 	FFSM2_ASSERT(active < WIDTH);
 
 	ScopedRegion region{control};
@@ -79,19 +79,19 @@ C_<TA, TH, TS...>::deepPreUpdate(FullControl& control) noexcept {
 		HeadState::deepPreUpdate(control);
 	FFSM2_IF_PLANS(headStatus(control) |= h);
 
-	FFSM2_IF_PLANS(subStatus(control) |=)
+	FFSM2_IF_PLANS( subStatus(control) |=)
 		SubStates::widePreUpdate(control, active);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename TA, typename TH, typename... TS>
+template <typename TA_, typename TH_, typename... TS_>
 FFSM2_CONSTEXPR(14)
 void
-C_<TA, TH, TS...>::deepUpdate(FullControl& control) noexcept {
-	FFSM2_ASSERT(compoRequested(control) == INVALID_SHORT);
+C_<TA_, TH_, TS_...>::deepUpdate(FullControl& control) noexcept {
+	FFSM2_ASSERT(compoRequested(control) == INVALID_PRONG);
 
-	const Short  active = compoActive(control);
+	const Prong  active = compoActive(control);
 	FFSM2_ASSERT(active < WIDTH);
 
 	ScopedRegion region{control};
@@ -100,113 +100,113 @@ C_<TA, TH, TS...>::deepUpdate(FullControl& control) noexcept {
 		HeadState::deepUpdate(control);
 	FFSM2_IF_PLANS(headStatus(control) |= h);
 
-	FFSM2_IF_PLANS(subStatus(control) |=)
+	FFSM2_IF_PLANS( subStatus(control) |=)
 		SubStates::wideUpdate(control, active);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename TA, typename TH, typename... TS>
+template <typename TA_, typename TH_, typename... TS_>
 FFSM2_CONSTEXPR(14)
 void
-C_<TA, TH, TS...>::deepPostUpdate(FullControl& control) noexcept {
-	FFSM2_ASSERT(compoRequested(control) == INVALID_SHORT);
+C_<TA_, TH_, TS_...>::deepPostUpdate(FullControl& control) noexcept {
+	FFSM2_ASSERT(compoRequested(control) == INVALID_PRONG);
 
-	const Short  active = compoActive(control);
+	const Prong  active = compoActive(control);
 	FFSM2_ASSERT(active < WIDTH);
 
 	ScopedRegion region{control};
 
-	FFSM2_IF_PLANS(subStatus(control) |=)
+	FFSM2_IF_PLANS( subStatus	 (control) |=)
 		SubStates::widePostUpdate(control, active);
 
 	FFSM2_IF_PLANS(const TaskStatus h =)
 		HeadState::deepPostUpdate(control);
-	FFSM2_IF_PLANS(headStatus(control) |= h);
+	FFSM2_IF_PLANS(headStatus	 (control) |= h);
 }
 
 //------------------------------------------------------------------------------
 
-template <typename TA, typename TH, typename... TS>
+template <typename TA_, typename TH_, typename... TS_>
 template <typename TEvent>
 FFSM2_CONSTEXPR(14)
 void
-C_<TA, TH, TS...>::deepPreReact(FullControl& control,
-								const TEvent& event) noexcept
+C_<TA_, TH_, TS_...>::deepPreReact(FullControl& control,
+								   const TEvent& event) noexcept
 {
-	FFSM2_ASSERT(compoRequested(control) == INVALID_SHORT);
+	FFSM2_ASSERT(compoRequested(control) == INVALID_PRONG);
 
-	const Short  active = compoActive(control);
+	const Prong  active = compoActive(control);
 	FFSM2_ASSERT(active < WIDTH);
 
 	ScopedRegion region{control};
 
 	FFSM2_IF_PLANS(const TaskStatus h =)
 		HeadState::deepPreReact(control, event);
-	FFSM2_IF_PLANS(headStatus(control) |= h);
+	FFSM2_IF_PLANS(headStatus  (control) |= h);
 
-	FFSM2_IF_PLANS(subStatus(control) |=)
+	FFSM2_IF_PLANS( subStatus  (control) |=)
 		SubStates::widePreReact(control, event, active);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename TA, typename TH, typename... TS>
+template <typename TA_, typename TH_, typename... TS_>
 template <typename TEvent>
 FFSM2_CONSTEXPR(14)
 void
-C_<TA, TH, TS...>::deepReact(FullControl& control,
-							 const TEvent& event) noexcept
+C_<TA_, TH_, TS_...>::deepReact(FullControl& control,
+								const TEvent& event) noexcept
 {
-	FFSM2_ASSERT(compoRequested(control) == INVALID_SHORT);
+	FFSM2_ASSERT(compoRequested(control) == INVALID_PRONG);
 
-	const Short  active = compoActive(control);
+	const Prong  active = compoActive(control);
 	FFSM2_ASSERT(active < WIDTH);
 
 	ScopedRegion region{control};
 
 	FFSM2_IF_PLANS(const TaskStatus h =)
-		HeadState::deepReact(control, event);
+		HeadState:: deepReact(control, event);
 	FFSM2_IF_PLANS(headStatus(control) |= h);
 
-	FFSM2_IF_PLANS(subStatus(control) |=)
-		SubStates::wideReact(control, event, active);
+	FFSM2_IF_PLANS( subStatus(control) |=)
+		SubStates:: wideReact(control, event, active);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename TA, typename TH, typename... TS>
+template <typename TA_, typename TH_, typename... TS_>
 template <typename TEvent>
 FFSM2_CONSTEXPR(14)
 void
-C_<TA, TH, TS...>::deepPostReact(FullControl& control,
-								 const TEvent& event) noexcept
+C_<TA_, TH_, TS_...>::deepPostReact(FullControl& control,
+									const TEvent& event) noexcept
 {
-	FFSM2_ASSERT(compoRequested(control) == INVALID_SHORT);
+	FFSM2_ASSERT(compoRequested(control) == INVALID_PRONG);
 
-	const Short  active = compoActive(control);
+	const Prong  active = compoActive(control);
 	FFSM2_ASSERT(active < WIDTH);
 
 	ScopedRegion region{control};
 
-	FFSM2_IF_PLANS(subStatus(control) |=)
+	FFSM2_IF_PLANS( subStatus	(control) |=)
 		SubStates::widePostReact(control, event, active);
 
 	FFSM2_IF_PLANS(const TaskStatus h =)
 		HeadState::deepPostReact(control, event);
-	FFSM2_IF_PLANS(headStatus(control) |= h);
+	FFSM2_IF_PLANS(headStatus	(control) |= h);
 }
 
 //------------------------------------------------------------------------------
 
-template <typename TA, typename TH, typename... TS>
+template <typename TA_, typename TH_, typename... TS_>
 template <typename TEvent>
 FFSM2_CONSTEXPR(14)
 void
-C_<TA, TH, TS...>::deepQuery(ConstControl& control,
-							 TEvent& event) const noexcept
+C_<TA_, TH_, TS_...>::deepQuery(ConstControl& control,
+								TEvent& event) const noexcept
 {
-	const Short  active = compoActive(control);
+	const Prong  active = compoActive(control);
 	FFSM2_ASSERT(active < WIDTH);
 
 	HeadState::deepQuery(control, event);
@@ -217,17 +217,17 @@ C_<TA, TH, TS...>::deepQuery(ConstControl& control,
 
 #if FFSM2_PLANS_AVAILABLE()
 
-template <typename TA, typename TH, typename... TS>
+template <typename TA_, typename TH_, typename... TS_>
 FFSM2_CONSTEXPR(14)
 void
-C_<TA, TH, TS...>::deepUpdatePlans(FullControl& control) noexcept {
-	FFSM2_ASSERT(compoRequested(control) == INVALID_SHORT);
+C_<TA_, TH_, TS_...>::deepUpdatePlans(FullControl& control) noexcept {
+	FFSM2_ASSERT(compoRequested(control) == INVALID_PRONG);
 
-	const Short  active = compoActive(control);
+	const Prong  active = compoActive(control);
 	FFSM2_ASSERT(active < WIDTH);
 
-	const TaskStatus s =	 subStatus(control) |
-		SubStates::wideUpdatePlans(control, active);
+	const TaskStatus s =  subStatus(control) |
+		SubStates::wideUpdatePlans (control, active);
 
 	const bool planExists = control._core.planData.planExists;
 
@@ -239,11 +239,11 @@ C_<TA, TH, TS...>::deepUpdatePlans(FullControl& control) noexcept {
 
 //------------------------------------------------------------------------------
 
-template <typename TA, typename TH, typename... TS>
+template <typename TA_, typename TH_, typename... TS_>
 FFSM2_CONSTEXPR(14)
 bool
-C_<TA, TH, TS...>::deepForwardExitGuard(GuardControl& control) noexcept {
-	const Short  active = compoActive(control);
+C_<TA_, TH_, TS_...>::deepForwardExitGuard(GuardControl& control) noexcept {
+	const Prong  active = compoActive(control);
 	FFSM2_ASSERT(active < WIDTH);
 
 	FFSM2_ASSERT(compoRequested(control) < WIDTH);
@@ -253,11 +253,11 @@ C_<TA, TH, TS...>::deepForwardExitGuard(GuardControl& control) noexcept {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename TA, typename TH, typename... TS>
+template <typename TA_, typename TH_, typename... TS_>
 FFSM2_CONSTEXPR(14)
 bool
-C_<TA, TH, TS...>::deepExitGuard(GuardControl& control) noexcept {
-	const Short  active = compoActive(control);
+C_<TA_, TH_, TS_...>::deepExitGuard(GuardControl& control) noexcept {
+	const Prong  active = compoActive(control);
 	FFSM2_ASSERT(active < WIDTH);
 
 	FFSM2_ASSERT(compoRequested(control) < WIDTH);
@@ -268,17 +268,17 @@ C_<TA, TH, TS...>::deepExitGuard(GuardControl& control) noexcept {
 
 //------------------------------------------------------------------------------
 
-template <typename TA, typename TH, typename... TS>
+template <typename TA_, typename TH_, typename... TS_>
 FFSM2_CONSTEXPR(14)
 void
-C_<TA, TH, TS...>::deepExit(PlanControl& control) noexcept {
-	Short& active = compoActive(control);
+C_<TA_, TH_, TS_...>::deepExit(PlanControl& control) noexcept {
+	Prong& active	 = compoActive   (control);
 	FFSM2_ASSERT(active < WIDTH);
 
 	SubStates::wideExit(control, active);
 	HeadState::deepExit(control);
 
-	active = INVALID_SHORT;
+	active	  = INVALID_PRONG;
 
 #if FFSM2_PLANS_AVAILABLE()
 	Plan plan = control.plan();
@@ -290,12 +290,12 @@ C_<TA, TH, TS...>::deepExit(PlanControl& control) noexcept {
 //------------------------------------------------------------------------------
 // COMMON
 
-template <typename TA, typename TH, typename... TS>
+template <typename TA_, typename TH_, typename... TS_>
 FFSM2_CONSTEXPR(14)
 void
-C_<TA, TH, TS...>::deepChangeToRequested(PlanControl& control) noexcept {
-	Short& requested = compoRequested(control);
-	Short& active	 = compoActive(control);
+C_<TA_, TH_, TS_...>::deepChangeToRequested(PlanControl& control) noexcept {
+	Prong& requested = compoRequested(control);
+	Prong& active	 = compoActive	 (control);
 
 	FFSM2_ASSERT(active	   < WIDTH);
 
@@ -305,11 +305,11 @@ C_<TA, TH, TS...>::deepChangeToRequested(PlanControl& control) noexcept {
 		SubStates::wideExit	  (control, active);
 
 		active	  = requested;
-		requested = INVALID_SHORT;
+		requested = INVALID_PRONG;
 
 		SubStates::wideEnter  (control, active);
 	} else {
-		requested = INVALID_SHORT;
+		requested = INVALID_PRONG;
 
 		// reconstruction done in S_::reenter()
 		SubStates::wideReenter(control, active);
@@ -320,11 +320,11 @@ C_<TA, TH, TS...>::deepChangeToRequested(PlanControl& control) noexcept {
 
 #if FFSM2_SERIALIZATION_AVAILABLE()
 
-template <typename TA, typename TH, typename... TS>
+template <typename TA_, typename TH_, typename... TS_>
 FFSM2_CONSTEXPR(14)
 void
-C_<TA, TH, TS...>::deepSaveActive(const Registry& registry,
-								  WriteStream& stream) const noexcept
+C_<TA_, TH_, TS_...>::deepSaveActive(const Registry& registry,
+									 WriteStream& stream) const noexcept
 {
 	stream.template write<WIDTH_BITS>(registry.active);
 }
@@ -332,14 +332,16 @@ C_<TA, TH, TS...>::deepSaveActive(const Registry& registry,
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename TA, typename TH, typename... TS>
+template <typename TA_, typename TH_, typename... TS_>
 FFSM2_CONSTEXPR(14)
 void
-C_<TA, TH, TS...>::deepLoadRequested(Registry& registry,
-									 ReadStream& stream) const noexcept
+C_<TA_, TH_, TS_...>::deepLoadRequested(Registry& registry,
+										ReadStream& stream) const noexcept
 {
-	registry.requested = stream.template read<WIDTH_BITS>();
-	FFSM2_ASSERT(registry.requested < WIDTH);
+	Prong& requested = compoRequested(registry);
+
+	requested = stream.template read<WIDTH_BITS>();
+	FFSM2_ASSERT(requested < WIDTH);
 }
 
 #endif

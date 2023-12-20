@@ -32,8 +32,6 @@ FFSM2_CONSTEXPR(14) TaskStatus& operator |= (TaskStatus& l, const TaskStatus r)	
 
 #if FFSM2_PLANS_AVAILABLE()
 
-#pragma pack(push, 1)
-
 struct TaskLink final {
 	Long prev		= INVALID_LONG;
 	Long next		= INVALID_LONG;
@@ -48,17 +46,15 @@ struct Bounds final {
 	FFSM2_CONSTEXPR(14) void clear()									noexcept	{ first = INVALID_LONG; last = INVALID_LONG;	}
 };
 
-#pragma pack(pop)
-
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename
-		, typename
-		, typename
-		FFSM2_IF_SERIALIZATION(, Long)
-		, Long
-		, Long
-		, typename>
+template <
+	typename
+  , typename
+  FFSM2_IF_SERIALIZATION(, Long)
+  , Long
+  , typename
+>
 struct ArgsT;
 
 template <typename>
@@ -66,33 +62,35 @@ struct PlanDataT;
 
 //------------------------------------------------------------------------------
 
-template <typename TContext
-		, typename TConfig
-		, typename TStateList
-		FFSM2_IF_SERIALIZATION(, Long NSerialBits)
-		, Long NSubstitutionLimit
-		, Long NTaskCapacity
-		, typename TPayload>
-struct PlanDataT<ArgsT<TContext
-					 , TConfig
-					 , TStateList
-					 FFSM2_IF_SERIALIZATION(, NSerialBits)
-					 , NSubstitutionLimit
-					 , NTaskCapacity
-					 , TPayload>> final
+template <
+	typename TConfig
+  , typename TStateList
+  FFSM2_IF_SERIALIZATION(, Long NSerialBits)
+  , Long NTaskCapacity
+  , typename TPayload
+>
+struct PlanDataT<
+		   ArgsT<
+			   TConfig
+			 , TStateList
+			 FFSM2_IF_SERIALIZATION(, NSerialBits)
+			 , NTaskCapacity
+			 , TPayload
+		   >
+	   > final
 {
-	using StateList		 = TStateList;
-	using Payload		 = TPayload;
+	using StateList			= TStateList;
+	using Payload			= TPayload;
 
-	static constexpr Long  STATE_COUNT	 = StateList::SIZE;
-	static constexpr Short TASK_CAPACITY = NTaskCapacity;
+	static constexpr Long STATE_COUNT	= StateList ::SIZE;
+	static constexpr Long TASK_CAPACITY	= NTaskCapacity;
 
-	using Task			 = TaskT	   <Payload>;
-	using Tasks			 = TaskListT   <Payload,  TASK_CAPACITY>;
-	using TaskLinks		 = StaticArrayT<TaskLink, TASK_CAPACITY>;
-	using Payloads		 = StaticArrayT<Payload,  TASK_CAPACITY>;
+	using Task				= TaskT		  <Payload>;
+	using Tasks				= TaskListT   <Payload,  TASK_CAPACITY>;
+	using TaskLinks			= StaticArrayT<TaskLink, TASK_CAPACITY>;
+	using Payloads			= StaticArrayT<Payload,  TASK_CAPACITY>;
 
-	using TasksBits		 = BitArrayT<STATE_COUNT>;
+	using TasksBits			= BitArrayT   <				STATE_COUNT>;
 
 	Tasks tasks;
 	TaskLinks taskLinks;
@@ -120,30 +118,32 @@ struct PlanDataT<ArgsT<TContext
 
 //------------------------------------------------------------------------------
 
-template <typename TContext
-		, typename TConfig
-		, typename TStateList
-		FFSM2_IF_SERIALIZATION(, Long NSerialBits)
-		, Long NSubstitutionLimit
-		, Long NTaskCapacity>
-struct PlanDataT<ArgsT<TContext
-					 , TConfig
-					 , TStateList
-					 FFSM2_IF_SERIALIZATION(, NSerialBits)
-					 , NSubstitutionLimit
-					 , NTaskCapacity
-					 , void>> final
+template <
+	typename TConfig
+  , typename TStateList
+  FFSM2_IF_SERIALIZATION(, Long NSerialBits)
+  , Long NTaskCapacity
+>
+struct PlanDataT<
+		   ArgsT<
+			   TConfig
+			 , TStateList
+			 FFSM2_IF_SERIALIZATION(, NSerialBits)
+			 , NTaskCapacity
+			 , void
+		   >
+	   > final
 {
-	using StateList		= TStateList;
+	using StateList			= TStateList;
 
-	static constexpr Long STATE_COUNT	= StateList::SIZE;
+	static constexpr Long  STATE_COUNT	= StateList ::SIZE;
 	static constexpr Long TASK_CAPACITY	= NTaskCapacity;
 
-	using Task			= TaskT<void>;
-	using Tasks			= TaskListT	  <void,	 TASK_CAPACITY>;
-	using TaskLinks		= StaticArrayT<TaskLink, TASK_CAPACITY>;
+	using Task				= TaskT		  <void>;
+	using Tasks				= TaskListT	  <void,	 TASK_CAPACITY>;
+	using TaskLinks			= StaticArrayT<TaskLink, TASK_CAPACITY>;
 
-	using TasksBits		= BitArrayT<STATE_COUNT>;
+	using TasksBits			= BitArrayT	  <				STATE_COUNT>;
 
 	Tasks tasks;
 	TaskLinks taskLinks;

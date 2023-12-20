@@ -5,10 +5,10 @@ namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <Long NBC>
+template <Long NBitCapacity>
 FFSM2_CONSTEXPR(14)
 bool
-StreamBufferT<NBC>::operator == (const StreamBuffer& buffer) const noexcept {
+StreamBufferT<NBitCapacity>::operator == (const StreamBuffer& buffer) const noexcept {
 	for (Long i = 0; i < BYTE_COUNT; ++i)
 		if (_data[i] != buffer._data[i])
 			return false;
@@ -18,10 +18,10 @@ StreamBufferT<NBC>::operator == (const StreamBuffer& buffer) const noexcept {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <Long NBC>
+template <Long NBitCapacity>
 FFSM2_CONSTEXPR(14)
 bool
-StreamBufferT<NBC>::operator != (const StreamBuffer& buffer) const noexcept {
+StreamBufferT<NBitCapacity>::operator != (const StreamBuffer& buffer) const noexcept {
 	for (Long i = 0; i < BYTE_COUNT; ++i)
 		if (_data[i] != buffer._data[i])
 			return true;
@@ -31,11 +31,11 @@ StreamBufferT<NBC>::operator != (const StreamBuffer& buffer) const noexcept {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <Long NBC>
+template <Long NBitCapacity>
 template <Short NBitWidth>
 FFSM2_CONSTEXPR(14)
 void
-BitWriteStreamT<NBC>::write(const UBitWidth<NBitWidth> item) noexcept {
+BitWriteStreamT<NBitCapacity>::write(const UBitWidth<NBitWidth> item) noexcept {
 	constexpr Short BIT_WIDTH = NBitWidth;
 	static_assert(BIT_WIDTH > 0, "STATIC ASSERT");
 
@@ -63,11 +63,11 @@ BitWriteStreamT<NBC>::write(const UBitWidth<NBitWidth> item) noexcept {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <Long NBC>
+template <Long NBitCapacity>
 template <Short NBitWidth>
 FFSM2_CONSTEXPR(14)
 UBitWidth<NBitWidth>
-BitReadStreamT<NBC>::read() noexcept {
+BitReadStreamT<NBitCapacity>::read() noexcept {
 	constexpr Short BIT_WIDTH = NBitWidth;
 	static_assert(BIT_WIDTH > 0, "STATIC ASSERT");
 

@@ -20,7 +20,7 @@ template <typename...>
 struct WrapInfoT;
 
 template <typename TH>
-struct WrapInfoT<	 TH> final {
+struct WrapInfoT	<TH> final {
 	using Type = SI_<TH>;
 };
 
@@ -40,28 +40,9 @@ struct SI_ final {
 	using Head				= THead;
 	using StateList			= TL_<Head>;
 
-	static constexpr Short WIDTH		= 1;
+	static constexpr Short WIDTH		  = 1;
 
-	static constexpr Long  STATE_COUNT	= StateList::SIZE;
-};
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-template <typename TI, typename... TR>
-struct CSI_<TL_<TI, TR...>> final {
-	using Initial			= WrapInfo<TI>;
-	using Remaining			= CSI_<TL_<TR...>>;
-	using StateList			= Merge<typename Initial::StateList,  typename Remaining::StateList>;
-
-	static constexpr Long  STATE_COUNT	= StateList::SIZE;
-};
-
-template <typename TI>
-struct CSI_<TL_<TI>> final {
-	using Initial			= WrapInfo<TI>;
-	using StateList			= typename Initial::StateList;
-
-	static constexpr Long  STATE_COUNT	= StateList::SIZE;
+	static constexpr Long  STATE_COUNT	  =  StateList::SIZE;
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -73,46 +54,68 @@ struct CI_ final {
 	using SubStates			= CSI_<TL_<TSubStates...>>;
 	using StateList			= typename SubStates::StateList;
 
-	static constexpr Short WIDTH		= sizeof...(TSubStates);
+	static constexpr Short WIDTH		  = sizeof...(TSubStates);
+
+	static constexpr Long  STATE_COUNT	  =  StateList::SIZE;
 
 #if FFSM2_SERIALIZATION_AVAILABLE()
-	static constexpr Long  WIDTH_BITS	= static_cast<Long>(bitWidth(WIDTH));
-	static constexpr Long  ACTIVE_BITS	= WIDTH_BITS;
+	static constexpr Long  WIDTH_BITS	  = static_cast<Long>(bitWidth(WIDTH));
+	static constexpr Long  ACTIVE_BITS	  = WIDTH_BITS;
 #endif
+};
 
-	static constexpr Long  STATE_COUNT	= StateList::SIZE;
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <typename TI, typename... TR>
+struct CSI_<TL_<TI, TR...>> final {
+	using Initial			= WrapInfo<TI>;
+	using Remaining			= CSI_<TL_<TR...>>;
+	using StateList			= Merge<typename Initial::StateList,  typename Remaining::StateList>;
+
+	static constexpr Long  STATE_COUNT	  =  StateList::SIZE;
+};
+
+template <typename TI>
+struct CSI_<TL_<TI>> final {
+	using Initial			= WrapInfo<TI>;
+	using StateList			= typename Initial::StateList;
+
+	static constexpr Long  STATE_COUNT	  =  StateList::SIZE;
 };
 
 // COMMON
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename TContext
-		, typename TConfig
-		, typename TStateList
-		FFSM2_IF_SERIALIZATION(, Long NSerialBits)
-		, Long NSubstitutionLimit
-		FFSM2_IF_PLANS(, Long NTaskCapacity)
-		, typename TPayload>
+template <
+	typename TConfig
+  , typename TStateList
+  FFSM2_IF_SERIALIZATION(, Long NSerialBits)
+  FFSM2_IF_PLANS(, Long NTaskCapacity)
+  , typename TPayload
+>
 struct ArgsT final {
-	using Context		= TContext;
+	using Config		= TConfig;
+	using Context		= typename Config::Context;
 	using PureContext	= Undecorate<Context>;
 
 #if FFSM2_LOG_INTERFACE_AVAILABLE()
-	using Logger		= typename TConfig::LoggerInterface;
+	using Logger		= typename Config::LoggerInterface;
 #endif
 
 	using StateList		= TStateList;
 
-	static constexpr Long  STATE_COUNT		  = StateList::SIZE;
+	static constexpr Long  STATE_COUNT			= StateList ::SIZE;
 
 #if FFSM2_SERIALIZATION_AVAILABLE()
-	static constexpr Short SERIAL_BITS		  = NSerialBits;
+	static constexpr Short SERIAL_BITS			= NSerialBits;
 #endif
 
-	static constexpr Short SUBSTITUTION_LIMIT = NSubstitutionLimit;
+	static constexpr Short SUBSTITUTION_LIMIT	= Config::SUBSTITUTION_LIMIT;
 
 #if FFSM2_PLANS_AVAILABLE()
-	static constexpr Long  TASK_CAPACITY	  = NTaskCapacity;
+	static constexpr Long  TASK_CAPACITY		= NTaskCapacity;
 #endif
 
 	using Payload		= TPayload;
@@ -148,14 +151,14 @@ struct MaterialT_  <NN, TA, TH> final {
 	using Type = S_<NN, TA, TH>;
 };
 
-template <StateID NN, typename TA, 			   typename... TS>
-struct MaterialT_  <NN, TA, CI_<void,   TS...>> {
-	using Type = C_<   TA, EmptyT<TA>, TS...>;
+template <StateID NN, typename TA, 				typename... TS>
+struct MaterialT_  <NN, TA, CI_<void	  , TS...>> {
+	using Type = C_<	TA,		EmptyT<TA>, TS...>;
 };
 
 template <StateID NN, typename TA, typename TH, typename... TS>
-struct MaterialT_  <NN, TA, CI_<TH,	   TS...>> {
-	using Type = C_<   TA,	   TH,	   TS...>;
+struct MaterialT_  <NN, TA, CI_<TH, TS...>> {
+	using Type = C_<	TA,		TH, TS...>;
 };
 
 template <StateID NN, typename... TS>
@@ -163,30 +166,33 @@ using MaterialT = typename MaterialT_<NN, TS...>::Type;
 
 //------------------------------------------------------------------------------
 
-template <typename TConfig,
-		  typename TApex>
+template <
+	typename TConfig
+  , typename TApex
+>
 struct RF_ final {
-	using Context		= typename TConfig::Context;
-	using Apex			= TApex;
+	using Config			= TConfig;
+	using Context			= typename Config::Context;
+	using Apex				= TApex;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	using StateList		= typename Apex::StateList;
+	using StateList			= typename Apex::StateList;
 
 	static constexpr Long  STATE_COUNT			= Apex::STATE_COUNT;
 
-	static constexpr Long  SUBSTITUTION_LIMIT	= TConfig::SUBSTITUTION_LIMIT;
+	static constexpr Short SUBSTITUTION_LIMIT	= Config::SUBSTITUTION_LIMIT;
 
 #if FFSM2_PLANS_AVAILABLE()
-	static constexpr Long  TASK_CAPACITY		= TConfig::TASK_CAPACITY != INVALID_LONG ?
-													  TConfig::TASK_CAPACITY : Apex::STATE_COUNT;
+	static constexpr Long  TASK_CAPACITY		= Config::TASK_CAPACITY != INVALID_LONG ?
+													  Config::TASK_CAPACITY : Apex::STATE_COUNT;
 #endif
 
-	using Payload		= typename TConfig::Payload;
-	using Transition	= TransitionT<Payload>;
+	using Payload			= typename Config::Payload;
+	using Transition		= TransitionT<Payload>;
 
 #if FFSM2_PLANS_AVAILABLE()
-	using Task			= typename TConfig::Task;
+	using Task				= typename Config::Task;
 #endif
 
 #if FFSM2_SERIALIZATION_AVAILABLE()
@@ -194,34 +200,34 @@ struct RF_ final {
 	static constexpr Long  SERIAL_BITS			= 1 + ACTIVE_BITS;
 #endif
 
-	using Args			= ArgsT<Context
-							  , TConfig
-							  , StateList
-							  FFSM2_IF_SERIALIZATION(, SERIAL_BITS)
-							  , SUBSTITUTION_LIMIT
-							  FFSM2_IF_PLANS(, TASK_CAPACITY)
-							  , Payload>;
+	using Args				= ArgsT<
+								  TConfig
+								, StateList
+								FFSM2_IF_SERIALIZATION(, SERIAL_BITS)
+								FFSM2_IF_PLANS(, TASK_CAPACITY)
+								, Payload
+							  >;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	using Instance		= InstanceT<TConfig, Apex>;
+	using Instance			= InstanceT<Config, Apex>;
 
-	using ConstControl	= ConstControlT<Args>;
-	using Control		= ControlT	   <Args>;
-	using FullControl	= FullControlT <Args>;
-	using GuardControl	= GuardControlT<Args>;
+	using ConstControl		= ConstControlT<Args>;
+	using Control			= ControlT	   <Args>;
+	using FullControl		= FullControlT <Args>;
+	using GuardControl		= GuardControlT<Args>;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	using State			= EmptyT<Args>;
+	using State				= EmptyT	   <Args>;
 
 	template <typename... TInjections>
-	using StateT		= A_<TInjections...>;
+	using StateT			= A_<TInjections...>;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #if FFSM2_LOG_INTERFACE_AVAILABLE()
-	using Logger		= typename TConfig::LoggerInterface;
+	using Logger			= typename Config::LoggerInterface;
 #endif
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

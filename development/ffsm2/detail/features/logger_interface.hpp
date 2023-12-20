@@ -1,11 +1,17 @@
 namespace ffsm2 {
 
+//------------------------------------------------------------------------------
+
+struct FFSM2_EMPTY_BASES EmptyContext {};
+
 #if FFSM2_LOG_INTERFACE_AVAILABLE()
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <FeatureTag NFeatureTag = FFSM2_FEATURE_TAG
-		, typename TContext = EmptyContext>
+template <
+	FeatureTag NFeatureTag = FFSM2_FEATURE_TAG
+  , typename TContext = EmptyContext
+>
 struct LoggerInterfaceT {
 	using Context		 = TContext;
 
@@ -64,8 +70,10 @@ struct LoggerInterfaceT {
 
 #else
 
-template <FeatureTag NFeatureTag = FFSM2_FEATURE_TAG
-		, typename TContext = EmptyContext>
+template <
+	FeatureTag NFeatureTag = FFSM2_FEATURE_TAG
+  , typename TContext = EmptyContext
+>
 using LoggerInterfaceT = void;
 
 #endif

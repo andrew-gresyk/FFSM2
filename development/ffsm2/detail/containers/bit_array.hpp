@@ -8,7 +8,7 @@ namespace detail {
 template <unsigned NCapacity>
 class BitArrayT final {
 public:
-	using Index	= UCapacity<NCapacity>;
+	using Index		= UCapacity<NCapacity>;
 
 	static constexpr Index CAPACITY   = NCapacity;
 	static constexpr Index UNIT_COUNT = contain(CAPACITY, 8);

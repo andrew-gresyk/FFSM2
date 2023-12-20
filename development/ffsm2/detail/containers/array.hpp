@@ -81,13 +81,13 @@ struct StaticArrayT<T, 0> final {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename T, Long NCapacity>
-class ArrayT final {
+class DynamicArrayT final {
 	template <typename>
 	friend class IteratorT;
 
 public:
-	using  Iterator	= IteratorT<      ArrayT>;
-	using CIterator	= IteratorT<const ArrayT>;
+	using  Iterator	= IteratorT<      DynamicArrayT>;
+	using CIterator	= IteratorT<const DynamicArrayT>;
 
 	using Item		= T;
 	using Index		= UCapacity<NCapacity>;
@@ -113,12 +113,12 @@ public:
 	FFSM2_CONSTEXPR(11)	 bool empty()								  const noexcept	{ return _count == 0;				}
 
 	// SPECIFIC
-	FFSM2_CONSTEXPR(14)	ArrayT& operator += (const Item & item)				noexcept;
-	FFSM2_CONSTEXPR(14)	ArrayT& operator += (	   Item&& item)				noexcept;
+	FFSM2_CONSTEXPR(14)	DynamicArrayT& operator += (const Item & item)		noexcept;
+	FFSM2_CONSTEXPR(14)	DynamicArrayT& operator += (	  Item&& item)		noexcept;
 	// SPECIFIC
 
 	template <Long N>
-	FFSM2_CONSTEXPR(14)	ArrayT& operator += (const ArrayT<Item, N>& other)	noexcept;
+	FFSM2_CONSTEXPR(14)	DynamicArrayT& operator += (const DynamicArrayT<Item, N>& other)	noexcept;
 
 	FFSM2_CONSTEXPR(14)	 Iterator  begin()									noexcept	{ return  Iterator(*this, first());	}
 	FFSM2_CONSTEXPR(11)	CIterator  begin()							  const noexcept	{ return CIterator(*this, first());	}
@@ -141,7 +141,7 @@ private:
 //------------------------------------------------------------------------------
 
 template <typename T>
-class ArrayT<T, 0> final {
+class DynamicArrayT<T, 0> final {
 public:
 	using Item	= T;
 	using Index	= UCapacity<0>;

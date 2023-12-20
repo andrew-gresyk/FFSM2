@@ -1,0 +1,18 @@
+namespace ffsm2 {
+namespace detail {
+
+////////////////////////////////////////////////////////////////////////////////
+
+template <typename TArgs>
+FFSM2_CONSTEXPR(14)
+void
+GuardControlT<TArgs>::cancelPendingTransition() noexcept {
+	_cancelled = true;
+
+	FFSM2_LOG_CANCELLED_PENDING(context(), _originId);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+}
+}

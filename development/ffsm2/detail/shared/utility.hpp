@@ -2,7 +2,6 @@ namespace ffsm2 {
 
 //------------------------------------------------------------------------------
 
-struct EmptyContext {};
 struct EmptyPayload final {};
 
 struct Automatic;
@@ -13,47 +12,42 @@ struct Manual;
 using Short		 = uint8_t;
 static constexpr Short		INVALID_SHORT		= UINT8_MAX;
 
+using Prong		 = Short;
+static constexpr Prong		INVALID_PRONG		= INVALID_SHORT;
+
 using Long		 = uint8_t;
 static constexpr Long		INVALID_LONG		= UINT8_MAX;
 
 using StateID	 = Long;
 static constexpr StateID	INVALID_STATE_ID	= INVALID_LONG;
 
-//------------------------------------------------------------------------------
-
 ////////////////////////////////////////////////////////////////////////////////
 
-template <bool B,
-		  typename TT,
-		  typename TF>
+template <
+	bool B
+  , typename TT
+  , typename TF
+>
 struct ConditionalT final {
 	using Type = TT;
 };
 
-template <typename TT,
-		  typename TF>
+template <
+	typename TT
+  , typename TF
+>
 struct ConditionalT<false, TT, TF> final {
 	using Type = TF;
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <bool B,
-		  typename TT,
-		  typename TF>
+template <
+	bool B
+  , typename TT
+  , typename TF
+>
 using Conditional = typename ConditionalT<B, TT, TF>::Type;
-
-//------------------------------------------------------------------------------
-
-template <typename, typename>
-struct IsSameT final {
-	static constexpr bool Value = false;
-};
-
-template <typename T>
-struct IsSameT<T, T> final {
-	static constexpr bool Value = true;
-};
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -257,6 +251,7 @@ contain(const T x,
 	return (x + static_cast<T>(to) - 1) / static_cast<T>(to);
 }
 
+//------------------------------------------------------------------------------
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
@@ -266,6 +261,7 @@ fill(T& a, const char value)											noexcept	{
 	memset(&a, static_cast<int>(value), sizeof(a));
 }
 
+//------------------------------------------------------------------------------
 ////////////////////////////////////////////////////////////////////////////////
 
 template <int>
