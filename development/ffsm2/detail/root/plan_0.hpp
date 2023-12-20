@@ -41,7 +41,7 @@ public:
 	struct Iterator final {
 		FFSM2_CONSTEXPR(14)	Iterator(const CPlanT& plan)				noexcept;
 
-		FFSM2_CONSTEXPR(11)	explicit operator bool()			  const noexcept;
+		FFSM2_CONSTEXPR(14)	explicit operator bool()			  const noexcept;
 
 		FFSM2_CONSTEXPR(14)	void operator ++()							noexcept;
 

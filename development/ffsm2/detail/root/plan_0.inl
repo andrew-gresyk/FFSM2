@@ -17,7 +17,7 @@ CPlanT<TArgs>::Iterator::Iterator(const CPlanT& plan) noexcept
 //------------------------------------------------------------------------------
 
 template <typename TArgs>
-FFSM2_CONSTEXPR(11)
+FFSM2_CONSTEXPR(14)
 CPlanT<TArgs>::Iterator::operator bool() const noexcept {
 	FFSM2_ASSERT(_curr < CPlanT::TASK_CAPACITY ||
 				 _curr == INVALID_LONG);
