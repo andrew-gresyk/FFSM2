@@ -364,16 +364,6 @@ template <
 >
 using Conditional = typename ConditionalT<B, TT, TF>::Type;
 
-template <typename, typename>
-struct IsSameT final {
-	static constexpr bool Value = false;
-};
-
-template <typename T>
-struct IsSameT<T, T> final {
-	static constexpr bool Value = true;
-};
-
 template <typename T>
 struct RemoveConstT final {
 	using Type = T;
@@ -2474,7 +2464,7 @@ private:
 	FFSM2_CONSTEXPR(11) StateID stateId()								noexcept	{ return index<StateList , TState>();		}
 
 public:
-	FFSM2_CONSTEXPR(11)	explicit operator bool()				  const noexcept;
+	FFSM2_CONSTEXPR(14)	explicit operator bool()				  const noexcept;
 
 	/// @brief Begin iteration over plan tasks
 	/// @return CIterator to the first task
@@ -2549,7 +2539,7 @@ CPlanT<TArgs>::Iterator::next() const noexcept {
 }
 
 template <typename TArgs>
-FFSM2_CONSTEXPR(11)
+FFSM2_CONSTEXPR(14)
 CPlanT<TArgs>::operator bool() const noexcept {
 	FFSM2_ASSERT(_bounds.first < TASK_CAPACITY &&
 				 _bounds.last  < TASK_CAPACITY ||
@@ -2653,7 +2643,7 @@ protected:
 	FFSM2_CONSTEXPR(14)	void clearTasks()								noexcept;
 
 public:
-	FFSM2_CONSTEXPR(11)	explicit operator bool()				  const noexcept;
+	FFSM2_CONSTEXPR(14)	explicit operator bool()				  const noexcept;
 
 	/// @brief Clear all tasks from the plan
 	FFSM2_CONSTEXPR(14)	void clear()									noexcept;
@@ -2901,7 +2891,7 @@ PlanT<TArgs>::clearTasks() noexcept	{
 }
 
 template <typename TArgs>
-FFSM2_CONSTEXPR(11)
+FFSM2_CONSTEXPR(14)
 PlanT<TArgs>::operator bool() const noexcept {
 	FFSM2_ASSERT(_bounds.first < TASK_CAPACITY &&
 				 _bounds.last  < TASK_CAPACITY ||

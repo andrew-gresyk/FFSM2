@@ -55,7 +55,7 @@ CPlanT<TArgs>::Iterator::next() const noexcept {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TArgs>
-FFSM2_CONSTEXPR(11)
+FFSM2_CONSTEXPR(14)
 CPlanT<TArgs>::operator bool() const noexcept {
 	FFSM2_ASSERT(_bounds.first < TASK_CAPACITY &&
 				 _bounds.last  < TASK_CAPACITY ||

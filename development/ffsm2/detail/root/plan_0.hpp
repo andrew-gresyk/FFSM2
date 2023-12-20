@@ -68,7 +68,7 @@ private:
 	FFSM2_CONSTEXPR(11) StateID stateId()								noexcept	{ return index<StateList , TState>();		}
 
 public:
-	FFSM2_CONSTEXPR(11)	explicit operator bool()				  const noexcept;
+	FFSM2_CONSTEXPR(14)	explicit operator bool()				  const noexcept;
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

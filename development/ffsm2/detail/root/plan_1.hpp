@@ -78,7 +78,7 @@ protected:
 	FFSM2_CONSTEXPR(14)	void clearTasks()								noexcept;
 
 public:
-	FFSM2_CONSTEXPR(11)	explicit operator bool()				  const noexcept;
+	FFSM2_CONSTEXPR(14)	explicit operator bool()				  const noexcept;
 
 	/// @brief Clear all tasks from the plan
 	FFSM2_CONSTEXPR(14)	void clear()									noexcept;
