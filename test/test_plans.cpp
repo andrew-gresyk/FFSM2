@@ -90,7 +90,7 @@ struct A
 	void enter(PlanControl& control) {
 		const auto plan = control.plan();
 
-		auto it = plan.first();
+		auto it = plan.begin();
 		REQUIRE(it);
 		REQUIRE(*it == FSM::Task{ FSM::stateId<A>(), FSM::stateId<B>() });
 

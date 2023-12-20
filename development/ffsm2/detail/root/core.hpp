@@ -38,8 +38,8 @@ struct CoreT {
 
 	Context context;
 	Registry registry;
-	FFSM2_IF_PLANS(PlanData planData);
 	Transition request;
+	FFSM2_IF_PLANS(PlanData planData);
 	FFSM2_IF_LOG_INTERFACE(Logger* logger);
 };
 

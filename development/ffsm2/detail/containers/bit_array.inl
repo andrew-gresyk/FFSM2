@@ -17,30 +17,30 @@ namespace detail {
 ////////////////////////////////////////////////////////////////////////////////
 // COMMON
 
-template <unsigned NCapacity>
+template <unsigned NC_>
 FFSM2_CONSTEXPR(14)
 void
-BitArrayT<NCapacity>::set() noexcept {
+BitArrayT<NC_>::set() noexcept {
 	for (uint8_t& unit : _storage)
 		unit = UINT8_MAX;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <unsigned NCapacity>
+template <unsigned NC_>
 FFSM2_CONSTEXPR(14)
 void
-BitArrayT<NCapacity>::clear() noexcept {
+BitArrayT<NC_>::clear() noexcept {
 	for (uint8_t& unit : _storage)
 		unit = uint8_t{0};
 }
 
 //------------------------------------------------------------------------------
 
-template <unsigned NCapacity>
+template <unsigned NC_>
 FFSM2_CONSTEXPR(14)
 bool
-BitArrayT<NCapacity>::empty() const noexcept {
+BitArrayT<NC_>::empty() const noexcept {
 	for (const uint8_t& unit : _storage)
 		if (unit != uint8_t{0})
 			return false;
@@ -53,11 +53,11 @@ BitArrayT<NCapacity>::empty() const noexcept {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //------------------------------------------------------------------------------
 
-template <unsigned NCapacity>
+template <unsigned NC_>
 template <typename TIndex>
 FFSM2_CONSTEXPR(14)
 bool
-BitArrayT<NCapacity>::get(const TIndex index) const noexcept {
+BitArrayT<NC_>::get(const TIndex index) const noexcept {
 	FFSM2_ASSERT(index < CAPACITY);
 
 	const Index unit = static_cast<Index>(index) / 8;
@@ -69,11 +69,11 @@ BitArrayT<NCapacity>::get(const TIndex index) const noexcept {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <unsigned NCapacity>
+template <unsigned NC_>
 template <typename TIndex>
 FFSM2_CONSTEXPR(14)
 void
-BitArrayT<NCapacity>::set(const TIndex index) noexcept {
+BitArrayT<NC_>::set(const TIndex index) noexcept {
 	FFSM2_ASSERT(index < CAPACITY);
 
 	const Index unit = static_cast<Index>(index) / 8;
@@ -85,11 +85,11 @@ BitArrayT<NCapacity>::set(const TIndex index) noexcept {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <unsigned NCapacity>
+template <unsigned NC_>
 template <typename TIndex>
 FFSM2_CONSTEXPR(14)
 void
-BitArrayT<NCapacity>::clear(const TIndex index) noexcept {
+BitArrayT<NC_>::clear(const TIndex index) noexcept {
 	FFSM2_ASSERT(index < CAPACITY);
 
 	const Index unit = static_cast<Index>(index) / 8;
@@ -101,10 +101,10 @@ BitArrayT<NCapacity>::clear(const TIndex index) noexcept {
 
 //------------------------------------------------------------------------------
 
-template <unsigned NCapacity>
+template <unsigned NC_>
 FFSM2_CONSTEXPR(14)
 bool
-BitArrayT<NCapacity>::operator & (const BitArray& other) const noexcept {
+BitArrayT<NC_>::operator & (const BitArray& other) const noexcept {
 	for (Index i = 0; i < UNIT_COUNT; ++i)
 		if ((_storage[i] & other._storage[i]) == 0)
 			return false;
@@ -114,10 +114,10 @@ BitArrayT<NCapacity>::operator & (const BitArray& other) const noexcept {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <unsigned NCapacity>
+template <unsigned NC_>
 FFSM2_CONSTEXPR(14)
 void
-BitArrayT<NCapacity>::operator &= (const BitArray& other) noexcept {
+BitArrayT<NC_>::operator &= (const BitArray& other) noexcept {
 	for (Index i = 0; i < UNIT_COUNT; ++i)
 		_storage[i] &= other._storage[i];
 }

@@ -28,13 +28,9 @@ FFSM2_CONSTEXPR(11)
 CoreT<TArgs>::CoreT(const CoreT& other) noexcept
 	: context {other.context }
 	, registry{other.registry}
-#if FFSM2_PLANS_AVAILABLE()
-	, planData{other.planData}
-#endif
 	, request {other.request }
-#if FFSM2_LOG_INTERFACE_AVAILABLE()
-	, logger  {other.logger  }
-#endif
+	FFSM2_IF_PLANS			   (, planData			 {other.planData		   })
+	FFSM2_IF_LOG_INTERFACE	   (, logger			 {other.logger			   })
 {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -44,13 +40,9 @@ FFSM2_CONSTEXPR(11)
 CoreT<TArgs>::CoreT(CoreT&& other) noexcept
 	: context {move(other.context )}
 	, registry{move(other.registry)}
-#if FFSM2_PLANS_AVAILABLE()
-	, planData{move(other.planData)}
-#endif
 	, request {move(other.request )}
-#if FFSM2_LOG_INTERFACE_AVAILABLE()
-	, logger  {move(other.logger  )}
-#endif
+	FFSM2_IF_PLANS			   (, planData			 {move(other.planData			)})
+	FFSM2_IF_LOG_INTERFACE	   (, logger			 {move(other.logger				)})
 {}
 
 ////////////////////////////////////////////////////////////////////////////////

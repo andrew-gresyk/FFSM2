@@ -75,6 +75,7 @@
 #endif
 
 //------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 #if defined _DEBUG && defined _MSC_VER
 	#define FFSM2_BREAK()										  __debugbreak()
@@ -112,6 +113,7 @@
 	#define FFSM2_ASSERT_OR(y, n)											   n
 #endif
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ////////////////////////////////////////////////////////////////////////////////
 
 #ifdef FFSM2_ENABLE_ALL
@@ -262,15 +264,21 @@
 		if (auto* const logger = control._core.logger)						   \
 			logger->recordMethod(control.context(), STATE_ID, METHOD_ID)
 
+	#define FFSM2_IF_LOG_STATE_METHOD(...)							 __VA_ARGS__
+
 #elif FFSM2_LOG_INTERFACE_AVAILABLE()
 
 	#define FFSM2_LOG_STATE_METHOD(METHOD, METHOD_ID)						   \
 		if (auto* const logger = control._core.logger)						   \
 			log(METHOD, *logger, control.context(), METHOD_ID)
 
+	#define FFSM2_IF_LOG_STATE_METHOD(...)							 __VA_ARGS__
+
 #else
 
 	#define FFSM2_LOG_STATE_METHOD(METHOD, METHOD_ID)
+
+	#define FFSM2_IF_LOG_STATE_METHOD(...)
 
 #endif
 

@@ -3,12 +3,19 @@ namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename TArgs,
-		  typename THead,
-		  typename... TSubStates>
+template <
+	typename TArgs
+  , typename THead
+  , typename... TSubStates
+>
 struct FFSM2_EMPTY_BASES C_
 	: S_<INVALID_STATE_ID, TArgs, THead>
-	, CS_<0, TArgs, 0, TL_<TSubStates...>>
+	, CS_<
+		  0
+		, TArgs
+		, 0
+		, TL_<TSubStates...>
+	  >
 {
 	using Args			= TArgs;
 
@@ -48,14 +55,19 @@ struct FFSM2_EMPTY_BASES C_
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	FFSM2_CONSTEXPR(11)	static Short&		compoRequested		  (		Control& control)	noexcept	{ return control._core.registry.requested;	}
+#if FFSM2_SERIALIZATION_AVAILABLE()
+	FFSM2_CONSTEXPR(11)	static Prong		compoRequested		  (const Registry& registry)	noexcept	{ return registry.requested;	}
+	FFSM2_CONSTEXPR(11)	static Prong&		compoRequested		  (		 Registry& registry)	noexcept	{ return registry.requested;	}
+#endif
 
-	FFSM2_CONSTEXPR(11)	static Short&		compoActive			  (		Control& control)	noexcept	{ return control._core.registry.active;		}
-	FFSM2_CONSTEXPR(11)	static Short		compoActive			  (ConstControl& control)	noexcept	{ return control._core.registry.active;		}
+	FFSM2_CONSTEXPR(11)	static Prong&		compoRequested		  (		Control& control)		noexcept	{ return control._core.registry.requested;	}
+
+	FFSM2_CONSTEXPR(11)	static Prong&		compoActive			  (		Control& control)		noexcept	{ return control._core.registry.active;		}
+	FFSM2_CONSTEXPR(11)	static Prong		compoActive			  (ConstControl& control)		noexcept	{ return control._core.registry.active;		}
 
 #if FFSM2_PLANS_AVAILABLE()
-	FFSM2_CONSTEXPR(11)	static TaskStatus&	headStatus			  (		Control& control)	noexcept	{ return control._core.planData.headStatus;	}
-	FFSM2_CONSTEXPR(11)	static TaskStatus&	 subStatus			  (		Control& control)	noexcept	{ return control._core.planData.subStatus;	}
+	FFSM2_CONSTEXPR(11)	static TaskStatus&	headStatus			  (		Control& control)		noexcept	{ return control._core.planData.headStatus;	}
+	FFSM2_CONSTEXPR(11)	static TaskStatus&	 subStatus			  (		Control& control)		noexcept	{ return control._core.planData.subStatus;	}
 #endif
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
