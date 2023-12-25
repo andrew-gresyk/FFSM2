@@ -1,5 +1,5 @@
 ﻿// FFSM2 (flat state machine for games and interactive applications)
-// 2.3.3 (2023-12-21)
+// 2.4.0 (2023-12-25)
 //
 // Created by Andrew Gresyk
 //
@@ -32,8 +32,8 @@
 #pragma once
 
 #define FFSM2_VERSION_MAJOR 2
-#define FFSM2_VERSION_MINOR 3
-#define FFSM2_VERSION_PATCH 3
+#define FFSM2_VERSION_MINOR 4
+#define FFSM2_VERSION_PATCH 0
 
 #define FFSM2_VERSION (10000 * FFSM2_VERSION_MAJOR + 100 * FFSM2_VERSION_MINOR + FFSM2_VERSION_PATCH)
 
@@ -491,8 +491,10 @@ move(T&& t)																noexcept	{
 	return static_cast<RemoveReference<T>&&>(t);
 }
 
-template <typename T0,
-		  typename T1>
+template <
+	typename T0
+  , typename T1
+>
 FFSM2_CONSTEXPR(11)
 T0
 min(const T0 t0,
@@ -502,8 +504,10 @@ min(const T0 t0,
 		   t0 : static_cast<T0>(t1);
 }
 
-template <typename T0,
-		  typename T1>
+template <
+	typename T0
+  , typename T1
+>
 FFSM2_CONSTEXPR(11)
 T0
 max(const T0 t0,
@@ -513,17 +517,21 @@ max(const T0 t0,
 		   t0 : static_cast<T0>(t1);
 }
 
-template <typename TIndex,
-		  typename TElement,
-		  TIndex NCount>
+template <
+	typename TIndex
+  , typename TElement
+  , TIndex NCount
+>
 FFSM2_CONSTEXPR(11)
 TIndex
-count(const TElement(&)[NCount])										noexcept	{
+count(const TElement (&)[NCount])										noexcept	{
 	return NCount;
 }
 
-template <typename T,
-		  typename TT>
+template <
+	typename T
+  , typename TT
+>
 FFSM2_CONSTEXPR(11)
 T
 contain(const T x,
@@ -537,6 +545,12 @@ FFSM2_CONSTEXPR(14)
 void
 fill(T& a, const char value)											noexcept	{
 	memset(&a, static_cast<int>(value), sizeof(a));
+}
+
+template<class T>
+FFSM2_CONSTEXPR(14)
+void destroy(T& t)														noexcept	{
+	t.~T();
 }
 
 template <int>

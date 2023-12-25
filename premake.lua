@@ -203,8 +203,7 @@ project "debug_logger_interface-clang"
 project "temp-14"
 	cppdialect "C++11"
 	files {
-		"development/**.*",
-		"temp/**.*",
+		"examples/temp/**.*",
 	}
 	kind "ConsoleApp"
 	toolset "msc-v140"
@@ -212,8 +211,7 @@ project "temp-14"
 project "temp-15"
 	cppdialect "C++14"
 	files {
-		"development/**.*",
-		"temp/**.*",
+		"examples/temp/**.*",
 	}
 	kind "ConsoleApp"
 	toolset "msc-v141"
@@ -221,8 +219,7 @@ project "temp-15"
 project "temp-16"
 	cppdialect "C++17"
 	files {
-		"development/**.*",
-		"temp/**.*",
+		"examples/temp/**.*",
 	}
 	kind "ConsoleApp"
 	toolset "msc-v142"
@@ -230,8 +227,7 @@ project "temp-16"
 project "temp-17"
 	cppdialect "C++20"
 	files {
-		"development/**.*",
-		"temp/**.*",
+		"examples/temp/**.*",
 	}
 	kind "ConsoleApp"
 	toolset "msc-v143"
@@ -239,8 +235,7 @@ project "temp-17"
 project "temp-clang"
 	cppdialect "C++20"
 	files {
-		"development/**.*",
-		"temp/**.*",
+		"examples/temp/**.*",
 	}
 	kind "ConsoleApp"
 	toolset "msc-ClangCL"

@@ -1,19 +1,26 @@
-// FFSM2 (flat state machine for games and interactive applications)
+// FFSM2 (hierarchical state machine for games and interactive applications)
 // Created by Andrew Gresyk
 
-#pragma once
+#include <cstddef> // max_align_t
+
+////////////////////////////////////////////////////////////////////////////////
 
 class Actor {
 public:
-	using FsmHost = char[32]; // the size is hand-adjusted
-
-	struct Context { /* .. */ };
+	struct alignas(std::max_align_t) FsmHost {
+		char buffer[104]; // the size is hand-adjusted
+	};
 
 public:
 	Actor();
 	~Actor();
 
+	void turnOn();
+
+	bool isOn() const;
+
 private:
-	Context _context;
 	FsmHost _fsmHost;
 };
+
+////////////////////////////////////////////////////////////////////////////////

@@ -204,8 +204,10 @@ move(T&& t)																noexcept	{
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename T0,
-		  typename T1>
+template <
+	typename T0
+  , typename T1
+>
 FFSM2_CONSTEXPR(11)
 T0
 min(const T0 t0,
@@ -217,8 +219,10 @@ min(const T0 t0,
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <typename T0,
-		  typename T1>
+template <
+	typename T0
+  , typename T1
+>
 FFSM2_CONSTEXPR(11)
 T0
 max(const T0 t0,
@@ -230,19 +234,23 @@ max(const T0 t0,
 
 //------------------------------------------------------------------------------
 
-template <typename TIndex,
-		  typename TElement,
-		  TIndex NCount>
+template <
+	typename TIndex
+  , typename TElement
+  , TIndex NCount
+>
 FFSM2_CONSTEXPR(11)
 TIndex
-count(const TElement(&)[NCount])										noexcept	{
+count(const TElement (&)[NCount])										noexcept	{
 	return NCount;
 }
 
 //------------------------------------------------------------------------------
 
-template <typename T,
-		  typename TT>
+template <
+	typename T
+  , typename TT
+>
 FFSM2_CONSTEXPR(11)
 T
 contain(const T x,
@@ -251,7 +259,6 @@ contain(const T x,
 	return (x + static_cast<T>(to) - 1) / static_cast<T>(to);
 }
 
-//------------------------------------------------------------------------------
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
@@ -262,6 +269,14 @@ fill(T& a, const char value)											noexcept	{
 }
 
 //------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+
+template<class T>
+FFSM2_CONSTEXPR(14)
+void destroy(T& t)														noexcept	{
+	t.~T();
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 template <int>
