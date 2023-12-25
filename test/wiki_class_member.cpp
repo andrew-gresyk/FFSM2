@@ -1,11 +1,11 @@
-// FFSM2 (hierarchical state machine for games and interactive applications)
+// FFSM2 (flat state machine for games and interactive applications)
 // Created by Andrew Gresyk
 
 #include "wiki_class_member.hpp"
 
-#include "ffsm2/machine.hpp"
+#include <ffsm2/machine_dev.hpp>
 
-#include "doctest/doctest.h"
+#include <doctest/doctest.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace actor_fsm {
