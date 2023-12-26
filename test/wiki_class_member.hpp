@@ -1,6 +1,8 @@
 // FFSM2 (flat state machine for games and interactive applications)
 // Created by Andrew Gresyk
 
+#pragma once
+
 #include <cstddef> // max_align_t
 
 ////////////////////////////////////////////////////////////////////////////////
