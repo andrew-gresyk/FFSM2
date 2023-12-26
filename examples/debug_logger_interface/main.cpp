@@ -87,7 +87,7 @@ struct Logger
 {
 	void recordMethod(const Context& /*context*/,
 					  const ffsm2::StateID /*origin*/,
-					  const Method method) noexcept override
+					  const Method method) override
 	{
 		std::cout //<< ffsm2::stateName(origin) << "::"
 				  << ffsm2::methodName(method) << "()\n";
@@ -95,7 +95,7 @@ struct Logger
 
 	void recordTransition(const Context& /*context*/,
 						  const ffsm2::StateID /*origin*/,
-						  const ffsm2::StateID /*target*/) noexcept override
+						  const ffsm2::StateID /*target*/) override
 	{
 		std::cout //<< ffsm2::stateName(origin) << ": "
 				  << "changeTo<"

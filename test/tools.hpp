@@ -50,14 +50,14 @@ struct Event final {
 
 	Event(const ffsm2::StateID origin_,
 		  const Type type_,
-		  const ffsm2::StateID target_ = ffsm2::INVALID_STATE_ID) noexcept
+		  const ffsm2::StateID target_ = ffsm2::INVALID_STATE_ID)
 		: origin{origin_}
 		, type{type_}
 		, target{target_}
 	{}
 
 	Event(const Type type_,
-		  const ffsm2::StateID target_) noexcept
+		  const ffsm2::StateID target_)
 		: origin{ffsm2::INVALID_STATE_ID}
 		, type{type_}
 		, target{target_}
@@ -88,27 +88,27 @@ struct LoggerT final
 
 	void recordMethod(const Context& context,
 					  const StateID origin,
-					  const Method method) noexcept override;
+					  const Method method) override;
 
 	void recordTransition(const Context& context,
 						  const StateID origin,
-						  const StateID target) noexcept override;
+						  const StateID target) override;
 
 #if FFSM2_PLANS_AVAILABLE()
 
 	void recordTaskStatus(const Context& context,
 						  const StateID origin,
-						  const StatusEvent event) noexcept override;
+						  const StatusEvent event) override;
 
 	void recordPlanStatus(const Context& context,
-						  const StatusEvent event) noexcept override;
+						  const StatusEvent event) override;
 
 #endif
 
 	void recordCancelledPending(const Context& context,
-								const StateID origin) noexcept override;
+								const StateID origin) override;
 
-	void assertSequence(const Events& reference) noexcept;
+	void assertSequence(const Events& reference);
 
 	Events history;
 };

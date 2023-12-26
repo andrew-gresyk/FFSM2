@@ -80,7 +80,7 @@ struct Logger
 
 	void recordTransition(const Context& /*context*/,
 						  const StateID origin,
-						  const StateID target) noexcept override
+						  const StateID target) override
 	{
 		std::cout << stateName(origin) << " -> " << stateName(target) << "\n";
 	}
