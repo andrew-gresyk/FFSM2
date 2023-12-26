@@ -3,7 +3,7 @@
 
 #include "wiki_class_member.hpp"
 
-#include <ffsm2/machine_dev.hpp>
+#include <ffsm2/machine.hpp>
 
 #include <doctest/doctest.h>
 
