@@ -1,7 +1,7 @@
 workspace "ffsm2"
 	configurations {
-		"debug",
-		"release"
+		"Debug",
+		"Release"
 	}
 	conformancemode "On"
 	debugdir "."
@@ -23,15 +23,15 @@ workspace "ffsm2"
 	location "projects/premake"
 	objdir "$(BUILD_ROOT)/$(SolutionName)-$(PlatformArchitecture)/$(ProjectName)-$(Configuration)/"
 	platforms {
-		"32",
-		"64",
+		"x86",
+		"x64",
 	}
 
 	system "windows"
 	systemversion "latest"
 	--systemversion "$([Microsoft.Build.Utilities.ToolLocationHelper]::GetLatestSDKTargetPlatformVersion('Windows', '10.0'))"
 
-	targetdir "binaries-$(PlatformArchitecture)/"
+	targetdir "binaries/"
 	targetname "$(ProjectName)-$(Configuration)-$(PlatformArchitecture)"
 	warnings "High"
 
@@ -203,8 +203,7 @@ project "debug_logger_interface-clang"
 project "temp-14"
 	cppdialect "C++11"
 	files {
-		"development/**.*",
-		"temp/**.*",
+		"examples/temp/**.*",
 	}
 	kind "ConsoleApp"
 	toolset "msc-v140"
@@ -212,8 +211,7 @@ project "temp-14"
 project "temp-15"
 	cppdialect "C++14"
 	files {
-		"development/**.*",
-		"temp/**.*",
+		"examples/temp/**.*",
 	}
 	kind "ConsoleApp"
 	toolset "msc-v141"
@@ -221,8 +219,7 @@ project "temp-15"
 project "temp-16"
 	cppdialect "C++17"
 	files {
-		"development/**.*",
-		"temp/**.*",
+		"examples/temp/**.*",
 	}
 	kind "ConsoleApp"
 	toolset "msc-v142"
@@ -230,8 +227,7 @@ project "temp-16"
 project "temp-17"
 	cppdialect "C++20"
 	files {
-		"development/**.*",
-		"temp/**.*",
+		"examples/temp/**.*",
 	}
 	kind "ConsoleApp"
 	toolset "msc-v143"
@@ -239,8 +235,7 @@ project "temp-17"
 project "temp-clang"
 	cppdialect "C++20"
 	files {
-		"development/**.*",
-		"temp/**.*",
+		"examples/temp/**.*",
 	}
 	kind "ConsoleApp"
 	toolset "msc-ClangCL"
