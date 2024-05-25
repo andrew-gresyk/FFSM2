@@ -44,6 +44,16 @@ jobs:
               CXX: g++-12
             }
           - {
+              OS: ubuntu-22.04,
+              CC: gcc-13,
+              CXX: g++-13
+            }
+          - {
+              OS: ubuntu-22.04,
+              CC: gcc-14,
+              CXX: g++-14
+            }
+          - {
               OS: ubuntu-20.04,
               CC: clang-6.0,
               CXX: clang++-6.0,
@@ -101,12 +111,12 @@ jobs:
               VERSION: '15'
             }
           - {
-              OS: macos-11,
+              OS: macos-14,
               CC: clang,
               CXX: clang++
             }
           - {
-              OS: macos-12,
+              OS: macos-14-large,
               CC: clang,
               CXX: clang++
             }

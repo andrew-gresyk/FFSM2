@@ -17,10 +17,6 @@ struct G_ final {
 	using Context			 = TContext;
 	using Activation		 = TActivation;
 
-#if FFSM2_LOG_INTERFACE_AVAILABLE()
-	using LoggerInterface	 = LoggerInterfaceT<FEATURE_TAG, Context>;
-#endif
-
 	static constexpr Short SUBSTITUTION_LIMIT = NSubstitutionLimit;
 
 #if FFSM2_PLANS_AVAILABLE()
@@ -34,8 +30,12 @@ struct G_ final {
 	using Task				 = TaskT<Payload>;
 #endif
 
+#if FFSM2_LOG_INTERFACE_AVAILABLE()
+	using LoggerInterface	 = LoggerInterfaceT<FEATURE_TAG, Context>;
+#endif
+
 	/// @brief Set Context type
-	/// @tparam T Context type for data shared between states and/or data interface between FSM and external code
+	/// @tparam `T` Context type for data shared between states and/or data interface between FSM and external code
 	template <typename T>
 	using ContextT			 = G_<FEATURE_TAG, T	  , Activation, SUBSTITUTION_LIMIT FFSM2_IF_PLANS(, TASK_CAPACITY), Payload>;
 
@@ -46,21 +46,21 @@ struct G_ final {
 #endif
 
 	/// @brief Set Substitution limit
-	/// @tparam N Maximum number times 'guard()' methods can substitute their states for others
-	template <Long N>
+	/// @tparam `N` Maximum number times 'guard()' methods can substitute their states for others
+	template <Short N>
 	using SubstitutionLimitN = G_<FEATURE_TAG, Context, Activation, N				   FFSM2_IF_PLANS(, TASK_CAPACITY), Payload>;
 
 #if FFSM2_PLANS_AVAILABLE()
 
 	/// @brief Set Task capacity
-	/// @tparam N Maximum number of tasks across all plans
+	/// @tparam `N` Maximum number of tasks across all plans
 	template <Long N>
 	using TaskCapacityN		 = G_<FEATURE_TAG, Context, Activation, SUBSTITUTION_LIMIT				  , N             , Payload>;
 
 #endif
 
 	/// @brief Set Transition Payload type
-	/// @tparam T Utility type for 'TUtility State::utility() const' method
+	/// @tparam `T` Payload type
 	template <typename T>
 	using PayloadT			 = G_<FEATURE_TAG, Context, Activation, SUBSTITUTION_LIMIT FFSM2_IF_PLANS(, TASK_CAPACITY), T      >;
 };
@@ -116,13 +116,13 @@ struct M_<
 	// COMMON
 
 	/// @brief Root
-	/// @tparam THead Head state
-	/// @tparam TSubStates Sub-states
+	/// @tparam `THead` Head state
+	/// @tparam `TSubStates` Sub-states
 	template <typename THead, typename... TSubStates>
 	using Root				= RF_<Cfg, CI_<THead, TSubStates...>>;
 
 	/// @brief Headless root
-	/// @tparam TSubStates Sub-states
+	/// @tparam `TSubStates` Sub-states
 	template <				  typename... TSubStates>
 	using PeerRoot			= RF_<Cfg, CI_<void,  TSubStates...>>;
 
@@ -148,8 +148,8 @@ using Config = detail::G_<
 					   >;
 
 /// @brief 'Template namespace' for FSM classes
-/// @tparam TConfig 'ConfigT<>' type configuration for MachineT<>
-/// @see ConfigT<>
+/// @tparam `TConfig` `ConfigT<>` type configuration for MachineT<>
+/// @see `ConfigT<>`
 template <typename TConfig = Config>
 using MachineT = detail::M_<TConfig>;
 
