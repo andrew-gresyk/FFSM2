@@ -1,5 +1,5 @@
 // FFSM2 (flat state machine for games and interactive applications)
-// 2.4.0 (2023-12-25)
+// 2.5.1 (2024-05-25)
 //
 // Created by Andrew Gresyk
 //
@@ -9,7 +9,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2023
+// Copyright (c) 2024
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,10 +32,12 @@
 #pragma once
 
 #define FFSM2_VERSION_MAJOR 2
-#define FFSM2_VERSION_MINOR 4
-#define FFSM2_VERSION_PATCH 0
+#define FFSM2_VERSION_MINOR 5
+#define FFSM2_VERSION_PATCH 1
 
 #define FFSM2_VERSION (10000 * FFSM2_VERSION_MAJOR + 100 * FFSM2_VERSION_MINOR + FFSM2_VERSION_PATCH)
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #include <stdint.h>			// uint32_t, uint64_t
 #include <string.h>			// memcpy_s()
