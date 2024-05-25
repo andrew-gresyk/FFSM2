@@ -111,12 +111,27 @@ jobs:
               VERSION: '15'
             }
           - {
-              OS: macos-14,
+              OS: macos-13-xlarge,
+              CC: gcc-11,
+              CXX: g++-11
+            }
+          - {
+              OS: macos-13-xlarge,
+              CC: gcc-12,
+              CXX: g++-12
+            }
+          - {
+              OS: macos-13-xlarge,
+              CC: gcc-13,
+              CXX: g++-13
+            }
+          - {
+              OS: macos-13,
               CC: clang,
               CXX: clang++
             }
           - {
-              OS: macos-14-large,
+              OS: macos-13-xlarge,
               CC: clang,
               CXX: clang++
             }
