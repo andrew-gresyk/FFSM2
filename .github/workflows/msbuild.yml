@@ -6,15 +6,25 @@ on:
   pull_request:
     branches: [ master ]
 
-env:
-  SOLUTION_FILE_PATH: projects\premake\ffsm2-vs.sln
-
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.PLATFORM.OS }}
+
+    env:
+      SOLUTION_FILE_PATH: ${{ matrix.PLATFORM.SOLUTION_FILE_PATH }}
 
     strategy:
       matrix:
+        PLATFORM:
+          - {
+              OS: windows-2019,
+              SOLUTION_FILE_PATH: projects\premake\ffsm2-vs-2019.sln
+            }
+          - {
+              OS: windows-2022,
+              SOLUTION_FILE_PATH: projects\premake\ffsm2-vs-2022.sln
+            }
+
         BUILD_CONFIG: [ Release, Debug ]
         BUILD_PLATFORM: [ 32, 64 ]
 
@@ -26,7 +36,6 @@ jobs:
 
     - name: Build
       working-directory: ${{env.GITHUB_WORKSPACE}}
-      # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
       run: msbuild /m /p:Configuration=${{matrix.BUILD_CONFIG}} /p:Platform=${{matrix.BUILD_PLATFORM}} ${{env.SOLUTION_FILE_PATH}}
 
     - name: Test

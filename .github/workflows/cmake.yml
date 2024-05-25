@@ -44,12 +44,12 @@ jobs:
               CXX: g++-12
             }
           - {
-              OS: ubuntu-22.04,
+              OS: ubuntu-24.04,
               CC: gcc-13,
               CXX: g++-13
             }
           - {
-              OS: ubuntu-22.04,
+              OS: ubuntu-24.04,
               CC: gcc-14,
               CXX: g++-14
             }
