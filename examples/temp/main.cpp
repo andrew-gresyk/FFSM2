@@ -5,9 +5,12 @@
 
 //------------------------------------------------------------------------------
 
-struct Context {};
+#include <variant>
 
-using Config = ffsm2::Config::ContextT<Context*>;
+struct Context {};
+using Payload = std::variant<int>; // This doesn't work
+
+using Config = ffsm2::Config::ContextT<Context*>::PayloadT<Payload>;
 
 using M = ffsm2::MachineT<Config>;
 

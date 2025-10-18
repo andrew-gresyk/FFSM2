@@ -10,6 +10,8 @@
 // Include FFSM2 header:
 #include <ffsm2/machine.hpp>
 
+namespace wiki_tutorial {
+
 ////////////////////////////////////////////////////////////////////////////////
 
 // Define interface class between the state machine and its host
@@ -32,8 +34,8 @@ using M = ffsm2::MachineT<Config>;
 #define S(s) struct s
 
 using FSM = M::Root<S(On),
-                S(Off),                                // initial top-level state
-                S(Red),					               // initial sub-state of the region
+                S(Off),                                        // initial top-level state
+                S(Red),					                       // initial sub-state of the region
                 S(Yellow),
                 S(Green),
                 S(Done)
@@ -53,57 +55,57 @@ struct Event {};
 struct Off
     : FSM::State
 {
-    void entryGuard(FullControl& control) {            // called before state activation, use to re-route transitions
-        if (control.context().powerOn)                 // access shared data
-            control.changeTo<Red>();                   // initiate a transition into 'On' region
+    void entryGuard(FullControl& control) {                    // called before state activation, use to re-route transitions
+        if (control.context().powerOn)                         // access shared data
+            control.changeTo<Red>();                           // initiate a transition into 'On' region
     }
 
-    void exit(PlanControl& /*control*/) {}             // called on state deactivation
+    void exit(PlanControl& /*control*/) {}                     // called on state deactivation
 };
 
 struct On
     : FSM::State
 {
-    void enter(PlanControl& control) {                 // called on state activation
-        auto plan = control.plan();                    // access the plan for the region
+    void enter(PlanControl& control) {                         // called on state activation
+        auto plan = control.plan();                            // access the plan for the region
 
-        plan.change<Red, Yellow>();                    // sequence plan steps, executed when the previous state succeeds
+        plan.change<Red, Yellow>();                            // sequence plan steps, executed when the previous state succeeds
         plan.change<Yellow, Green>();
         plan.change<Green, Yellow>();
         plan.change<Yellow, Red>();
     }
 
-    void exit(PlanControl& /*control*/) {}             // called on state deactivation
+    void exit(PlanControl& /*control*/) {}                     // called on state deactivation
 
-    void planSucceeded(FullControl& control) {         // called on the successful completion of all plan steps
+    void planSucceeded(FullControl& control) {                 // called on the successful completion of all plan steps
         control.changeTo<Done>();
     }
 
-    void planFailed(FullControl& /*control*/) {}       // called if any of the plan steps fails
+    void planFailed(FullControl& /*control*/) {}               // called if any of the plan steps fails
 };
 
 struct Red
     : FSM::State
 {
-    void update(FullControl& control) {                // called on periodic state machine updates
-        control.succeed();                             // notify successful completion of the plan step
-    }                                                  // plan will advance to the 'Yellow' state
+    void update(FullControl& control) {                        // called on periodic state machine updates
+        control.succeed();                                     // notify successful completion of the plan step
+    }                                                          // plan will advance to the 'Yellow' state
 };
 
 struct Yellow
     : FSM::State
 {
     void update(FullControl& control) {
-        control.succeed();                             // plan will advance to the 'Green' state on the first entry
-                                                       // and 'Red' state on the second one
+        control.succeed();                                     // plan will advance to the 'Green' state on the first entry
+                                                               // and 'Red' state on the second one
     }
 };
 
 struct Green
     : FSM::State
 {
-    void react(const Event&, FullControl& control) {   // called on external events
-        control.succeed();                             // advance to the next plan step
+    void react(const Event&, FullControl& control) {           // called on external events
+        control.succeed();                                     // advance to the next plan step
     }
 };
 
@@ -120,22 +122,24 @@ TEST_CASE("Wiki.Tutorial") {
     context.powerOn = true;
 
     FSM::Instance fsm{context};
-    REQUIRE(fsm.isActive<Red>());                       // On's initial sub-state
+    REQUIRE(fsm.isActive<Red>());                              // On's initial sub-state
 
     fsm.update();
-    REQUIRE(fsm.isActive<Yellow>());                    // 1st setp of On's plan
+    REQUIRE(fsm.isActive<Yellow>());                           // 1st setp of On's plan
 
     fsm.update();
-    REQUIRE(fsm.isActive<Green>());                     // 2nd setp of On's plan
+    REQUIRE(fsm.isActive<Green>());                            // 2nd setp of On's plan
 
     fsm.react(Event{});
-    REQUIRE(fsm.isActive<Yellow>());                    // 3rd setp of On's plan
+    REQUIRE(fsm.isActive<Yellow>());                           // 3rd setp of On's plan
 
     fsm.update();
-    REQUIRE(fsm.isActive<Red>());                       // 4th setp of On's plan
+    REQUIRE(fsm.isActive<Red>());                              // 4th setp of On's plan
 
     fsm.update();
-    REQUIRE(fsm.isActive<Done>());                      // activated by On::planSucceeded()
+    REQUIRE(fsm.isActive<Done>());                             // activated by On::planSucceeded()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+}

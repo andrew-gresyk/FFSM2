@@ -5,6 +5,8 @@
 #define FFSM2_ENABLE_PLANS
 #include "tools.hpp"
 
+using namespace test_tools;
+
 namespace test_plan_external_payloads {
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -74,7 +76,10 @@ struct Apex
 	}
 
 	void planFailed(FullControl& control) {
-		REQUIRE(control.plan());
+		auto plan = control.plan();
+
+		REQUIRE(plan);
+		plan.clear();
 
 		control.changeWith<D>(Payload{});
 	}

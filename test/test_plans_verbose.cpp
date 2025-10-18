@@ -5,6 +5,8 @@
 #define FFSM2_ENABLE_VERBOSE_DEBUG_LOG
 #include "tools.hpp"
 
+using namespace test_tools;
+
 namespace test_plans_verbose {
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -83,7 +85,10 @@ struct Apex
 	}
 
 	void planFailed(FullControl& control) {
-		REQUIRE(control.plan());
+		auto plan = control.plan();
+
+		REQUIRE(plan);
+		plan.clear();
 
 		control.changeTo<D>();
 	}

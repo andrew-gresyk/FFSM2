@@ -5,6 +5,8 @@
 #define FFSM2_DISABLE_TYPEINDEX
 #include "tools.hpp"
 
+using namespace test_tools;
+
 namespace test_manual_activation {
 
 ////////////////////////////////////////////////////////////////////////////////

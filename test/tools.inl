@@ -1,6 +1,8 @@
 // FFSM2 (flat state machine for games and interactive applications)
 // Created by Andrew Gresyk
 
+namespace test_tools {
+
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TConfig>
@@ -21,9 +23,13 @@ LoggerT<TConfig>::recordMethod(const Context& /*context*/,
 			history.emplace_back(origin, Event::Type::ENTER);
 			break;
 
+	//#ifdef FFSM2_ENABLE_REENTER
+
 		case Method::REENTER:
 			history.emplace_back(origin, Event::Type::REENTER);
 			break;
+
+	//#endif
 
 		case Method::PRE_UPDATE:
 			history.emplace_back(origin, Event::Type::PRE_UPDATE);
@@ -57,7 +63,7 @@ LoggerT<TConfig>::recordMethod(const Context& /*context*/,
 			history.emplace_back(origin, Event::Type::EXIT);
 			break;
 
-	#if FFSM2_PLANS_AVAILABLE()
+	//#ifdef FFSM2_ENABLE_PLANS
 
 		case Method::PLAN_SUCCEEDED:
 			history.emplace_back(origin, Event::Type::PLAN_SUCCEEDED);
@@ -67,10 +73,10 @@ LoggerT<TConfig>::recordMethod(const Context& /*context*/,
 			history.emplace_back(origin, Event::Type::PLAN_FAILED);
 			break;
 
-	#endif
+	//#endif
 
 		default:
-			FFSM2_BREAK();
+			assert(false);
 	}
 }
 
@@ -78,7 +84,7 @@ LoggerT<TConfig>::recordMethod(const Context& /*context*/,
 
 template <typename TConfig>
 void
-LoggerT<TConfig>::recordTransition(const Context& /*context*/,
+LoggerT<TConfig>::recordTransition(const Context& UNUSED(context),
 								   const StateID origin,
 								   const StateID target)
 {
@@ -87,11 +93,11 @@ LoggerT<TConfig>::recordTransition(const Context& /*context*/,
 
 //------------------------------------------------------------------------------
 
-#if FFSM2_PLANS_AVAILABLE()
+#ifdef FFSM2_ENABLE_PLANS
 
 template <typename TConfig>
 void
-LoggerT<TConfig>::recordTaskStatus(const Context& /*context*/,
+LoggerT<TConfig>::recordTaskStatus(const Context& UNUSED(context),
 								   const StateID origin,
 								   const StatusEvent event)
 {
@@ -105,15 +111,15 @@ LoggerT<TConfig>::recordTaskStatus(const Context& /*context*/,
 			break;
 
 		default:
-			FFSM2_BREAK();
+			assert(false);
 	}
 }
 
-//------------------------------------------------------------------------------
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <typename TConfig>
 void
-LoggerT<TConfig>::recordPlanStatus(const Context& /*context*/,
+LoggerT<TConfig>::recordPlanStatus(const Context& UNUSED(context),
 								   const StatusEvent event)
 {
 	switch (event) {
@@ -126,18 +132,17 @@ LoggerT<TConfig>::recordPlanStatus(const Context& /*context*/,
 			break;
 
 		default:
-			FFSM2_BREAK();
+			assert(false);
 	}
 }
 
 #endif
 
-
 //------------------------------------------------------------------------------
 
 template <typename TConfig>
 void
-LoggerT<TConfig>::recordCancelledPending(const Context& /*context*/,
+LoggerT<TConfig>::recordCancelledPending(const Context& UNUSED(context),
 										 const StateID origin)
 {
 	history.emplace_back(origin, Event::Type::CANCEL_PENDING);
@@ -148,18 +153,21 @@ LoggerT<TConfig>::recordCancelledPending(const Context& /*context*/,
 template <typename TConfig>
 void
 LoggerT<TConfig>::assertSequence(const Events& reference) {
-	const auto count = std::max(history.size(), reference.size());
+	const auto count = ffsm2::max(history.size(), reference.size());
 
 	for (unsigned i = 0; i < count; ++i) {
-		REQUIRE(i < history.size()); //-V521
-		REQUIRE(i < reference.size()); //-V521
+		REQUIRE(i < history  .size());
+		REQUIRE(i < reference.size());
 
-		if (i < history.size() &&
+		if (i < history	 .size() &&
 			i < reference.size())
 		{
-			REQUIRE(history[i].type	  == reference[i].type); //-V521
-			REQUIRE(history[i].origin == reference[i].origin); //-V521
-			REQUIRE(history[i].target == reference[i].target); //-V521
+			const Event h = history  [i];
+			const Event r = reference[i];
+
+			REQUIRE(h.type	 == r.type	);
+			REQUIRE(h.origin == r.origin);
+			REQUIRE(h.target == r.target);
 		}
 	}
 
@@ -167,3 +175,5 @@ LoggerT<TConfig>::assertSequence(const Events& reference) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+}

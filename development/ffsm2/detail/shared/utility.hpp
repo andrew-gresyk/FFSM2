@@ -20,6 +20,7 @@ static constexpr Long		INVALID_LONG		= UINT8_MAX;
 
 using StateID	 = Long;
 static constexpr StateID	INVALID_STATE_ID	= INVALID_LONG;
+static constexpr StateID	ROOT_ID				= 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 

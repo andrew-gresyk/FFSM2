@@ -135,7 +135,7 @@ struct S_;
 template <typename, typename, typename...>
 struct C_;
 
-template <StateID, typename, Short, typename>
+template <StateID, typename, Prong, typename>
 struct CS_;
 
 template <typename, typename>
@@ -241,10 +241,10 @@ struct RF_ final {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <StateID, typename, Short, typename>
+template <StateID, typename, Prong, typename>
 struct LHalfCST;
 
-template <StateID NN, typename TA, Short NI, typename... TS>
+template <StateID NN, typename TA, Prong NI, typename... TS>
 struct LHalfCST<NN, TA, NI, TL_<TS...>> final {
 	using Type = CS_<NN,
 					 TA,
@@ -252,15 +252,15 @@ struct LHalfCST<NN, TA, NI, TL_<TS...>> final {
 					 LHalfTypes<TS...>>;
 };
 
-template <StateID NN, typename TA, Short NI, typename TL>
+template <StateID NN, typename TA, Prong NI, typename TL>
 using LHalfCS = typename LHalfCST<NN, TA, NI, TL>::Type;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-template <StateID, typename, Short, typename>
+template <StateID, typename, Prong, typename>
 struct RHalfCST;
 
-template <StateID NN, typename TA, Short NI, typename... TS>
+template <StateID NN, typename TA, Prong NI, typename... TS>
 struct RHalfCST<NN, TA, NI, TL_<TS...>> final {
 	using Type = CS_<NN + sizeof...(TS) / 2,
 					 TA,
@@ -268,7 +268,7 @@ struct RHalfCST<NN, TA, NI, TL_<TS...>> final {
 					 RHalfTypes<TS...>>;
 };
 
-template <StateID NN, typename TA, Short NI, typename TL>
+template <StateID NN, typename TA, Prong NI, typename TL>
 using RHalfCS = typename RHalfCST<NN, TA, NI, TL>::Type;
 
 ////////////////////////////////////////////////////////////////////////////////

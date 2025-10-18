@@ -4,6 +4,8 @@
 #define FFSM2_ENABLE_TRANSITION_HISTORY
 #include "tools.hpp"
 
+using namespace test_tools;
+
 namespace test_replication {
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -44,16 +46,6 @@ struct B : FSM::State {};
 struct C : FSM::State {};
 struct D : FSM::State {};
 struct E : FSM::State {};
-
-//------------------------------------------------------------------------------
-
-const Types all = {
-	FSM::stateId<A>(),
-	FSM::stateId<B>(),
-	FSM::stateId<C>(),
-	FSM::stateId<D>(),
-	FSM::stateId<E>(),
-};
 
 ////////////////////////////////////////////////////////////////////////////////
 

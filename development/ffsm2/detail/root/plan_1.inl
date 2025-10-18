@@ -102,15 +102,6 @@ PlanT<TArgs>::Iterator::next() const noexcept {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename TArgs>
-FFSM2_CONSTEXPR(11)
-PlanT<TArgs>::PlanT(PlanData& planData) noexcept
-	: _planData{planData}
-	, _bounds{planData.tasksBounds}
-{}
-
-//------------------------------------------------------------------------------
-
-template <typename TArgs>
 FFSM2_CONSTEXPR(14)
 bool
 PlanT<TArgs>::append(const StateID origin,
