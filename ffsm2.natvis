@@ -88,19 +88,19 @@
 	<!-- ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ -->
 
 	<Type Name="ffsm2::detail::PlanControlT&lt;*&gt;">
-		<DisplayString>({_status})</DisplayString>
+		<DisplayString>({_taskStatus})</DisplayString>
 	</Type>
 
 	<!-- ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ -->
 
 	<Type Name="ffsm2::detail::FullControlT&lt;*&gt;">
-		<DisplayString>[{_status}]</DisplayString>
+		<DisplayString>[{_taskStatus}]</DisplayString>
 	</Type>
 
 	<!-- ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ -->
 
 	<Type Name="ffsm2::detail::GuardControlT&lt;*,*&gt;">
-		<DisplayString>[{_status}] ({_pending})</DisplayString>
+		<DisplayString>[{_taskStatus}] ({_pending})</DisplayString>
 	</Type>
 
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -142,6 +142,8 @@
 	<!-- ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ -->
 
 	<Type Name="ffsm2::detail::PlanDataT&lt;*&gt;">
+		<DisplayString Condition="tasksBounds.first == INVALID_LONG">&lt;Empty&gt;</DisplayString>
+		<DisplayString>{tasksBounds}</DisplayString>
 		<Expand HideRawView="true">
 			<CustomListItems MaxItemsPerView="100">
 				<Variable Name="i" InitialValue="tasksBounds.first" />
@@ -179,6 +181,13 @@
 		</Expand>
 	</Type>
 
+	<Type Name="ffsm2::detail::PayloadPlanT&lt;*&gt;">
+		<DisplayString>{_planData}</DisplayString>
+		<Expand HideRawView="true">
+			<ExpandedItem>_planData</ExpandedItem>
+		</Expand>
+	</Type>
+
 	<!-- ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ -->
 
 	<Type Name="ffsm2::detail::CPlanT&lt;*&gt;::Iterator">
@@ -196,6 +205,20 @@
 	</Type>
 
 	<Type Name="ffsm2::detail::PlanT&lt;*&gt;::CIterator">
+		<DisplayString Condition="_curr == INVALID_LONG">(■)</DisplayString>
+		<DisplayString Condition="_curr != INVALID_LONG">{_plan._planData.tasks._items[_curr]}</DisplayString>
+		<DisplayString Condition="_curr != INVALID_LONG &amp;&amp; _next != INVALID_LONG">{_plan._planData.tasks._items[_curr]}, {_plan._planData.tasks._items[_next]}</DisplayString>
+		<Expand HideRawView="true" />
+	</Type>
+
+	<Type Name="ffsm2::detail::PayloadPlanT&lt;*&gt;::Iterator">
+		<DisplayString Condition="_curr == INVALID_LONG">(■)</DisplayString>
+		<DisplayString Condition="_curr != INVALID_LONG">{_plan._planData.tasks._items[_curr]}</DisplayString>
+		<DisplayString Condition="_curr != INVALID_LONG &amp;&amp; _next != INVALID_LONG">{_plan._planData.tasks._items[_curr]}, {_plan._planData.tasks._items[_next]}</DisplayString>
+		<Expand HideRawView="true" />
+	</Type>
+
+	<Type Name="ffsm2::detail::PayloadPlanT&lt;*&gt;::CIterator">
 		<DisplayString Condition="_curr == INVALID_LONG">(■)</DisplayString>
 		<DisplayString Condition="_curr != INVALID_LONG">{_plan._planData.tasks._items[_curr]}</DisplayString>
 		<DisplayString Condition="_curr != INVALID_LONG &amp;&amp; _next != INVALID_LONG">{_plan._planData.tasks._items[_curr]}, {_plan._planData.tasks._items[_next]}</DisplayString>

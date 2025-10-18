@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     env:
       CC: arm-linux-gnueabihf-gcc
@@ -27,18 +27,16 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    # install dependencies
     - name: Install ARM GCC on ubuntu
       run: |
         sudo apt-get update
         sudo apt-get install gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf qemu-user
 
-    # main test
-    - name: Configure Test
-      run: cmake -B ./build -DCMAKE_BUILD_TYPE=${{ matrix.BUILD_CONFIG }}
+    - name: Configure
+      run: cmake -B ./build -DHFSM2_BUILD_TESTS=ON -DHFSM2_BUILD_EXAMPLES=ON -DCMAKE_BUILD_TYPE=${{ matrix.BUILD_CONFIG }}
       working-directory: ${{ github.workspace }}
 
-    - name: Build Text
+    - name: Build
       run: cmake --build ./build --config ${{ matrix.BUILD_CONFIG }}
       working-directory: ${{ github.workspace }}
 

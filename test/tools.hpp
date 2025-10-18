@@ -9,10 +9,17 @@
 
 #include <doctest/doctest.h>
 
-#include <algorithm> // std::max()
 #include <vector>
 
+#include <assert.h>
+
+namespace test_tools {
+
 ////////////////////////////////////////////////////////////////////////////////
+
+#define UNUSED(x)
+
+//------------------------------------------------------------------------------
 
 struct Event final {
 	enum class Type {
@@ -88,25 +95,25 @@ struct LoggerT final
 
 	void recordMethod(const Context& context,
 					  const StateID origin,
-					  const Method method) override;
+					  const Method method)								override;
 
 	void recordTransition(const Context& context,
 						  const StateID origin,
-						  const StateID target) override;
+						  const StateID target)							override;
 
 #if FFSM2_PLANS_AVAILABLE()
 
 	void recordTaskStatus(const Context& context,
 						  const StateID origin,
-						  const StatusEvent event) override;
+						  const StatusEvent event)						override;
 
 	void recordPlanStatus(const Context& context,
-						  const StatusEvent event) override;
+						  const StatusEvent event)						override;
 
 #endif
 
 	void recordCancelledPending(const Context& context,
-								const StateID origin) override;
+								const StateID origin)					override;
 
 	void assertSequence(const Events& reference);
 
@@ -114,10 +121,8 @@ struct LoggerT final
 };
 using Logger = LoggerT<::ffsm2::Config>;
 
-//------------------------------------------------------------------------------
-
-using Types = std::vector<ffsm2::StateID>;
-
 ////////////////////////////////////////////////////////////////////////////////
+
+}
 
 #include "tools.inl"

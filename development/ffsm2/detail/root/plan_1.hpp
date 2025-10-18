@@ -64,7 +64,10 @@ public:
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 protected:
-	FFSM2_CONSTEXPR(11)	PlanT(PlanData& planData)						noexcept;
+	FFSM2_CONSTEXPR(11)	PlanT(PlanData& planData)						noexcept
+		: _planData{planData}
+		, _bounds{planData.tasksBounds}
+	{}
 
 	template <typename TState>
 	static

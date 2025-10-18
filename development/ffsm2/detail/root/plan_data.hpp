@@ -98,16 +98,17 @@ struct PlanDataT<
 	TasksBits payloadExists;
 
 	Bounds tasksBounds;
+	bool planExists;
+
 	TasksBits tasksSuccesses;
 	TasksBits tasksFailures;
-	bool planExists;
 	TaskStatus headStatus;
 	TaskStatus subStatus;
 
 	FFSM2_CONSTEXPR(14)	void clearTaskStatus  (const StateID stateId)		noexcept;
 	FFSM2_CONSTEXPR(14)	void verifyEmptyStatus(const StateID stateId) const noexcept;
 
-	FFSM2_CONSTEXPR(14)	void clearRegionStatuses()							noexcept;
+	FFSM2_CONSTEXPR(14)	void clearStatuses()								noexcept;
 	FFSM2_CONSTEXPR(14)	void clear()										noexcept;
 
 #if FFSM2_ASSERT_AVAILABLE()
@@ -149,16 +150,17 @@ struct PlanDataT<
 	TaskLinks taskLinks;
 
 	Bounds tasksBounds;
+	bool planExists;
+
 	TasksBits tasksSuccesses;
 	TasksBits tasksFailures;
-	bool planExists;
 	TaskStatus headStatus;
 	TaskStatus subStatus;
 
 	FFSM2_CONSTEXPR(14)	void clearTaskStatus  (const StateID stateId)		noexcept;
 	FFSM2_CONSTEXPR(14)	void verifyEmptyStatus(const StateID stateId) const noexcept;
 
-	FFSM2_CONSTEXPR(14)	void clearRegionStatuses()							noexcept;
+	FFSM2_CONSTEXPR(14)	void clearStatuses()								noexcept;
 	FFSM2_CONSTEXPR(14)	void clear()										noexcept;
 
 #if FFSM2_ASSERT_AVAILABLE()

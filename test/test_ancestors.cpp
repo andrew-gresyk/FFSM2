@@ -53,17 +53,17 @@ void
 assertSequence(Events& history,
 			   const Events& reference)
 {
-	const auto count = std::max(history.size(), reference.size());
+	const auto count = ffsm2::max(history.size(), reference.size());
 
 	for (unsigned i = 0; i < count; ++i) {
-		REQUIRE(i < history.size()); //-V521
-		REQUIRE(i < reference.size()); //-V521
+		REQUIRE(i < history.size());
+		REQUIRE(i < reference.size());
 
 		if (i < history.size() &&
 			i < reference.size())
 		{
-			REQUIRE(history[i].type	  == reference[i].type); //-V521
-			REQUIRE(history[i].origin == reference[i].origin); //-V521
+			REQUIRE(history[i].type	  == reference[i].type);
+			REQUIRE(history[i].origin == reference[i].origin);
 		}
 	}
 

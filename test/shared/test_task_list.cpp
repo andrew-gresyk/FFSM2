@@ -16,57 +16,57 @@ TEST_CASE("Shared.List<>") {
 	List list;
 	constexpr auto CAPACITY = List::CAPACITY;
 
-	REQUIRE(list.count()  == 0); //-V521
+	REQUIRE(list.count()  == 0);
 
 	WHEN("fill, delete and re-insert an element") {
 		for (List::Index i = 0; i < CAPACITY; ++i) {
 			const auto index = list.emplace(static_cast<ffsm2::Long>(i),
 											static_cast<ffsm2::Long>(i));
 
-			REQUIRE(index == i); //-V521
-			REQUIRE(list.count() == i + 1); //-V521
+			REQUIRE(index == i);
+			REQUIRE(list.count() == i + 1);
 		}
 
 		for (List::Index i = 0; i < CAPACITY; ++i)
 			REQUIRE(list[i] == ffsm2::detail::TaskBase{static_cast<ffsm2::Long>(i),
-													   static_cast<ffsm2::Long>(i)}); //-V521
+													   static_cast<ffsm2::Long>(i)});
 
 		THEN("at the start") {
-			REQUIRE(list.count() == CAPACITY); //-V521
+			REQUIRE(list.count() == CAPACITY);
 
 			list.remove(0);
-			REQUIRE(list.count() == CAPACITY - 1); //-V521
+			REQUIRE(list.count() == CAPACITY - 1);
 
 			const auto index = list.emplace(static_cast<ffsm2::Long>(0u),
 											static_cast<ffsm2::Long>(0u));
-			REQUIRE(index == 0); //-V521
-			REQUIRE(list.count() == CAPACITY); //-V521
+			REQUIRE(index == 0);
+			REQUIRE(list.count() == CAPACITY);
 		}
 
 		AND_THEN("at the mid") {
-			REQUIRE(list.count() == CAPACITY); //-V521
+			REQUIRE(list.count() == CAPACITY);
 
 			constexpr List::Index mid = CAPACITY / 2;
 			list.remove(mid);
-			REQUIRE(list.count() == CAPACITY - 1); //-V521
+			REQUIRE(list.count() == CAPACITY - 1);
 
 			const auto index = list.emplace(static_cast<ffsm2::Long>(mid),
 											static_cast<ffsm2::Long>(mid));
-			REQUIRE(index == mid); //-V521
-			REQUIRE(list.count() == CAPACITY); //-V521
+			REQUIRE(index == mid);
+			REQUIRE(list.count() == CAPACITY);
 		}
 
 		AND_THEN("at the end") {
-			REQUIRE(list.count() == CAPACITY); //-V521
+			REQUIRE(list.count() == CAPACITY);
 
 			constexpr List::Index end = CAPACITY - 1;
 			list.remove(end);
-			REQUIRE(list.count() == CAPACITY - 1); //-V521
+			REQUIRE(list.count() == CAPACITY - 1);
 
 			const auto index = list.emplace(static_cast<ffsm2::Long>(end),
 											static_cast<ffsm2::Long>(end));
-			REQUIRE(index == end); //-V521
-			REQUIRE(list.count() == CAPACITY); //-V521
+			REQUIRE(index == end);
+			REQUIRE(list.count() == CAPACITY);
 		}
 	}
 
@@ -75,49 +75,49 @@ TEST_CASE("Shared.List<>") {
 			const auto index = list.emplace(static_cast<ffsm2::Long>(i),
 											static_cast<ffsm2::Long>(i));
 
-			REQUIRE(index == i); //-V521
-			REQUIRE(list.count() == i + 1); //-V521
+			REQUIRE(index == i);
+			REQUIRE(list.count() == i + 1);
 		}
 
 		for (List::Index i = 0; i < CAPACITY; ++i)
 			REQUIRE(list[i] == ffsm2::detail::TaskBase{static_cast<ffsm2::Long>(i),
-													   static_cast<ffsm2::Long>(i)}); //-V521
+													   static_cast<ffsm2::Long>(i)});
 
 		THEN("from the start") {
-			REQUIRE(list.count() == CAPACITY); //-V521
+			REQUIRE(list.count() == CAPACITY);
 
 			for (List::Index i = 0; i < CAPACITY; ++i) {
 				list.remove(i);
-				REQUIRE(list.count() == CAPACITY - 1 - i); //-V521
+				REQUIRE(list.count() == CAPACITY - 1 - i);
 			}
 
 			for (List::Index i = 0; i < CAPACITY; ++i) {
 				const auto index = list.emplace(static_cast<ffsm2::Long>(i),
 												static_cast<ffsm2::Long>(i));
 
-				REQUIRE(index == CAPACITY - 1 - i); //-V521
-				REQUIRE(list.count() == i + 1); //-V521
+				REQUIRE(index == CAPACITY - 1 - i);
+				REQUIRE(list.count() == i + 1);
 			}
 		}
 
 		AND_THEN("at the mid") {
-			REQUIRE(list.count() == CAPACITY); //-V521
+			REQUIRE(list.count() == CAPACITY);
 		}
 
 		AND_THEN("from the end") {
-			REQUIRE(list.count() == CAPACITY); //-V521
+			REQUIRE(list.count() == CAPACITY);
 
 			for (List::Index i = 0; i < CAPACITY; ++i) {
 				list.remove(CAPACITY - 1 - i);
-				REQUIRE(list.count() == CAPACITY - 1 - i); //-V521
+				REQUIRE(list.count() == CAPACITY - 1 - i);
 			}
 
 			for (List::Index i = 0; i < CAPACITY; ++i) {
 				const auto index = list.emplace(static_cast<ffsm2::Long>(i),
 												static_cast<ffsm2::Long>(i));
 
-				REQUIRE(index == i); //-V521
-				REQUIRE(list.count() == i + 1); //-V521
+				REQUIRE(index == i);
+				REQUIRE(list.count() == i + 1);
 			}
 		}
 	}

@@ -86,7 +86,10 @@ PlanDataT<ArgsT<TG_, TSL_ FFSM2_IF_SERIALIZATION(, NSB_), NTC_, TTP_>>::verifyEm
 template <typename TG_, typename TSL_ FFSM2_IF_SERIALIZATION(, Long NSB_), Long NTC_, typename TTP_>
 FFSM2_CONSTEXPR(14)
 void
-PlanDataT<ArgsT<TG_, TSL_ FFSM2_IF_SERIALIZATION(, NSB_), NTC_, TTP_>>::clearRegionStatuses() noexcept {
+PlanDataT<ArgsT<TG_, TSL_ FFSM2_IF_SERIALIZATION(, NSB_), NTC_, TTP_>>::clearStatuses() noexcept {
+	tasksSuccesses.clear();
+	tasksFailures .clear();
+
 	headStatus.clear();
 	 subStatus.clear();
 }
@@ -103,11 +106,9 @@ PlanDataT<ArgsT<TG_, TSL_ FFSM2_IF_SERIALIZATION(, NSB_), NTC_, TTP_>>::clear() 
 	payloadExists .clear();
 
 	tasksBounds	  .clear();
-	tasksSuccesses.clear();
-	tasksFailures .clear();
 	planExists	 = false;
 
-	clearRegionStatuses();
+	clearStatuses();
 }
 
 //------------------------------------------------------------------------------
@@ -190,9 +191,12 @@ PlanDataT<ArgsT<TG_, TSL_ FFSM2_IF_SERIALIZATION(, NSB_), NTC_, void>>::verifyEm
 template <typename TG_, typename TSL_ FFSM2_IF_SERIALIZATION(, Long NSB_), Long NTC_>
 FFSM2_CONSTEXPR(14)
 void
-PlanDataT<ArgsT<TG_, TSL_ FFSM2_IF_SERIALIZATION(, NSB_), NTC_, void>>::clearRegionStatuses() noexcept {
+PlanDataT<ArgsT<TG_, TSL_ FFSM2_IF_SERIALIZATION(, NSB_), NTC_, void>>::clearStatuses() noexcept {
+	tasksSuccesses.clear();
+	tasksFailures .clear();
+
 	headStatus.clear();
-	subStatus .clear();
+	 subStatus.clear();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -201,15 +205,13 @@ template <typename TG_, typename TSL_ FFSM2_IF_SERIALIZATION(, Long NSB_), Long 
 FFSM2_CONSTEXPR(14)
 void
 PlanDataT<ArgsT<TG_, TSL_ FFSM2_IF_SERIALIZATION(, NSB_), NTC_, void>>::clear() noexcept {
-	tasks		  .clear();
-	taskLinks	  .clear();
+	tasks	   .clear();
+	taskLinks  .clear();
 
-	tasksBounds	  .clear();
-	tasksSuccesses.clear();
-	tasksFailures .clear();
-	planExists	 = false;
+	tasksBounds.clear();
+	planExists = false;
 
-	clearRegionStatuses();
+	clearStatuses();
 }
 
 //------------------------------------------------------------------------------
@@ -228,7 +230,7 @@ PlanDataT<ArgsT<TG_, TSL_ FFSM2_IF_SERIALIZATION(, NSB_), NTC_, void>>::verifyPl
 	if (bounds.first != INVALID_LONG) {
 		FFSM2_ASSERT(bounds.last != INVALID_LONG);
 
-		for (auto slow = bounds.first, fast = slow; ; ) {
+		for (Long slow = bounds.first, fast = slow; ; ) {
 			++length;
 			const TaskLink& task = taskLinks[slow];
 

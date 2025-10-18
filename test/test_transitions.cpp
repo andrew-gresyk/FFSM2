@@ -5,6 +5,8 @@
 #define FFSM2_DISABLE_TYPEINDEX
 #include "tools.hpp"
 
+using namespace test_tools;
+
 namespace test_transitions {
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -147,16 +149,6 @@ struct E
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-
-const Types all = {
-	FSM::stateId<A>(),
-	FSM::stateId<B>(),
-	FSM::stateId<C>(),
-	FSM::stateId<D>(),
-	FSM::stateId<E>(),
-};
-
-//------------------------------------------------------------------------------
 
 void step1(FSM::Instance& machine, Logger& logger) {
 	logger.assertSequence({

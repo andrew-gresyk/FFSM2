@@ -61,7 +61,7 @@ struct A_<TFirst>
 
 #if FFSM2_PLANS_AVAILABLE()
 	FFSM2_CONSTEXPR(14)	void	planSucceeded ( FullControl&		)			noexcept	{}
-	FFSM2_CONSTEXPR(14)	void	planFailed	  ( FullControl&		)			noexcept	{}
+	FFSM2_CONSTEXPR(14)	void	planFailed	  ( FullControl&		)			noexcept;
 #endif
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

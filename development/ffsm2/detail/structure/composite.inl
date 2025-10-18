@@ -279,11 +279,6 @@ C_<TA_, TH_, TS_...>::deepExit(PlanControl& control) noexcept {
 	HeadState::deepExit(control);
 
 	active	  = INVALID_PRONG;
-
-#if FFSM2_PLANS_AVAILABLE()
-	Plan plan = control.plan();
-	plan.clear();
-#endif
 }
 
 // COMMON

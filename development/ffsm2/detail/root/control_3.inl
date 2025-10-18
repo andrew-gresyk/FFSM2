@@ -82,7 +82,7 @@ FullControlT<ArgsT<TG_, TSL_ FFSM2_IF_SERIALIZATION(, NSB_), NTC_, TTP_>>::updat
 		_taskStatus.result = TaskStatus::FAILURE;
 		headState.wrapPlanFailed(*this);
 
-		plan().clear();
+		_core.planData.clearStatuses();
 	} else if (subStatus.result == TaskStatus::SUCCESS) {
 		if (Plan p = plan()) {
 			TasksBits successesToClear;
@@ -114,7 +114,7 @@ FullControlT<ArgsT<TG_, TSL_ FFSM2_IF_SERIALIZATION(, NSB_), NTC_, TTP_>>::updat
 			_taskStatus.result = TaskStatus::SUCCESS;
 			headState.wrapPlanSucceeded(*this);
 
-			plan().clear();
+			_core.planData.clearStatuses();
 		}
 	}
 }
@@ -159,7 +159,7 @@ FullControlT<ArgsT<TG_, TSL_ FFSM2_IF_SERIALIZATION(, NSB_), NTC_, void>>::updat
 		_taskStatus.result = TaskStatus::FAILURE;
 		headState.wrapPlanFailed(*this);
 
-		plan().clear();
+		_core.planData.clearStatuses();
 	} else if (subStatus.result == TaskStatus::SUCCESS) {
 		if (Plan p = plan()) {
 			TasksBits successesToClear;
@@ -188,7 +188,7 @@ FullControlT<ArgsT<TG_, TSL_ FFSM2_IF_SERIALIZATION(, NSB_), NTC_, void>>::updat
 			_taskStatus.result = TaskStatus::SUCCESS;
 			headState.wrapPlanSucceeded(*this);
 
-			plan().clear();
+			_core.planData.clearStatuses();
 		}
 	}
 }

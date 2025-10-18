@@ -135,6 +135,9 @@ TaskStatus
 S_<NN_, TA_, TH_>::deepReact(FullControl& control,
 						  const TEvent& event) noexcept
 {
+	// If you see `error: 'static_cast': cannot convert from `...` to
+	//   `void (__cdecl Class::* )(const TEvent &,_::EventControlT<> &)`
+	//   add `using FSM::State::react;` within state declaration
 	auto method = static_cast<void (Head::*)(const TEvent&, FullControl&)>(&Head::react);
 
 	FFSM2_LOG_STATE_METHOD(method,
@@ -155,7 +158,7 @@ template <typename TEvent>
 FFSM2_CONSTEXPR(14)
 TaskStatus
 S_<NN_, TA_, TH_>::deepPostReact(FullControl& control,
-							  const TEvent& event) noexcept
+								 const TEvent& event) noexcept
 {
 	auto method = static_cast<void (Head::*)(const TEvent&, FullControl&)>(&Head::postReact);
 
@@ -177,7 +180,7 @@ template <typename TEvent>
 FFSM2_CONSTEXPR(14)
 void
 S_<NN_, TA_, TH_>::deepQuery(ConstControl& control,
-						  TEvent&  event) const noexcept
+							 TEvent&  event) const noexcept
 {
 	auto method = static_cast<void (Head::*)(TEvent&, ConstControl&) const>(&Head::query);
 

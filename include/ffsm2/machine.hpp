@@ -339,6 +339,7 @@ static constexpr Long		INVALID_LONG		= UINT8_MAX;
 
 using StateID	 = Long;
 static constexpr StateID	INVALID_STATE_ID	= INVALID_LONG;
+static constexpr StateID	ROOT_ID				= 0;
 
 template <
 	bool B
@@ -1163,7 +1164,7 @@ typename DynamicArrayT<T, NC_>::Index
 DynamicArrayT<T, NC_>::emplace(TArgs&&... args) noexcept {
 	FFSM2_ASSERT(_count < CAPACITY);
 
-	new (&_items[_count]) Item{forward<TArgs>(args)...};
+	new (&_items[_count]) Item{::ffsm2::forward<TArgs>(args)...};
 
 	return _count++;
 }
@@ -1867,7 +1868,7 @@ TaskListT<TP_, NC_>::emplace(TA_&&... args) noexcept {
 			_vacantTail = INVALID;
 		}
 
-		new (&item) Item{forward<TA_>(args)...};
+		new (&item) Item{::ffsm2::forward<TA_>(args)...};
 		++_count;
 
 		FFSM2_IF_ASSERT(verifyStructure());
@@ -2111,16 +2112,17 @@ struct PlanDataT<
 	TasksBits payloadExists;
 
 	Bounds tasksBounds;
+	bool planExists;
+
 	TasksBits tasksSuccesses;
 	TasksBits tasksFailures;
-	bool planExists;
 	TaskStatus headStatus;
 	TaskStatus subStatus;
 
 	FFSM2_CONSTEXPR(14)	void clearTaskStatus  (const StateID stateId)		noexcept;
 	FFSM2_CONSTEXPR(14)	void verifyEmptyStatus(const StateID stateId) const noexcept;
 
-	FFSM2_CONSTEXPR(14)	void clearRegionStatuses()							noexcept;
+	FFSM2_CONSTEXPR(14)	void clearStatuses()								noexcept;
 	FFSM2_CONSTEXPR(14)	void clear()										noexcept;
 
 #if FFSM2_ASSERT_AVAILABLE()
@@ -2160,16 +2162,17 @@ struct PlanDataT<
 	TaskLinks taskLinks;
 
 	Bounds tasksBounds;
+	bool planExists;
+
 	TasksBits tasksSuccesses;
 	TasksBits tasksFailures;
-	bool planExists;
 	TaskStatus headStatus;
 	TaskStatus subStatus;
 
 	FFSM2_CONSTEXPR(14)	void clearTaskStatus  (const StateID stateId)		noexcept;
 	FFSM2_CONSTEXPR(14)	void verifyEmptyStatus(const StateID stateId) const noexcept;
 
-	FFSM2_CONSTEXPR(14)	void clearRegionStatuses()							noexcept;
+	FFSM2_CONSTEXPR(14)	void clearStatuses()								noexcept;
 	FFSM2_CONSTEXPR(14)	void clear()										noexcept;
 
 #if FFSM2_ASSERT_AVAILABLE()
@@ -2255,7 +2258,10 @@ PlanDataT<ArgsT<TG_, TSL_ FFSM2_IF_SERIALIZATION(, NSB_), NTC_, TTP_>>::verifyEm
 template <typename TG_, typename TSL_ FFSM2_IF_SERIALIZATION(, Long NSB_), Long NTC_, typename TTP_>
 FFSM2_CONSTEXPR(14)
 void
-PlanDataT<ArgsT<TG_, TSL_ FFSM2_IF_SERIALIZATION(, NSB_), NTC_, TTP_>>::clearRegionStatuses() noexcept {
+PlanDataT<ArgsT<TG_, TSL_ FFSM2_IF_SERIALIZATION(, NSB_), NTC_, TTP_>>::clearStatuses() noexcept {
+	tasksSuccesses.clear();
+	tasksFailures .clear();
+
 	headStatus.clear();
 	 subStatus.clear();
 }
@@ -2270,11 +2276,9 @@ PlanDataT<ArgsT<TG_, TSL_ FFSM2_IF_SERIALIZATION(, NSB_), NTC_, TTP_>>::clear() 
 	payloadExists .clear();
 
 	tasksBounds	  .clear();
-	tasksSuccesses.clear();
-	tasksFailures .clear();
 	planExists	 = false;
 
-	clearRegionStatuses();
+	clearStatuses();
 }
 
 #if FFSM2_ASSERT_AVAILABLE()
@@ -2347,24 +2351,25 @@ PlanDataT<ArgsT<TG_, TSL_ FFSM2_IF_SERIALIZATION(, NSB_), NTC_, void>>::verifyEm
 template <typename TG_, typename TSL_ FFSM2_IF_SERIALIZATION(, Long NSB_), Long NTC_>
 FFSM2_CONSTEXPR(14)
 void
-PlanDataT<ArgsT<TG_, TSL_ FFSM2_IF_SERIALIZATION(, NSB_), NTC_, void>>::clearRegionStatuses() noexcept {
+PlanDataT<ArgsT<TG_, TSL_ FFSM2_IF_SERIALIZATION(, NSB_), NTC_, void>>::clearStatuses() noexcept {
+	tasksSuccesses.clear();
+	tasksFailures .clear();
+
 	headStatus.clear();
-	subStatus .clear();
+	 subStatus.clear();
 }
 
 template <typename TG_, typename TSL_ FFSM2_IF_SERIALIZATION(, Long NSB_), Long NTC_>
 FFSM2_CONSTEXPR(14)
 void
 PlanDataT<ArgsT<TG_, TSL_ FFSM2_IF_SERIALIZATION(, NSB_), NTC_, void>>::clear() noexcept {
-	tasks		  .clear();
-	taskLinks	  .clear();
+	tasks	   .clear();
+	taskLinks  .clear();
 
-	tasksBounds	  .clear();
-	tasksSuccesses.clear();
-	tasksFailures .clear();
-	planExists	 = false;
+	tasksBounds.clear();
+	planExists = false;
 
-	clearRegionStatuses();
+	clearStatuses();
 }
 
 #if FFSM2_ASSERT_AVAILABLE()
@@ -2379,7 +2384,7 @@ PlanDataT<ArgsT<TG_, TSL_ FFSM2_IF_SERIALIZATION(, NSB_), NTC_, void>>::verifyPl
 	if (bounds.first != INVALID_LONG) {
 		FFSM2_ASSERT(bounds.last != INVALID_LONG);
 
-		for (auto slow = bounds.first, fast = slow; ; ) {
+		for (Long slow = bounds.first, fast = slow; ; ) {
 			++length;
 			const TaskLink& task = taskLinks[slow];
 
@@ -2643,7 +2648,10 @@ public:
 	};
 
 protected:
-	FFSM2_CONSTEXPR(11)	PlanT(PlanData& planData)						noexcept;
+	FFSM2_CONSTEXPR(11)	PlanT(PlanData& planData)						noexcept
+		: _planData{planData}
+		, _bounds{planData.tasksBounds}
+	{}
 
 	template <typename TState>
 	static
@@ -2815,13 +2823,6 @@ PlanT<TArgs>::Iterator::next() const noexcept {
 		return INVALID_LONG;
 	}
 }
-
-template <typename TArgs>
-FFSM2_CONSTEXPR(11)
-PlanT<TArgs>::PlanT(PlanData& planData) noexcept
-	: _planData{planData}
-	, _bounds{planData.tasksBounds}
-{}
 
 template <typename TArgs>
 FFSM2_CONSTEXPR(14)
@@ -3983,7 +3984,7 @@ FullControlT<ArgsT<TG_, TSL_ FFSM2_IF_SERIALIZATION(, NSB_), NTC_, TTP_>>::updat
 		_taskStatus.result = TaskStatus::FAILURE;
 		headState.wrapPlanFailed(*this);
 
-		plan().clear();
+		_core.planData.clearStatuses();
 	} else if (subStatus.result == TaskStatus::SUCCESS) {
 		if (Plan p = plan()) {
 			TasksBits successesToClear;
@@ -4015,7 +4016,7 @@ FullControlT<ArgsT<TG_, TSL_ FFSM2_IF_SERIALIZATION(, NSB_), NTC_, TTP_>>::updat
 			_taskStatus.result = TaskStatus::SUCCESS;
 			headState.wrapPlanSucceeded(*this);
 
-			plan().clear();
+			_core.planData.clearStatuses();
 		}
 	}
 }
@@ -4050,7 +4051,7 @@ FullControlT<ArgsT<TG_, TSL_ FFSM2_IF_SERIALIZATION(, NSB_), NTC_, void>>::updat
 		_taskStatus.result = TaskStatus::FAILURE;
 		headState.wrapPlanFailed(*this);
 
-		plan().clear();
+		_core.planData.clearStatuses();
 	} else if (subStatus.result == TaskStatus::SUCCESS) {
 		if (Plan p = plan()) {
 			TasksBits successesToClear;
@@ -4079,7 +4080,7 @@ FullControlT<ArgsT<TG_, TSL_ FFSM2_IF_SERIALIZATION(, NSB_), NTC_, void>>::updat
 			_taskStatus.result = TaskStatus::SUCCESS;
 			headState.wrapPlanSucceeded(*this);
 
-			plan().clear();
+			_core.planData.clearStatuses();
 		}
 	}
 }
@@ -4469,7 +4470,7 @@ struct A_<TFirst>
 
 #if FFSM2_PLANS_AVAILABLE()
 	FFSM2_CONSTEXPR(14)	void	planSucceeded ( FullControl&		)			noexcept	{}
-	FFSM2_CONSTEXPR(14)	void	planFailed	  ( FullControl&		)			noexcept	{}
+	FFSM2_CONSTEXPR(14)	void	planFailed	  ( FullControl&		)			noexcept;
 #endif
 
 	FFSM2_CONSTEXPR(14)	void	wideEntryGuard(GuardControl& control)			noexcept;
@@ -4508,6 +4509,17 @@ struct A_<TFirst>
 
 namespace ffsm2 {
 namespace detail {
+
+#if FFSM2_PLANS_AVAILABLE()
+
+template <typename TF_>
+FFSM2_CONSTEXPR(14)
+void
+A_<TF_>::planFailed(FullControl& control) noexcept {
+	control.plan().clear();
+}
+
+#endif
 
 template <typename TF_>
 FFSM2_CONSTEXPR(14)
@@ -4847,6 +4859,9 @@ TaskStatus
 S_<NN_, TA_, TH_>::deepReact(FullControl& control,
 						  const TEvent& event) noexcept
 {
+	// If you see `error: 'static_cast': cannot convert from `...` to
+	//   `void (__cdecl Class::* )(const TEvent &,_::EventControlT<> &)`
+	//   add `using FSM::State::react;` within state declaration
 	auto method = static_cast<void (Head::*)(const TEvent&, FullControl&)>(&Head::react);
 
 	FFSM2_LOG_STATE_METHOD(method,
@@ -4865,7 +4880,7 @@ template <typename TEvent>
 FFSM2_CONSTEXPR(14)
 TaskStatus
 S_<NN_, TA_, TH_>::deepPostReact(FullControl& control,
-							  const TEvent& event) noexcept
+								 const TEvent& event) noexcept
 {
 	auto method = static_cast<void (Head::*)(const TEvent&, FullControl&)>(&Head::postReact);
 
@@ -4885,7 +4900,7 @@ template <typename TEvent>
 FFSM2_CONSTEXPR(14)
 void
 S_<NN_, TA_, TH_>::deepQuery(ConstControl& control,
-						  TEvent&  event) const noexcept
+							 TEvent&  event) const noexcept
 {
 	auto method = static_cast<void (Head::*)(TEvent&, ConstControl&) const>(&Head::query);
 
@@ -5384,7 +5399,7 @@ struct S_;
 template <typename, typename, typename...>
 struct C_;
 
-template <StateID, typename, Short, typename>
+template <StateID, typename, Prong, typename>
 struct CS_;
 
 template <typename, typename>
@@ -5474,10 +5489,10 @@ struct RF_ final {
 	static constexpr StateID  stateId()			noexcept	{ return					   index<StateList , TState>() ;	}
 };
 
-template <StateID, typename, Short, typename>
+template <StateID, typename, Prong, typename>
 struct LHalfCST;
 
-template <StateID NN, typename TA, Short NI, typename... TS>
+template <StateID NN, typename TA, Prong NI, typename... TS>
 struct LHalfCST<NN, TA, NI, TL_<TS...>> final {
 	using Type = CS_<NN,
 					 TA,
@@ -5485,13 +5500,13 @@ struct LHalfCST<NN, TA, NI, TL_<TS...>> final {
 					 LHalfTypes<TS...>>;
 };
 
-template <StateID NN, typename TA, Short NI, typename TL>
+template <StateID NN, typename TA, Prong NI, typename TL>
 using LHalfCS = typename LHalfCST<NN, TA, NI, TL>::Type;
 
-template <StateID, typename, Short, typename>
+template <StateID, typename, Prong, typename>
 struct RHalfCST;
 
-template <StateID NN, typename TA, Short NI, typename... TS>
+template <StateID NN, typename TA, Prong NI, typename... TS>
 struct RHalfCST<NN, TA, NI, TL_<TS...>> final {
 	using Type = CS_<NN + sizeof...(TS) / 2,
 					 TA,
@@ -5499,7 +5514,7 @@ struct RHalfCST<NN, TA, NI, TL_<TS...>> final {
 					 RHalfTypes<TS...>>;
 };
 
-template <StateID NN, typename TA, Short NI, typename TL>
+template <StateID NN, typename TA, Prong NI, typename TL>
 using RHalfCS = typename RHalfCST<NN, TA, NI, TL>::Type;
 
 }
@@ -6405,11 +6420,6 @@ C_<TA_, TH_, TS_...>::deepExit(PlanControl& control) noexcept {
 	HeadState::deepExit(control);
 
 	active	  = INVALID_PRONG;
-
-#if FFSM2_PLANS_AVAILABLE()
-	Plan plan = control.plan();
-	plan.clear();
-#endif
 }
 
 template <typename TA_, typename TH_, typename... TS_>
@@ -6908,7 +6918,7 @@ R_<TG_, TA_>::update() noexcept {
 
 #if FFSM2_PLANS_AVAILABLE()
 	_apex.deepUpdatePlans(control);
-	_core.planData.clearRegionStatuses();
+	_core.planData.clearStatuses();
 #endif
 
 	processRequest();
@@ -6930,7 +6940,7 @@ R_<TG_, TA_>::react(const TEvent& event) noexcept {
 
 #if FFSM2_PLANS_AVAILABLE()
 	_apex.deepUpdatePlans(control);
-	_core.planData.clearRegionStatuses();
+	_core.planData.clearStatuses();
 #endif
 
 	processRequest();
