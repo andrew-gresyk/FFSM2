@@ -189,28 +189,27 @@ R_<TG_, TA_>::initialEnter() noexcept {
 	Transition pendingTransition;
 
 	PlanControl control{_core, currentTransition};
+
 	applyRequest(currentTransition, 0);
 
-	cancelledByEntryGuards(currentTransition,
-						   pendingTransition);
+	approvedByEntryGuards(currentTransition,
+						  pendingTransition);
 
 	for (Long i = 0;
 		 i < SUBSTITUTION_LIMIT && _core.request;
 		 ++i)
 	{
-		//backup();
-
 		if (applyRequest(currentTransition,
 						 _core.request.destination))
 		{
 			pendingTransition = _core.request;
 			_core.request.clear();
 
-			if (cancelledByEntryGuards(currentTransition,
-									   pendingTransition))
-				FFSM2_BREAK();
-			else
+			if (approvedByEntryGuards(currentTransition,
+									  pendingTransition))
 				currentTransition = pendingTransition;
+			else
+				FFSM2_BREAK();
 
 			pendingTransition.clear();
 		} else
@@ -279,30 +278,27 @@ void
 R_<TG_, TA_>::processTransitions(Transition& currentTransition) noexcept {
 	FFSM2_ASSERT(_core.request);
 
-	PlanControl control{_core, currentTransition};
-
 	Transition pendingTransition;
+
+	PlanControl control{_core, currentTransition};
 
 	for (Long i = 0;
 		i < SUBSTITUTION_LIMIT && _core.request;
 		++i)
 	{
-		//backup();
-
 		if (applyRequest(currentTransition,
 						 _core.request.destination))
 		{
 			pendingTransition = _core.request;
 			_core.request.clear();
 
-			if (cancelledByGuards(currentTransition,
-								  pendingTransition))
-				;
-			else
+			if (approvedByGuards(currentTransition,
+								 pendingTransition))
 				currentTransition = pendingTransition;
 
 			pendingTransition.clear();
-		} else
+		}
+		else
 			_core.request.clear();
 	}
 	FFSM2_ASSERT(!_core.request);
@@ -326,7 +322,8 @@ R_<TG_, TA_>::applyRequest(const Transition& currentTransition,
 		_core.registry.requested = destination;
 
 		return true;
-	} else
+	}
+	else
 		return false;
 }
 
@@ -336,12 +333,12 @@ R_<TG_, TA_>::applyRequest(const Transition& currentTransition,
 template <typename TG_, typename TA_>
 FFSM2_CONSTEXPR(14)
 bool
-R_<TG_, TA_>::cancelledByEntryGuards(const Transition& currentTransition,
-									 const Transition& pendingTransition) noexcept
+R_<TG_, TA_>::approvedByEntryGuards(const Transition& currentTransition,
+									const Transition& pendingTransition) noexcept
 {
-	GuardControl guardControl{_core
-							, currentTransition
-							, pendingTransition};
+	GuardControl guardControl{_core,
+							  currentTransition,
+							  pendingTransition};
 
 	return _apex.deepEntryGuard(guardControl);
 }
@@ -351,14 +348,14 @@ R_<TG_, TA_>::cancelledByEntryGuards(const Transition& currentTransition,
 template <typename TG_, typename TA_>
 FFSM2_CONSTEXPR(14)
 bool
-R_<TG_, TA_>::cancelledByGuards(const Transition& currentTransition,
-								const Transition& pendingTransition) noexcept
+R_<TG_, TA_>::approvedByGuards(const Transition& currentTransition,
+							   const Transition& pendingTransition) noexcept
 {
-	GuardControl guardControl{_core
-							, currentTransition
-							, pendingTransition};
+	GuardControl guardControl{_core,
+							  currentTransition,
+							  pendingTransition};
 
-	return _apex.deepForwardExitGuard (guardControl) ||
+	return _apex.deepForwardExitGuard (guardControl) &&
 		   _apex.deepForwardEntryGuard(guardControl);
 }
 

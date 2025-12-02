@@ -274,7 +274,8 @@ fill(T& a, const char value)											noexcept	{
 
 template<class T>
 FFSM2_CONSTEXPR(14)
-void destroy(T& t)														noexcept	{
+void
+destroy(T& t)															noexcept	{
 	t.~T();
 }
 

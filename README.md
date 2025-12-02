@@ -21,7 +21,7 @@ Header-only flat FSM framework in C++11, with fully statically-defined structure
 ## Compiler Support
 
 - Visual Studio: 2015, 2017, 2019, **2022**
-- GCC: **9, 10, 11, 12, 13, 14**
+- GCC: **10, 11, 12, 13, 14**
 - GCC (ARM): **9**
 - Clang: **13, 14, 15, 16, 17, 18**
 - AppleClang: **15, 16**
@@ -61,7 +61,7 @@ Header-only flat FSM framework in C++11, with fully statically-defined structure
 - Type-safe transitions: `FSM.changeTo<TargetState>()` with optional payloads
 - Flexible configuration using `FFSM2_ENABLE_*` macros
 - Scalable, supports robust state re-use via state injections
-- Gamedev-friendly, supports explicit `State::update()`
+- Gamedev and embedded friendly
 - Also supports traditional event-based workflow with `State::react()`
 - Inspect anything: previous and current transitions, state activation status, and more!
 - Game AI-friendly with dynamic planning support
