@@ -11,7 +11,7 @@ S_<NN_, TA_, EmptyT<TA_>>::deepEntryGuard(GuardControl& FFSM2_IF_LOG_STATE_METHO
 	FFSM2_LOG_STATE_METHOD(&Empty::entryGuard,
 						   Method::ENTRY_GUARD);
 
-	return false;
+	return true;
 }
 
 //------------------------------------------------------------------------------
@@ -156,7 +156,7 @@ S_<NN_, TA_, EmptyT<TA_>>::deepExitGuard(GuardControl& FFSM2_IF_LOG_STATE_METHOD
 	FFSM2_LOG_STATE_METHOD(&Empty::exitGuard,
 						   Method::EXIT_GUARD);
 
-	return false;
+	return true;
 }
 
 //------------------------------------------------------------------------------

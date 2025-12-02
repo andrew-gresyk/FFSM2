@@ -30,7 +30,7 @@ C_<TA_, TH_, TS_...>::deepEntryGuard(GuardControl& control) noexcept {
 	const Prong  requested = compoRequested(control);
 	FFSM2_ASSERT(requested < WIDTH);
 
-	return HeadState::deepEntryGuard(control) ||
+	return HeadState::deepEntryGuard(control) &&
 		   SubStates::wideEntryGuard(control, requested);
 }
 
@@ -262,7 +262,7 @@ C_<TA_, TH_, TS_...>::deepExitGuard(GuardControl& control) noexcept {
 
 	FFSM2_ASSERT(compoRequested(control) < WIDTH);
 
-	return HeadState::deepExitGuard(control) ||
+	return HeadState::deepExitGuard(control) &&
 		   SubStates::wideExitGuard(control, active);
 }
 
