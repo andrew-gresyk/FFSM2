@@ -17,7 +17,7 @@ template <FeatureTag NFT_, typename TC_, typename TV_, Short NSL_ FFSM2_IF_PLANS
 FFSM2_CONSTEXPR(11)
 InstanceT<G_<NFT_, TC_, TV_, NSL_ FFSM2_IF_PLANS(, NTC_), TP_>, TA_>::InstanceT(PureContext&& context
 																			  FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
-	: Base{move(context)
+	: Base{::ffsm2::move(context)
 	FFSM2_IF_LOG_INTERFACE(, logger)}
 {}
 

@@ -102,7 +102,6 @@ void
 PlanDataT<ArgsT<TG_, TSL_ FFSM2_IF_SERIALIZATION(, NSB_), NTC_, TTP_>>::clear() noexcept {
 	tasks		  .clear();
 	taskLinks	  .clear();
-	taskPayloads  .clear();
 	payloadExists .clear();
 
 	tasksBounds	  .clear();
@@ -205,11 +204,11 @@ template <typename TG_, typename TSL_ FFSM2_IF_SERIALIZATION(, Long NSB_), Long 
 FFSM2_CONSTEXPR(14)
 void
 PlanDataT<ArgsT<TG_, TSL_ FFSM2_IF_SERIALIZATION(, NSB_), NTC_, void>>::clear() noexcept {
-	tasks	   .clear();
-	taskLinks  .clear();
+	tasks		  .clear();
+	taskLinks	  .clear();
 
-	tasksBounds.clear();
-	planExists = false;
+	tasksBounds	  .clear();
+	planExists	 = false;
 
 	clearStatuses();
 }

@@ -17,7 +17,7 @@ template <typename TG_, typename TA_>
 FFSM2_CONSTEXPR(11)
 R_<TG_, TA_>::R_(PureContext&& context
 			   FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
-	: _core{move(context)
+	: _core{::ffsm2::move(context)
 		  FFSM2_IF_LOG_INTERFACE(, logger)}
 {}
 

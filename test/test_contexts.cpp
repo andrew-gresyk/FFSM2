@@ -21,7 +21,7 @@ struct Context {
 	constexpr Context(const Context& other) = default;
 
 	constexpr Context(Context&& other)
-		: value{ffsm2::move(other.value)}
+		: value{::ffsm2::move(other.value)}
 		, moved{true}
 	{}
 
@@ -127,7 +127,7 @@ template <typename T>
 constexpr
 T
 consume(T&& value) {
-	return T{ffsm2::move(value)};
+	return T{::ffsm2::move(value)};
 }
 
 //------------------------------------------------------------------------------
@@ -158,15 +158,15 @@ TEST_CASE("FSM.Contexts") {
 		Instance machine{primary};
 		REQUIRE(machine.context() == primary);
 
-		Instance recepient{ffsm2::move(Context{7})};
-		REQUIRE(recepient.context().value == 7);
-		REQUIRE(recepient.context().moved);
+		Instance recipient{::ffsm2::move(Context{7})};
+		REQUIRE(recipient.context().value == 7);
+		REQUIRE(recipient.context().moved);
 
 		Instance copy{machine};
 		REQUIRE(copy.context().value == 7);
 		REQUIRE(copy.context().moved == false);
 
-		const Instance moved = consume(ffsm2::move(Instance{primary}));
+		const Instance moved = consume(::ffsm2::move(Instance{primary}));
 		REQUIRE(moved.context().value == primary.value);
 		REQUIRE(moved.context().moved);
 	}
@@ -183,15 +183,15 @@ TEST_CASE("FSM.Contexts") {
 		Instance machine{primary};
 		REQUIRE(machine.context() == primary);
 
-		Instance recepient{ffsm2::move(Context{7})};
-		REQUIRE(recepient.context().value == 7);
-		REQUIRE(recepient.context().moved);
+		Instance recipient{::ffsm2::move(Context{7})};
+		REQUIRE(recipient.context().value == 7);
+		REQUIRE(recipient.context().moved);
 
 		Instance copy{machine};
 		REQUIRE(copy.context().value == 7);
 		REQUIRE(copy.context().moved == false);
 
-		const Instance moved = consume(ffsm2::move(Instance{primary}));
+		const Instance moved = consume(::ffsm2::move(Instance{primary}));
 		REQUIRE(moved.context().value == primary.value);
 		REQUIRE(moved.context().moved);
 	}
@@ -210,7 +210,7 @@ TEST_CASE("FSM.Contexts") {
 		REQUIRE(copy.context().value == primary.value);
 		REQUIRE(copy.context().moved == false);
 
-		//const Instance moved = consume(ffsm2::move(Instance{primary}));
+		//const Instance moved = consume(::ffsm2::move(Instance{primary}));
 		//REQUIRE(moved.context().value == primary.value);
 		//REQUIRE(moved.context().moved);
 	}

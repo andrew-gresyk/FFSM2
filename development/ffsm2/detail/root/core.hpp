@@ -19,10 +19,6 @@ struct CoreT {
 	using Logger			= typename TArgs::Logger;
 #endif
 
-#if FFSM2_TRANSITION_HISTORY_AVAILABLE()
-	Transition previousTransition;
-#endif
-
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	FFSM2_CONSTEXPR(11)	explicit CoreT(Context& context_
@@ -40,6 +36,7 @@ struct CoreT {
 	Registry registry;
 	Transition request;
 	FFSM2_IF_PLANS(PlanData planData);
+	FFSM2_IF_TRANSITION_HISTORY(Transition previousTransition);
 	FFSM2_IF_LOG_INTERFACE(Logger* logger);
 };
 

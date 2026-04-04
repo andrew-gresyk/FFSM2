@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="development">
@@ -42,10 +42,16 @@
     <ClInclude Include="..\..\development\ffsm2\detail\containers\array.inl">
       <Filter>development\ffsm2\detail\containers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\development\ffsm2\detail\containers\bit_array.hpp">
+    <ClInclude Include="..\..\development\ffsm2\detail\containers\bit_flat_set.hpp">
       <Filter>development\ffsm2\detail\containers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\development\ffsm2\detail\containers\bit_array.inl">
+    <ClInclude Include="..\..\development\ffsm2\detail\containers\bit_flat_set.inl">
+      <Filter>development\ffsm2\detail\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\development\ffsm2\detail\containers\bit_slice_set.hpp">
+      <Filter>development\ffsm2\detail\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\development\ffsm2\detail\containers\bit_slice_set.inl">
       <Filter>development\ffsm2\detail\containers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\development\ffsm2\detail\features\logger_interface.hpp">
@@ -171,6 +177,9 @@
     <ClInclude Include="..\..\development\ffsm2\detail\shared\utility.hpp">
       <Filter>development\ffsm2\detail\shared</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\development\ffsm2\detail\shared\utility_bits.hpp">
+      <Filter>development\ffsm2\detail\shared</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\development\ffsm2\detail\structure\ancestors_1.hpp">
       <Filter>development\ffsm2\detail\structure</Filter>
     </ClInclude>
@@ -236,7 +245,10 @@
     <ClCompile Include="..\..\test\main.cpp">
       <Filter>test</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\test\shared\test_bit_array.cpp">
+    <ClCompile Include="..\..\test\shared\test_bit_flat_set.cpp">
+      <Filter>test\shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\shared\test_bit_slice_set.cpp">
       <Filter>test\shared</Filter>
     </ClCompile>
     <ClCompile Include="..\..\test\shared\test_bit_stream.cpp">

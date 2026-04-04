@@ -19,7 +19,7 @@ template <FeatureTag NFT_, typename TC_, Short NSL_ FFSM2_IF_PLANS(, Long NTC_),
 FFSM2_CONSTEXPR(14)
 RV_<G_<NFT_, TC_, Automatic, NSL_ FFSM2_IF_PLANS(, NTC_), TP_>, TA_>::RV_(PureContext&& context
 																		FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
-	: Base{move(context)
+	: Base{::ffsm2::move(context)
 	FFSM2_IF_LOG_INTERFACE(, logger)}
 {
 	initialEnter();
@@ -38,7 +38,7 @@ RV_<G_<NFT_, TC_, Automatic, NSL_ FFSM2_IF_PLANS(, NTC_), TP_>, TA_>::RV_(const 
 template <FeatureTag NFT_, typename TC_, Short NSL_ FFSM2_IF_PLANS(, Long NTC_), typename TP_, typename TA_>
 FFSM2_CONSTEXPR(14)
 RV_<G_<NFT_, TC_, Automatic, NSL_ FFSM2_IF_PLANS(, NTC_), TP_>, TA_>::RV_(RV_&& other) noexcept
-	: Base{move(other)}
+	: Base{::ffsm2::move(other)}
 {}
 
 //------------------------------------------------------------------------------
