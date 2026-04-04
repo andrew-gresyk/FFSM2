@@ -21,10 +21,11 @@ Header-only flat FSM framework in C++11, with fully statically-defined structure
 ## Compiler Support
 
 - Visual Studio: 2015, 2017, 2019, **2022**
-- GCC: **10, 11, 12, 13, 14**
-- GCC (ARM): **9**
+- GCC: **10, 11, 12, 13, 14, 15**
+- GCC (ARM): **13**
 - Clang: **13, 14, 15, 16, 17, 18**
-- AppleClang: **15, 16**
+- AppleClang (Intel): **17**
+- AppleClang: **15, 17**
 
 ---
 
