@@ -77,7 +77,12 @@ jobs:
               VERSION: '18'
             }
           - {
-              OS: macos-13,
+              OS: macos-15-intel,
+              CC: clang,
+              CXX: clang++
+            }
+          - {
+              OS: macos-26-intel,
               CC: clang,
               CXX: clang++
             }
@@ -88,6 +93,11 @@ jobs:
             }
           - {
               OS: macos-15,
+              CC: clang,
+              CXX: clang++
+            }
+          - {
+              OS: macos-26,
               CC: clang,
               CXX: clang++
             }
