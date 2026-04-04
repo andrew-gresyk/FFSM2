@@ -118,7 +118,7 @@ template <typename T, Long NC_>
 FFSM2_CONSTEXPR(14)
 DynamicArrayT<T, NC_>&
 DynamicArrayT<T, NC_>::operator += (Item&& item) noexcept {
-	emplace(move(item));
+	emplace(::ffsm2::move(item));
 
 	return *this;
 }

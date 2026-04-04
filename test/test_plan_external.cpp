@@ -263,7 +263,7 @@ void step7(FSM::Instance& machine, Logger& logger) {
 
 //------------------------------------------------------------------------------
 
-TEST_CASE("FSM.Plans") {
+TEST_CASE("FSM.Plans External") {
 	Logger logger;
 
 	{

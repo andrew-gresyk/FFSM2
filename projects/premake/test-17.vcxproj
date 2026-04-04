@@ -70,28 +70,28 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>..\..\binaries\</OutDir>
+    <OutDir>$(ProjectDir)..\..\binaries\</OutDir>
     <IntDir>$(BUILD_ROOT)\$(SolutionName)-$(PlatformArchitecture)\$(ProjectName)-$(Configuration)\x86\Debug\test-17\</IntDir>
     <TargetName>$(ProjectName)-$(Configuration)-$(Platform)</TargetName>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>..\..\binaries\</OutDir>
+    <OutDir>$(ProjectDir)..\..\binaries\</OutDir>
     <IntDir>$(BUILD_ROOT)\$(SolutionName)-$(PlatformArchitecture)\$(ProjectName)-$(Configuration)\x64\Debug\test-17\</IntDir>
     <TargetName>$(ProjectName)-$(Configuration)-$(Platform)</TargetName>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\..\binaries\</OutDir>
+    <OutDir>$(ProjectDir)..\..\binaries\</OutDir>
     <IntDir>$(BUILD_ROOT)\$(SolutionName)-$(PlatformArchitecture)\$(ProjectName)-$(Configuration)\x86\Release\test-17\</IntDir>
     <TargetName>$(ProjectName)-$(Configuration)-$(Platform)</TargetName>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\..\binaries\</OutDir>
+    <OutDir>$(ProjectDir)..\..\binaries\</OutDir>
     <IntDir>$(BUILD_ROOT)\$(SolutionName)-$(PlatformArchitecture)\$(ProjectName)-$(Configuration)\x64\Release\test-17\</IntDir>
     <TargetName>$(ProjectName)-$(Configuration)-$(Platform)</TargetName>
     <TargetExt>.exe</TargetExt>
@@ -114,6 +114,8 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <ProjectReference>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -133,6 +135,8 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <ProjectReference>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -155,7 +159,10 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
+    <ProjectReference>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -178,14 +185,19 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
+    <ProjectReference>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\development\ffsm2\detail\config.hpp" />
     <ClInclude Include="..\..\development\ffsm2\detail\containers\array.hpp" />
     <ClInclude Include="..\..\development\ffsm2\detail\containers\array.inl" />
-    <ClInclude Include="..\..\development\ffsm2\detail\containers\bit_array.hpp" />
-    <ClInclude Include="..\..\development\ffsm2\detail\containers\bit_array.inl" />
+    <ClInclude Include="..\..\development\ffsm2\detail\containers\bit_flat_set.hpp" />
+    <ClInclude Include="..\..\development\ffsm2\detail\containers\bit_flat_set.inl" />
+    <ClInclude Include="..\..\development\ffsm2\detail\containers\bit_slice_set.hpp" />
+    <ClInclude Include="..\..\development\ffsm2\detail\containers\bit_slice_set.inl" />
     <ClInclude Include="..\..\development\ffsm2\detail\features\logger_interface.hpp" />
     <ClInclude Include="..\..\development\ffsm2\detail\features\task.hpp" />
     <ClInclude Include="..\..\development\ffsm2\detail\features\task_list.hpp" />
@@ -227,6 +239,7 @@
     <ClInclude Include="..\..\development\ffsm2\detail\shared\macros_on.hpp" />
     <ClInclude Include="..\..\development\ffsm2\detail\shared\type_list.hpp" />
     <ClInclude Include="..\..\development\ffsm2\detail\shared\utility.hpp" />
+    <ClInclude Include="..\..\development\ffsm2\detail\shared\utility_bits.hpp" />
     <ClInclude Include="..\..\development\ffsm2\detail\structure\ancestors_1.hpp" />
     <ClInclude Include="..\..\development\ffsm2\detail\structure\ancestors_1.inl" />
     <ClInclude Include="..\..\development\ffsm2\detail\structure\ancestors_2.hpp" />
@@ -250,7 +263,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\test\main.cpp" />
-    <ClCompile Include="..\..\test\shared\test_bit_array.cpp" />
+    <ClCompile Include="..\..\test\shared\test_bit_flat_set.cpp" />
+    <ClCompile Include="..\..\test\shared\test_bit_slice_set.cpp" />
     <ClCompile Include="..\..\test\shared\test_bit_stream.cpp" />
     <ClCompile Include="..\..\test\shared\test_task_list.cpp" />
     <ClCompile Include="..\..\test\test_access.cpp" />

@@ -1,5 +1,5 @@
 ﻿// FFSM2 (flat state machine for games and interactive applications)
-// 2.10.0 (2025-11-30)
+// 2.11.0 (2026-04-05)
 //
 // Created by Andrew Gresyk
 //
@@ -9,7 +9,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2024
+// Copyright (c) 2026
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@
 #pragma once
 
 #define FFSM2_VERSION_MAJOR 2
-#define FFSM2_VERSION_MINOR 10
+#define FFSM2_VERSION_MINOR 11
 #define FFSM2_VERSION_PATCH 0
 
 #define FFSM2_VERSION (10000 * FFSM2_VERSION_MAJOR + 100 * FFSM2_VERSION_MINOR + FFSM2_VERSION_PATCH)
@@ -535,8 +535,8 @@ template <
 >
 FFSM2_CONSTEXPR(11)
 T
-contain(const T x,
-		const TT to)													noexcept
+ceilingDivide(const T x,
+			  const TT to)												noexcept
 {
 	return (x + static_cast<T>(to) - 1) / static_cast<T>(to);
 }
@@ -561,6 +561,62 @@ struct StaticPrintConstT;
 template <typename>
 struct StaticPrintTypeT;
 
+}
+
+namespace ffsm2 {
+namespace detail {
+
+template <typename TIndex>
+FFSM2_CONSTEXPR(14)
+uint8_t
+bitMask(const TIndex bit) noexcept {
+	return static_cast<uint8_t>(1u << static_cast<unsigned>(bit));
+}
+
+template <typename TIndex>
+FFSM2_CONSTEXPR(14)
+uint8_t
+lowMask(const TIndex bitCount) noexcept {
+	return static_cast<uint8_t>((1u << static_cast<unsigned>(bitCount)) - 1u);
+}
+
+template <typename TIndex>
+FFSM2_CONSTEXPR(14)
+bool
+bitGet(const uint8_t* const storage,
+	   const TIndex index) noexcept
+{
+	const TIndex unit = index / 8;
+	const TIndex bit  = index % 8;
+
+	return (storage[unit] & bitMask(bit)) != 0;
+}
+
+template <typename TIndex>
+FFSM2_CONSTEXPR(14)
+void
+bitSet(uint8_t* const storage,
+	   const TIndex index) noexcept
+{
+	const TIndex unit = index / 8;
+	const TIndex bit  = index % 8;
+
+	storage[unit] |= bitMask(bit);
+}
+
+template <typename TIndex>
+FFSM2_CONSTEXPR(14)
+void
+bitClear(uint8_t* const storage,
+		 const TIndex index) noexcept
+{
+	const TIndex unit = index / 8;
+	const TIndex bit  = index % 8;
+
+	storage[unit] &= static_cast<uint8_t>(~bitMask(bit));
+}
+
+}
 }
 
 namespace ffsm2 {
@@ -672,7 +728,7 @@ class StreamBufferT {
 
 public:
 	static constexpr Long BIT_CAPACITY	= NBitCapacity;
-	static constexpr Long BYTE_COUNT	= contain(BIT_CAPACITY, 8u);
+	static constexpr Long BYTE_COUNT	= ceilingDivide(BIT_CAPACITY, 8u);
 
 	using StreamBuffer	= StreamBufferT<BIT_CAPACITY>;
 	using Data			= uint8_t	   [BYTE_COUNT	];
@@ -1203,7 +1259,7 @@ template <typename T, Long NC_>
 FFSM2_CONSTEXPR(14)
 DynamicArrayT<T, NC_>&
 DynamicArrayT<T, NC_>::operator += (Item&& item) noexcept {
-	emplace(move(item));
+	emplace(::ffsm2::move(item));
 
 	return *this;
 }
@@ -1222,29 +1278,28 @@ DynamicArrayT<T, NC_>::operator += (const DynamicArrayT<T, N>& other) noexcept {
 }
 }
 
-#if FFSM2_PLANS_AVAILABLE()
-
 namespace ffsm2 {
 namespace detail {
 
 template <unsigned NCapacity>
-class BitArrayT final {
+class BitFlatSetT final {
 public:
-	using Index		= UCapacity<NCapacity>;
+	using Index			= UCapacity<NCapacity>;
 
 	static constexpr Index CAPACITY   = NCapacity;
-	static constexpr Index UNIT_COUNT = contain(CAPACITY, 8);
+	static constexpr Index UNIT_COUNT = ceilingDivide(CAPACITY, 8);
 
-	using BitArray	= BitArrayT<CAPACITY>;
+	using This	= BitFlatSetT<CAPACITY>;
 
 public:
-	FFSM2_CONSTEXPR(14)	BitArrayT()										noexcept	{ clear();	}
+	FFSM2_CONSTEXPR(14)	BitFlatSetT()									noexcept	{ clear();			}
 
 	FFSM2_CONSTEXPR(14)	void set()										noexcept;
-
 	FFSM2_CONSTEXPR(14)	void clear()									noexcept;
-
 	FFSM2_CONSTEXPR(14)	bool empty()							  const noexcept;
+
+	template <Short NIndex>
+	FFSM2_CONSTEXPR(14)	bool get()								  const noexcept;
 
 	template <typename TIndex>
 	FFSM2_CONSTEXPR(14)	bool get  (const TIndex index)			  const noexcept;
@@ -1255,116 +1310,112 @@ public:
 	template <typename TIndex>
 	FFSM2_CONSTEXPR(14)	void clear(const TIndex index)					noexcept;
 
-	FFSM2_CONSTEXPR(14)	bool operator &  (const BitArray& other)  const noexcept;
-
-	FFSM2_CONSTEXPR(14)	void operator &= (const BitArray& other)		noexcept;
+	FFSM2_CONSTEXPR(14)	void operator &= (const This& other)			noexcept;
 
 private:
 	uint8_t _storage[UNIT_COUNT] {};
 };
 
 template <>
-class BitArrayT<0> final {
+class BitFlatSetT<0> final {
 public:
+	FFSM2_CONSTEXPR(14)	void set()										noexcept	{}
 	FFSM2_CONSTEXPR(14)	void clear()									noexcept	{}
-
-	FFSM2_CONSTEXPR(11)	bool empty()							  const noexcept	{ return true;	}
+	FFSM2_CONSTEXPR(11)	bool empty()							  const noexcept	{ return true;		}
 };
 
 }
 }
 
-#endif
-
-#if FFSM2_PLANS_AVAILABLE()
-
 namespace ffsm2 {
 namespace detail {
 
-template <unsigned NC_>
+template <unsigned NCapacity>
 FFSM2_CONSTEXPR(14)
 void
-BitArrayT<NC_>::set() noexcept {
+BitFlatSetT<NCapacity>::set() noexcept {
 	for (uint8_t& unit : _storage)
 		unit = UINT8_MAX;
+
+	constexpr Index lastBits = CAPACITY % 8;
+
+#if defined _MSC_VER
+	#pragma warning(push)
+	#pragma warning(disable: 4127) // conditional expression is constant
+#endif
+
+	if (lastBits != 0)
+		_storage[UNIT_COUNT - 1] = lowMask(lastBits);
+
+#if defined _MSC_VER
+	#pragma warning(pop)
+#endif
 }
 
-template <unsigned NC_>
+template <unsigned NCapacity>
 FFSM2_CONSTEXPR(14)
 void
-BitArrayT<NC_>::clear() noexcept {
+BitFlatSetT<NCapacity>::clear() noexcept {
 	for (uint8_t& unit : _storage)
 		unit = uint8_t{0};
 }
 
-template <unsigned NC_>
+template <unsigned NCapacity>
 FFSM2_CONSTEXPR(14)
 bool
-BitArrayT<NC_>::empty() const noexcept {
-	for (const uint8_t& unit : _storage)
-		if (unit != uint8_t{0})
-			return false;
-
-	return true;
-}
-
-template <unsigned NC_>
-template <typename TIndex>
-FFSM2_CONSTEXPR(14)
-bool
-BitArrayT<NC_>::get(const TIndex index) const noexcept {
-	FFSM2_ASSERT(index < CAPACITY);
-
-	const Index unit = static_cast<Index>(index) / 8;
-	const Index bit  = static_cast<Index>(index) % 8;
-	const uint8_t mask = 1 << bit;
-
-	return (_storage[unit] & mask) != 0;
-}
-
-template <unsigned NC_>
-template <typename TIndex>
-FFSM2_CONSTEXPR(14)
-void
-BitArrayT<NC_>::set(const TIndex index) noexcept {
-	FFSM2_ASSERT(index < CAPACITY);
-
-	const Index unit = static_cast<Index>(index) / 8;
-	const Index bit  = static_cast<Index>(index) % 8;
-	const uint8_t mask = 1 << bit;
-
-	_storage[unit] |= mask;
-}
-
-template <unsigned NC_>
-template <typename TIndex>
-FFSM2_CONSTEXPR(14)
-void
-BitArrayT<NC_>::clear(const TIndex index) noexcept {
-	FFSM2_ASSERT(index < CAPACITY);
-
-	const Index unit = static_cast<Index>(index) / 8;
-	const Index bit  = static_cast<Index>(index) % 8;
-	const uint8_t mask = 1 << bit;
-
-	_storage[unit] &= ~mask;
-}
-
-template <unsigned NC_>
-FFSM2_CONSTEXPR(14)
-bool
-BitArrayT<NC_>::operator & (const BitArray& other) const noexcept {
+BitFlatSetT<NCapacity>::empty() const noexcept {
 	for (Index i = 0; i < UNIT_COUNT; ++i)
-		if ((_storage[i] & other._storage[i]) == 0)
+		if (_storage[i])
 			return false;
 
 	return true;
 }
 
-template <unsigned NC_>
+template <unsigned NCapacity>
+template <Short NIndex>
+FFSM2_CONSTEXPR(14)
+bool
+BitFlatSetT<NCapacity>::get() const noexcept {
+	constexpr Index INDEX = NIndex;
+	static_assert(INDEX < CAPACITY, "");
+
+	return bitGet(_storage, INDEX);
+}
+
+template <unsigned NCapacity>
+template <typename TIndex>
+FFSM2_CONSTEXPR(14)
+bool
+BitFlatSetT<NCapacity>::get(const TIndex index) const noexcept {
+	FFSM2_ASSERT(index < CAPACITY);
+
+	return bitGet(_storage, static_cast<Index>(index));
+}
+
+template <unsigned NCapacity>
+template <typename TIndex>
 FFSM2_CONSTEXPR(14)
 void
-BitArrayT<NC_>::operator &= (const BitArray& other) noexcept {
+BitFlatSetT<NCapacity>::set(const TIndex index) noexcept {
+	FFSM2_ASSERT(index < CAPACITY);
+
+	bitSet(_storage, static_cast<Index>(index));
+}
+
+template <unsigned NCapacity>
+template <typename TIndex>
+FFSM2_CONSTEXPR(14)
+void
+BitFlatSetT<NCapacity>::clear(const TIndex index) noexcept {
+	FFSM2_ASSERT(index < CAPACITY);
+
+	bitClear(_storage, static_cast<Index>(index));
+}
+
+template <unsigned NCapacity>
+FFSM2_CONSTEXPR(14)
+void
+BitFlatSetT<NCapacity>::operator &= (const This& other) noexcept {
 	for (Index i = 0; i < UNIT_COUNT; ++i)
 		_storage[i] &= other._storage[i];
 }
@@ -1372,7 +1423,241 @@ BitArrayT<NC_>::operator &= (const BitArray& other) noexcept {
 }
 }
 
-#endif
+namespace ffsm2 {
+namespace detail {
+
+struct BitSlice final {
+	FFSM2_CONSTEXPR(11)	BitSlice(Short unit_  = INVALID_SHORT,
+								 Short width_ = INVALID_SHORT)			noexcept
+		: byteOffset{unit_ }
+		, bitWidth  {width_}
+	{}
+
+	Short byteOffset;
+	Short bitWidth;
+};
+
+template <unsigned NCapacity>
+class BitSliceSetT final {
+public:
+	using Index			= UCapacity<NCapacity>;
+
+	static constexpr Index CAPACITY   = NCapacity;
+	static constexpr Index UNIT_COUNT = ceilingDivide(CAPACITY, 8);
+
+	using This	= BitSliceSetT<CAPACITY>;
+
+	class Bits {
+		template <unsigned>
+		friend class BitSliceSetT;
+
+	private:
+		FFSM2_CONSTEXPR(11)	explicit Bits(uint8_t* const storage,
+										  const Index width)			noexcept
+			: _storage{storage}
+			, _width  {width  }
+		{}
+
+	public:
+		FFSM2_CONSTEXPR(14)	explicit operator bool()			  const noexcept;
+		FFSM2_CONSTEXPR(14)	void clear()								noexcept;
+		FFSM2_CONSTEXPR(14)	void set(const Index index)					noexcept;
+
+	private:
+		uint8_t* const _storage;
+		const Index _width;
+	};
+
+	class CBits {
+		template <unsigned>
+		friend class BitSliceSetT;
+
+	private:
+		FFSM2_CONSTEXPR(11)	explicit CBits(const uint8_t* const storage,
+										   const Index width)			noexcept
+			: _storage{storage}
+			, _width  {width  }
+		{}
+
+	public:
+		FFSM2_CONSTEXPR(14)	explicit operator bool()			  const noexcept;
+		FFSM2_CONSTEXPR(14)	bool get(const Index index)			  const noexcept;
+
+	private:
+		const uint8_t* const _storage;
+		const Index _width;
+	};
+
+public:
+	FFSM2_CONSTEXPR(14)	BitSliceSetT()									noexcept	{ clear();			}
+
+	FFSM2_CONSTEXPR(14)	void clear()									noexcept;
+	FFSM2_CONSTEXPR(14)	bool empty()							  const noexcept;
+
+	template <Short NUnit, Short NWidth>
+	FFSM2_CONSTEXPR(14)	 Bits  bits()									noexcept;
+
+	template <Short NUnit, Short NWidth>
+	FFSM2_CONSTEXPR(14)	CBits cbits()							  const noexcept;
+
+	FFSM2_CONSTEXPR(14)	 Bits  bits(const BitSlice& units)				noexcept;
+
+	FFSM2_CONSTEXPR(14)	bool operator != (const This& other)	  const noexcept;
+
+private:
+	uint8_t _storage[UNIT_COUNT] {};
+};
+
+template <>
+class BitSliceSetT<0> final {
+public:
+	FFSM2_CONSTEXPR(14)	void clear()									noexcept	{}
+	FFSM2_CONSTEXPR(11)	bool empty()							  const noexcept	{ return true;		}
+};
+
+}
+}
+
+namespace ffsm2 {
+namespace detail {
+
+template <typename TIndex>
+FFSM2_CONSTEXPR(14)
+bool
+viewAny(const uint8_t* const storage,
+		const TIndex width) noexcept
+{
+	const TIndex fullUnits = width / 8;
+
+	for (TIndex i = 0; i < fullUnits; ++i)
+		if (storage[i])
+			return true;
+
+	const TIndex bit = width % 8;
+	if (bit == 0)
+		return false;
+
+	return (storage[fullUnits] & lowMask(bit)) != 0;
+}
+
+template <typename TIndex>
+FFSM2_CONSTEXPR(14)
+void
+viewClear(uint8_t* const storage,
+		  const TIndex width) noexcept
+{
+	const TIndex fullUnits = width / 8;
+
+	for (TIndex i = 0; i < fullUnits; ++i)
+		storage[i] = uint8_t{0};
+
+	const TIndex trailing = width % 8;
+	if (trailing != 0)
+		storage[fullUnits] &= static_cast<uint8_t>(~lowMask(trailing));
+}
+
+template <unsigned NCapacity>
+FFSM2_CONSTEXPR(14)
+BitSliceSetT<NCapacity>::Bits::operator bool() const noexcept {
+	return viewAny(_storage, _width);
+}
+
+template <unsigned NCapacity>
+FFSM2_CONSTEXPR(14)
+void
+BitSliceSetT<NCapacity>::Bits::clear() noexcept {
+	viewClear(_storage, _width);
+}
+
+template <unsigned NCapacity>
+FFSM2_CONSTEXPR(14)
+void
+BitSliceSetT<NCapacity>::Bits::set(const Index index) noexcept {
+	FFSM2_ASSERT(index < _width);
+
+	bitSet(_storage, index);
+}
+
+template <unsigned NCapacity>
+FFSM2_CONSTEXPR(14)
+BitSliceSetT<NCapacity>::CBits::operator bool() const noexcept {
+	return viewAny(_storage, _width);
+}
+
+template <unsigned NCapacity>
+FFSM2_CONSTEXPR(14)
+bool
+BitSliceSetT<NCapacity>::CBits::get(const Index index) const noexcept {
+	FFSM2_ASSERT(index < _width);
+
+	return bitGet(_storage, index);
+}
+
+template <unsigned NCapacity>
+FFSM2_CONSTEXPR(14)
+void
+BitSliceSetT<NCapacity>::clear() noexcept {
+	for (uint8_t& unit : _storage)
+		unit = uint8_t{0};
+}
+
+template <unsigned NCapacity>
+FFSM2_CONSTEXPR(14)
+bool
+BitSliceSetT<NCapacity>::empty() const noexcept {
+	for (Index i = 0; i < UNIT_COUNT; ++i)
+		if (_storage[i])
+			return false;
+
+	return true;
+}
+
+template <unsigned NCapacity>
+template <Short NUnit, Short NWidth>
+FFSM2_CONSTEXPR(14)
+typename BitSliceSetT<NCapacity>::Bits
+BitSliceSetT<NCapacity>::bits() noexcept {
+	constexpr Short UNIT  = NUnit;
+	constexpr Short WIDTH = NWidth;
+	static_assert(UNIT + ceilingDivide(WIDTH, 8) <= UNIT_COUNT, "");
+
+	return Bits{_storage + UNIT, WIDTH};
+}
+
+template <unsigned NCapacity>
+template <Short NUnit, Short NWidth>
+FFSM2_CONSTEXPR(14)
+typename BitSliceSetT<NCapacity>::CBits
+BitSliceSetT<NCapacity>::cbits() const noexcept {
+	constexpr Short UNIT  = NUnit;
+	constexpr Short WIDTH = NWidth;
+	static_assert(UNIT + ceilingDivide(WIDTH, 8) <= UNIT_COUNT, "");
+
+	return CBits{_storage + UNIT, WIDTH};
+}
+
+template <unsigned NCapacity>
+FFSM2_CONSTEXPR(14)
+typename BitSliceSetT<NCapacity>::Bits
+BitSliceSetT<NCapacity>::bits(const BitSlice& units) noexcept {
+	FFSM2_ASSERT(units.byteOffset + ceilingDivide(units.bitWidth, 8) <= UNIT_COUNT);
+
+	return Bits{_storage + units.byteOffset, units.bitWidth};
+}
+
+template <unsigned NCapacity>
+FFSM2_CONSTEXPR(14)
+bool
+BitSliceSetT<NCapacity>::operator != (const This& other) const noexcept {
+	for (Index i = 0; i < UNIT_COUNT; ++i)
+		if (_storage[i] != other._storage[i])
+			return true;
+
+	return false;
+}
+
+}
+}
 
 namespace ffsm2 {
 
@@ -2101,24 +2386,21 @@ struct PlanDataT<
 	static constexpr Long TASK_CAPACITY	= NTaskCapacity;
 
 	using Task				= TaskT		  <Payload>;
-	using Tasks				= TaskListT   <Payload,  TASK_CAPACITY>;
+	using Tasks				= TaskListT   <Payload , TASK_CAPACITY>;
 	using TaskLinks			= StaticArrayT<TaskLink, TASK_CAPACITY>;
-	using Payloads			= StaticArrayT<Payload,  TASK_CAPACITY>;
 
-	using TasksBits			= BitArrayT   <				STATE_COUNT>;
+	using TasksBits			= BitFlatSetT <	            STATE_COUNT>;
 
 	Tasks tasks;
 	TaskLinks taskLinks;
-	Payloads taskPayloads;
 	TasksBits payloadExists;
 
 	Bounds tasksBounds;
-	bool planExists;
-
 	TasksBits tasksSuccesses;
 	TasksBits tasksFailures;
+	bool planExists = false;
 	TaskStatus headStatus;
-	TaskStatus subStatus;
+	TaskStatus  subStatus;
 
 	FFSM2_CONSTEXPR(14)	void clearTaskStatus  (const StateID stateId)		noexcept;
 	FFSM2_CONSTEXPR(14)	void verifyEmptyStatus(const StateID stateId) const noexcept;
@@ -2154,21 +2436,20 @@ struct PlanDataT<
 	static constexpr Long TASK_CAPACITY	= NTaskCapacity;
 
 	using Task				= TaskT		  <void>;
-	using Tasks				= TaskListT	  <void,	 TASK_CAPACITY>;
+	using Tasks				= TaskListT	  <void    , TASK_CAPACITY>;
 	using TaskLinks			= StaticArrayT<TaskLink, TASK_CAPACITY>;
 
-	using TasksBits			= BitArrayT	  <				STATE_COUNT>;
+	using TasksBits			= BitFlatSetT <	            STATE_COUNT>;
 
 	Tasks tasks;
 	TaskLinks taskLinks;
 
 	Bounds tasksBounds;
-	bool planExists;
-
 	TasksBits tasksSuccesses;
 	TasksBits tasksFailures;
+	bool planExists = false;
 	TaskStatus headStatus;
-	TaskStatus subStatus;
+	TaskStatus  subStatus;
 
 	FFSM2_CONSTEXPR(14)	void clearTaskStatus  (const StateID stateId)		noexcept;
 	FFSM2_CONSTEXPR(14)	void verifyEmptyStatus(const StateID stateId) const noexcept;
@@ -2273,7 +2554,6 @@ void
 PlanDataT<ArgsT<TG_, TSL_ FFSM2_IF_SERIALIZATION(, NSB_), NTC_, TTP_>>::clear() noexcept {
 	tasks		  .clear();
 	taskLinks	  .clear();
-	taskPayloads  .clear();
 	payloadExists .clear();
 
 	tasksBounds	  .clear();
@@ -2364,11 +2644,11 @@ template <typename TG_, typename TSL_ FFSM2_IF_SERIALIZATION(, Long NSB_), Long 
 FFSM2_CONSTEXPR(14)
 void
 PlanDataT<ArgsT<TG_, TSL_ FFSM2_IF_SERIALIZATION(, NSB_), NTC_, void>>::clear() noexcept {
-	tasks	   .clear();
-	taskLinks  .clear();
+	tasks		  .clear();
+	taskLinks	  .clear();
 
-	tasksBounds.clear();
-	planExists = false;
+	tasksBounds	  .clear();
+	planExists	 = false;
 
 	clearStatuses();
 }
@@ -3172,10 +3452,6 @@ struct CoreT {
 	using Logger			= typename TArgs::Logger;
 #endif
 
-#if FFSM2_TRANSITION_HISTORY_AVAILABLE()
-	Transition previousTransition;
-#endif
-
 	FFSM2_CONSTEXPR(11)	explicit CoreT(Context& context_
 									 FFSM2_IF_LOG_INTERFACE(, Logger* const logger_ = nullptr))		noexcept;
 
@@ -3189,6 +3465,7 @@ struct CoreT {
 	Registry registry;
 	Transition request;
 	FFSM2_IF_PLANS(PlanData planData);
+	FFSM2_IF_TRANSITION_HISTORY(Transition previousTransition);
 	FFSM2_IF_LOG_INTERFACE(Logger* logger);
 };
 
@@ -3210,7 +3487,7 @@ template <typename TArgs>
 FFSM2_CONSTEXPR(11)
 CoreT<TArgs>::CoreT(PureContext&& context_
 				  FFSM2_IF_LOG_INTERFACE(, Logger* const logger_)) noexcept
-	: context{move(context_)}
+	: context{::ffsm2::move(context_)}
 	FFSM2_IF_LOG_INTERFACE(, logger{logger_})
 {}
 
@@ -3220,18 +3497,20 @@ CoreT<TArgs>::CoreT(const CoreT& other) noexcept
 	: context {other.context }
 	, registry{other.registry}
 	, request {other.request }
-	FFSM2_IF_PLANS			   (, planData			 {other.planData		   })
-	FFSM2_IF_LOG_INTERFACE	   (, logger			 {other.logger			   })
+	FFSM2_IF_PLANS			   (, planData          {other.planData          })
+	FFSM2_IF_TRANSITION_HISTORY(, previousTransition{other.previousTransition})
+	FFSM2_IF_LOG_INTERFACE	   (, logger            {other.logger            })
 {}
 
 template <typename TArgs>
 FFSM2_CONSTEXPR(11)
 CoreT<TArgs>::CoreT(CoreT&& other) noexcept
-	: context {move(other.context )}
-	, registry{move(other.registry)}
-	, request {move(other.request )}
-	FFSM2_IF_PLANS			   (, planData			 {move(other.planData			)})
-	FFSM2_IF_LOG_INTERFACE	   (, logger			 {move(other.logger				)})
+	: context {::ffsm2::move(other.context )}
+	, registry{::ffsm2::move(other.registry)}
+	, request {::ffsm2::move(other.request )}
+	FFSM2_IF_PLANS			   (, planData          {::ffsm2::move(other.planData          )})
+	FFSM2_IF_TRANSITION_HISTORY(, previousTransition{::ffsm2::move(other.previousTransition)})
+	FFSM2_IF_LOG_INTERFACE	   (, logger            {::ffsm2::move(other.logger            )})
 {}
 
 }
@@ -3666,7 +3945,7 @@ protected:
 	using typename PlanControl::Transition;
 
 #if FFSM2_PLANS_AVAILABLE()
-	using TasksBits		= BitArrayT<StateList::SIZE>;
+	using TasksBits		= BitFlatSetT<StateList::SIZE>;
 #endif
 
 	struct Lock final {
@@ -6894,7 +7173,7 @@ template <typename TG_, typename TA_>
 FFSM2_CONSTEXPR(11)
 R_<TG_, TA_>::R_(PureContext&& context
 			   FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
-	: _core{move(context)
+	: _core{::ffsm2::move(context)
 		  FFSM2_IF_LOG_INTERFACE(, logger)}
 {}
 
@@ -7537,7 +7816,7 @@ template <FeatureTag NFT_, typename TC_, Short NSL_ FFSM2_IF_PLANS(, Long NTC_),
 FFSM2_CONSTEXPR(14)
 RV_<G_<NFT_, TC_, Automatic, NSL_ FFSM2_IF_PLANS(, NTC_), TP_>, TA_>::RV_(PureContext&& context
 																		FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
-	: Base{move(context)
+	: Base{::ffsm2::move(context)
 	FFSM2_IF_LOG_INTERFACE(, logger)}
 {
 	initialEnter();
@@ -7552,7 +7831,7 @@ RV_<G_<NFT_, TC_, Automatic, NSL_ FFSM2_IF_PLANS(, NTC_), TP_>, TA_>::RV_(const 
 template <FeatureTag NFT_, typename TC_, Short NSL_ FFSM2_IF_PLANS(, Long NTC_), typename TP_, typename TA_>
 FFSM2_CONSTEXPR(14)
 RV_<G_<NFT_, TC_, Automatic, NSL_ FFSM2_IF_PLANS(, NTC_), TP_>, TA_>::RV_(RV_&& other) noexcept
-	: Base{move(other)}
+	: Base{::ffsm2::move(other)}
 {}
 
 template <FeatureTag NFT_, typename TC_, Short NSL_ FFSM2_IF_PLANS(, Long NTC_), typename TP_, typename TA_>
@@ -8169,7 +8448,7 @@ template <FeatureTag NFT_, typename TC_, typename TV_, Short NSL_ FFSM2_IF_PLANS
 FFSM2_CONSTEXPR(11)
 InstanceT<G_<NFT_, TC_, TV_, NSL_ FFSM2_IF_PLANS(, NTC_), TP_>, TA_>::InstanceT(PureContext&& context
 																			  FFSM2_IF_LOG_INTERFACE(, Logger* const logger)) noexcept
-	: Base{move(context)
+	: Base{::ffsm2::move(context)
 	FFSM2_IF_LOG_INTERFACE(, logger)}
 {}
 

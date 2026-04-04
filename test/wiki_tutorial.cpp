@@ -125,16 +125,16 @@ TEST_CASE("Wiki.Tutorial") {
     REQUIRE(fsm.isActive<Red>());                              // On's initial sub-state
 
     fsm.update();
-    REQUIRE(fsm.isActive<Yellow>());                           // 1st setp of On's plan
+    REQUIRE(fsm.isActive<Yellow>());                           // 1st step of On's plan
 
     fsm.update();
-    REQUIRE(fsm.isActive<Green>());                            // 2nd setp of On's plan
+    REQUIRE(fsm.isActive<Green>());                            // 2nd step of On's plan
 
     fsm.react(Event{});
-    REQUIRE(fsm.isActive<Yellow>());                           // 3rd setp of On's plan
+    REQUIRE(fsm.isActive<Yellow>());                           // 3rd step of On's plan
 
     fsm.update();
-    REQUIRE(fsm.isActive<Red>());                              // 4th setp of On's plan
+    REQUIRE(fsm.isActive<Red>());                              // 4th step of On's plan
 
     fsm.update();
     REQUIRE(fsm.isActive<Done>());                             // activated by On::planSucceeded()

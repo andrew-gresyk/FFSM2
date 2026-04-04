@@ -86,24 +86,21 @@ struct PlanDataT<
 	static constexpr Long TASK_CAPACITY	= NTaskCapacity;
 
 	using Task				= TaskT		  <Payload>;
-	using Tasks				= TaskListT   <Payload,  TASK_CAPACITY>;
+	using Tasks				= TaskListT   <Payload , TASK_CAPACITY>;
 	using TaskLinks			= StaticArrayT<TaskLink, TASK_CAPACITY>;
-	using Payloads			= StaticArrayT<Payload,  TASK_CAPACITY>;
 
-	using TasksBits			= BitArrayT   <				STATE_COUNT>;
+	using TasksBits			= BitFlatSetT <	            STATE_COUNT>;
 
 	Tasks tasks;
 	TaskLinks taskLinks;
-	Payloads taskPayloads;
 	TasksBits payloadExists;
 
 	Bounds tasksBounds;
-	bool planExists;
-
 	TasksBits tasksSuccesses;
 	TasksBits tasksFailures;
+	bool planExists = false;
 	TaskStatus headStatus;
-	TaskStatus subStatus;
+	TaskStatus  subStatus;
 
 	FFSM2_CONSTEXPR(14)	void clearTaskStatus  (const StateID stateId)		noexcept;
 	FFSM2_CONSTEXPR(14)	void verifyEmptyStatus(const StateID stateId) const noexcept;
@@ -141,21 +138,20 @@ struct PlanDataT<
 	static constexpr Long TASK_CAPACITY	= NTaskCapacity;
 
 	using Task				= TaskT		  <void>;
-	using Tasks				= TaskListT	  <void,	 TASK_CAPACITY>;
+	using Tasks				= TaskListT	  <void    , TASK_CAPACITY>;
 	using TaskLinks			= StaticArrayT<TaskLink, TASK_CAPACITY>;
 
-	using TasksBits			= BitArrayT	  <				STATE_COUNT>;
+	using TasksBits			= BitFlatSetT <	            STATE_COUNT>;
 
 	Tasks tasks;
 	TaskLinks taskLinks;
 
 	Bounds tasksBounds;
-	bool planExists;
-
 	TasksBits tasksSuccesses;
 	TasksBits tasksFailures;
+	bool planExists = false;
 	TaskStatus headStatus;
-	TaskStatus subStatus;
+	TaskStatus  subStatus;
 
 	FFSM2_CONSTEXPR(14)	void clearTaskStatus  (const StateID stateId)		noexcept;
 	FFSM2_CONSTEXPR(14)	void verifyEmptyStatus(const StateID stateId) const noexcept;

@@ -64,7 +64,7 @@ using FSM = M::PeerRoot<
 				Red,
 				YellowDownwards,
 				YellowUpwards,
-				Green
+				Green,
 				Off
 			>;
 
@@ -183,7 +183,8 @@ struct Off
 
 ////////////////////////////////////////////////////////////////////////////////
 
-int main() {
+int
+main() {
 	// shared data storage instance
 	Context context;
 

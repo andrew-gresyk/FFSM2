@@ -1,28 +1,27 @@
-#if FFSM2_PLANS_AVAILABLE()
-
 namespace ffsm2 {
 namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
 template <unsigned NCapacity>
-class BitArrayT final {
+class BitFlatSetT final {
 public:
-	using Index		= UCapacity<NCapacity>;
+	using Index			= UCapacity<NCapacity>;
 
 	static constexpr Index CAPACITY   = NCapacity;
-	static constexpr Index UNIT_COUNT = contain(CAPACITY, 8);
+	static constexpr Index UNIT_COUNT = ceilingDivide(CAPACITY, 8);
 
-	using BitArray	= BitArrayT<CAPACITY>;
+	using This	= BitFlatSetT<CAPACITY>;
 
 public:
-	FFSM2_CONSTEXPR(14)	BitArrayT()										noexcept	{ clear();	}
+	FFSM2_CONSTEXPR(14)	BitFlatSetT()									noexcept	{ clear();			}
 
 	FFSM2_CONSTEXPR(14)	void set()										noexcept;
-
 	FFSM2_CONSTEXPR(14)	void clear()									noexcept;
-
 	FFSM2_CONSTEXPR(14)	bool empty()							  const noexcept;
+
+	template <Short NIndex>
+	FFSM2_CONSTEXPR(14)	bool get()								  const noexcept;
 
 	template <typename TIndex>
 	FFSM2_CONSTEXPR(14)	bool get  (const TIndex index)			  const noexcept;
@@ -33,9 +32,7 @@ public:
 	template <typename TIndex>
 	FFSM2_CONSTEXPR(14)	void clear(const TIndex index)					noexcept;
 
-	FFSM2_CONSTEXPR(14)	bool operator &  (const BitArray& other)  const noexcept;
-
-	FFSM2_CONSTEXPR(14)	void operator &= (const BitArray& other)		noexcept;
+	FFSM2_CONSTEXPR(14)	void operator &= (const This& other)			noexcept;
 
 private:
 	uint8_t _storage[UNIT_COUNT] {};
@@ -44,11 +41,11 @@ private:
 //------------------------------------------------------------------------------
 
 template <>
-class BitArrayT<0> final {
+class BitFlatSetT<0> final {
 public:
+	FFSM2_CONSTEXPR(14)	void set()										noexcept	{}
 	FFSM2_CONSTEXPR(14)	void clear()									noexcept	{}
-
-	FFSM2_CONSTEXPR(11)	bool empty()							  const noexcept	{ return true;	}
+	FFSM2_CONSTEXPR(11)	bool empty()							  const noexcept	{ return true;		}
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -56,6 +53,4 @@ public:
 }
 }
 
-#endif
-
-#include "bit_array.inl"
+#include "bit_flat_set.inl"
