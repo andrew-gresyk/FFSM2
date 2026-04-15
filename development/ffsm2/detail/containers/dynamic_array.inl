@@ -24,7 +24,7 @@ DynamicArrayT<T, NC_>::DynamicArrayT(This&& other) noexcept {
 //------------------------------------------------------------------------------
 
 template <typename T, Long NC_>
-FFSM2_CONSTEXPR(14)
+FFSM2_CONSTEXPR(20)
 DynamicArrayT<T, NC_>::~DynamicArrayT() noexcept {
 	clear();
 }

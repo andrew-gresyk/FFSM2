@@ -26,7 +26,7 @@ public:
 						 DynamicArrayT()								noexcept	= default;
 	FFSM2_CONSTEXPR(14)	 DynamicArrayT(const This & other)				noexcept;
 	FFSM2_CONSTEXPR(14)	 DynamicArrayT(      This&& other)				noexcept;
-	FFSM2_CONSTEXPR(14)	~DynamicArrayT()								noexcept;
+	FFSM2_CONSTEXPR(20)	~DynamicArrayT()								noexcept;
 
 	FFSM2_CONSTEXPR(14)	DynamicArrayT& operator = (const This & other)	noexcept;
 	FFSM2_CONSTEXPR(14)	DynamicArrayT& operator = (      This&& other)	noexcept;

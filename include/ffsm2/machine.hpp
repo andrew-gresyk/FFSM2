@@ -118,7 +118,7 @@
 	#define FFSM2_BREAK_AVAILABLE()										   false
 #endif
 
-#ifdef _DEBUG
+#if defined _DEBUG
 	#define FFSM2_IF_DEBUG(...)										 __VA_ARGS__
 	#define FFSM2_UNLESS_DEBUG(...)
 	#define FFSM2_DEBUG_OR(y, n)											   y
@@ -142,7 +142,7 @@
 	#define FFSM2_ASSERT_OR(y, n)											   n
 #endif
 
-#ifdef FFSM2_ENABLE_ALL
+#if defined FFSM2_ENABLE_ALL
 	#define FFSM2_ENABLE_DEBUG_STATE_TYPE
 	#define FFSM2_ENABLE_PLANS
 	#define FFSM2_ENABLE_SERIALIZATION
@@ -150,7 +150,7 @@
 	#define FFSM2_ENABLE_TRANSITION_HISTORY
 #endif
 
-#ifndef FFSM2_DISABLE_TYPEINDEX
+#if !defined FFSM2_DISABLE_TYPEINDEX
 	#define FFSM2_TYPEINDEX_AVAILABLE()										true
 	#define FFSM2_IF_TYPEINDEX(...)									 __VA_ARGS__
 	#define FFSM2_TYPEINDEX_MASK										(1 << 0)
@@ -160,7 +160,7 @@
 	#define FFSM2_TYPEINDEX_MASK										(0 << 0)
 #endif
 
-#ifdef FFSM2_ENABLE_DEBUG_STATE_TYPE
+#if defined FFSM2_ENABLE_DEBUG_STATE_TYPE
 	#define FFSM2_DEBUG_STATE_TYPE_AVAILABLE()								true
 	#define FFSM2_DEBUG_STATE_TYPE_MASK									(1 << 1)
 #else
@@ -168,7 +168,7 @@
 	#define FFSM2_DEBUG_STATE_TYPE_MASK									(0 << 1)
 #endif
 
-#ifdef FFSM2_ENABLE_PLANS
+#if defined FFSM2_ENABLE_PLANS
 	#define FFSM2_PLANS_AVAILABLE()											true
 	#define FFSM2_IF_PLANS(...)										 __VA_ARGS__
 	#define FFSM2_PLANS_MASK											(1 << 2)
@@ -178,7 +178,7 @@
 	#define FFSM2_PLANS_MASK											(0 << 2)
 #endif
 
-#ifdef FFSM2_ENABLE_SERIALIZATION
+#if defined FFSM2_ENABLE_SERIALIZATION
 	#define FFSM2_SERIALIZATION_AVAILABLE()									true
 	#define FFSM2_IF_SERIALIZATION(...)								 __VA_ARGS__
 	#define FFSM2_SERIALIZATION_MASK									(1 << 3)
@@ -188,7 +188,7 @@
 	#define FFSM2_SERIALIZATION_MASK									(0 << 3)
 #endif
 
-#ifdef FFSM2_ENABLE_STRUCTURE_REPORT
+#if defined FFSM2_ENABLE_STRUCTURE_REPORT
 	#define FFSM2_STRUCTURE_REPORT_AVAILABLE()								true
 	#define FFSM2_IF_STRUCTURE_REPORT(...)							 __VA_ARGS__
 	#define FFSM2_STRUCTURE_REPORT_MASK									(1 << 4)
@@ -198,7 +198,7 @@
 	#define FFSM2_STRUCTURE_REPORT_MASK									(0 << 4)
 #endif
 
-#ifdef FFSM2_ENABLE_TRANSITION_HISTORY
+#if defined FFSM2_ENABLE_TRANSITION_HISTORY
 	#define FFSM2_TRANSITION_HISTORY_AVAILABLE()							true
 	#define FFSM2_IF_TRANSITION_HISTORY(...)						 __VA_ARGS__
 	#define FFSM2_TRANSITION_HISTORY_MASK								(1 << 5)
@@ -208,13 +208,13 @@
 	#define FFSM2_TRANSITION_HISTORY_MASK								(0 << 5)
 #endif
 
-#ifdef FFSM2_ENABLE_UTILITY_THEORY
+#if defined FFSM2_ENABLE_UTILITY_THEORY
 	#define FFSM2_UTILITY_THEORY_AVAILABLE()								true
 #else
 	#define FFSM2_UTILITY_THEORY_AVAILABLE()							   false
 #endif
 
-#ifdef FFSM2_ENABLE_VERBOSE_DEBUG_LOG
+#if defined FFSM2_ENABLE_VERBOSE_DEBUG_LOG
 	#define FFSM2_ENABLE_LOG_INTERFACE
 
 	#define FFSM2_VERBOSE_DEBUG_LOG_AVAILABLE()								true
@@ -224,7 +224,7 @@
 	#define FFSM2_VERBOSE_DEBUG_LOG_MASK								(0 << 7)
 #endif
 
-#ifdef FFSM2_ENABLE_LOG_INTERFACE
+#if defined FFSM2_ENABLE_LOG_INTERFACE
 	#define FFSM2_LOG_INTERFACE_AVAILABLE()									true
 	#define FFSM2_IF_LOG_INTERFACE(...)								 __VA_ARGS__
 	#define FFSM2_LOG_INTERFACE_MASK									(1 << 8)
@@ -1122,7 +1122,7 @@ public:
 	using This		= StaticArrayT<Item, CAPACITY>;
 
 public:
-	FFSM2_CONSTEXPR(11)	StaticArrayT() = default;
+	FFSM2_CONSTEXPR(11)	StaticArrayT()								   = default;
 	FFSM2_CONSTEXPR(14)	StaticArrayT(const Item filler)					noexcept	{ fill(filler);						}
 
 	template <typename N>
@@ -1263,7 +1263,7 @@ public:
 						 DynamicArrayT()								noexcept	= default;
 	FFSM2_CONSTEXPR(14)	 DynamicArrayT(const This & other)				noexcept;
 	FFSM2_CONSTEXPR(14)	 DynamicArrayT(      This&& other)				noexcept;
-	FFSM2_CONSTEXPR(14)	~DynamicArrayT()								noexcept;
+	FFSM2_CONSTEXPR(20)	~DynamicArrayT()								noexcept;
 
 	FFSM2_CONSTEXPR(14)	DynamicArrayT& operator = (const This & other)	noexcept;
 	FFSM2_CONSTEXPR(14)	DynamicArrayT& operator = (      This&& other)	noexcept;
@@ -1351,7 +1351,7 @@ DynamicArrayT<T, NC_>::DynamicArrayT(This&& other) noexcept {
 }
 
 template <typename T, Long NC_>
-FFSM2_CONSTEXPR(14)
+FFSM2_CONSTEXPR(20)
 DynamicArrayT<T, NC_>::~DynamicArrayT() noexcept {
 	clear();
 }
