@@ -42,7 +42,9 @@ public:
 	public:
 		FFSM2_CONSTEXPR(14)	explicit operator bool()			  const noexcept;
 		FFSM2_CONSTEXPR(14)	void clear()								noexcept;
-		FFSM2_CONSTEXPR(14)	void set(const Index index)					noexcept;
+
+		FFSM2_CONSTEXPR(14)	void set  (const Index index)				noexcept;
+		FFSM2_CONSTEXPR(14)	void clear(const Index index)				noexcept;
 
 	private:
 		uint8_t* const _storage;
@@ -64,6 +66,7 @@ public:
 
 	public:
 		FFSM2_CONSTEXPR(14)	explicit operator bool()			  const noexcept;
+
 		FFSM2_CONSTEXPR(14)	bool get(const Index index)			  const noexcept;
 
 	private:
@@ -86,6 +89,7 @@ public:
 	FFSM2_CONSTEXPR(14)	CBits cbits()							  const noexcept;
 
 	FFSM2_CONSTEXPR(14)	 Bits  bits(const BitSlice& units)				noexcept;
+	FFSM2_CONSTEXPR(14)	CBits cbits(const BitSlice& units)		  const noexcept;
 
 	FFSM2_CONSTEXPR(14)	bool operator != (const This& other)	  const noexcept;
 

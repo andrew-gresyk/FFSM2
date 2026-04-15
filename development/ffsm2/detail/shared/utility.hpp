@@ -203,6 +203,18 @@ move(T&& t)																noexcept	{
 	return static_cast<RemoveReference<T>&&>(t);
 }
 
+//------------------------------------------------------------------------------
+
+template <
+	typename TIn,
+	typename TOut = TIn
+>
+FFSM2_CONSTEXPR(11)
+const TOut&
+constant(TIn& t)														noexcept	{
+	return static_cast<const TOut&>(t);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 template <
@@ -249,15 +261,15 @@ count(const TElement (&)[NCount])										noexcept	{
 //------------------------------------------------------------------------------
 
 template <
-	typename T
-  , typename TT
+	typename N1
+  , typename N2
 >
 FFSM2_CONSTEXPR(11)
-T
-ceilingDivide(const T x,
-			  const TT to)												noexcept
+N1
+ceilingDivide(const N1 n,
+			  const N2 to)												noexcept
 {
-	return (x + static_cast<T>(to) - 1) / static_cast<T>(to);
+	return (n + static_cast<N1>(to) - 1) / static_cast<N1>(to);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -270,9 +282,52 @@ fill(T& a, const char value)											noexcept	{
 }
 
 //------------------------------------------------------------------------------
+
+template <typename T>
+FFSM2_CONSTEXPR(14)
+void
+swap(T& l, T& r)														noexcept	{
+	T t = ::ffsm2::move(l);
+	l   = ::ffsm2::move(r);
+	r   = ::ffsm2::move(t);
+}
+
+//------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 
-template<class T>
+template <
+	typename TO
+  , typename TI
+>
+FFSM2_CONSTEXPR(17)
+TO*
+reinterpret_launder(      TI* const in)									noexcept	{
+#if FFSM2_CONSTEXPR_AVAILABLE(17)
+	return ::std::launder(reinterpret_cast<      TO*>(in));
+#else
+	return                reinterpret_cast<      TO*>(in);
+#endif
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <
+	typename TO
+  , typename TI
+>
+FFSM2_CONSTEXPR(17)
+const TO*
+reinterpret_launder(const TI* const in)									noexcept	{
+#if FFSM2_CONSTEXPR_AVAILABLE(17)
+	return ::std::launder(reinterpret_cast<const TO*>(in));
+#else
+	return                reinterpret_cast<const TO*>(in);
+#endif
+}
+
+//------------------------------------------------------------------------------
+
+template<typename T>
 FFSM2_CONSTEXPR(14)
 void
 destroy(T& t)															noexcept	{

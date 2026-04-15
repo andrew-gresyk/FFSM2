@@ -3,28 +3,35 @@ namespace detail {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename TContainer>
+template <
+	typename TContainer,
+	typename TItem,
+	typename TIndex
+>
 class IteratorT {
 public:
 	using Container = TContainer;
-	using Item		= typename Container::Item;
-	using Index		= typename Container::Index;
+	using Item		= TItem;
+	using Index		= TIndex;
 
 	template <typename, Long>
 	friend class DynamicArrayT;
+
+	template <typename, Long>
+	friend class StaticArrayT;
 
 private:
 	FFSM2_CONSTEXPR(11)	IteratorT(Container& container,
 								  const Index cursor)										noexcept
 		: _container{container}
-		, _cursor{cursor}
+		, _cursor   {cursor   }
 	{}
 
 public:
-	FFSM2_CONSTEXPR(14)	bool operator != (const IteratorT& FFSM2_IF_ASSERT(other))	  const noexcept	{
+	FFSM2_CONSTEXPR(14)	bool operator != (const IteratorT& other)	  const noexcept	{
 		FFSM2_ASSERT(&_container == &other._container);
 
-		return _cursor != _container.limit();
+		return _cursor != other._cursor;
 	}
 
 	FFSM2_CONSTEXPR(14)	IteratorT& operator ++()											noexcept	{
@@ -47,28 +54,35 @@ private:
 
 //------------------------------------------------------------------------------
 
-template <typename TContainer>
-class IteratorT<const TContainer> {
+template <
+	typename TContainer,
+	typename TItem,
+	typename TIndex
+>
+class IteratorT<const TContainer, TItem, TIndex> {
 public:
 	using Container = TContainer;
-	using Item		= typename Container::Item;
-	using Index		= typename Container::Index;
+	using Item		= TItem;
+	using Index		= TIndex;
 
 	template <typename, Long>
 	friend class DynamicArrayT;
+
+	template <typename, Long>
+	friend class StaticArrayT;
 
 private:
 	FFSM2_CONSTEXPR(11)	IteratorT(const Container& container,
 								  const Index cursor)										noexcept
 		: _container{container}
-		, _cursor{cursor}
+		, _cursor   {cursor   }
 	{}
 
 public:
-	FFSM2_CONSTEXPR(14)	bool operator != (const IteratorT& FFSM2_IF_ASSERT(other))	  const noexcept	{
+	FFSM2_CONSTEXPR(14)	bool operator != (const IteratorT& other)	  const noexcept	{
 		FFSM2_ASSERT(&_container == &other._container);
 
-		return _cursor != _container.limit();
+		return _cursor != other._cursor;
 	}
 
 	FFSM2_CONSTEXPR(14)	IteratorT& operator ++()											noexcept	{

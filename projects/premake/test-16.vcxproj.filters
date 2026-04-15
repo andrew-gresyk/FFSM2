@@ -36,12 +36,6 @@
     <ClInclude Include="..\..\development\ffsm2\detail\config.hpp">
       <Filter>development\ffsm2\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\development\ffsm2\detail\containers\array.hpp">
-      <Filter>development\ffsm2\detail\containers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\development\ffsm2\detail\containers\array.inl">
-      <Filter>development\ffsm2\detail\containers</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\development\ffsm2\detail\containers\bit_flat_set.hpp">
       <Filter>development\ffsm2\detail\containers</Filter>
     </ClInclude>
@@ -52,6 +46,21 @@
       <Filter>development\ffsm2\detail\containers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\development\ffsm2\detail\containers\bit_slice_set.inl">
+      <Filter>development\ffsm2\detail\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\development\ffsm2\detail\containers\dynamic_array.hpp">
+      <Filter>development\ffsm2\detail\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\development\ffsm2\detail\containers\dynamic_array.inl">
+      <Filter>development\ffsm2\detail\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\development\ffsm2\detail\containers\iterator.hpp">
+      <Filter>development\ffsm2\detail\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\development\ffsm2\detail\containers\static_array.hpp">
+      <Filter>development\ffsm2\detail\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\development\ffsm2\detail\containers\static_array.inl">
       <Filter>development\ffsm2\detail\containers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\development\ffsm2\detail\features\logger_interface.hpp">
@@ -162,9 +171,6 @@
     <ClInclude Include="..\..\development\ffsm2\detail\shared\bit_stream.inl">
       <Filter>development\ffsm2\detail\shared</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\development\ffsm2\detail\shared\iterator.hpp">
-      <Filter>development\ffsm2\detail\shared</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\development\ffsm2\detail\shared\macros_off.hpp">
       <Filter>development\ffsm2\detail\shared</Filter>
     </ClInclude>
@@ -252,6 +258,12 @@
       <Filter>test\shared</Filter>
     </ClCompile>
     <ClCompile Include="..\..\test\shared\test_bit_stream.cpp">
+      <Filter>test\shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\shared\test_dynamic_array.cpp">
+      <Filter>test\shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\shared\test_static_array.cpp">
       <Filter>test\shared</Filter>
     </ClCompile>
     <ClCompile Include="..\..\test\shared\test_task_list.cpp">

@@ -32,6 +32,7 @@ public:
 	template <typename TIndex>
 	FFSM2_CONSTEXPR(14)	void clear(const TIndex index)					noexcept;
 
+	FFSM2_CONSTEXPR(14)	bool operator &  (const This& other)	  const noexcept;
 	FFSM2_CONSTEXPR(14)	void operator &= (const This& other)			noexcept;
 
 private:
