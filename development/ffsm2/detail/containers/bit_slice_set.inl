@@ -68,6 +68,17 @@ BitSliceSetT<NCapacity>::Bits::set(const Index index) noexcept {
 	bitSet(_storage, index);
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <unsigned NCapacity>
+FFSM2_CONSTEXPR(14)
+void
+BitSliceSetT<NCapacity>::Bits::clear(const Index index) noexcept {
+	FFSM2_ASSERT(index < _width);
+
+	bitClear(_storage, index);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 template <unsigned NCapacity>
@@ -119,12 +130,14 @@ typename BitSliceSetT<NCapacity>::Bits
 BitSliceSetT<NCapacity>::bits() noexcept {
 	constexpr Short UNIT  = NUnit;
 	constexpr Short WIDTH = NWidth;
-	static_assert(UNIT + ceilingDivide(WIDTH, 8) <= UNIT_COUNT, "");
+
+	static_assert(0 < WIDTH, "");
+	static_assert(UNIT * 8 + WIDTH <= CAPACITY, "");
 
 	return Bits{_storage + UNIT, WIDTH};
 }
 
-//------------------------------------------------------------------------------
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 template <unsigned NCapacity>
 template <Short NUnit, Short NWidth>
@@ -133,7 +146,9 @@ typename BitSliceSetT<NCapacity>::CBits
 BitSliceSetT<NCapacity>::cbits() const noexcept {
 	constexpr Short UNIT  = NUnit;
 	constexpr Short WIDTH = NWidth;
-	static_assert(UNIT + ceilingDivide(WIDTH, 8) <= UNIT_COUNT, "");
+
+	static_assert(0 < WIDTH, "");
+	static_assert(UNIT * 8 + WIDTH <= CAPACITY, "");
 
 	return CBits{_storage + UNIT, WIDTH};
 }
@@ -144,9 +159,22 @@ template <unsigned NCapacity>
 FFSM2_CONSTEXPR(14)
 typename BitSliceSetT<NCapacity>::Bits
 BitSliceSetT<NCapacity>::bits(const BitSlice& units) noexcept {
-	FFSM2_ASSERT(units.byteOffset + ceilingDivide(units.bitWidth, 8) <= UNIT_COUNT);
+	FFSM2_ASSERT(0 < units.bitWidth);
+	FFSM2_ASSERT(static_cast<Long>(units.byteOffset) * 8 + units.bitWidth <= CAPACITY);
 
 	return Bits{_storage + units.byteOffset, units.bitWidth};
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+template <unsigned NCapacity>
+FFSM2_CONSTEXPR(14)
+typename BitSliceSetT<NCapacity>::CBits
+BitSliceSetT<NCapacity>::cbits(const BitSlice& units) const noexcept {
+	FFSM2_ASSERT(0 < units.bitWidth);
+	FFSM2_ASSERT(static_cast<Long>(units.byteOffset) * 8 + units.bitWidth <= CAPACITY);
+
+	return CBits{_storage + units.byteOffset, units.bitWidth};
 }
 
 //------------------------------------------------------------------------------

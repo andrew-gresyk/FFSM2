@@ -74,6 +74,7 @@
 #endif
 
 #define FFSM2_CONSTEXPR(A)								   FFSM2_CONSTEXPR_##A()
+#define FFSM2_CONSTEXPR_AVAILABLE(A)			 FFSM2_CONSTEXPR_AVAILABLE_##A()
 
 #define FFSM2_CONSTEXPR_NO()
 
@@ -87,8 +88,14 @@
 
 #if __cplusplus >= 201703L
 	#define FFSM2_CONSTEXPR_17()									   constexpr
+	#define FFSM2_CONSTEXPR_AVAILABLE_17()									true
+
+	#define FFSM2_NOEXCEPT_17(...)						   noexcept(__VA_ARGS__)
 #else
 	#define FFSM2_CONSTEXPR_17()										  inline
+	#define FFSM2_CONSTEXPR_AVAILABLE_17()								   false
+
+	#define FFSM2_NOEXCEPT_17(...)
 #endif
 
 #if __cplusplus >= 202002L
@@ -493,6 +500,16 @@ move(T&& t)																noexcept	{
 }
 
 template <
+	typename TIn,
+	typename TOut = TIn
+>
+FFSM2_CONSTEXPR(11)
+const TOut&
+constant(TIn& t)														noexcept	{
+	return static_cast<const TOut&>(t);
+}
+
+template <
 	typename T0
   , typename T1
 >
@@ -530,15 +547,15 @@ count(const TElement (&)[NCount])										noexcept	{
 }
 
 template <
-	typename T
-  , typename TT
+	typename N1
+  , typename N2
 >
 FFSM2_CONSTEXPR(11)
-T
-ceilingDivide(const T x,
-			  const TT to)												noexcept
+N1
+ceilingDivide(const N1 n,
+			  const N2 to)												noexcept
 {
-	return (x + static_cast<T>(to) - 1) / static_cast<T>(to);
+	return (n + static_cast<N1>(to) - 1) / static_cast<N1>(to);
 }
 
 template <typename T>
@@ -548,7 +565,44 @@ fill(T& a, const char value)											noexcept	{
 	memset(&a, static_cast<int>(value), sizeof(a));
 }
 
-template<class T>
+template <typename T>
+FFSM2_CONSTEXPR(14)
+void
+swap(T& l, T& r)														noexcept	{
+	T t = ::ffsm2::move(l);
+	l   = ::ffsm2::move(r);
+	r   = ::ffsm2::move(t);
+}
+
+template <
+	typename TO
+  , typename TI
+>
+FFSM2_CONSTEXPR(17)
+TO*
+reinterpret_launder(      TI* const in)									noexcept	{
+#if FFSM2_CONSTEXPR_AVAILABLE(17)
+	return ::std::launder(reinterpret_cast<      TO*>(in));
+#else
+	return                reinterpret_cast<      TO*>(in);
+#endif
+}
+
+template <
+	typename TO
+  , typename TI
+>
+FFSM2_CONSTEXPR(17)
+const TO*
+reinterpret_launder(const TI* const in)									noexcept	{
+#if FFSM2_CONSTEXPR_AVAILABLE(17)
+	return ::std::launder(reinterpret_cast<const TO*>(in));
+#else
+	return                reinterpret_cast<const TO*>(in);
+#endif
+}
+
+template<typename T>
 FFSM2_CONSTEXPR(14)
 void
 destroy(T& t)															noexcept	{
@@ -615,94 +669,6 @@ bitClear(uint8_t* const storage,
 
 	storage[unit] &= static_cast<uint8_t>(~bitMask(bit));
 }
-
-}
-}
-
-namespace ffsm2 {
-namespace detail {
-
-template <typename TContainer>
-class IteratorT {
-public:
-	using Container = TContainer;
-	using Item		= typename Container::Item;
-	using Index		= typename Container::Index;
-
-	template <typename, Long>
-	friend class DynamicArrayT;
-
-private:
-	FFSM2_CONSTEXPR(11)	IteratorT(Container& container,
-								  const Index cursor)										noexcept
-		: _container{container}
-		, _cursor{cursor}
-	{}
-
-public:
-	FFSM2_CONSTEXPR(14)	bool operator != (const IteratorT& FFSM2_IF_ASSERT(other))	  const noexcept	{
-		FFSM2_ASSERT(&_container == &other._container);
-
-		return _cursor != _container.limit();
-	}
-
-	FFSM2_CONSTEXPR(14)	IteratorT& operator ++()											noexcept	{
-		_cursor = _container.next(_cursor);
-
-		return *this;
-	}
-
-	FFSM2_CONSTEXPR(14)		  Item& operator *()			noexcept	{ return  _container[_cursor];	}
-	FFSM2_CONSTEXPR(11)	const Item& operator *()	  const noexcept	{ return  _container[_cursor];	}
-
-	FFSM2_CONSTEXPR(14)		  Item* operator->()			noexcept	{ return &_container[_cursor];	}
-	FFSM2_CONSTEXPR(11)	const Item* operator->()	  const noexcept	{ return &_container[_cursor];	}
-
-private:
-	Container& _container;
-
-	Index _cursor;
-};
-
-template <typename TContainer>
-class IteratorT<const TContainer> {
-public:
-	using Container = TContainer;
-	using Item		= typename Container::Item;
-	using Index		= typename Container::Index;
-
-	template <typename, Long>
-	friend class DynamicArrayT;
-
-private:
-	FFSM2_CONSTEXPR(11)	IteratorT(const Container& container,
-								  const Index cursor)										noexcept
-		: _container{container}
-		, _cursor{cursor}
-	{}
-
-public:
-	FFSM2_CONSTEXPR(14)	bool operator != (const IteratorT& FFSM2_IF_ASSERT(other))	  const noexcept	{
-		FFSM2_ASSERT(&_container == &other._container);
-
-		return _cursor != _container.limit();
-	}
-
-	FFSM2_CONSTEXPR(14)	IteratorT& operator ++()											noexcept	{
-		_cursor = _container.next(_cursor);
-
-		return *this;
-	}
-
-	FFSM2_CONSTEXPR(11)	const Item& operator *()	  const noexcept	{ return _container[_cursor];	}
-
-	FFSM2_CONSTEXPR(11)	const Item* operator->()	  const noexcept	{ return &operator *();			}
-
-private:
-	const Container& _container;
-
-	Index _cursor;
-};
 
 }
 }
@@ -1023,11 +989,113 @@ constexpr bool contains() noexcept	{ return detail::Find<TList, T>::VALUE != INV
 namespace ffsm2 {
 namespace detail {
 
-template <typename T>
+template <
+	typename TContainer,
+	typename TItem,
+	typename TIndex
+>
+class IteratorT {
+public:
+	using Container = TContainer;
+	using Item		= TItem;
+	using Index		= TIndex;
+
+	template <typename, Long>
+	friend class DynamicArrayT;
+
+	template <typename, Long>
+	friend class StaticArrayT;
+
+private:
+	FFSM2_CONSTEXPR(11)	IteratorT(Container& container,
+								  const Index cursor)										noexcept
+		: _container{container}
+		, _cursor   {cursor   }
+	{}
+
+public:
+	FFSM2_CONSTEXPR(14)	bool operator != (const IteratorT& other)	  const noexcept	{
+		FFSM2_ASSERT(&_container == &other._container);
+
+		return _cursor != other._cursor;
+	}
+
+	FFSM2_CONSTEXPR(14)	IteratorT& operator ++()											noexcept	{
+		_cursor = _container.next(_cursor);
+
+		return *this;
+	}
+
+	FFSM2_CONSTEXPR(14)		  Item& operator *()			noexcept	{ return  _container[_cursor];	}
+	FFSM2_CONSTEXPR(11)	const Item& operator *()	  const noexcept	{ return  _container[_cursor];	}
+
+	FFSM2_CONSTEXPR(14)		  Item* operator->()			noexcept	{ return &_container[_cursor];	}
+	FFSM2_CONSTEXPR(11)	const Item* operator->()	  const noexcept	{ return &_container[_cursor];	}
+
+private:
+	Container& _container;
+
+	Index _cursor;
+};
+
+template <
+	typename TContainer,
+	typename TItem,
+	typename TIndex
+>
+class IteratorT<const TContainer, TItem, TIndex> {
+public:
+	using Container = TContainer;
+	using Item		= TItem;
+	using Index		= TIndex;
+
+	template <typename, Long>
+	friend class DynamicArrayT;
+
+	template <typename, Long>
+	friend class StaticArrayT;
+
+private:
+	FFSM2_CONSTEXPR(11)	IteratorT(const Container& container,
+								  const Index cursor)										noexcept
+		: _container{container}
+		, _cursor   {cursor   }
+	{}
+
+public:
+	FFSM2_CONSTEXPR(14)	bool operator != (const IteratorT& other)	  const noexcept	{
+		FFSM2_ASSERT(&_container == &other._container);
+
+		return _cursor != other._cursor;
+	}
+
+	FFSM2_CONSTEXPR(14)	IteratorT& operator ++()											noexcept	{
+		_cursor = _container.next(_cursor);
+
+		return *this;
+	}
+
+	FFSM2_CONSTEXPR(11)	const Item& operator *()	  const noexcept	{ return _container[_cursor];	}
+
+	FFSM2_CONSTEXPR(11)	const Item* operator->()	  const noexcept	{ return &operator *();			}
+
+private:
+	const Container& _container;
+
+	Index _cursor;
+};
+
+}
+}
+
+namespace ffsm2 {
+namespace detail {
+
+template <typename TItem>
 FFSM2_CONSTEXPR(11)
-T
+TItem
 filler()																noexcept	{
-	return T{};
+	return TItem{};
 }
 
 template <>
@@ -1037,22 +1105,24 @@ filler<Short>()															noexcept	{
 	return INVALID_SHORT;
 }
 
-template <typename T, Long NCapacity>
+template <typename TItem, Long NCapacity>
 class StaticArrayT final {
-	template <typename>
+	template <typename, typename, typename>
 	friend class IteratorT;
 
 public:
-	using  Iterator	= IteratorT<      StaticArrayT>;
-	using CIterator	= IteratorT<const StaticArrayT>;
-
-	using Item		= T;
+	using Item		= TItem;
 	using Index		= UCapacity<NCapacity>;
+
+	using  Iterator	= IteratorT<      StaticArrayT, Item, Index>;
+	using CIterator	= IteratorT<const StaticArrayT, Item, Index>;
 
 	static constexpr Index CAPACITY	= NCapacity;
 
+	using This		= StaticArrayT<Item, CAPACITY>;
+
 public:
-	FFSM2_CONSTEXPR(14)	StaticArrayT() = default;
+	FFSM2_CONSTEXPR(11)	StaticArrayT() = default;
 	FFSM2_CONSTEXPR(14)	StaticArrayT(const Item filler)					noexcept	{ fill(filler);						}
 
 	template <typename N>
@@ -1062,6 +1132,9 @@ public:
 	FFSM2_CONSTEXPR(14)	const Item& operator[] (const N index)	  const noexcept;
 
 	FFSM2_CONSTEXPR(11)	Index count()							  const noexcept	{ return CAPACITY;					}
+
+	FFSM2_CONSTEXPR(14)	bool operator == (const This& other)	  const noexcept;
+	FFSM2_CONSTEXPR(14)	bool operator != (const This& other)	  const noexcept;
 
 	FFSM2_CONSTEXPR(14)	void fill(const Item filler)					noexcept;
 	FFSM2_CONSTEXPR(14)	void clear()									noexcept	{ fill(filler<Item>());				}
@@ -1084,77 +1157,14 @@ private:
 	Item _items[CAPACITY] {};
 };
 
-template <typename T>
-struct StaticArrayT<T, 0> final {
-	using Item		= T;
+template <typename TItem>
+class StaticArrayT<TItem, 0> final {
+public:
+	using Item		= TItem;
 
+public:
 	FFSM2_CONSTEXPR(11)	StaticArrayT() = default;
 	FFSM2_CONSTEXPR(11)	StaticArrayT(const Item)						noexcept	{}
-};
-
-template <typename T, Long NCapacity>
-class DynamicArrayT final {
-	template <typename>
-	friend class IteratorT;
-
-public:
-	using  Iterator	= IteratorT<      DynamicArrayT>;
-	using CIterator	= IteratorT<const DynamicArrayT>;
-
-	using Item		= T;
-	using Index		= UCapacity<NCapacity>;
-
-	static constexpr Index CAPACITY	= NCapacity;
-
-public:
-	template <typename... TArgs>
-	FFSM2_CONSTEXPR(14)	Index emplace(const TArgs &... args)				noexcept;
-
-	template <typename... TArgs>
-	FFSM2_CONSTEXPR(14)	Index emplace(		TArgs&&... args)				noexcept;
-
-	template <typename N>
-	FFSM2_CONSTEXPR(14)		  Item& operator[] (const N index)				noexcept;
-
-	template <typename N>
-	FFSM2_CONSTEXPR(14)	const Item& operator[] (const N index)		  const noexcept;
-
-	FFSM2_CONSTEXPR(11)	Index  count()								  const noexcept	{ return _count;					}
-
-	FFSM2_CONSTEXPR(14)	 void clear()										noexcept	{ _count = 0;						}
-	FFSM2_CONSTEXPR(11)	 bool empty()								  const noexcept	{ return _count == 0;				}
-
-	FFSM2_CONSTEXPR(14)	DynamicArrayT& operator += (const Item & item)		noexcept;
-	FFSM2_CONSTEXPR(14)	DynamicArrayT& operator += (	  Item&& item)		noexcept;
-
-	template <Long N>
-	FFSM2_CONSTEXPR(14)	DynamicArrayT& operator += (const DynamicArrayT<Item, N>& other)	noexcept;
-
-	FFSM2_CONSTEXPR(14)	 Iterator  begin()									noexcept	{ return  Iterator(*this, first());	}
-	FFSM2_CONSTEXPR(11)	CIterator  begin()							  const noexcept	{ return CIterator(*this, first());	}
-	FFSM2_CONSTEXPR(11)	CIterator cbegin()							  const noexcept	{ return CIterator(*this, first());	}
-
-	FFSM2_CONSTEXPR(14)	 Iterator	 end()									noexcept	{ return  Iterator(*this, limit());	}
-	FFSM2_CONSTEXPR(11)	CIterator	 end()							  const noexcept	{ return CIterator(*this, limit());	}
-	FFSM2_CONSTEXPR(11)	CIterator	cend()							  const noexcept	{ return CIterator(*this, limit());	}
-
-private:
-	FFSM2_CONSTEXPR(11)	Index first()								  const noexcept	{ return 0;							}
-	FFSM2_CONSTEXPR(11)	Index next(const Index index)				  const noexcept	{ return index + 1;					}
-	FFSM2_CONSTEXPR(11)	Index limit()								  const noexcept	{ return _count;					}
-
-private:
-	Index _count = 0;
-	Item _items[CAPACITY] {};
-};
-
-template <typename T>
-class DynamicArrayT<T, 0> final {
-public:
-	using Item	= T;
-	using Index	= UCapacity<0>;
-
-	static constexpr Index CAPACITY = 0;
 };
 
 }
@@ -1167,7 +1177,7 @@ template <typename T, Long NC_>
 template <typename N>
 FFSM2_CONSTEXPR(14)
 T&
-StaticArrayT<T, NC_>::operator[] (const N index) noexcept	{
+StaticArrayT<T, NC_>::operator[] (const N index) noexcept {
 	FFSM2_ASSERT(0 <= index && index < CAPACITY);
 
 	return _items[static_cast<Index>(index)];
@@ -1194,6 +1204,28 @@ StaticArrayT<T, NC_>::fill(const Item filler) noexcept {
 template <typename T, Long NC_>
 FFSM2_CONSTEXPR(14)
 bool
+StaticArrayT<T, NC_>::operator == (const This& other) const noexcept {
+	for (Index i = 0; i < CAPACITY; ++i)
+		if (_items[i] != other._items[i])
+			return false;
+
+	return true;
+}
+
+template <typename T, Long NC_>
+FFSM2_CONSTEXPR(14)
+bool
+StaticArrayT<T, NC_>::operator != (const This& other) const noexcept {
+	for (Index i = 0; i < CAPACITY; ++i)
+		if (_items[i] != other._items[i])
+			return true;
+
+	return false;
+}
+
+template <typename T, Long NC_>
+FFSM2_CONSTEXPR(14)
+bool
 StaticArrayT<T, NC_>::empty() const noexcept {
 	for (const Item& item : _items)
 		if (item != filler<Item>())
@@ -1202,26 +1234,168 @@ StaticArrayT<T, NC_>::empty() const noexcept {
 	return true;
 }
 
+}
+}
+
+namespace ffsm2 {
+namespace detail {
+
+template <typename TItem, Long NCapacity>
+class DynamicArrayT final {
+	template <typename, typename, typename>
+	friend class IteratorT;
+
+public:
+	using Item		= TItem;
+	using Index		= UCapacity<NCapacity>;
+
+	using  Iterator	= IteratorT<      DynamicArrayT, Item, Index>;
+	using CIterator	= IteratorT<const DynamicArrayT, Item, Index>;
+
+	static constexpr Index CAPACITY	= NCapacity;
+	using Storage	= uint8_t[sizeof(Item) * CAPACITY];
+
+	using This		= DynamicArrayT<Item, CAPACITY>;
+
+	static_assert(sizeof(Item) % alignof(Item) == 0, "");
+
+public:
+						 DynamicArrayT()								noexcept	= default;
+	FFSM2_CONSTEXPR(14)	 DynamicArrayT(const This & other)				noexcept;
+	FFSM2_CONSTEXPR(14)	 DynamicArrayT(      This&& other)				noexcept;
+	FFSM2_CONSTEXPR(14)	~DynamicArrayT()								noexcept;
+
+	FFSM2_CONSTEXPR(14)	DynamicArrayT& operator = (const This & other)	noexcept;
+	FFSM2_CONSTEXPR(14)	DynamicArrayT& operator = (      This&& other)	noexcept;
+
+	template <typename... TArgs>
+	FFSM2_CONSTEXPR(14)	Index emplace(TArgs&&... args)			  FFSM2_NOEXCEPT_17(noexcept(Item{::ffsm2::forward<TArgs>(args)...}));
+
+	template <typename N>
+	FFSM2_CONSTEXPR(14)		  Item& operator[] (const N index)			noexcept;
+
+	template <typename N>
+	FFSM2_CONSTEXPR(14)	const Item& operator[] (const N index)	  const noexcept;
+
+	FFSM2_CONSTEXPR(11)	Index count()							  const noexcept	{ return _count;					}
+
+	FFSM2_CONSTEXPR(14)	 void clear()									noexcept;
+	FFSM2_CONSTEXPR(11)	 bool empty()							  const noexcept	{ return _count == 0;				}
+
+	template <Long N>
+	FFSM2_CONSTEXPR(14)	DynamicArrayT& operator += (const DynamicArrayT<Item, N>& other)	noexcept;
+
+	FFSM2_CONSTEXPR(14)	 Iterator  begin()								noexcept	{ return  Iterator(*this, first());	}
+	FFSM2_CONSTEXPR(11)	CIterator  begin()						  const noexcept	{ return CIterator(*this, first());	}
+	FFSM2_CONSTEXPR(11)	CIterator cbegin()						  const noexcept	{ return CIterator(*this, first());	}
+
+	FFSM2_CONSTEXPR(14)	 Iterator    end()								noexcept	{ return  Iterator(*this, limit());	}
+	FFSM2_CONSTEXPR(11)	CIterator    end()						  const noexcept	{ return CIterator(*this, limit());	}
+	FFSM2_CONSTEXPR(11)	CIterator   cend()						  const noexcept	{ return CIterator(*this, limit());	}
+
+private:
+	FFSM2_CONSTEXPR(11)	Index first()							  const noexcept	{ return 0;							}
+	FFSM2_CONSTEXPR(11)	Index next(const Index index)			  const noexcept	{ return index + 1;					}
+	FFSM2_CONSTEXPR(11)	Index limit()							  const noexcept	{ return _count;					}
+
+	FFSM2_CONSTEXPR(14)		  Item   & item   (const Index index)		noexcept;
+	FFSM2_CONSTEXPR(11)	const Item   & item   (const Index index) const noexcept;
+
+	FFSM2_CONSTEXPR(14)		  uint8_t* storage(const Index index)		noexcept;
+	FFSM2_CONSTEXPR(11)	const uint8_t* storage(const Index index) const noexcept;
+
+private:
+	Index _count = 0;
+
+#ifdef _MSC_VER
+	#pragma warning(push)
+	#pragma warning(disable: 4324) // structure was padded due to alignment specifier
+#endif
+
+	alignas(Item) Storage _storage {};
+
+#ifdef _MSC_VER
+	#pragma warning(pop)
+#endif
+};
+
+template <typename TItem>
+class DynamicArrayT<TItem, 0> final {
+public:
+	using Item	= TItem;
+	using Index	= UCapacity<0>;
+
+	static constexpr Index CAPACITY = 0;
+};
+
+}
+}
+
+namespace ffsm2 {
+namespace detail {
+
 template <typename T, Long NC_>
-template <typename... TArgs>
 FFSM2_CONSTEXPR(14)
-typename DynamicArrayT<T, NC_>::Index
-DynamicArrayT<T, NC_>::emplace(const TArgs&... args) noexcept {
-	FFSM2_ASSERT(_count < CAPACITY);
+DynamicArrayT<T, NC_>::DynamicArrayT(const This& other) noexcept {
+	for (const Item& item : other)
+		emplace(item);
+}
 
-	new (&_items[_count]) Item{args...};
+template <typename T, Long NC_>
+FFSM2_CONSTEXPR(14)
+DynamicArrayT<T, NC_>::DynamicArrayT(This&& other) noexcept {
+	for (Item& item : other)
+		emplace(::ffsm2::move(item));
 
-	return _count++;
+	other.clear();
+}
+
+template <typename T, Long NC_>
+FFSM2_CONSTEXPR(14)
+DynamicArrayT<T, NC_>::~DynamicArrayT() noexcept {
+	clear();
+}
+
+template <typename T, Long NC_>
+FFSM2_CONSTEXPR(14)
+DynamicArrayT<T, NC_>&
+DynamicArrayT<T, NC_>::operator = (const This& other) noexcept {
+	if (this == &other)
+		return *this;
+
+	clear();
+
+	for (const Item& item : other)
+		emplace(item);
+
+	return *this;
+}
+
+template <typename T, Long NC_>
+FFSM2_CONSTEXPR(14)
+DynamicArrayT<T, NC_>&
+DynamicArrayT<T, NC_>::operator = (This&& other) noexcept {
+	if (this == &other)
+		return *this;
+
+	clear();
+
+	for (Index i = 0; i < other._count; ++i)
+		emplace(::ffsm2::move(other.item(i)));
+
+	other.clear();
+
+	return *this;
 }
 
 template <typename T, Long NC_>
 template <typename... TArgs>
 FFSM2_CONSTEXPR(14)
 typename DynamicArrayT<T, NC_>::Index
-DynamicArrayT<T, NC_>::emplace(TArgs&&... args) noexcept {
+DynamicArrayT<T, NC_>::emplace(TArgs&&... args) FFSM2_NOEXCEPT_17(noexcept(T{::ffsm2::forward<TArgs>(args)...})) {
 	FFSM2_ASSERT(_count < CAPACITY);
 
-	new (&_items[_count]) Item{::ffsm2::forward<TArgs>(args)...};
+	new (storage(_count)) Item{::ffsm2::forward<TArgs>(args)...};
 
 	return _count++;
 }
@@ -1233,7 +1407,7 @@ typename DynamicArrayT<T, NC_>::Item&
 DynamicArrayT<T, NC_>::operator[] (const N index) noexcept {
 	FFSM2_ASSERT(0 <= index && index < _count);
 
-	return _items[static_cast<Index>(index)];
+	return item(static_cast<Index>(index));
 }
 
 template <typename T, Long NC_>
@@ -1243,25 +1417,17 @@ const typename DynamicArrayT<T, NC_>::Item&
 DynamicArrayT<T, NC_>::operator[] (const N index) const noexcept {
 	FFSM2_ASSERT(0 <= index && index < _count);
 
-	return _items[static_cast<Index>(index)];
+	return item(static_cast<Index>(index));
 }
 
 template <typename T, Long NC_>
 FFSM2_CONSTEXPR(14)
-DynamicArrayT<T, NC_>&
-DynamicArrayT<T, NC_>::operator += (const Item& item) noexcept {
-	emplace(item);
+void
+DynamicArrayT<T, NC_>::clear() noexcept {
+	for (Index i = _count; i > 0; --i)
+		item(i - 1).~Item();
 
-	return *this;
-}
-
-template <typename T, Long NC_>
-FFSM2_CONSTEXPR(14)
-DynamicArrayT<T, NC_>&
-DynamicArrayT<T, NC_>::operator += (Item&& item) noexcept {
-	emplace(::ffsm2::move(item));
-
-	return *this;
+	_count = 0;
 }
 
 template <typename T, Long NC_>
@@ -1269,10 +1435,41 @@ template <Long N>
 FFSM2_CONSTEXPR(14)
 DynamicArrayT<T, NC_>&
 DynamicArrayT<T, NC_>::operator += (const DynamicArrayT<T, N>& other) noexcept {
+	FFSM2_ASSERT(static_cast<const void*>(this) != static_cast<const void*>(&other));
+	FFSM2_ASSERT(_count + other.count() <= CAPACITY);
+
 	for (const auto& item : other)
 		emplace(item);
 
 	return *this;
+}
+
+template <typename T, Long NC_>
+FFSM2_CONSTEXPR(14)
+typename DynamicArrayT<T, NC_>::Item&
+DynamicArrayT<T, NC_>::item(const Index index) noexcept {
+	return *::ffsm2::reinterpret_launder<Item>(storage(index));
+}
+
+template <typename T, Long NC_>
+FFSM2_CONSTEXPR(11)
+const typename DynamicArrayT<T, NC_>::Item&
+DynamicArrayT<T, NC_>::item(const Index index) const noexcept {
+	return *::ffsm2::reinterpret_launder<Item>(storage(index));
+}
+
+template <typename T, Long NC_>
+FFSM2_CONSTEXPR(14)
+uint8_t*
+DynamicArrayT<T, NC_>::storage(const Index index) noexcept {
+	return &_storage[index * sizeof(Item)];
+}
+
+template <typename T, Long NC_>
+FFSM2_CONSTEXPR(11)
+const uint8_t*
+DynamicArrayT<T, NC_>::storage(const Index index) const noexcept {
+	return &_storage[index * sizeof(Item)];
 }
 
 }
@@ -1310,6 +1507,7 @@ public:
 	template <typename TIndex>
 	FFSM2_CONSTEXPR(14)	void clear(const TIndex index)					noexcept;
 
+	FFSM2_CONSTEXPR(14)	bool operator &  (const This& other)	  const noexcept;
 	FFSM2_CONSTEXPR(14)	void operator &= (const This& other)			noexcept;
 
 private:
@@ -1414,6 +1612,17 @@ BitFlatSetT<NCapacity>::clear(const TIndex index) noexcept {
 
 template <unsigned NCapacity>
 FFSM2_CONSTEXPR(14)
+bool
+BitFlatSetT<NCapacity>::operator & (const This& other) const noexcept {
+	for (Index i = 0; i < UNIT_COUNT; ++i)
+		if ((_storage[i] & other._storage[i]) == 0)
+			return false;
+
+	return true;
+}
+
+template <unsigned NCapacity>
+FFSM2_CONSTEXPR(14)
 void
 BitFlatSetT<NCapacity>::operator &= (const This& other) noexcept {
 	for (Index i = 0; i < UNIT_COUNT; ++i)
@@ -1461,7 +1670,9 @@ public:
 	public:
 		FFSM2_CONSTEXPR(14)	explicit operator bool()			  const noexcept;
 		FFSM2_CONSTEXPR(14)	void clear()								noexcept;
-		FFSM2_CONSTEXPR(14)	void set(const Index index)					noexcept;
+
+		FFSM2_CONSTEXPR(14)	void set  (const Index index)				noexcept;
+		FFSM2_CONSTEXPR(14)	void clear(const Index index)				noexcept;
 
 	private:
 		uint8_t* const _storage;
@@ -1481,6 +1692,7 @@ public:
 
 	public:
 		FFSM2_CONSTEXPR(14)	explicit operator bool()			  const noexcept;
+
 		FFSM2_CONSTEXPR(14)	bool get(const Index index)			  const noexcept;
 
 	private:
@@ -1501,6 +1713,7 @@ public:
 	FFSM2_CONSTEXPR(14)	CBits cbits()							  const noexcept;
 
 	FFSM2_CONSTEXPR(14)	 Bits  bits(const BitSlice& units)				noexcept;
+	FFSM2_CONSTEXPR(14)	CBits cbits(const BitSlice& units)		  const noexcept;
 
 	FFSM2_CONSTEXPR(14)	bool operator != (const This& other)	  const noexcept;
 
@@ -1580,6 +1793,15 @@ BitSliceSetT<NCapacity>::Bits::set(const Index index) noexcept {
 
 template <unsigned NCapacity>
 FFSM2_CONSTEXPR(14)
+void
+BitSliceSetT<NCapacity>::Bits::clear(const Index index) noexcept {
+	FFSM2_ASSERT(index < _width);
+
+	bitClear(_storage, index);
+}
+
+template <unsigned NCapacity>
+FFSM2_CONSTEXPR(14)
 BitSliceSetT<NCapacity>::CBits::operator bool() const noexcept {
 	return viewAny(_storage, _width);
 }
@@ -1619,7 +1841,9 @@ typename BitSliceSetT<NCapacity>::Bits
 BitSliceSetT<NCapacity>::bits() noexcept {
 	constexpr Short UNIT  = NUnit;
 	constexpr Short WIDTH = NWidth;
-	static_assert(UNIT + ceilingDivide(WIDTH, 8) <= UNIT_COUNT, "");
+
+	static_assert(0 < WIDTH, "");
+	static_assert(UNIT * 8 + WIDTH <= CAPACITY, "");
 
 	return Bits{_storage + UNIT, WIDTH};
 }
@@ -1631,7 +1855,9 @@ typename BitSliceSetT<NCapacity>::CBits
 BitSliceSetT<NCapacity>::cbits() const noexcept {
 	constexpr Short UNIT  = NUnit;
 	constexpr Short WIDTH = NWidth;
-	static_assert(UNIT + ceilingDivide(WIDTH, 8) <= UNIT_COUNT, "");
+
+	static_assert(0 < WIDTH, "");
+	static_assert(UNIT * 8 + WIDTH <= CAPACITY, "");
 
 	return CBits{_storage + UNIT, WIDTH};
 }
@@ -1640,9 +1866,20 @@ template <unsigned NCapacity>
 FFSM2_CONSTEXPR(14)
 typename BitSliceSetT<NCapacity>::Bits
 BitSliceSetT<NCapacity>::bits(const BitSlice& units) noexcept {
-	FFSM2_ASSERT(units.byteOffset + ceilingDivide(units.bitWidth, 8) <= UNIT_COUNT);
+	FFSM2_ASSERT(0 < units.bitWidth);
+	FFSM2_ASSERT(static_cast<Long>(units.byteOffset) * 8 + units.bitWidth <= CAPACITY);
 
 	return Bits{_storage + units.byteOffset, units.bitWidth};
+}
+
+template <unsigned NCapacity>
+FFSM2_CONSTEXPR(14)
+typename BitSliceSetT<NCapacity>::CBits
+BitSliceSetT<NCapacity>::cbits(const BitSlice& units) const noexcept {
+	FFSM2_ASSERT(0 < units.bitWidth);
+	FFSM2_ASSERT(static_cast<Long>(units.byteOffset) * 8 + units.bitWidth <= CAPACITY);
+
+	return CBits{_storage + units.byteOffset, units.bitWidth};
 }
 
 template <unsigned NCapacity>
@@ -8499,6 +8736,8 @@ InstanceT<G_<NFT_, EmptyContext, TV_, NSL_ FFSM2_IF_PLANS(, NTC_), TP_>, TA_>::I
 #undef FFSM2_CONSTEXPR_14
 
 #undef FFSM2_CONSTEXPR_17
+#undef FFSM2_CONSTEXPR_AVAILABLE_17
+#undef FFSM2_NOEXCEPT_17
 
 #undef FFSM2_CONSTEXPR_20
 
@@ -8542,7 +8781,7 @@ InstanceT<G_<NFT_, EmptyContext, TV_, NSL_ FFSM2_IF_PLANS(, NTC_), TP_>, TA_>::I
 
 #undef FFSM2_LOG_TRANSITION
 
-#if FFSM2_PLANS_AVAILABLE()
+#ifdef FFSM2_ENABLE_PLANS
 	#undef FFSM2_LOG_TASK_STATUS
 	#undef FFSM2_LOG_PLAN_STATUS
 #endif

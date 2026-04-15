@@ -47,6 +47,8 @@
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #undef FFSM2_CONSTEXPR_17
+#undef FFSM2_CONSTEXPR_AVAILABLE_17
+#undef FFSM2_NOEXCEPT_17
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -120,7 +122,7 @@
 
 #undef FFSM2_LOG_TRANSITION
 
-#if FFSM2_PLANS_AVAILABLE()
+#ifdef FFSM2_ENABLE_PLANS
 	#undef FFSM2_LOG_TASK_STATUS
 	#undef FFSM2_LOG_PLAN_STATUS
 #endif

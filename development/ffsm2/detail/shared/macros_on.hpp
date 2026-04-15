@@ -33,6 +33,7 @@
 //------------------------------------------------------------------------------
 
 #define FFSM2_CONSTEXPR(A)								   FFSM2_CONSTEXPR_##A()
+#define FFSM2_CONSTEXPR_AVAILABLE(A)			 FFSM2_CONSTEXPR_AVAILABLE_##A()
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -54,8 +55,14 @@
 
 #if __cplusplus >= 201703L
 	#define FFSM2_CONSTEXPR_17()									   constexpr
+	#define FFSM2_CONSTEXPR_AVAILABLE_17()									true
+
+	#define FFSM2_NOEXCEPT_17(...)						   noexcept(__VA_ARGS__)
 #else
 	#define FFSM2_CONSTEXPR_17()										  inline
+	#define FFSM2_CONSTEXPR_AVAILABLE_17()								   false
+
+	#define FFSM2_NOEXCEPT_17(...)
 #endif
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -87,7 +94,7 @@
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-#ifdef _DEBUG
+#if defined _DEBUG
 	#define FFSM2_IF_DEBUG(...)										 __VA_ARGS__
 	#define FFSM2_UNLESS_DEBUG(...)
 	#define FFSM2_DEBUG_OR(y, n)											   y
@@ -116,7 +123,7 @@
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifdef FFSM2_ENABLE_ALL
+#if defined FFSM2_ENABLE_ALL
 	#define FFSM2_ENABLE_DEBUG_STATE_TYPE
 	#define FFSM2_ENABLE_PLANS
 	#define FFSM2_ENABLE_SERIALIZATION
@@ -126,7 +133,7 @@
 
 //------------------------------------------------------------------------------
 
-#ifndef FFSM2_DISABLE_TYPEINDEX
+#if !defined FFSM2_DISABLE_TYPEINDEX
 	#define FFSM2_TYPEINDEX_AVAILABLE()										true
 	#define FFSM2_IF_TYPEINDEX(...)									 __VA_ARGS__
 	#define FFSM2_TYPEINDEX_MASK										(1 << 0)
@@ -138,7 +145,7 @@
 
 //------------------------------------------------------------------------------
 
-#ifdef FFSM2_ENABLE_DEBUG_STATE_TYPE
+#if defined FFSM2_ENABLE_DEBUG_STATE_TYPE
 	#define FFSM2_DEBUG_STATE_TYPE_AVAILABLE()								true
 	#define FFSM2_DEBUG_STATE_TYPE_MASK									(1 << 1)
 #else
@@ -148,7 +155,7 @@
 
 //------------------------------------------------------------------------------
 
-#ifdef FFSM2_ENABLE_PLANS
+#if defined FFSM2_ENABLE_PLANS
 	#define FFSM2_PLANS_AVAILABLE()											true
 	#define FFSM2_IF_PLANS(...)										 __VA_ARGS__
 	#define FFSM2_PLANS_MASK											(1 << 2)
@@ -160,7 +167,7 @@
 
 //------------------------------------------------------------------------------
 
-#ifdef FFSM2_ENABLE_SERIALIZATION
+#if defined FFSM2_ENABLE_SERIALIZATION
 	#define FFSM2_SERIALIZATION_AVAILABLE()									true
 	#define FFSM2_IF_SERIALIZATION(...)								 __VA_ARGS__
 	#define FFSM2_SERIALIZATION_MASK									(1 << 3)
@@ -172,7 +179,7 @@
 
 //------------------------------------------------------------------------------
 
-#ifdef FFSM2_ENABLE_STRUCTURE_REPORT
+#if defined FFSM2_ENABLE_STRUCTURE_REPORT
 	#define FFSM2_STRUCTURE_REPORT_AVAILABLE()								true
 	#define FFSM2_IF_STRUCTURE_REPORT(...)							 __VA_ARGS__
 	#define FFSM2_STRUCTURE_REPORT_MASK									(1 << 4)
@@ -184,7 +191,7 @@
 
 //------------------------------------------------------------------------------
 
-#ifdef FFSM2_ENABLE_TRANSITION_HISTORY
+#if defined FFSM2_ENABLE_TRANSITION_HISTORY
 	#define FFSM2_TRANSITION_HISTORY_AVAILABLE()							true
 	#define FFSM2_IF_TRANSITION_HISTORY(...)						 __VA_ARGS__
 	#define FFSM2_TRANSITION_HISTORY_MASK								(1 << 5)
@@ -196,7 +203,7 @@
 
 //------------------------------------------------------------------------------
 
-#ifdef FFSM2_ENABLE_UTILITY_THEORY
+#if defined FFSM2_ENABLE_UTILITY_THEORY
 	#define FFSM2_UTILITY_THEORY_AVAILABLE()								true
 #else
 	#define FFSM2_UTILITY_THEORY_AVAILABLE()							   false
@@ -204,7 +211,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifdef FFSM2_ENABLE_VERBOSE_DEBUG_LOG
+#if defined FFSM2_ENABLE_VERBOSE_DEBUG_LOG
 	#define FFSM2_ENABLE_LOG_INTERFACE
 
 	#define FFSM2_VERBOSE_DEBUG_LOG_AVAILABLE()								true
@@ -216,7 +223,7 @@
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-#ifdef FFSM2_ENABLE_LOG_INTERFACE
+#if defined FFSM2_ENABLE_LOG_INTERFACE
 	#define FFSM2_LOG_INTERFACE_AVAILABLE()									true
 	#define FFSM2_IF_LOG_INTERFACE(...)								 __VA_ARGS__
 	#define FFSM2_LOG_INTERFACE_MASK									(1 << 8)
